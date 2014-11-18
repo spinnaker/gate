@@ -1,6 +1,6 @@
 buildscript {
   ext {
-    springBootVersion = "1.1.7.RELEASE"
+    springBootVersion = "1.1.9.RELEASE"
   }
   repositories {
     jcenter()
@@ -29,12 +29,10 @@ dependencies {
   compile spinnaker.dependency("frigga")
 
   compile 'org.springframework:springloaded:1.2.1.RELEASE'
+  spinnaker.group('retrofitDefault')
 
-  compile 'cglib:cglib-nodep:3.1'
-  compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+  compile spinnaker.dependency('cglib')
   compile 'com.netflix.hystrix:hystrix-core:1.4.0-RC5'
-  compile 'com.squareup.retrofit:retrofit:1.6.1'
-  compile 'com.squareup.retrofit:converter-jackson:1.6.1'
   compile "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
 
   spinnaker.group("bootWeb")

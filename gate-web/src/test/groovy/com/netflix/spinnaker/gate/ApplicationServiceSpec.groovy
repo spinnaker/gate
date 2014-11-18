@@ -43,10 +43,9 @@ class ApplicationServiceSpec extends Specification {
       def results = service.all.toBlocking().first()
 
     then:
-      1 * credentialsService.getAccountNames() >> { rx.Observable.from([account]) }
-      1 * front50.getAll(account) >> [meta]
-      1 == results.size()
-      results.first() == [name: name, email: email, owner: owner]
+      1 * credentialsService.getAccountNames() >> rx.Observable.just(account)
+      1 * front50.getAll(account) >> rx.Observable.just(meta)
+      results == [name: name, email: email, owner: owner]
 
     where:
       name = "foo"

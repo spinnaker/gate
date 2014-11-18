@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.services
 
 import retrofit.http.*
+import rx.Observable
 
 interface OortService {
 
@@ -26,7 +27,7 @@ interface OortService {
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}")
-  Map getApplication(@Path("name") String name)
+  Observable<Map> getApplication(@Path("name") String name)
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}/clusters")

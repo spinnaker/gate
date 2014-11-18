@@ -17,17 +17,18 @@
 package com.netflix.spinnaker.gate.services
 
 import retrofit.http.*
+import rx.Observable
 
 interface Front50Service {
   @GET('/{account}/applications')
-  List<Map> getAll(@Path("account") String account)
+  Observable<Map> getAll(@Path("account") String account)
 
   @GET('/{account}/applications/name/{name}')
-  Map getMetaData(@Path('account') String account, @Path('name') String name)
+  Observable<Map> getMetaData(@Path('account') String account, @Path('name') String name)
 
   @DELETE('/{account}/applications/name/{name}')
-  rx.Observable<Map> delete(@Path('account') String account, @Path('name') String name)
+  Observable<Map> delete(@Path('account') String account, @Path('name') String name)
 
   @POST('/{account}/applications/name/{name}')
-  rx.Observable<Map> create(@Path('account') String account, @Path('name') String name, @Body Map<String, String> app)
+  Observable<Map> create(@Path('account') String account, @Path('name') String name, @Body Map<String, String> app)
 }
