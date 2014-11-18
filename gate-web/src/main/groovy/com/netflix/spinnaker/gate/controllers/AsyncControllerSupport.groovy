@@ -21,13 +21,27 @@ import org.springframework.web.context.request.async.DeferredResult
 
 @CompileStatic
 class AsyncControllerSupport {
-  static <T> DeferredResult<T> defer(rx.Observable<T> obs) {
+  static <T> DeferredResult<T> deferOne(rx.Observable<T> obs) {
     def q = new DeferredResult<T>()
-    obs.subscribe({
-      q.result = it
-    }, { Throwable t ->
-      q.errorResult = t
+    obs.limit(1).subscribe({ q.result = it}, { q.errorResult = it})
+    q
+  }
+
+  static <T> DeferredResult<List<T>> deferAll(rx.Observable<T> obs) {
+    def q = new DeferredResult<List<T>>()
+    List<T> result = []
+    obs.subscribe({ //onNext
+      result.add(it)
+    },{ //onError
+      q.errorResult = it
+    }, { //onComplete
+      q.result = result
     })
     q
+  }
+
+
+  static <T> DeferredResult<T> defer(rx.Observable<T> obs) {
+    deferOne(obs)
   }
 }

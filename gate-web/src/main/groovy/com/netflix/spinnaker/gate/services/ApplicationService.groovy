@@ -48,21 +48,19 @@ class ApplicationService {
     HystrixCommandProperties.invokeMethod("Setter", null)
   }
 
-  Observable<List<Map>> getAll() {
-    new HystrixObservableCommand<List<Map>>(HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_KEY)
+  Observable<Map> getAll() {
+    new HystrixObservableCommand<Map>(HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_KEY)
         .andCommandKey(HystrixCommandKey.Factory.asKey("getAll"))
         .andCommandPropertiesDefaults(createHystrixCommandPropertiesSetter()
         .withExecutionIsolationThreadTimeoutInMilliseconds(30000))) {
       @Override
-      protected Observable<List<Map>> run() {
-        credentialsService.getAccountNames().flatMap { String name ->
-          rx.Observable.from(front50Service.getAll(name))
-        }.toList()
+      protected Observable<Map> run() {
+        credentialsService.getAccountNames().flatMap ({ front50Service.getAll(it) } as Func1<String, Observable<Map>>)
       }
 
       @Override
-      protected Observable<List<Map>> getFallback() {
-        Observable.from([])
+      protected Observable<Map> getFallback() {
+        Observable.empty()
       }
 
       @Override
@@ -79,22 +77,15 @@ class ApplicationService {
         .withExecutionIsolationThreadTimeoutInMilliseconds(30000))) {
       @Override
       protected Observable<Map> run() {
-        Observable.just(oortService.getApplication(name)).mergeWith(credentialsService.accountNames.flatMap { String account ->
-          rx.Observable.just(front50Service.getMetaData(account, name))
-        }).onErrorReturn(new Func1<Throwable, Map>() {
-          @Override
-          Map call(Throwable throwable) {
-            [:]
-          }
-        }).observeOn(Schedulers.io()).map {
-          it
-        }.reduce([:], { Map app, Map data ->
-          if (data.containsKey("clusters")) {
-            app.putAll data
+        Observable.mergeDelayError(
+                oortService.getApplication(name),
+                credentialsService.accountNames.flatMap({ String account -> front50Service.getMetaData(account, name) } as Func1<String, Observable<Map>>))
+                .onErrorReturn { t -> [:] }
+                .observeOn(Schedulers.io())
+                .reduce([attributes: [:]], { Map app, Map data ->
+          if (data.containsKey('clusters')) {
+            app.putAll(data)
           } else {
-            if (!app.containsKey("attributes")) {
-              app.attributes = [:]
-            }
             app.attributes.putAll(data)
           }
           app
@@ -103,7 +94,7 @@ class ApplicationService {
 
       @Override
       protected Observable<Map> getFallback() {
-        Observable.from([])
+        Observable.empty()
       }
 
       @Override

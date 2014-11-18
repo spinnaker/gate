@@ -29,18 +29,18 @@ class CredentialsService {
   @Autowired
   KatoService katoService
 
-  Observable<List> getAccountNames() {
-    new HystrixObservableCommand<Map>(HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_KEY)
+  Observable<String> getAccountNames() {
+    new HystrixObservableCommand<String>(HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_KEY)
         .andCommandKey(HystrixCommandKey.Factory.asKey("getAccountNames"))) {
 
       @Override
-      protected Observable<List> run() {
-        Observable.from(katoService.accountNames)
+      protected Observable<String> run() {
+        katoService.accountNames
       }
 
       @Override
-      protected Observable<List> getFallback() {
-        Observable.from([])
+      protected Observable<String> getFallback() {
+        Observable.empty()
       }
 
       @Override
@@ -56,12 +56,12 @@ class CredentialsService {
 
       @Override
       protected Observable<Map> run() {
-        Observable.from(katoService.getAccount(account))
+        katoService.getAccount(account)
       }
 
       @Override
       protected Observable<Map> getFallback() {
-        Observable.from([:])
+        Observable.just([:])
       }
 
       @Override

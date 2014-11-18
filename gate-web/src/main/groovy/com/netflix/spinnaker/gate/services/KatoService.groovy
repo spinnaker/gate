@@ -18,12 +18,13 @@ package com.netflix.spinnaker.gate.services
 
 import retrofit.http.GET
 import retrofit.http.Path
+import rx.Observable
 
 interface KatoService {
 
   @GET('/credentials')
-  List<String> getAccountNames()
+  Observable<String> getAccountNames()
 
   @GET('/credentials/{account}')
-  Map getAccount(@Path("account") String account)
+  Observable<Map> getAccount(@Path("account") String account)
 }

@@ -15,7 +15,6 @@
  */
 
 package com.netflix.spinnaker.gate
-
 import com.netflix.spinnaker.gate.controllers.ApplicationController
 import com.netflix.spinnaker.gate.services.*
 import org.springframework.boot.SpringApplication
@@ -81,7 +80,7 @@ class FunctionalSpec extends Specification {
       api.applications
 
     then:
-      1 * applicationService.getAll() >> Observable.just([])
+      1 * applicationService.getAll() >> Observable.empty()
   }
 
   void "should call ApplicationService for a single application"() {

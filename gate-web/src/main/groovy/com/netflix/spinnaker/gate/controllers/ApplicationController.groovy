@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.DeferredResult
 
 
-import static com.netflix.spinnaker.gate.controllers.AsyncControllerSupport.defer
+import static com.netflix.spinnaker.gate.controllers.AsyncControllerSupport.*
 
 @CompileStatic
 @RequestMapping("/applications")
@@ -41,22 +41,22 @@ class ApplicationController {
 
   @RequestMapping(method = RequestMethod.GET)
   DeferredResult<List<Map>> get() {
-    defer applicationService.all
+    deferAll applicationService.all
   }
 
   @RequestMapping(method = RequestMethod.POST)
   DeferredResult<Map> create(@RequestBody Map<String, String> app) {
-    defer applicationService.create(app)
+    deferOne applicationService.create(app)
   }
 
   @RequestMapping(value = "/{name}", method = RequestMethod.GET)
   DeferredResult<Map> show(@PathVariable("name") String name) {
-    defer applicationService.get(name)
+    deferOne applicationService.get(name)
   }
 
   @RequestMapping(value = "/{name}", method = RequestMethod.DELETE)
   DeferredResult<Map> delete(@RequestParam String account, @PathVariable String name) {
-    defer applicationService.delete(account, name)
+    deferOne applicationService.delete(account, name)
   }
 
   @RequestMapping(value = "/{name}/bake", method = RequestMethod.POST)
