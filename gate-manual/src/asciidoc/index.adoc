@@ -190,7 +190,7 @@ include::bakeStage.adoc[]
 - - -
 include::copyLastAsgStage.adoc[]
 - - -
-include::deleteAmazonLoadBalancer.adoc[]
+include::deleteLoadBalancer.adoc[]
 - - -
 include::deleteSecurityGroup.adoc[]
 - - -

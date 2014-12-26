@@ -1,8 +1,8 @@
-===== Delete Amazon Load Balancer
+===== Delete Load Balancer
 
 ====== Type
 
-+deleteAmazonLoadBalancer+
++deleteLoadBalancer+
 
 ====== Description
 
@@ -22,7 +22,7 @@ _deleteAmazonLoadBalancer_, _forceCacheRefresh_, _monitorDelete_
 [source,javascript]
 ----
 {
-  "type": "deleteAmazonLoadBalancer",
+  "type": "deleteLoadBalancer",
   "loadBalancerName": "kato-main-frontend",
   "regions": ["us-east-1", "us-west-1", "us-west-2", "eu-west-1"],
   "credentials": "test"
