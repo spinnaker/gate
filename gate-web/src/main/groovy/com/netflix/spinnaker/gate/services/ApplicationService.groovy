@@ -79,9 +79,9 @@ class ApplicationService {
     } execute()
   }
 
-  List getTasks(String app) {
+  List getTasks(String app, Integer pageNumber, Integer pageSize) {
     Preconditions.checkNotNull(app)
-    orcaService.getTasks(app)
+    orcaService.getTasks(app, pageNumber, pageSize)
   }
 
   List getPipelines(String app) {

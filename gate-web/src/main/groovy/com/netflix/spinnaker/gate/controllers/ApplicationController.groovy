@@ -82,8 +82,8 @@ class ApplicationController {
   }
 
   @RequestMapping(value = "/{name}/tasks", method = RequestMethod.GET)
-  List getTasks(@PathVariable("name") String name) {
-    applicationService.getTasks(name)
+  List getTasks(@PathVariable("name") String name, @RequestParam(value = "page", required = false) Integer pageNumber, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    applicationService.getTasks(name, pageNumber, pageSize)
   }
 
   @RequestMapping(value = "/{name}/pipelines", method = RequestMethod.GET)

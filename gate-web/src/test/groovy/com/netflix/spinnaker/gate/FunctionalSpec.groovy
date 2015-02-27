@@ -134,10 +134,10 @@ class FunctionalSpec extends Specification {
 
   void "should call ApplicationService for an application's tasks"() {
     when:
-      api.getTasks(name)
+      api.getTasks(name, 1, 10)
 
     then:
-      1 * applicationService.getTasks(name) >> []
+      1 * applicationService.getTasks(name, 1, 10) >> []
 
     where:
       name = "foo"
