@@ -26,7 +26,7 @@ interface OrcaService {
 
   @Headers("Accept: application/json")
   @GET("/applications/{application}/tasks")
-  List getTasks(@Path("application") String app)
+  List getTasks(@Path("application") String app, @Query("page") Integer pageNumber, @Query("pageSize") Integer pageSize)
 
   @Headers("Accept: application/json")
   @GET("/applications/{application}/pipelines")
