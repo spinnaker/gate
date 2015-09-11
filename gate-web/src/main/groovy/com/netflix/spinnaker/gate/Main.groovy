@@ -15,9 +15,7 @@
  */
 
 package com.netflix.spinnaker.gate
-
 import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
@@ -45,23 +43,11 @@ class Main extends SpringBootServletInitializer {
           'spring.profiles.active': "${System.getProperty('netflix.environment', 'test')},local"
   ]
 
-  static {
-    applyDefaults()
-  }
-
-  static void applyDefaults() {
-    DEFAULT_PROPS.each { k, v ->
-      System.setProperty(k, System.getProperty(k, v))
-    }
-  }
-
   static void main(String... args) {
-    SpringApplication.run this, args
-  }
-
-  @Override
-  SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-    builder.sources(Main)
+    new SpringApplicationBuilder()
+      .sources(Main)
+      .properties(DEFAULT_PROPS)
+      .run(args)
   }
 
   @Bean
