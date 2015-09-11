@@ -3,15 +3,15 @@ server:
 
 services:
   oort:
-    baseUrl: http://localhost:8081
+    baseUrl: http://localhost:7002
   orca:
     baseUrl: http://localhost:8083
   front50:
     baseUrl: http://localhost:8080
   mort:
-    baseUrl: http://localhost:8082
+    baseUrl: http://localhost:7002
   kato:
-    baseUrl: http://localhost:8501
+    baseUrl: http://localhost:7002
 #optional services:
   echo:
     enabled: false
