@@ -34,6 +34,7 @@ import rx.Observable
 import rx.Scheduler
 import rx.schedulers.Schedulers
 
+import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -62,30 +63,35 @@ class ApplicationService {
 
   private AtomicReference<List<Map>> allApplicationsCache = new AtomicReference<>([])
 
-  ApplicationService() {
+  @PostConstruct
+  void startMonitoring() {
     Observable
-      .timer(30000, TimeUnit.MILLISECONDS, scheduler)
-      .repeat()
-      .subscribe({ Long interval -> tick() })
+        .timer(30000, TimeUnit.MILLISECONDS, scheduler)
+        .repeat()
+        .subscribe({ Long interval -> tick() })
   }
 
   void tick() {
-    log.info("Refreshing Application List")
+    try {
+      log.info("Refreshing Application List")
 
-    def applicationListRetrievers = buildApplicationListRetrievers()
-    def applications = HystrixFactory.newListCommand(GROUP, "getAll", {
-      List<Future<List<Map>>> futures = executorService.invokeAll(applicationListRetrievers)
-      List<List<Map>> all = futures.collect { it.get() } // spread operator doesn't work here; no clue why.
-      List<Map> flat = (List<Map>) all?.flatten()?.toList()
-      def mergedApplications = mergeApps(flat, serviceConfiguration.getService('front50')).collect {
-        it.attributes
-      } as List<Map>
+      def applicationListRetrievers = buildApplicationListRetrievers()
+      def applications = HystrixFactory.newListCommand(GROUP, "getAll", {
+        List<Future<List<Map>>> futures = executorService.invokeAll(applicationListRetrievers)
+        List<List<Map>> all = futures.collect { it.get() } // spread operator doesn't work here; no clue why.
+        List<Map> flat = (List<Map>) all?.flatten()?.toList()
+        def mergedApplications = mergeApps(flat, serviceConfiguration.getService('front50')).collect {
+          it.attributes
+        } as List<Map>
 
-      return mergedApplications
-    }, { return allApplicationsCache.get() }).execute()
+        return mergedApplications
+      }, { return allApplicationsCache.get() }).execute()
 
-    allApplicationsCache.set(applications)
-    log.info("Refreshed Application List")
+      allApplicationsCache.set(applications)
+      log.info("Refreshed Application List")
+    } catch (Exception e) {
+      log.error("Failed to refresh Application list due to ${e.message}")
+    }
   }
 
   List<Map> getAll() {
