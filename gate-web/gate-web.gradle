@@ -1,13 +1,3 @@
-ext {
-  springConfigLocation = System.getProperty('spring.config.location', "${System.getProperty('user.home')}/.spinnaker/")
-}
-
-tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
-  systemProperty('spring.config.location', project.springConfigLocation)
-}
-
-apply plugin: 'spring-boot'
-apply plugin: 'nebula.ospackage'
 apply plugin: 'groovy'
 apply plugin: 'idea'
 
@@ -33,38 +23,4 @@ configurations.all {
   exclude group: 'javax.servlet', module: 'servlet-api'
   exclude group: "org.slf4j", module: "slf4j-log4j12"
 }
-
-startScripts {
-  doLast {
-    unixScript.text = unixScript.text.replace('CLASSPATH=$APP_HOME', 'CLASSPATH=$APP_HOME/config:$APP_HOME')
-    windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%APP_HOME%\\config;')
-  }
-}
-
-applicationName = 'gate'
-applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom"]
-applicationDistribution.from(project.file('config')) {
-  into 'config'
-}
-
-String toVers(String v) {
-  int idx = v.indexOf('-')
-  if (idx != -1) {
-    return v.substring(0, idx)
-  }
-  return v
-}
-
-ospackage {
-  packageName = project.applicationName
-  version = toVers(project.version.toString())
-  release '3'
-  into "/opt/${project.applicationName}"
-  from "${project.buildDir}/install/${project.applicationName}"
-}
-buildDeb {
-  dependsOn installApp
-}
-
-tasks.bootRepackage.enabled = false
 

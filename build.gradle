@@ -31,4 +31,4 @@ allprojects {
   group = "com.netflix.spinnaker.gate"
 }
 
-defaultTasks ':gate-web:bootRun'
+defaultTasks ':gate-pkg:bootRun'
