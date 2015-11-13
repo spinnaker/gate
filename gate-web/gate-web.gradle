@@ -43,7 +43,8 @@ startScripts {
 }
 
 applicationName = 'gate'
-applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom", "-Dspring.config.location=/opt/spinnaker/config/"]
+applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom"]
+// applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom", "-Dspring.config.location=/opt/spinnaker/config/"]
 applicationDistribution.from(project.file('config')) {
   into 'config'
 }
