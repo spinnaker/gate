@@ -27,6 +27,7 @@ startScripts {
 }
 
 applicationName = 'gate'
+mainClassName = 'com.netflix.spinnaker.gate.Main'
 applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom"]
 applicationDistribution.from(project.file('config')) {
   into 'config'
