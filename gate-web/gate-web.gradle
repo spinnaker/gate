@@ -8,8 +8,6 @@ tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
 
 apply plugin: 'spring-boot'
 apply plugin: 'nebula.ospackage'
-apply plugin: 'groovy'
-apply plugin: 'idea'
 
 dependencies {
   compile project(":gate-manual")
@@ -59,7 +57,7 @@ String toVers(String v) {
 ospackage {
   packageName = project.applicationName
   version = toVers(project.version.toString())
-  release '3'
+//  release '3'
   into "/opt/${project.applicationName}"
   from "${project.buildDir}/install/${project.applicationName}"
 
