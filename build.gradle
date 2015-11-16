@@ -3,11 +3,12 @@ buildscript {
     springBootVersion = "1.2.5.RELEASE"
   }
   repositories {
+    mavenLocal()
     jcenter()
     maven { url "http://spinnaker.bintray.com/gradle" }
   }
   dependencies {
-    classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:2.6.0'
+    classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:2.7.0-rc.1'
     classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
   }
 }

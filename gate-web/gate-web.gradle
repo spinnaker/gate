@@ -82,7 +82,7 @@ ospackage {
 }
 
 buildDeb {
-  dependsOn installApp
+  dependsOn installDist
 }
 
 buildRpm {
