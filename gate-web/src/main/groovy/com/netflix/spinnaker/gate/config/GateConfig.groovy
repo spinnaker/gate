@@ -16,6 +16,8 @@
 
 package com.netflix.spinnaker.gate.config
 
+import org.springframework.http.HttpHeaders
+
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.servlet.*
@@ -178,8 +180,9 @@ class GateConfig {
           response.setHeader("Access-Control-Allow-Origin", origin);
           response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, PATCH");
           response.setHeader("Access-Control-Max-Age", "3600");
-          response.setHeader("Access-Control-Allow-Headers", "x-requested-with, content-type");
-          response.setHeader("Access-Control-Expose-Headers", [Headers.AUTHENTICATION_REDIRECT_HEADER_NAME].join(", "))
+          response.setHeader("Access-Control-Allow-Headers", "x-requested-with, content-type, authorization");
+          response.setHeader("Access-Control-Expose-Headers", [Headers.AUTHENTICATION_REDIRECT_HEADER_NAME,
+                                                               Headers.OAUTH2_TOKEN_HEADER].join(", "))
           chain.doFilter(req, res);
         }
 
