@@ -17,12 +17,16 @@
 package com.netflix.spinnaker.gate.security.oauth2
 
 import com.netflix.spinnaker.gate.config.Headers
+import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.anonymous.AnonymousSecurityConfig
+import com.netflix.spinnaker.gate.security.oauth2.OAuth2SecurityConfig.OAuth2Configuration
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails
@@ -52,10 +56,17 @@ class OAuth2SecurityController {
   @Autowired
   OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails // OAuth2 config details
 
+  @Autowired
+  OAuth2Configuration oAuth2Configuration
+
   @Autowired(required = false)
   AnonymousSecurityConfig anonymousSecurityConfig
 
-  private String oauth2TokenValue
+  @Autowired
+  AnonymousAccountsService anonymousAccountsService
+
+  @Value('${services.deck.baseUrl:http://localhost:9000}')
+  String deckUrl
 
   @RequestMapping(value = "/code")
   void codeCallback(HttpServletRequest request, HttpServletResponse response,
@@ -69,65 +80,63 @@ class OAuth2SecurityController {
       throw new AccessDeniedException("OAuth2 access denied")
     }
 
+    // get token
     def form = new LinkedMultiValueMap<String, String>();
     form.add('code', code)
-    form.add('client_id', oAuth2ProtectedResourceDetails.clientId)
-    form.add('client_secret', oAuth2ProtectedResourceDetails.clientSecret)
+    form.add('client_id', oAuth2Configuration.clientId)
+    form.add('client_secret', oAuth2Configuration.clientSecret)
     form.add('redirect_uri', request.scheme + '://' + request.serverName + ':' + request.serverPort + '/oauth/code')
     form.add('grant_type', 'authorization_code')
-    ResponseEntity<DefaultOAuth2AccessToken> responseEntity = restTemplate.postForEntity(oAuth2ProtectedResourceDetails.accessTokenUri, form, DefaultOAuth2AccessToken)
+    ResponseEntity<DefaultOAuth2AccessToken> tokenResponse = restTemplate.postForEntity(oAuth2Configuration.accessTokenUri, form, DefaultOAuth2AccessToken)
 
-    PreAuthenticatedAuthenticationToken authn = new PreAuthenticatedAuthenticationToken(new User(email: 'jacobkiefer'), responseEntity.body)
+    // get email
+    HttpHeaders headers = new HttpHeaders()
+    headers.set('Authorization', 'Bearer ' + tokenResponse.body.value)
+    def infoReq = new HttpEntity(headers)
+    ResponseEntity<Map> userInfo = restTemplate.exchange(oAuth2Configuration.userInfoUri, HttpMethod.GET, infoReq, Map)
+    log.info(userInfo.body.toString())
+
+    // populate security context
+    def user = new User(userInfo.body.email, null, null, ["user"], anonymousAccountsService.getAllowedAccounts())
+    // TODO(jacobkiefer): service accounts?
+    PreAuthenticatedAuthenticationToken authn = new PreAuthenticatedAuthenticationToken(user, null)
     authn.setAuthenticated(true)
     SecurityContextHolder.context.setAuthentication(authn)
-    log.info('oauth token: ' + responseEntity.body.toString())
-    oauth2TokenValue = responseEntity.body.value
-    request
-    response.sendRedirect('http://localhost:9000') // TODO(jacobkiefer) don't hardcode this
+
+    response.sendRedirect(deckUrl)
   }
 
   @RequestMapping(value = "/info", method = RequestMethod.GET)
-  ResponseEntity<User> getUser(HttpServletRequest request, HttpServletResponse response) {
+  User getUser(HttpServletRequest request, HttpServletResponse response) {
     Object whoami = SecurityContextHolder.context.authentication.principal
-    if (!whoami || !(whoami instanceof User) || !(hasRequiredRole(anonymousSecurityConfig, oAuth2ProtectedResourceDetails, whoami))) {
+    if (!whoami || !(whoami instanceof User) || !(hasRequiredRole(anonymousSecurityConfig, oAuth2Configuration, whoami))) {
 
-      UriBuilder redirectBuilder = UriBuilder.fromUri('https://accounts.google.com/o/oauth2/v2/auth')
+      UriBuilder redirectBuilder = UriBuilder.fromUri(oAuth2Configuration.userAuthorizationUri)
       // TODO(jacobkiefer): add in state qparam?
       redirectBuilder.queryParam('response_type', 'code')
-      redirectBuilder.queryParam('client_id', oAuth2ProtectedResourceDetails.clientId)
+      redirectBuilder.queryParam('client_id', oAuth2Configuration.clientId)
       redirectBuilder.queryParam('redirect_uri',
         URLEncoder.encode(request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/oauth/code', 'UTF-8'))
-      redirectBuilder.queryParam('scope', 'profile email') // TODO(jacobkiefer): don't hardcode this?
+      redirectBuilder.queryParam('scope', 'profile email')
 
       response.addHeader Headers.AUTHENTICATION_REDIRECT_HEADER_NAME, redirectBuilder.build().toString()
       response.sendError 401
       null
     } else {
       (User) whoami
-      HttpHeaders respHeaders = new HttpHeaders();
-      respHeaders.set(Headers.OAUTH2_TOKEN_HEADER, oauth2TokenValue)
-      SecurityContextHolder.clearContext() // TODO(jacobkiefer): set up a filter to clear this after each request
-      new ResponseEntity<User>((User) whoami, respHeaders, HttpStatus.OK)
     }
   }
 
   static boolean hasRequiredRole(AnonymousSecurityConfig anonymousSecurityConfig,
-                                 OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+                                 OAuth2Configuration oAuth2Configuration,
                                  User user) {
-//    if (oAuth2ProtectedResourceDetails.requiredRoles) {
-//      // ensure the user has at least one of the required roles (and at least one allowed account)
-//      return user.getRoles().find { String allowedRole ->
-//        samlSecurityConfigProperties.requiredRoles.contains(allowedRole)
-//      } && user.allowedAccounts
-//    }
-
+    // TODO(jacobkiefer): requiredRoles
     if (anonymousSecurityConfig && user.email == anonymousSecurityConfig.defaultEmail) {
       // force an anonymous user to login and get a proper set of roles/allowedAccounts
       return false
     }
 
     return true
-//    return user.allowedAccounts
   }
 
 }
