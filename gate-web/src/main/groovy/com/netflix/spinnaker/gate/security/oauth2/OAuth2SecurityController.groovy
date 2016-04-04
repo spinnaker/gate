@@ -24,6 +24,7 @@ import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -48,6 +49,7 @@ import java.nio.file.AccessDeniedException
 @RequestMapping(value = "/oauth")
 @RestController
 @Slf4j
+@ConditionalOnExpression('${oauth2.enabled:false}')
 class OAuth2SecurityController {
 
   @Autowired
