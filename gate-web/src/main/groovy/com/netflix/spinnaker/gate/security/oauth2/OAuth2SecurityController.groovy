@@ -56,9 +56,6 @@ class OAuth2SecurityController {
   RestTemplate restTemplate
 
   @Autowired
-  OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails // OAuth2 config details
-
-  @Autowired
   OAuth2Configuration oAuth2Configuration
 
   @Autowired(required = false)
