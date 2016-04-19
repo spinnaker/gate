@@ -18,7 +18,7 @@ package com.netflix.spinnaker.gate.security.saml
 
 import com.netflix.spinnaker.gate.config.Headers
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
-import com.netflix.spinnaker.gate.security.AuthController
+import com.netflix.spinnaker.gate.controllers.AuthController
 import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.security.User

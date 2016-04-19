@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security
+package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
