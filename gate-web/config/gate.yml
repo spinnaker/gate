@@ -75,3 +75,36 @@ hystrix:
     fetchGlobalAccounts:
       execution.isolation.thread.timeoutInMilliseconds: 2000
 
+auth:
+  anonymous:
+    enabled: true # You likely want to disable this in production.
+  oauth2Client:
+    enabled: false
+    userAuthorizationUri:
+    scope:
+    clientId:
+    clientSecret:
+    accessTokenUri:
+    userInfoUri:
+  oauth2ResourceServer:
+    enabled: false
+    accessTokenUri:
+    clientId:
+    clientSecret:
+    grantType:
+  saml:
+    enabled: false
+    url:
+    certificate:
+    redirectBase:
+    issuerId:
+    keyStore:
+    keyStoreType: JKS
+    keyStorePassword:
+    keyStoreAliasName:
+    requiredRoles:
+    -
+    userAttributeMapping:
+      firstName: User.FirstName
+      lastName: User.LastName
+      roles: memberOf

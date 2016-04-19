@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Netflix, Inc.
+ * Copyright 2016 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security.oauth2
+package com.netflix.spinnaker.gate.security.oauth2.client
 
 import com.netflix.spinnaker.gate.config.Headers
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
-import com.netflix.spinnaker.gate.security.anonymous.AnonymousSecurityConfig
-import com.netflix.spinnaker.gate.security.oauth2.OAuth2SecurityConfig.OAuth2Configuration
+import com.netflix.spinnaker.gate.security.AuthController
+import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
+import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestTemplate
 
 import javax.servlet.http.HttpServletRequest
@@ -46,31 +42,28 @@ import javax.servlet.http.HttpServletResponse
 import javax.ws.rs.core.UriBuilder
 import java.nio.file.AccessDeniedException
 
-@RequestMapping(value = "/oauth")
-@RestController
 @Slf4j
-@ConditionalOnExpression('${oauth2.enabled:false}')
-class OAuth2SecurityController {
+@ConditionalOnExpression('${auth.oauth2Client.enabled:false}')
+@Component
+class OAuth2LoginAuthenticator implements AuthController.LoginAuthenticator {
 
   @Autowired
   RestTemplate restTemplate
 
   @Autowired
-  OAuth2Configuration oAuth2Configuration
+  OAuth2ClientConfig oAuth2Configuration
 
   @Autowired(required = false)
-  AnonymousSecurityConfig anonymousSecurityConfig
+  AnonymousConfig anonymousSecurityConfig
 
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  @Value('${services.deck.baseUrl:http://localhost:9000}')
-  String deckUrl
+  @Override
+  boolean handleAuthSignIn(HttpServletRequest request, HttpServletResponse response) {
+    String code = request.getParameter("code")
+    String error = request.getParameter("error")
 
-  @RequestMapping(value = "/code")
-  void codeCallback(HttpServletRequest request, HttpServletResponse response,
-                    @RequestParam(value = "code", required = false) String code,
-                    @RequestParam(value = "error", required = false) String error) {
     if (!error && !code) {
       throw new OAuth2Exception("Neither code nor error returned in OAuth2 code call")
     }
@@ -84,50 +77,63 @@ class OAuth2SecurityController {
     form.add('code', code)
     form.add('client_id', oAuth2Configuration.clientId)
     form.add('client_secret', oAuth2Configuration.clientSecret)
-    form.add('redirect_uri', request.scheme + '://' + request.serverName + ':' + request.serverPort + '/oauth/code')
+    form.add('redirect_uri', request.scheme + '://' + request.serverName + ':' + request.serverPort + '/auth/signIn')
     form.add('grant_type', 'authorization_code')
-    ResponseEntity<DefaultOAuth2AccessToken> tokenResponse = restTemplate.postForEntity(oAuth2Configuration.accessTokenUri, form, DefaultOAuth2AccessToken)
+    HttpHeaders headers = new HttpHeaders()
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+    HttpEntity entity = new HttpEntity(form, headers)
+    DefaultOAuth2AccessToken tokenResponse = restTemplate.postForObject(oAuth2Configuration.accessTokenUri,
+                                                                        entity,
+                                                                        DefaultOAuth2AccessToken)
 
     // get email
-    HttpHeaders headers = new HttpHeaders()
-    headers.set('Authorization', 'Bearer ' + tokenResponse.body.value)
+    headers = new HttpHeaders()
+    headers.set('Authorization', 'Bearer ' + tokenResponse.value)
     def infoReq = new HttpEntity(headers)
     ResponseEntity<Map> userInfo = restTemplate.exchange(oAuth2Configuration.userInfoUri, HttpMethod.GET, infoReq, Map)
-    log.info(userInfo.body.toString())
+    Map userData = userInfo.body
+    log.info(userData.toString())
 
     // populate security context
-    def user = new User(userInfo.body.email, null, null, ["user"], anonymousAccountsService.getAllowedAccounts())
+    def user = new User(email: userData.email,
+                        firstName: userData.given_name,
+                        lastName: userData.family_name,
+                        roles: ["user"],
+                        allowedAccounts: anonymousAccountsService.getAllowedAccounts())
     // TODO(jacobkiefer): service accounts?
     PreAuthenticatedAuthenticationToken authn = new PreAuthenticatedAuthenticationToken(user, null)
     authn.setAuthenticated(true)
     SecurityContextHolder.context.setAuthentication(authn)
 
-    response.sendRedirect(deckUrl)
+    return true
   }
 
-  @RequestMapping(value = "/info", method = RequestMethod.GET)
-  User getUser(HttpServletRequest request, HttpServletResponse response) {
+  @Override
+  void handleAuth(HttpServletRequest request, HttpServletResponse response) {
+    UriBuilder redirectBuilder = UriBuilder.fromUri(oAuth2Configuration.userAuthorizationUri)
+    // TODO(jacobkiefer): add in state qparam?
+    redirectBuilder.queryParam('response_type', 'code')
+    redirectBuilder.queryParam('client_id', oAuth2Configuration.clientId)
+    redirectBuilder.queryParam('scope', oAuth2Configuration.scope.join(" "))
+    redirectBuilder.queryParam('redirect_uri',
+                               URLEncoder.encode(request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/auth/signIn', 'UTF-8'))
+
+
+    response.sendRedirect(redirectBuilder.build().toString())
+  }
+
+  @Override
+  User handleAuthInfo(HttpServletRequest request, HttpServletResponse response) {
     Object whoami = SecurityContextHolder.context.authentication.principal
-    if (!whoami || !(whoami instanceof User) || !(hasRequiredRole(anonymousSecurityConfig, oAuth2Configuration, whoami))) {
-
-      UriBuilder redirectBuilder = UriBuilder.fromUri(oAuth2Configuration.userAuthorizationUri)
-      // TODO(jacobkiefer): add in state qparam?
-      redirectBuilder.queryParam('response_type', 'code')
-      redirectBuilder.queryParam('client_id', oAuth2Configuration.clientId)
-      redirectBuilder.queryParam('redirect_uri',
-        URLEncoder.encode(request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/oauth/code', 'UTF-8'))
-      redirectBuilder.queryParam('scope', 'profile email')
-
-      response.addHeader Headers.AUTHENTICATION_REDIRECT_HEADER_NAME, redirectBuilder.build().toString()
-      response.sendError 401
-      null
-    } else {
-      (User) whoami
+    if (whoami && (whoami instanceof User) && (hasRequiredRole(anonymousSecurityConfig, whoami))) {
+      return (User) whoami
     }
+
+    response.addHeader Headers.AUTHENTICATION_REDIRECT_HEADER_NAME, "/auth"
+    response.sendError 401
   }
 
-  static boolean hasRequiredRole(AnonymousSecurityConfig anonymousSecurityConfig,
-                                 OAuth2Configuration oAuth2Configuration,
+  static boolean hasRequiredRole(AnonymousConfig anonymousSecurityConfig,
                                  User user) {
     // TODO(jacobkiefer): requiredRoles
     if (anonymousSecurityConfig && user.email == anonymousSecurityConfig.defaultEmail) {
