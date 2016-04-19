@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Netflix, Inc.
+ * Copyright 2016 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,34 +16,52 @@
 
 package com.netflix.spinnaker.gate.security
 
+import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.context.embedded.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
 
 import javax.servlet.Filter
 
-@ConditionalOnExpression('${saml.enabled:false} || ${x509.enabled:false} || ${oauth2.enabled:false}')
 @EnableWebSecurity
 @Configuration
 @Import(SecurityAutoConfiguration)
-class SecurityConfig extends WebSecurityConfigurerAdapter {
+@Slf4j
+class AuthConfig extends WebSecurityConfigurerAdapter {
+
+  @Autowired(required = false)
+  AnonymousConfig anonymousConfig
+
   @Autowired(required = false)
   Collection<WebSecurityAugmentor> webSecurityAugmentors = []
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+    http.csrf().disable()
+
     webSecurityAugmentors.each {
       it.configure(http, userDetailsService(), authenticationManager())
+    }
+
+    if (!anonymousConfig?.enabled) {
+      http.authorizeRequests()
+          .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+          .antMatchers('/auth/**').permitAll()
+          .antMatchers('/health').permitAll()
+          .antMatchers('/**').authenticated()
     }
   }
 
@@ -56,11 +74,19 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public FilterRegistrationBean securityFilterChain(
-    @Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
-    FilterRegistrationBean registration = new FilterRegistrationBean(securityFilter);
-    registration.setOrder(0);
-    registration
-      .setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
-    return registration;
+      @Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
+    FilterRegistrationBean registration = new FilterRegistrationBean(securityFilter)
+    registration.setOrder(0)
+    registration.setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)
+    return registration
+  }
+
+  static interface WebSecurityAugmentor {
+    void configure(AuthenticationManagerBuilder authenticationManagerBuilder)
+
+    void configure(HttpSecurity http,
+                   UserDetailsService userDetailsService,
+                   AuthenticationManager authenticationManager)
+
   }
 }
