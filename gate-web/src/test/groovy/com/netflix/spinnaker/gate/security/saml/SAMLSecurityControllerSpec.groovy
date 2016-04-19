@@ -17,7 +17,7 @@
 package com.netflix.spinnaker.gate.security.saml
 
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
-import com.netflix.spinnaker.gate.security.anonymous.AnonymousSecurityConfig
+import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
 
 import com.netflix.spinnaker.security.User
 import org.opensaml.DefaultBootstrap
@@ -70,14 +70,14 @@ class SAMLSecurityControllerSpec extends Specification {
     ].flatten() as List<ClouddriverService.Account>
 
     def assertion = SAMLUtils.buildAssertion(new String(new org.apache.commons.codec.binary.Base64().encode(samlResponse.bytes)))
-    def userAttributeMapping = new SAMLSecurityConfig.UserAttributeMapping(
+    def userAttributeMapping = new SAMLConfig.UserAttributeMapping(
       firstName: "givenName",
       lastName: "familyName",
       roles: "memberOf"
     )
 
     when:
-    def user = SAMLSecurityController.buildUser(
+    def user = SAMLLoginAuthenticator.buildUser(
       assertion, userAttributeMapping, allowedAnonymousAccounts, allAccounts
     )
 
@@ -98,14 +98,14 @@ class SAMLSecurityControllerSpec extends Specification {
   @Unroll
   void "should check whether a user has a required role"() {
     given:
-    def anonymousSecurityConfig = new AnonymousSecurityConfig()
-    def oneLoginSecurityConfig = new SAMLSecurityConfig.SAMLSecurityConfigProperties(
+    def anonymousSecurityConfig = new AnonymousConfig()
+    def oneLoginSecurityConfig = new SAMLConfig.SAMLSecurityConfigProperties(
       requiredRoles: requiredRoles
     )
     def user = new User(email: email, roles: roles, allowedAccounts: allowedAccounts)
 
     expect:
-    SAMLSecurityController.hasRequiredRole(anonymousSecurityConfig, oneLoginSecurityConfig, user) == hasRequiredRole
+    SAMLLoginAuthenticator.hasRequiredRole(anonymousSecurityConfig, oneLoginSecurityConfig, user) == hasRequiredRole
 
     where:
     email        | requiredRoles | roles    | allowedAccounts || hasRequiredRole

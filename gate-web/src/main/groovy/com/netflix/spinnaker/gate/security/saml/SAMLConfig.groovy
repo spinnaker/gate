@@ -16,7 +16,8 @@
 
 package com.netflix.spinnaker.gate.security.saml
 
-import com.netflix.spinnaker.gate.security.WebSecurityAugmentor
+import com.netflix.spinnaker.gate.security.AuthConfig
+
 import groovy.util.logging.Slf4j
 import org.opensaml.DefaultBootstrap
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +25,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -33,15 +33,14 @@ import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
 import org.springframework.stereotype.Component
 
-@ConditionalOnExpression('${saml.enabled:false}')
+@ConditionalOnExpression('${auth.saml.enabled:false}')
 @Configuration
 @Slf4j
-class SAMLSecurityConfig implements WebSecurityAugmentor {
+class SAMLConfig implements AuthConfig.WebSecurityAugmentor {
   @Component
-  @ConfigurationProperties("saml")
+  @ConfigurationProperties("auth.saml")
   static class SAMLSecurityConfigProperties {
     Boolean enabled
-    Boolean requireAuthentication
     String url
     String certificate
     String redirectBase
@@ -72,18 +71,7 @@ class SAMLSecurityConfig implements WebSecurityAugmentor {
     org.opensaml.Configuration.validateJCEProviders()
     DefaultBootstrap.bootstrap()
 
-    http
-      .csrf().disable()
-      .rememberMe().rememberMeServices(rememberMeServices(userDetailsService))
-
-    if (samlSecurityConfigProperties.requireAuthentication) {
-      http.authorizeRequests()
-        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .antMatchers('/auth/**').permitAll()
-        .antMatchers('/health').permitAll()
-        .antMatchers('/**').authenticated()
-        .and()
-    }
+    http.rememberMe().rememberMeServices(rememberMeServices(userDetailsService))
   }
 
   @Override
