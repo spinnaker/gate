@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Netflix, Inc.
+ * Copyright 2016 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security.oauth2
+package com.netflix.spinnaker.gate.security.oauth2.resourceServer
 
-import com.netflix.spinnaker.gate.security.WebSecurityAugmentor
+import com.netflix.spinnaker.gate.security.AuthConfig
+
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.transform.CompileStatic
@@ -48,10 +49,12 @@ import javax.servlet.ServletResponse
 @Slf4j
 @CompileStatic
 @Configuration
-@ConditionalOnExpression('${netflixOAuth2.enabled:false}')
-class NetflixOAuth2SecurityConfig implements WebSecurityAugmentor {
+@ConditionalOnExpression('${auth.oauth2ResourceServer.enabled:false}')
+class OAuth2ResourceServerConfig implements AuthConfig.WebSecurityAugmentor {
   @Override
-  void configure(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
+  void configure(HttpSecurity http,
+                 UserDetailsService userDetailsService,
+                 AuthenticationManager authenticationManager) {
     def filter = new OAuth2AuthenticationProcessingFilter() {
       @Override
       void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -66,8 +69,6 @@ class NetflixOAuth2SecurityConfig implements WebSecurityAugmentor {
 
     filter.setAuthenticationManager(authenticationManager)
     http.addFilterBefore(filter, BasicAuthenticationFilter)
-
-    http.csrf().disable()
   }
 
   @Override
@@ -79,7 +80,7 @@ class NetflixOAuth2SecurityConfig implements WebSecurityAugmentor {
 
   @Bean
   AuthenticationProvider authenticationProvider(IdentityResourceServerTokenServices identityResourceServerTokenServices) {
-    return new OAuth2AuthenticationProvider(identityResourceServerTokenServices)
+    return new OAuth2ResourceServerAuthenticationProvider(identityResourceServerTokenServices)
   }
 
   @Bean
@@ -93,7 +94,7 @@ class NetflixOAuth2SecurityConfig implements WebSecurityAugmentor {
   }
 
   @Bean
-  @ConfigurationProperties('oauth2')
+  @ConfigurationProperties('auth.oauth2ResourceServer')
   IdentityResourceServerTokenServices.IdentityServerConfiguration identityServerConfiguration() {
     new IdentityResourceServerTokenServices.IdentityServerConfiguration()
   }
