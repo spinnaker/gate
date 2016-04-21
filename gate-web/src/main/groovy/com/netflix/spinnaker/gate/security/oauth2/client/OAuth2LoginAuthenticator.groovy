@@ -17,18 +17,17 @@
 package com.netflix.spinnaker.gate.security.oauth2.client
 
 import com.netflix.spinnaker.gate.config.Headers
-import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.controllers.AuthController
+import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
+import com.netflix.spinnaker.gate.security.userdetailsservice.SpinnakerUserProvider
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
@@ -59,6 +58,9 @@ class OAuth2LoginAuthenticator implements AuthController.LoginAuthenticator {
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
+  @Autowired
+  SpinnakerUserProvider userProvider
+
   @Override
   boolean handleAuthSignIn(HttpServletRequest request, HttpServletResponse response) {
     String code = request.getParameter("code")
@@ -83,24 +85,15 @@ class OAuth2LoginAuthenticator implements AuthController.LoginAuthenticator {
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
     HttpEntity entity = new HttpEntity(form, headers)
     DefaultOAuth2AccessToken tokenResponse = restTemplate.postForObject(oAuth2Configuration.accessTokenUri,
-                                                                        entity,
-                                                                        DefaultOAuth2AccessToken)
+      entity,
+      DefaultOAuth2AccessToken)
 
-    // get email
-    headers = new HttpHeaders()
-    headers.set('Authorization', 'Bearer ' + tokenResponse.value)
-    def infoReq = new HttpEntity(headers)
-    ResponseEntity<Map> userInfo = restTemplate.exchange(oAuth2Configuration.userInfoUri, HttpMethod.GET, infoReq, Map)
-    Map userData = userInfo.body
-    log.info(userData.toString())
+    // get user
+    def user = userProvider.loadUser(tokenResponse.value);
+    anonymousAccountsService.getAllowedAccounts()
+    log.info(user.toString())
 
     // populate security context
-    def user = new User(email: userData.email,
-                        firstName: userData.given_name,
-                        lastName: userData.family_name,
-                        roles: ["user"],
-                        allowedAccounts: anonymousAccountsService.getAllowedAccounts())
-    // TODO(jacobkiefer): service accounts?
     PreAuthenticatedAuthenticationToken authn = new PreAuthenticatedAuthenticationToken(user, null)
     authn.setAuthenticated(true)
     SecurityContextHolder.context.setAuthentication(authn)
@@ -116,7 +109,7 @@ class OAuth2LoginAuthenticator implements AuthController.LoginAuthenticator {
     redirectBuilder.queryParam('client_id', oAuth2Configuration.clientId)
     redirectBuilder.queryParam('scope', oAuth2Configuration.scope.join(" "))
     redirectBuilder.queryParam('redirect_uri',
-                               URLEncoder.encode(request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/auth/signIn', 'UTF-8'))
+      URLEncoder.encode(request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/auth/signIn', 'UTF-8'))
 
 
     response.sendRedirect(redirectBuilder.build().toString())
