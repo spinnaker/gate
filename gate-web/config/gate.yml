@@ -75,36 +75,19 @@ hystrix:
     fetchGlobalAccounts:
       execution.isolation.thread.timeoutInMilliseconds: 2000
 
-auth:
-  anonymous:
-    enabled: true # You likely want to disable this in production.
-  oauth2Client:
-    enabled: false
-    userAuthorizationUri:
-    scope:
-    clientId:
-    clientSecret:
-    accessTokenUri:
-    userInfoUri:
-  oauth2ResourceServer:
-    enabled: false
-    accessTokenUri:
-    clientId:
-    clientSecret:
-    grantType:
-  saml:
-    enabled: false
-    url:
-    certificate:
-    redirectBase:
-    issuerId:
-    keyStore:
-    keyStoreType: JKS
-    keyStorePassword:
-    keyStoreAliasName:
-    requiredRoles:
-    -
-    userAttributeMapping:
-      firstName: User.FirstName
-      lastName: User.LastName
-      roles: memberOf
+spring:
+  jackson:
+    mapper:
+      SORT_PROPERTIES_ALPHABETICALLY: true
+    serialization:
+      ORDER_MAP_ENTRIES_BY_KEYS: true
+#  oauth2:
+#      client:
+#        clientId:
+#        clientSecret:
+#        accessTokenUri:
+#        userAuthorizationUri:
+#        scope:
+#          - email
+#      resource:
+#        userInfoUri:

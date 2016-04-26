@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security.oauth2.client
+package com.netflix.spinnaker.gate.controllers
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Configuration
-@ConfigurationProperties("auth.oauth2Client")
-class OAuth2ClientConfig extends AuthorizationCodeResourceDetails {
-  String userInfoUri
+import java.security.Principal
+
+@RestController
+class UserController {
+
+  @RequestMapping("/user")
+  public Principal user(Principal user) {
+    return user;
+  }
 }

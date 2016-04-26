@@ -35,7 +35,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 @ConditionalOnExpression('${auth.anonymous.enabled:false}')
 @Configuration
 @ConfigurationProperties(prefix = "auth.anonymous")
-class AnonymousConfig implements AuthConfig.WebSecurityAugmentor {
+class AnonymousConfig {
   Boolean enabled
   String key = "spinnaker-anonymous"
   String defaultEmail = "anonymous"
@@ -43,7 +43,6 @@ class AnonymousConfig implements AuthConfig.WebSecurityAugmentor {
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  @Override
   void configure(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
     def filter = new AnonymousAuthenticationFilter(
       // it seems like a smell that this is statically initialized with the allowedAccounts
@@ -56,7 +55,6 @@ class AnonymousConfig implements AuthConfig.WebSecurityAugmentor {
     http.addFilter(filter)
   }
 
-  @Override
   void configure(AuthenticationManagerBuilder auth) {
     auth.authenticationProvider(new AnonymousAuthenticationProvider(key))
   }
