@@ -18,7 +18,6 @@ package com.netflix.spinnaker.gate.security.saml
 
 import com.netflix.spinnaker.gate.config.Headers
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
-import com.netflix.spinnaker.gate.controllers.AuthController
 import com.netflix.spinnaker.gate.security.anonymous.AnonymousConfig
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.security.User
@@ -39,7 +38,7 @@ import javax.ws.rs.core.Response
 
 @ConditionalOnExpression('${saml.enabled:false}')
 @Slf4j
-class SAMLLoginAuthenticator implements AuthController.LoginAuthenticator {
+class SAMLLoginAuthenticator {
   private final String url
   private final String certificate
   private final SAMLConfig.SAMLSecurityConfigProperties samlSecurityConfigProperties
@@ -62,28 +61,6 @@ class SAMLLoginAuthenticator implements AuthController.LoginAuthenticator {
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  @Override
-  void handleAuth(HttpServletRequest request, HttpServletResponse response) {
-    URL redirect
-    if (samlSecurityConfigProperties.redirectBase) {
-      redirect = (samlSecurityConfigProperties.redirectBase + '/auth/signIn').toURI().normalize().toURL()
-    } else {
-      redirect = new URL(request.scheme, request.serverName, request.serverPort, request.contextPath + '/auth/signIn')
-    }
-
-    def authnRequest = SAMLUtils.buildAuthnRequest(url, redirect, samlSecurityConfigProperties.issuerId)
-    def context = SAMLUtils.buildSAMLMessageContext(authnRequest, response, url)
-    samlSecurityConfigProperties.with {
-      def credential = SAMLUtils.buildCredential(keyStoreType, keyStore, keyStorePassword, keyStoreAliasName)
-      if (credential.present) {
-        context.setOutboundSAMLMessageSigningCredential(credential.get())
-      }
-    }
-
-    new HTTPRedirectDeflateEncoder().encode(context)
-  }
-
-  @Override
   boolean handleAuthSignIn(HttpServletRequest request, HttpServletResponse response) {
     String samlResponse = request.getParameter("samlResponse")
     if (!samlResponse) {
@@ -109,6 +86,26 @@ class SAMLLoginAuthenticator implements AuthController.LoginAuthenticator {
     return true
   }
 
+  void handleAuth(HttpServletRequest request, HttpServletResponse response) {
+    URL redirect
+    if (samlSecurityConfigProperties.redirectBase) {
+      redirect = (samlSecurityConfigProperties.redirectBase + '/auth/signIn').toURI().normalize().toURL()
+    } else {
+      redirect = new URL(request.scheme, request.serverName, request.serverPort, request.contextPath + '/auth/signIn')
+    }
+
+    def authnRequest = SAMLUtils.buildAuthnRequest(url, redirect, samlSecurityConfigProperties.issuerId)
+    def context = SAMLUtils.buildSAMLMessageContext(authnRequest, response, url)
+    samlSecurityConfigProperties.with {
+      def credential = SAMLUtils.buildCredential(keyStoreType, keyStore, keyStorePassword, keyStoreAliasName)
+      if (credential.present) {
+        context.setOutboundSAMLMessageSigningCredential(credential.get())
+      }
+    }
+
+    new HTTPRedirectDeflateEncoder().encode(context)
+  }
+
   static boolean hasRequiredRole(AnonymousConfig anonymousSecurityConfig,
                                  SAMLConfig.SAMLSecurityConfigProperties samlSecurityConfigProperties,
                                  User user) {
@@ -127,7 +124,6 @@ class SAMLLoginAuthenticator implements AuthController.LoginAuthenticator {
     return user.allowedAccounts
   }
 
-  @Override
   User handleAuthInfo(HttpServletRequest request, HttpServletResponse response) {
     Object whoami = SecurityContextHolder.context.authentication.principal
     if (!whoami || !(whoami instanceof User) || !(hasRequiredRole(anonymousSecurityConfig, samlSecurityConfigProperties, whoami))) {
