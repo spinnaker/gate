@@ -16,10 +16,13 @@
 
 package com.netflix.spinnaker.gate.security.oauth2.client
 
+import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
+import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
+import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties
 import org.springframework.cloud.security.oauth2.resource.UserInfoTokenServices
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurer
@@ -28,16 +31,20 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException
 import org.springframework.security.oauth2.provider.OAuth2Authentication
+import org.springframework.security.oauth2.provider.OAuth2Request
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices
 
 @Configuration
-@EnableWebSecurity
+@EnableWebMvcSecurity // Use @EnableWebSecurity if/when updated to Spring Security 4.
 @Import(SecurityAutoConfiguration)
 @EnableOAuth2Sso
 // Note the 4 single-quotes below - this is a raw groovy string, because SpEL and groovy
@@ -58,32 +65,72 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
   /**
    * ResourceServerTokenServices is an interface used to manage access tokens. The UserInfoTokenService object is an
    * implementation of that interface that uses an access token to get the logged in user's data (such as email or
-   * profile). We want to customize the Authentication object that is returned to include our list of
-   * GrantedAuthorities.
+   * profile). We want to customize the Authentication object that is returned to include our custom (Kork) User.
    */
   @Primary
   @Bean
   ResourceServerTokenServices spinnakerAuthorityInjectedUserInfoTokenServices() {
     return new ResourceServerTokenServices() {
+
+      @Autowired
+      private ResourceServerProperties sso;
+
       @Autowired
       UserInfoTokenServices userInfoTokenServices
+
+      @Autowired
+      AnonymousAccountsService anonymousAccountsService
 
       @Override
       OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
         OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
 
-        // TODO(jacobkiefer): Stuff granted authorities in here.
-        // make Groups API call, make into  list of GrantedAuthorities
-        // new SpinnakerAuthentication ...
-        // copy over relevant bits, such as user details.
+        // TODO(ttomsu): https://github.com/spring-projects/spring-boot/pull/5053 would obviate the need to create a
+        // custom Authentication object just to override the Principal. Alas, it's not scheduled to be released until
+        // Spring Boot 1.3.4.
+        // See also https://github.com/spring-projects/spring-boot/commit/4768faaba771e35301b0ac68abf09cdb0e2f6881,
+        // which adds an AuthoritiesExtractor, which eliminate the other need for this class (Authorities).
+        SpinnakerAuthentication spinnakerAuthentication = new SpinnakerAuthentication(AuthorityUtils.createAuthorityList("IM_A_ROLE"))
+        Map details = oAuth2Authentication.userAuthentication.details as Map
+        spinnakerAuthentication.principal = new User(
+            email: details.email,
+            firstName: details.given_name,
+            lastName: details.family_name,
+            // TODO(jacobkiefer): Get full list of allowed accounts based on group membership.
+            allowedAccounts: anonymousAccountsService.allowedAccounts,
+            roles: spinnakerAuthentication.authorities.collect { it.toString() }
+        )
+        spinnakerAuthentication.setAuthenticated(true)
 
-        return oAuth2Authentication
+        // impl copied from userInfoTokenServices
+        OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,
+                                                        null, null, null, null, null);
+
+        return new OAuth2Authentication(storedRequest, spinnakerAuthentication)
       }
 
       @Override
       OAuth2AccessToken readAccessToken(String accessToken) {
         return userInfoTokenServices.readAccessToken(accessToken)
       }
+    }
+  }
+
+  /**
+   * Simple implementation to hold our Kork User as the Principal, which is used all over the framework.
+   */
+  static class SpinnakerAuthentication extends AbstractAuthenticationToken {
+    def credentials
+    User principal
+
+    /**
+     * Creates a token with the supplied array of authorities.
+     *
+     * @param authorities the collection of <tt>GrantedAuthority</tt>s for the
+     *                    principal represented by this authentication object.
+     */
+    SpinnakerAuthentication(Collection<? extends GrantedAuthority> authorities) {
+      super(authorities)
     }
   }
 }
