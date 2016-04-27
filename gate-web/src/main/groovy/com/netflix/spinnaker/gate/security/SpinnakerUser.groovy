@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Netflix, Inc.
+ * Copyright 2016 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.controllers
+package com.netflix.spinnaker.gate.security
 
-import com.netflix.spinnaker.gate.security.SpinnakerUser
-import com.netflix.spinnaker.security.User
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
-class UserController {
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 
-  @RequestMapping("/user")
-  public User user(@SpinnakerUser User user) {
-    return user;
-  }
+@Target([ElementType.PARAMETER])
+@Retention(RetentionPolicy.RUNTIME)
+@AuthenticationPrincipal(errorOnInvalidType = true)
+@interface SpinnakerUser {
 }
