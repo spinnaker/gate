@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component
 @ConditionalOnExpression('${auth.saml.enabled:false}')
 @Configuration
 @Slf4j
-class SAMLConfig implements AuthConfig.WebSecurityAugmentor {
+class SAMLConfig {
   @Component
   @ConfigurationProperties("auth.saml")
   static class SAMLSecurityConfigProperties {
@@ -64,7 +64,6 @@ class SAMLConfig implements AuthConfig.WebSecurityAugmentor {
   @Autowired
   SAMLSecurityConfigProperties samlSecurityConfigProperties
 
-  @Override
   void configure(HttpSecurity http,
                  UserDetailsService userDetailsService,
                  AuthenticationManager authenticationManager) {
@@ -74,7 +73,6 @@ class SAMLConfig implements AuthConfig.WebSecurityAugmentor {
     http.rememberMe().rememberMeServices(rememberMeServices(userDetailsService))
   }
 
-  @Override
   void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
     // do nothing
   }
