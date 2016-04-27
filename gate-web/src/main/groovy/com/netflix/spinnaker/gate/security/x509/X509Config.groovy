@@ -30,12 +30,11 @@ import org.springframework.security.web.authentication.preauth.x509.X509Authenti
 
 @ConditionalOnExpression('${auth.x509.enabled:false}')
 @Configuration
-class X509Config implements AuthConfig.WebSecurityAugmentor {
+class X509Config {
 
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  @Override
   void configure(HttpSecurity http,
                  UserDetailsService userDetailsService,
                  AuthenticationManager authenticationManager) {
@@ -44,7 +43,6 @@ class X509Config implements AuthConfig.WebSecurityAugmentor {
     http.addFilter(filter)
   }
 
-  @Override
   void configure(AuthenticationManagerBuilder auth) {
     auth.authenticationProvider(new X509AuthenticationProvider(anonymousAccountsService))
   }

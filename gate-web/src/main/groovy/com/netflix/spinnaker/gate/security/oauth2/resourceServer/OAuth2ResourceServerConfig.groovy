@@ -50,8 +50,7 @@ import javax.servlet.ServletResponse
 @CompileStatic
 @Configuration
 @ConditionalOnExpression('${auth.oauth2ResourceServer.enabled:false}')
-class OAuth2ResourceServerConfig implements AuthConfig.WebSecurityAugmentor {
-  @Override
+class OAuth2ResourceServerConfig {
   void configure(HttpSecurity http,
                  UserDetailsService userDetailsService,
                  AuthenticationManager authenticationManager) {
@@ -71,7 +70,6 @@ class OAuth2ResourceServerConfig implements AuthConfig.WebSecurityAugmentor {
     http.addFilterBefore(filter, BasicAuthenticationFilter)
   }
 
-  @Override
   void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
     authenticationManagerBuilder.authenticationProvider(
       authenticationProvider(identityResourceServerTokenServices(restTemplate()))
