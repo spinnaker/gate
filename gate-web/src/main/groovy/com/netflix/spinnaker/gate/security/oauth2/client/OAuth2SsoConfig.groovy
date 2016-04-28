@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.security.oauth2.client
 
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
+import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -44,7 +45,9 @@ import org.springframework.security.oauth2.provider.OAuth2Request
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices
 
 @Configuration
-@EnableWebMvcSecurity // Use @EnableWebSecurity if/when updated to Spring Security 4.
+@SpinnakerAuthConfig
+// Use @EnableWebSecurity if/when updated to Spring Security 4.
+@EnableWebMvcSecurity
 @Import(SecurityAutoConfiguration)
 @EnableOAuth2Sso
 // Note the 4 single-quotes below - this is a raw groovy string, because SpEL and groovy
