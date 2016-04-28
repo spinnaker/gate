@@ -18,32 +18,41 @@ package com.netflix.spinnaker.gate.security.x509
 
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
-
+import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter
 
-@ConditionalOnExpression('${auth.x509.enabled:false}')
+@ConditionalOnExpression('${x509.enabled:false}')
+@SpinnakerAuthConfig
 @Configuration
-class X509Config {
+@EnableWebMvcSecurity
+class X509Config extends WebSecurityConfigurerAdapter {
 
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  void configure(HttpSecurity http,
-                 UserDetailsService userDetailsService,
-                 AuthenticationManager authenticationManager) {
-    def filter = new X509AuthenticationFilter()
-    filter.setAuthenticationManager(authenticationManager)
-    http.addFilter(filter)
-  }
 
+  @Override
   void configure(AuthenticationManagerBuilder auth) {
     auth.authenticationProvider(new X509AuthenticationProvider(anonymousAccountsService))
+  }
+
+  @Override
+  void configure(HttpSecurity http) {
+    // Specify which endpoints to lock down.
+    AuthConfig.configure(http)
+
+    // We don't use http.x509() here because there is no way to override it to use our
+    // Spinnaker User as the Principal. The {@link X509AuthenticationProvider} configured
+    // above (in tandem with this config) enable us to insert this custom Principal.
+    def filter = new X509AuthenticationFilter()
+    filter.setAuthenticationManager(authenticationManager())
+    http.addFilter(filter)
   }
 }

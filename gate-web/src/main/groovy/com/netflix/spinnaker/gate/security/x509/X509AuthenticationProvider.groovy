@@ -58,7 +58,8 @@ class X509AuthenticationProvider implements AuthenticationProvider {
 
     return new PreAuthenticatedAuthenticationToken(
       new User(rfc822Name as String, null, null, [], anonymousAccountsService.allowedAccounts),
-      authentication.credentials)
+      authentication.credentials,
+      [])
   }
 
   @Override
