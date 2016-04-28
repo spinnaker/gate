@@ -17,45 +17,31 @@
 package com.netflix.spinnaker.gate.security.anonymous
 
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
-import com.netflix.spinnaker.gate.security.AuthConfig
-
+import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AnonymousAuthenticationProvider
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 
-@ConditionalOnExpression('${auth.anonymous.enabled:false}')
+@ConditionalOnMissingBean(annotation = SpinnakerAuthConfig.class)
 @Configuration
-@ConfigurationProperties(prefix = "auth.anonymous")
-class AnonymousConfig {
-  Boolean enabled
+@EnableWebMvcSecurity
+class AnonymousConfig extends WebSecurityConfigurerAdapter {
   String key = "spinnaker-anonymous"
   String defaultEmail = "anonymous"
 
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
-  void configure(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
-    def filter = new AnonymousAuthenticationFilter(
-      // it seems like a smell that this is statically initialized with the allowedAccounts
-      key,
-      new User(email: defaultEmail,
-               roles: ["anonymous"],
-               allowedAccounts: anonymousAccountsService.getAllowedAccounts()),
-      [new SimpleGrantedAuthority("anonymous")]
-    )
-    http.addFilter(filter)
-  }
-
-  void configure(AuthenticationManagerBuilder auth) {
-    auth.authenticationProvider(new AnonymousAuthenticationProvider(key))
+  void configure(HttpSecurity http) {
+    http.anonymous()
+        .key(key)
+        .authorities("anonymous")
+        .principal(new User(email: defaultEmail,
+                            roles: ["anonymous"],
+                            allowedAccounts: anonymousAccountsService.getAllowedAccounts()))
   }
 }
