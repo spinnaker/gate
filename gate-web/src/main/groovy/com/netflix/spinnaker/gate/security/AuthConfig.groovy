@@ -27,7 +27,7 @@ class AuthConfig {
     http.csrf().disable()
     http.authorizeRequests()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .antMatchers('/auth/**').permitAll()
+        .antMatchers('/auth/user').permitAll()
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
   }
