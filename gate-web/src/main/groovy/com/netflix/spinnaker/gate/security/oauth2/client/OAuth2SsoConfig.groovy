@@ -19,9 +19,11 @@ package com.netflix.spinnaker.gate.security.oauth2.client
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
+import com.netflix.spinnaker.gate.security.rolesprovider.SpinnakerUserRolesProvider
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties
 import org.springframework.cloud.security.oauth2.resource.UserInfoTokenServices
@@ -65,6 +67,17 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
     AuthConfig.configure(http)
   }
 
+  @Bean
+  @ConditionalOnMissingBean(SpinnakerUserRolesProvider)
+  SpinnakerUserRolesProvider defaultUserRolesProvider() {
+    return new SpinnakerUserRolesProvider() {
+      @Override
+      Collection<String> loadRoles(String userEmail) {
+        return []
+      }
+    }
+  }
+
   /**
    * ResourceServerTokenServices is an interface used to manage access tokens. The UserInfoTokenService object is an
    * implementation of that interface that uses an access token to get the logged in user's data (such as email or
@@ -84,6 +97,9 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
       @Autowired
       AnonymousAccountsService anonymousAccountsService
 
+      @Autowired
+      SpinnakerUserRolesProvider spinnakerUserRolesProvider
+
       @Override
       OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
         OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
@@ -96,18 +112,17 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
         SpinnakerAuthentication spinnakerAuthentication = new SpinnakerAuthentication(AuthorityUtils.createAuthorityList("IM_A_ROLE"))
         Map details = oAuth2Authentication.userAuthentication.details as Map
         spinnakerAuthentication.principal = new User(
-            email: details.email,
-            firstName: details.given_name,
-            lastName: details.family_name,
-            // TODO(jacobkiefer): Get full list of allowed accounts based on group membership.
-            allowedAccounts: anonymousAccountsService.allowedAccounts,
-            roles: spinnakerAuthentication.authorities.collect { it.toString() }
+          email: details.email,
+          firstName: details.given_name,
+          lastName: details.family_name,
+          allowedAccounts: anonymousAccountsService.allowedAccounts,
+          roles: spinnakerUserRolesProvider.loadRoles(details.email)
         )
         spinnakerAuthentication.setAuthenticated(true)
 
         // impl copied from userInfoTokenServices
         OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,
-                                                        null, null, null, null, null);
+          null, null, null, null, null);
 
         return new OAuth2Authentication(storedRequest, spinnakerAuthentication)
       }
