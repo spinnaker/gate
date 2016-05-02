@@ -25,6 +25,6 @@ import java.lang.annotation.Target
 
 @Target([ElementType.PARAMETER])
 @Retention(RetentionPolicy.RUNTIME)
-@AuthenticationPrincipal
+@AuthenticationPrincipal(errorOnInvalidType = true)
 @interface SpinnakerUser {
 }

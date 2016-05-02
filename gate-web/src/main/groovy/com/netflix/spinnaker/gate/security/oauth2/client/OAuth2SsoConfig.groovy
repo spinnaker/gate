@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.security.oauth2.client
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
+import com.netflix.spinnaker.gate.security.SpinnakerUserDetails
 import com.netflix.spinnaker.gate.security.rolesprovider.SpinnakerUserRolesProvider
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +46,7 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.OAuth2Request
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 
 @Configuration
 @SpinnakerAuthConfig
@@ -104,51 +106,35 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
       OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
         OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
 
-        // TODO(ttomsu): https://github.com/spring-projects/spring-boot/pull/5053 would obviate the need to create a
-        // custom Authentication object just to override the Principal. Alas, it's not scheduled to be released until
-        // Spring Boot 1.3.4.
-        // See also https://github.com/spring-projects/spring-boot/commit/4768faaba771e35301b0ac68abf09cdb0e2f6881,
-        // which adds an AuthoritiesExtractor, which eliminate the other need for this class (Authorities).
-        SpinnakerAuthentication spinnakerAuthentication = new SpinnakerAuthentication(AuthorityUtils.createAuthorityList("IM_A_ROLE"))
         Map details = oAuth2Authentication.userAuthentication.details as Map
-        spinnakerAuthentication.principal = new User(
+
+        User spinnakerUser = new User(
           email: details.email,
           firstName: details.given_name,
           lastName: details.family_name,
           allowedAccounts: anonymousAccountsService.allowedAccounts,
           roles: spinnakerUserRolesProvider.loadRoles(details.email)
         )
-        spinnakerAuthentication.setAuthenticated(true)
+
+        SpinnakerUserDetails spinnakerUserDetails = new SpinnakerUserDetails(spinnakerUser: spinnakerUser)
+        // Uses the constructor that sets authenticated = true.
+        PreAuthenticatedAuthenticationToken authentication = new PreAuthenticatedAuthenticationToken(
+            spinnakerUserDetails,
+            null /* credentials */,
+            spinnakerUserDetails.authorities)
+
 
         // impl copied from userInfoTokenServices
         OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,
           null, null, null, null, null);
 
-        return new OAuth2Authentication(storedRequest, spinnakerAuthentication)
+        return new OAuth2Authentication(storedRequest, authentication)
       }
 
       @Override
       OAuth2AccessToken readAccessToken(String accessToken) {
         return userInfoTokenServices.readAccessToken(accessToken)
       }
-    }
-  }
-
-  /**
-   * Simple implementation to hold our Kork User as the Principal, which is used all over the framework.
-   */
-  static class SpinnakerAuthentication extends AbstractAuthenticationToken {
-    def credentials
-    User principal
-
-    /**
-     * Creates a token with the supplied array of authorities.
-     *
-     * @param authorities the collection of <tt>GrantedAuthority</tt>s for the
-     *                    principal represented by this authentication object.
-     */
-    SpinnakerAuthentication(Collection<? extends GrantedAuthority> authorities) {
-      super(authorities)
     }
   }
 }
