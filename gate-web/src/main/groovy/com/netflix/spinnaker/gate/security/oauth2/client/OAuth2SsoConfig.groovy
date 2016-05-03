@@ -35,12 +35,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
-import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException
 import org.springframework.security.oauth2.provider.OAuth2Authentication
@@ -48,6 +45,17 @@ import org.springframework.security.oauth2.provider.OAuth2Request
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 
+/**
+ * Each time a class extends WebSecurityConfigurerAdapter, a new set of matchers + filters gets added
+ * to the FilterChainProxy. This is not great when we want to protect the same URLs with different kinds of
+ * security mechanisms, because only the first set of filters that hit the matchers will be executed.
+ *
+ * In order to get around this, we must only have 1 class that extends WebSecurityConfigurerAdapter.
+ * Unfortunately, the OAuth2 library (sping-security-oauth) has such a class baked in. If we have OAuth2 enabled,
+ * AND want an additional kind of security mechanism (X509, for example), we must use the
+ * {@link OAuth2SsoConfigurerAdapter} hook the library has provided. This way, only a single set of matchers
+ * and filters are added.
+ */
 @Configuration
 @SpinnakerAuthConfig
 // Use @EnableWebSecurity if/when updated to Spring Security 4.
@@ -60,12 +68,12 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
 
   @Override
-  public void match(OAuth2SsoConfigurer.RequestMatchers matchers) {
+  void match(OAuth2SsoConfigurer.RequestMatchers matchers) {
     matchers.antMatchers('/**')
   }
 
   @Override
-  public void configure(HttpSecurity http) throws Exception {
+  void configure(HttpSecurity http) throws Exception {
     AuthConfig.configure(http)
   }
 
@@ -109,11 +117,11 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
         Map details = oAuth2Authentication.userAuthentication.details as Map
 
         User spinnakerUser = new User(
-          email: details.email,
-          firstName: details.given_name,
-          lastName: details.family_name,
-          allowedAccounts: anonymousAccountsService.allowedAccounts,
-          roles: spinnakerUserRolesProvider.loadRoles(details.email)
+            email: details.email,
+            firstName: details.given_name,
+            lastName: details.family_name,
+            allowedAccounts: anonymousAccountsService.allowedAccounts,
+            roles: spinnakerUserRolesProvider.loadRoles(details.email)
         )
 
         SpinnakerUserDetails spinnakerUserDetails = new SpinnakerUserDetails(spinnakerUser: spinnakerUser)
@@ -123,10 +131,9 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
             null /* credentials */,
             spinnakerUserDetails.authorities)
 
-
         // impl copied from userInfoTokenServices
         OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,
-          null, null, null, null, null);
+                                                        null, null, null, null, null);
 
         return new OAuth2Authentication(storedRequest, authentication)
       }

@@ -36,6 +36,8 @@ import java.security.cert.X509Certificate
 @Component
 class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
+  private static final String RFC822_NAME_ID = "1"
+
   @Autowired
   AnonymousAccountsService anonymousAccountsService
 
@@ -45,8 +47,34 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
       return null
     }
 
+    def x509 = (X509Certificate) token.credentials
+    def email = emailFromSubjectAlternativeName(x509) ?: token.principal
+
     return new SpinnakerUserDetails(
-        spinnakerUser: new User(email: token.principal,
+        spinnakerUser: new User(email: email,
                                 allowedAccounts: anonymousAccountsService.allowedAccounts))
+  }
+
+  /**
+   * https://tools.ietf.org/html/rfc3280#section-4.2.1.7
+   *
+   *  SubjectAltName ::= GeneralNames
+   *  GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
+   *  GeneralName ::= CHOICE {
+   *    otherName                       [0]
+   *    rfc822Name                      [1]
+   *    dNSName                         [2]
+   *    x400Address                     [3]
+   *    directoryName                   [4]
+   *    ediPartyName                    [5]
+   *    uniformResourceIdentifier       [6]
+   *    iPAddress                       [7]
+   *    registeredID                    [8]
+   *  }
+   */
+  static String emailFromSubjectAlternativeName(X509Certificate cert) {
+    cert.getSubjectAlternativeNames().find {
+      it.find { it.toString() == RFC822_NAME_ID }
+    }?.get(1)
   }
 }
