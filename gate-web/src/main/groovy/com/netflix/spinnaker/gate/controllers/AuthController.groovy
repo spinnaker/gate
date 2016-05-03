@@ -36,6 +36,8 @@ class AuthController {
 
   @RequestMapping("/redirect")
   void redirect(HttpServletResponse response, @RequestParam String to) {
+    // TODO(ttomsu): Open redirect vulnerability here. Add validation of 'to' param to ensure it's a
+    // trusted destination.
     response.sendRedirect(to)
   }
 }
