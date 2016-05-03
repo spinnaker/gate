@@ -112,7 +112,7 @@ class OAuth2ResourceServerConfig {
     @Override
     Authentication extractAuthentication(Map<String, ?> map) {
       def allowedAccounts = (map.scope ?: []).collect { String scope -> scope.replace("spinnaker_", "")}
-      def user = new User(map.client_id as String, null, null, [], allowedAccounts)
+      def user = new User(email: map.client_id as String, roles: [], allowedAccounts: allowedAccounts)
       return new UsernamePasswordAuthenticationToken(user, "N/A", [])
     }
   }
