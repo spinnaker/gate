@@ -18,19 +18,24 @@ package com.netflix.spinnaker.gate.security.x509
 
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
+import com.netflix.spinnaker.gate.security.oauth2.client.OAuth2SsoConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurer
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 
 @ConditionalOnExpression('${spring.x509.enabled:false}')
-@SpinnakerAuthConfig
 @Configuration
+@SpinnakerAuthConfig
 @EnableWebMvcSecurity
-class X509Config extends WebSecurityConfigurerAdapter {
+class X509Config {
 
   @Value('${spring.x509.subjectPrincipalRegex:}')
   String subjectPrincipalRegex
@@ -38,13 +43,45 @@ class X509Config extends WebSecurityConfigurerAdapter {
   @Autowired
   X509AuthenticationUserDetailsService x509AuthenticationUserDetailsService
 
-  @Override
   void configure(HttpSecurity http) {
-    AuthConfig.configure(http)
     http.x509().authenticationUserDetailsService(x509AuthenticationUserDetailsService)
 
     if (subjectPrincipalRegex) {
       http.x509().subjectPrincipalRegex(subjectPrincipalRegex)
+    }
+  }
+
+  /**
+   * See {@link OAuth2SsoConfig} for why these classes and conditionals exist!
+   */
+  @ConditionalOnMissingBean(OAuth2SsoConfig)
+  @Bean
+  X509StandaloneAuthConfig standaloneConfig() {
+    new X509StandaloneAuthConfig()
+  }
+
+  class X509StandaloneAuthConfig extends WebSecurityConfigurerAdapter {
+    void configure(HttpSecurity http) {
+      AuthConfig.configure(http)
+      X509Config.this.configure(http)
+    }
+  }
+
+  @ConditionalOnBean(OAuth2SsoConfig)
+  @Bean
+  X509MultiAuthConfig multiAuthConfig() {
+    new X509MultiAuthConfig()
+  }
+
+  class X509MultiAuthConfig implements OAuth2SsoConfigurer {
+    @Override
+    void match(OAuth2SsoConfigurer.RequestMatchers matchers) {
+      matchers.antMatchers('/**')
+    }
+
+    @Override
+    void configure(HttpSecurity http) throws Exception {
+      X509Config.this.configure(http)
     }
   }
 }
