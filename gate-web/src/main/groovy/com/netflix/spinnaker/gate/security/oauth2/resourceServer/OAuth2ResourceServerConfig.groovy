@@ -16,8 +16,6 @@
 
 package com.netflix.spinnaker.gate.security.oauth2.resourceServer
 
-import com.netflix.spinnaker.gate.security.AuthConfig
-
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.transform.CompileStatic
