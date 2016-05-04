@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.gate.security.x509
 
-import com.netflix.spinnaker.gate.security.AnonymousAccountsService
+import com.netflix.spinnaker.gate.services.AnonymousAccountsService
 
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired

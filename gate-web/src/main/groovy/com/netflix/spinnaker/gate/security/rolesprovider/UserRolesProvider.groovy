@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security.rolesprovider.google
+package com.netflix.spinnaker.gate.security.rolesprovider
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
-
-@Configuration
-@ConfigurationProperties("auth.groupMembership.google")
-class GoogleDirectoryUserRolesProviderConfig {
-
-  String serviceAccountEmail
-
-  String credentialPath
-
-  String adminUsername // email of the Google Apps admin the service account is acting on behalf of
-
-  String domain
+public interface UserRolesProvider {
+  public Collection<String> loadRoles(String userEmail)
 }
