@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.security.oauth2.client
+package com.netflix.spinnaker.gate.security.oauth2
 
-import com.netflix.spinnaker.gate.security.AnonymousAccountsService
+import com.netflix.spinnaker.gate.services.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.rolesprovider.SpinnakerUserRolesProvider
+import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -77,9 +77,9 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
   }
 
   @Bean
-  @ConditionalOnMissingBean(SpinnakerUserRolesProvider)
-  SpinnakerUserRolesProvider defaultUserRolesProvider() {
-    return new SpinnakerUserRolesProvider() {
+  @ConditionalOnMissingBean(UserRolesProvider)
+  UserRolesProvider defaultUserRolesProvider() {
+    return new UserRolesProvider() {
       @Override
       Collection<String> loadRoles(String userEmail) {
         return []
@@ -107,7 +107,7 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
       AnonymousAccountsService anonymousAccountsService
 
       @Autowired
-      SpinnakerUserRolesProvider spinnakerUserRolesProvider
+      UserRolesProvider spinnakerUserRolesProvider
 
       @Override
       OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {

@@ -24,19 +24,21 @@ import com.google.api.services.admin.directory.Directory
 import com.google.api.services.admin.directory.DirectoryScopes
 import com.google.api.services.admin.directory.model.Group
 import com.google.api.services.admin.directory.model.Groups
-import com.netflix.spinnaker.gate.security.rolesprovider.SpinnakerUserRolesProvider
+import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
 import org.springframework.util.Assert
 
 @Component
 @ConditionalOnProperty(value = "auth.groupMembership.service", havingValue = "google")
-class GoogleDirectoryUserRolesProvider implements SpinnakerUserRolesProvider, InitializingBean {
+class GoogleDirectoryUserRolesProvider implements UserRolesProvider, InitializingBean {
 
   @Autowired
-  GoogleDirectoryUserRolesProviderConfig config
+  Config config
 
   private static final Collection<String> SERVICE_ACCOUNT_SCOPES = [DirectoryScopes.ADMIN_DIRECTORY_GROUP_READONLY]
 
@@ -70,5 +72,21 @@ class GoogleDirectoryUserRolesProvider implements SpinnakerUserRolesProvider, In
     return new Directory.Builder(httpTransport, jsonFactory, credential)
       .setApplicationName("Spinnaker-Gate")
       .build()
+  }
+
+  @Configuration
+  @ConfigurationProperties("auth.groupMembership.google")
+  static class Config {
+
+    String serviceAccountEmail
+
+    String credentialPath
+
+    /**
+     * email of the Google Apps admin the service account is acting on behalf of.
+     */
+    String adminUsername
+
+    String domain
   }
 }
