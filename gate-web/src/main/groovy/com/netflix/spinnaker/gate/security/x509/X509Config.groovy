@@ -18,7 +18,7 @@ package com.netflix.spinnaker.gate.security.x509
 
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.oauth2.client.OAuth2SsoConfig
+import com.netflix.spinnaker.gate.security.oauth2.OAuth2SsoConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
