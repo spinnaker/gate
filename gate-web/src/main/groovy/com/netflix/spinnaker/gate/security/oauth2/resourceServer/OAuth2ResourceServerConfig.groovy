@@ -16,8 +16,6 @@
 
 package com.netflix.spinnaker.gate.security.oauth2.resourceServer
 
-import com.netflix.spinnaker.gate.security.AuthConfig
-
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.transform.CompileStatic
@@ -112,7 +110,7 @@ class OAuth2ResourceServerConfig {
     @Override
     Authentication extractAuthentication(Map<String, ?> map) {
       def allowedAccounts = (map.scope ?: []).collect { String scope -> scope.replace("spinnaker_", "")}
-      def user = new User(map.client_id as String, null, null, [], allowedAccounts)
+      def user = new User(email: map.client_id as String, roles: [], allowedAccounts: allowedAccounts)
       return new UsernamePasswordAuthenticationToken(user, "N/A", [])
     }
   }

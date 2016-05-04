@@ -17,7 +17,6 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.security.SpinnakerUser
-import com.netflix.spinnaker.gate.security.SpinnakerUserDetails
 import com.netflix.spinnaker.security.User
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -30,8 +29,8 @@ import javax.servlet.http.HttpServletResponse
 class AuthController {
 
   @RequestMapping("/user")
-  User user(@SpinnakerUser SpinnakerUserDetails user) {
-    user?.spinnakerUser
+  User user(@SpinnakerUser User user) {
+    user
   }
 
   @RequestMapping("/redirect")

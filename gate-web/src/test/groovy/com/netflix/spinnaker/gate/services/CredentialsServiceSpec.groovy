@@ -45,7 +45,7 @@ class CredentialsServiceSpec extends Specification {
     expect:
     AuthenticatedRequest.propagate({
       new CredentialsService(clouddriverService: clouddriverService).getAccounts()
-    }, false, new User("email", null, null, [], userAccounts)).call() as List<ClouddriverService.Account> == allowedACcounts
+    }, false, new User(email: "email", roles:[], allowedAccounts: userAccounts)).call() as List<ClouddriverService.Account> == allowedACcounts
 
     where:
     userAccounts                         || allowedACcounts

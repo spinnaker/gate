@@ -19,7 +19,6 @@ package com.netflix.spinnaker.gate.security.oauth2.client
 import com.netflix.spinnaker.gate.security.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.SpinnakerUserDetails
 import com.netflix.spinnaker.gate.security.rolesprovider.SpinnakerUserRolesProvider
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
@@ -124,12 +123,10 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
             roles: spinnakerUserRolesProvider.loadRoles(details.email)
         )
 
-        SpinnakerUserDetails spinnakerUserDetails = new SpinnakerUserDetails(spinnakerUser: spinnakerUser)
-        // Uses the constructor that sets authenticated = true.
         PreAuthenticatedAuthenticationToken authentication = new PreAuthenticatedAuthenticationToken(
-            spinnakerUserDetails,
+            spinnakerUser,
             null /* credentials */,
-            spinnakerUserDetails.authorities)
+            spinnakerUser.authorities)
 
         // impl copied from userInfoTokenServices
         OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,
