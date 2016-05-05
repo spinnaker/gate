@@ -16,14 +16,13 @@
 
 package com.netflix.spinnaker.gate.security.oauth2
 
-import com.netflix.spinnaker.gate.services.AnonymousAccountsService
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
+import com.netflix.spinnaker.gate.services.AnonymousAccountsService
 import com.netflix.spinnaker.security.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties
 import org.springframework.cloud.security.oauth2.resource.UserInfoTokenServices
@@ -76,17 +75,6 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
     AuthConfig.configure(http)
   }
 
-  @Bean
-  @ConditionalOnMissingBean(UserRolesProvider)
-  UserRolesProvider defaultUserRolesProvider() {
-    return new UserRolesProvider() {
-      @Override
-      Collection<String> loadRoles(String userEmail) {
-        return []
-      }
-    }
-  }
-
   /**
    * ResourceServerTokenServices is an interface used to manage access tokens. The UserInfoTokenService object is an
    * implementation of that interface that uses an access token to get the logged in user's data (such as email or
@@ -107,7 +95,7 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
       AnonymousAccountsService anonymousAccountsService
 
       @Autowired
-      UserRolesProvider spinnakerUserRolesProvider
+      UserRolesProvider userRolesProvider
 
       @Override
       OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
@@ -120,13 +108,14 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
             firstName: details.given_name,
             lastName: details.family_name,
             allowedAccounts: anonymousAccountsService.allowedAccounts,
-            roles: spinnakerUserRolesProvider.loadRoles(details.email)
+            roles: userRolesProvider.loadRoles(details.email)
         )
 
         PreAuthenticatedAuthenticationToken authentication = new PreAuthenticatedAuthenticationToken(
             spinnakerUser,
             null /* credentials */,
-            spinnakerUser.authorities)
+            spinnakerUser.authorities
+        )
 
         // impl copied from userInfoTokenServices
         OAuth2Request storedRequest = new OAuth2Request(null, sso.clientId, null, true /*approved*/,

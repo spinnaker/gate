@@ -16,12 +16,29 @@
 
 package com.netflix.spinnaker.gate.security
 
+import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
 import groovy.util.logging.Slf4j
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 
 @Slf4j
+@Configuration
 class AuthConfig {
+
+
+  @Bean
+  @ConditionalOnMissingBean(UserRolesProvider)
+  UserRolesProvider defaultUserRolesProvider() {
+    return new UserRolesProvider() {
+      @Override
+      Collection<String> loadRoles(String userEmail) {
+        return []
+      }
+    }
+  }
 
   static void configure(HttpSecurity http) throws Exception {
     http.csrf().disable()
