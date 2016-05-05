@@ -52,6 +52,9 @@ class GoogleDirectoryUserRolesProvider implements UserRolesProvider, Initializin
 
   @Override
   Collection<String> loadRoles(String userEmail) {
+    if (!userEmail) {
+      return []
+    }
     Directory service = getDirectoryService()
     Groups groups = service.groups().list().setDomain(config.domain).setUserKey(userEmail).execute()
     return groups.getGroups().collect { Group g -> g.getName() }
