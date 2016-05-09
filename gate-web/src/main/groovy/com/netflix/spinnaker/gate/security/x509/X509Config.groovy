@@ -19,6 +19,8 @@ package com.netflix.spinnaker.gate.security.x509
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.oauth2.OAuth2SsoConfig
+import com.netflix.spinnaker.gate.security.saml.SamlSsoConfig
+import com.netflix.spinnaker.gate.security.saml.SamlSsoConfigurer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -54,7 +56,7 @@ class X509Config {
   /**
    * See {@link OAuth2SsoConfig} for why these classes and conditionals exist!
    */
-  @ConditionalOnMissingBean(OAuth2SsoConfig)
+  @ConditionalOnMissingBean([OAuth2SsoConfig, SamlSsoConfig])
   @Bean
   X509StandaloneAuthConfig standaloneConfig() {
     new X509StandaloneAuthConfig()
@@ -69,16 +71,29 @@ class X509Config {
 
   @ConditionalOnBean(OAuth2SsoConfig)
   @Bean
-  X509MultiAuthConfig multiAuthConfig() {
-    new X509MultiAuthConfig()
+  X509OAuthConfig withOauthConfig() {
+    new X509OAuthConfig()
   }
 
-  class X509MultiAuthConfig implements OAuth2SsoConfigurer {
+  class X509OAuthConfig implements OAuth2SsoConfigurer {
     @Override
     void match(OAuth2SsoConfigurer.RequestMatchers matchers) {
       matchers.antMatchers('/**')
     }
 
+    @Override
+    void configure(HttpSecurity http) throws Exception {
+      X509Config.this.configure(http)
+    }
+  }
+
+  @ConditionalOnBean(SamlSsoConfig)
+  @Bean
+  X509SamlConfig withSamlConfig() {
+    new X509SamlConfig()
+  }
+
+  class X509SamlConfig implements SamlSsoConfigurer {
     @Override
     void configure(HttpSecurity http) throws Exception {
       X509Config.this.configure(http)
