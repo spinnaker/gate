@@ -18,14 +18,17 @@ package com.netflix.spinnaker.gate.security.saml
 
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
+import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
 import com.netflix.spinnaker.gate.services.AnonymousAccountsService
+import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
+import org.opensaml.saml2.core.Assertion
+import org.opensaml.saml2.core.Attribute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.web.ServerProperties
-import org.springframework.boot.context.embedded.Ssl
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -65,6 +68,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
     String metadataUrl
     // The hostname of this server passed to the SAML IdP.
     String redirectHostname
+    // The application identifier given to the IdP for this app.
+    String issuerId
 
     List<String> requiredRoles
     UserAttributeMapping userAttributeMapping = new UserAttributeMapping()
@@ -82,13 +87,19 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SAMLUserDetailsService samlUserDetailsService
 
+  @Autowired
+  List<SamlSsoConfigurer> configurers
+
   @Override
   void configure(HttpSecurity http) {
     http.rememberMe().rememberMeServices(rememberMeServices(userDetailsService()))
+      .and()
+      .authorizeRequests().antMatchers("/saml/**").permitAll()
 
-    if (samlSecurityConfigProperties.requireAuthentication) {
-      http.authorizeRequests().antMatchers("/saml/**").permitAll()
-      AuthConfig.configure(http)
+    AuthConfig.configure(http)
+
+    configurers.each {
+      it.configure(http)
     }
 
     http.apply(
@@ -116,16 +127,71 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   SAMLUserDetailsService samlUserDetailsService() {
+    // TODO(ttomsu): This is a NFLX specific user extractor. Make a more generic one?
     new SAMLUserDetailsService() {
 
       @Autowired
       AnonymousAccountsService anonymousAccountsService
 
+      @Autowired
+      ClouddriverService clouddriverService
+
+      @Autowired
+      UserRolesProvider userRolesProvider
+
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
-        new User(email: credential?.nameID?.value,
-                 roles: [],
-                 allowedAccounts: anonymousAccountsService.allowedAccounts)
+        def assertion = credential.authenticationAssertion
+        def attributes = extractAttributes(assertion)
+        def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
+
+        def email = assertion.getSubject().nameID.value
+        def roles = extractRoles(email, attributes, userAttributeMapping)
+
+        new User(email: email,
+          firstName: attributes[userAttributeMapping.firstName]?.get(0),
+          lastName: attributes[userAttributeMapping.lastName]?.get(0),
+          roles: roles,
+          allowedAccounts: allowedAccounts(roles))
+      }
+
+      Set<String> allowedAccounts(Set<String> roles) {
+        def allowedAccounts = (anonymousAccountsService.allowedAccounts ?: []) as Set<String>
+
+        clouddriverService.accounts.findAll {
+          it.requiredGroupMembership.find {
+            roles.contains(it.toLowerCase())
+          }
+        }.each {
+          allowedAccounts << it.name
+        }
+
+        return allowedAccounts
+      }
+
+
+      Set<String> extractRoles(String email,
+                                Map<String, List<String>> attributes,
+                                UserAttributeMapping userAttributeMapping) {
+        def assertionRoles = attributes[userAttributeMapping.roles].collect { String roles ->
+          def commonNames = roles.split(";")
+          commonNames.collect {
+            return it.indexOf("CN=") < 0 ? it : it.substring(it.indexOf("CN=") + 3, it.indexOf(","))
+          }
+        }.flatten()*.toLowerCase() as Set<String>
+
+        return assertionRoles + userRolesProvider.loadRoles(email)
+      }
+
+      static Map<String, List<String>> extractAttributes(Assertion assertion) {
+        def attributes = [:]
+        assertion.attributeStatements*.attributes.flatten().each { Attribute attribute ->
+          def name = attribute.name
+          def values = attribute.attributeValues*.getDOM()*.textContent
+          attributes[name] = values
+        }
+
+        return attributes
       }
     }
   }
