@@ -102,19 +102,22 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       it.configure(http)
     }
 
-    http.apply(
-        saml().keyStore()
-            .storeFilePath(samlSecurityConfigProperties.keyStore)
-            .password(samlSecurityConfigProperties.keyStorePassword)
-            .keyname(samlSecurityConfigProperties.keyStoreAliasName)
-            .keyPassword(samlSecurityConfigProperties.keyStorePassword)
+    http
+      .apply(saml())
+          .userDetailsService(samlUserDetailsService)
+          .identityProvider()
+            .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
             .and()
+          .serviceProvider()
             .entityId(samlSecurityConfigProperties.issuerId)
             .protocol(serverProperties?.ssl?.enabled ? "https" : "http")
             .hostname(samlSecurityConfigProperties.redirectHostname ?: serverProperties?.address?.hostName)
             .basePath("/")
-            .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
-            .userDetailsService(samlUserDetailsService))
+            .keyStore()
+              .storeFilePath(samlSecurityConfigProperties.keyStore)
+              .password(samlSecurityConfigProperties.keyStorePassword)
+              .keyname(samlSecurityConfigProperties.keyStoreAliasName)
+              .keyPassword(samlSecurityConfigProperties.keyStorePassword)
   }
 
   @Bean
