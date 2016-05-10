@@ -87,7 +87,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SAMLUserDetailsService samlUserDetailsService
 
-  @Autowired
+  @Autowired(required = false)
   List<SamlSsoConfigurer> configurers
 
   @Override
@@ -98,7 +98,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
     AuthConfig.configure(http)
 
-    configurers.each {
+    configurers?.each {
       it.configure(http)
     }
 
