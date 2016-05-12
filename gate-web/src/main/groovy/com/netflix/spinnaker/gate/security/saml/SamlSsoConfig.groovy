@@ -155,7 +155,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           firstName: attributes[userAttributeMapping.firstName]?.get(0),
           lastName: attributes[userAttributeMapping.lastName]?.get(0),
           roles: roles,
-          allowedAccounts: allowedAccounts(roles))
+          allowedAccounts: allowedAccounts(roles),
+          username: email) // TODO(ttomsu): assign username to email by default.
       }
 
       Set<String> allowedAccounts(Set<String> roles) {
@@ -190,7 +191,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         def attributes = [:]
         assertion.attributeStatements*.attributes.flatten().each { Attribute attribute ->
           def name = attribute.name
-          def values = attribute.attributeValues*.getDOM()*.textContent
+          def values = attribute.attributeValues*.textContent
           attributes[name] = values
         }
 
