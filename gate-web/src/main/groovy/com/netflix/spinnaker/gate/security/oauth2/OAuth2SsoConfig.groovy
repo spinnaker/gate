@@ -102,13 +102,16 @@ class OAuth2SsoConfig extends OAuth2SsoConfigurerAdapter {
         OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
 
         Map details = oAuth2Authentication.userAuthentication.details as Map
+        def email = details.email ?: details.userPrincipalName
 
+        // TODO(ttomsu): Pull these values into config so that every OAuth provider doesn't need to specify how to
+        // extract user details.
         User spinnakerUser = new User(
-            email: details.email,
-            firstName: details.given_name,
-            lastName: details.family_name,
+            email: email,
+            firstName: details.given_name ?: details.givenName,
+            lastName: details.family_name ?: details.surname,
             allowedAccounts: anonymousAccountsService.allowedAccounts,
-            roles: userRolesProvider.loadRoles(details.email)
+            roles: userRolesProvider.loadRoles(email),
         )
 
         PreAuthenticatedAuthenticationToken authentication = new PreAuthenticatedAuthenticationToken(
