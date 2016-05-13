@@ -107,9 +107,9 @@ spring:
       # Set these values in your own config file (e.g. spinnaker-local.yml or gate-azureOAuth.yml).
       # clientId:
       # clientSecret:
-       accessTokenUri: https://login.microsoftonline.com/${azureTenantId}/oauth2/token
-       userAuthorizationUri: https://login.microsoftonline.com/${azureTenantId}/oauth2/authorize?resource=https://graph.windows.net
-      scope: profile
+      accessTokenUri: https://login.microsoftonline.com/${azureTenantId}/oauth2/token
+      userAuthorizationUri: https://login.microsoftonline.com/${azureTenantId}/oauth2/authorize?resource=https://graph.windows.net
+      scope: "profile"
       clientAuthenticationScheme: query
     resource:
       userInfoUri: https://graph.windows.net/me?api-version=1.6
