@@ -17,6 +17,10 @@
 package com.netflix.spinnaker.gate.security.rolesprovider.google
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
+import com.google.api.client.googleapis.batch.BatchRequest
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback
+import com.google.api.client.googleapis.json.GoogleJsonError
+import com.google.api.client.http.HttpHeaders
 import com.google.api.client.http.HttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -25,6 +29,7 @@ import com.google.api.services.admin.directory.DirectoryScopes
 import com.google.api.services.admin.directory.model.Group
 import com.google.api.services.admin.directory.model.Groups
 import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -33,6 +38,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
 import org.springframework.util.Assert
 
+@Slf4j
 @Component
 @ConditionalOnProperty(value = "auth.groupMembership.service", havingValue = "google")
 class GoogleDirectoryUserRolesProvider implements UserRolesProvider, InitializingBean {
@@ -50,6 +56,43 @@ class GoogleDirectoryUserRolesProvider implements UserRolesProvider, Initializin
     Assert.state(config.credentialPath != null, "Supply an service account credentials path")
   }
 
+  private class GroupBatchCallback extends JsonBatchCallback<Groups> {
+
+    Map<String, Collection<String>> emailGroupsMap
+
+    String email
+
+    @Override
+    void onFailure(GoogleJsonError e, HttpHeaders responseHeaders) throws IOException {
+      log.error("Failed to fetch groups: " + e.getMessage())
+    }
+
+    @Override
+    void onSuccess(Groups groups, HttpHeaders responseHeaders) throws IOException {
+      emailGroupsMap[email] = groups.getGroups().collect { Group g -> g.getName() }
+    }
+  }
+
+  @Override
+  Map<String, Collection<String>> multiLoadRoles(Collection<String> userEmails) {
+    if (!userEmails) {
+      return [:]
+    }
+    def emailGroupsMap = [:]
+    Directory service = getDirectoryService()
+    BatchRequest batch = service.batch()
+    userEmails.each { String email ->
+      service
+          .groups()
+          .list()
+          .setDomain(config.domain)
+          .setUserKey(email)
+          .queue(batch, new GroupBatchCallback(emailGroupsMap: emailGroupsMap, email: email))
+    }
+    batch.execute()
+    emailGroupsMap
+  }
+
   @Override
   Collection<String> loadRoles(String userEmail) {
     if (!userEmail) {
@@ -64,17 +107,17 @@ class GoogleDirectoryUserRolesProvider implements UserRolesProvider, Initializin
     HttpTransport httpTransport = new NetHttpTransport()
     JacksonFactory jsonFactory = new JacksonFactory()
     GoogleCredential credential = new GoogleCredential.Builder()
-      .setServiceAccountUser(config.adminUsername)
-      .setTransport(httpTransport)
-      .setJsonFactory(jsonFactory)
-      .setServiceAccountId(config.serviceAccountEmail)
-      .setServiceAccountPrivateKeyFromP12File(new File(config.credentialPath))
-      .setServiceAccountScopes(SERVICE_ACCOUNT_SCOPES)
-      .build()
+        .setServiceAccountUser(config.adminUsername)
+        .setTransport(httpTransport)
+        .setJsonFactory(jsonFactory)
+        .setServiceAccountId(config.serviceAccountEmail)
+        .setServiceAccountPrivateKeyFromP12File(new File(config.credentialPath))
+        .setServiceAccountScopes(SERVICE_ACCOUNT_SCOPES)
+        .build()
 
     return new Directory.Builder(httpTransport, jsonFactory, credential)
-      .setApplicationName("Spinnaker-Gate")
-      .build()
+        .setApplicationName("Spinnaker-Gate")
+        .build()
   }
 
   @Configuration

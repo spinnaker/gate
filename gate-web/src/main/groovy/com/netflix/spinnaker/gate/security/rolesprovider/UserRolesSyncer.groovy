@@ -36,25 +36,35 @@ class UserRolesSyncer {
   UserRolesProvider userRolesProvider
 
   /**
-   Check if a user's groups have changed across _ALL_ sessions every 10 minutes, after an initial delay.
-   Invalidate the user's session if his groups have changed.
+   * Check all sessions to see whether the session user's groups have changed. If so, delete the session.
+   * Repeat every 10 minutes, after an initial delay.
    */
   @Scheduled(initialDelay = 10000L, fixedRate = 600000L)
   public void syncUserGroups() {
-    log.info("Syncing user groups in sessions")
+    Map<String, String> emailSessionKeyMap = [:]
+    Map<String, Collection<String>> emailCurrentGroupsMap = [:]
     Set<String> sessionKeys = redisTemplate.keys('*session:sessions*')
+
     sessionKeys.each { String key ->
-      println key
       def secCtx = redisTemplate.opsForHash().get(key, "sessionAttr:SPRING_SECURITY_CONTEXT") as SecurityContext
-      println secCtx.toString()
       def principal = secCtx?.authentication?.principal
       if (principal && principal instanceof User) {
-        def newRoles = userRolesProvider.loadRoles(principal.email)
-        if (newRoles != principal.roles) {
-          redisTemplate.delete(key)
-        }
+        emailSessionKeyMap[principal.email] = key
+        emailCurrentGroupsMap[principal.email] = principal.roles
       }
     }
-  }
 
+    def newGroupsMap = userRolesProvider.multiLoadRoles(emailSessionKeyMap.keySet())
+    def sessionKeysToDelete = []
+    newGroupsMap.each { String email, Collection<String> newGroups ->
+      // cast for equals check to work
+      List<String> newList = newGroups as List
+      List<String> oldList = emailCurrentGroupsMap[email] as List
+      if (oldList != newList) {
+        sessionKeysToDelete.add(emailSessionKeyMap[email])
+      }
+    }
+    redisTemplate.delete(sessionKeysToDelete)
+    log.info("Invalidated {} user sessions due to changed group memberships.", sessionKeysToDelete.size())
+  }
 }
