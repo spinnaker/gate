@@ -107,6 +107,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .userDetailsService(samlUserDetailsService)
           .identityProvider()
             .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
+            .discoveryEnabled(false)
             .and()
           .serviceProvider()
             .entityId(samlSecurityConfigProperties.issuerId)
