@@ -25,6 +25,7 @@ import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.opensaml.saml2.core.Assertion
 import org.opensaml.saml2.core.Attribute
+import org.opensaml.xml.schema.XSString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
@@ -176,8 +177,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
 
       Set<String> extractRoles(String email,
-                                Map<String, List<String>> attributes,
-                                UserAttributeMapping userAttributeMapping) {
+                               Map<String, List<String>> attributes,
+                               UserAttributeMapping userAttributeMapping) {
         def assertionRoles = attributes[userAttributeMapping.roles].collect { String roles ->
           def commonNames = roles.split(";")
           commonNames.collect {
@@ -192,7 +193,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         def attributes = [:]
         assertion.attributeStatements*.attributes.flatten().each { Attribute attribute ->
           def name = attribute.name
-          def values = attribute.attributeValues*.textContent
+          def values = attribute.attributeValues.collect { (it as XSString)?.value }
           attributes[name] = values
         }
 
