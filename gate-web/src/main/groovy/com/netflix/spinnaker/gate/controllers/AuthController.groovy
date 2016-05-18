@@ -18,15 +18,22 @@ package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.security.SpinnakerUser
 import com.netflix.spinnaker.security.User
+import groovy.util.logging.Slf4j
+import org.apache.commons.lang.exception.ExceptionUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import javax.servlet.http.HttpServletResponse
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 class AuthController {
+
+  @Value('${services.deck.baseUrl}')
+  URL deckBaseUrl
 
   @RequestMapping("/user")
   User user(@SpinnakerUser User user) {
@@ -35,8 +42,22 @@ class AuthController {
 
   @RequestMapping("/redirect")
   void redirect(HttpServletResponse response, @RequestParam String to) {
-    // TODO(ttomsu): Open redirect vulnerability here. Add validation of 'to' param to ensure it's a
-    // trusted destination.
-    response.sendRedirect(to)
+    validDeckRedirect(to) ?
+        response.sendRedirect(to) :
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Requested redirect address not recognized.")
+  }
+
+  boolean validDeckRedirect(String to) {
+    URL toURL
+    try {
+      toURL = new URL(to)
+    } catch (MalformedURLException malEx) {
+      log.warn "Malformed redirect URL: $to\n${ExceptionUtils.getStackTrace(malEx)}"
+      return false
+    }
+
+    return toURL.protocol == deckBaseUrl.protocol &&
+        toURL.host == deckBaseUrl.host &&
+        toURL.port == deckBaseUrl.port
   }
 }
