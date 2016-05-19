@@ -34,6 +34,11 @@ class AuthConfig {
   UserRolesProvider defaultUserRolesProvider() {
     return new UserRolesProvider() {
       @Override
+      Map<String, Collection<String>> multiLoadRoles(Collection<String> userEmails) {
+        return [:]
+      }
+
+      @Override
       Collection<String> loadRoles(String userEmail) {
         return []
       }
