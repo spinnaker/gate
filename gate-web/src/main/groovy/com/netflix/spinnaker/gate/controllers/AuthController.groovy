@@ -32,12 +32,31 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/auth")
 class AuthController {
 
+  static List LOGOUT_MESSAGES = [
+      "Hasta la vista, baby.",
+      "Frankly my dear, I don't give a damn.",
+      "For the Watch.",
+      "Go ahead, make my day.",
+      "Louis, I think this is a start of a beautiful friendship!",
+      "Roads? Where we're going we don't need roads!",
+      "Say hello to my little friend!",
+      "I wish we could chat longer, but I'm having and old friend for dinner. Bye!",
+      "Hodor.",
+  ]
+
   @Value('${services.deck.baseUrl}')
   URL deckBaseUrl
+
+  Random r = new Random()
 
   @RequestMapping("/user")
   User user(@SpinnakerUser User user) {
     user
+  }
+
+  @RequestMapping("/loggedOut")
+  String loggedOut() {
+    return LOGOUT_MESSAGES[r.nextInt(LOGOUT_MESSAGES.size()+1)]
   }
 
   @RequestMapping("/redirect")
