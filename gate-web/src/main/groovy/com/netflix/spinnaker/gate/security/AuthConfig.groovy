@@ -28,7 +28,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 @Configuration
 class AuthConfig {
 
-
   @Bean
   @ConditionalOnMissingBean(UserRolesProvider)
   UserRolesProvider defaultUserRolesProvider() {
@@ -46,11 +45,19 @@ class AuthConfig {
   }
 
   static void configure(HttpSecurity http) throws Exception {
-    http.csrf().disable()
-    http.authorizeRequests()
+    http
+      .authorizeRequests()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .antMatchers('/auth/user').permitAll()
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
+        .and()
+      .logout()
+        .logoutUrl("/auth/logout")
+        .logoutSuccessUrl("/auth/loggedOut")
+        .permitAll()
+        .and()
+      .csrf()
+        .disable()
   }
 }
