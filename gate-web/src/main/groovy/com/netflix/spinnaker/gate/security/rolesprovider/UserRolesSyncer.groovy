@@ -24,13 +24,17 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.session.ExpiringSession
+import org.springframework.session.Session
+import org.springframework.session.SessionRepository
 
 @Slf4j
 @Configuration
 class UserRolesSyncer {
+  @Autowired
+  RedisTemplate sessionRedisTemplate
 
   @Autowired
-  RedisTemplate<String, ExpiringSession> redisTemplate
+  SessionRepository<? extends ExpiringSession> repository
 
   @Autowired
   UserRolesProvider userRolesProvider
@@ -41,30 +45,40 @@ class UserRolesSyncer {
    */
   @Scheduled(initialDelay = 10000L, fixedRate = 600000L)
   public void syncUserGroups() {
-    Map<String, String> emailSessionKeyMap = [:]
+    Map<String, String> emailSessionIdMap = [:]
     Map<String, Collection<String>> emailCurrentGroupsMap = [:]
-    Set<String> sessionKeys = redisTemplate.keys('*session:sessions*')
+    Set<String> sessionKeys = sessionRedisTemplate.keys('*session:sessions*')
 
-    sessionKeys.each { String key ->
-      def secCtx = redisTemplate.opsForHash().get(key, "sessionAttr:SPRING_SECURITY_CONTEXT") as SecurityContext
-      def principal = secCtx?.authentication?.principal
-      if (principal && principal instanceof User) {
-        emailSessionKeyMap[principal.email] = key
-        emailCurrentGroupsMap[principal.email] = principal.roles
+    Set<String> sessionIds = sessionKeys.collect { String key ->
+      def toks = key.split(":")
+      toks[toks.length - 1]
+    }
+
+    sessionIds.each { String id ->
+      Session session = repository.getSession(id)
+      if (session) { // getSession(id) may return null if session is expired but not reaped
+        def secCtx = session.getAttribute("SPRING_SECURITY_CONTEXT") as SecurityContext
+        def principal = secCtx?.authentication?.principal
+        if (principal && principal instanceof User) {
+          emailSessionIdMap[principal.email] = id
+          emailCurrentGroupsMap[principal.email] = principal.roles
+        }
       }
     }
 
-    def newGroupsMap = userRolesProvider.multiLoadRoles(emailSessionKeyMap.keySet())
-    def sessionKeysToDelete = []
+    def newGroupsMap = userRolesProvider.multiLoadRoles(emailSessionIdMap.keySet())
+    def sessionIdsToDelete = []
     newGroupsMap.each { String email, Collection<String> newGroups ->
       // cast for equals check to work
       List<String> newList = newGroups as List
       List<String> oldList = emailCurrentGroupsMap[email] as List
       if (oldList != newList) {
-        sessionKeysToDelete.add(emailSessionKeyMap[email])
+        sessionIdsToDelete.add(emailSessionIdMap[email])
       }
     }
-    redisTemplate.delete(sessionKeysToDelete)
-    log.info("Invalidated {} user sessions due to changed group memberships.", sessionKeysToDelete.size())
+
+    def keysToDelete = sessionIdsToDelete.collect { String id -> "spring:session:sessions:" + id }
+    sessionRedisTemplate.delete(keysToDelete)
+    log.info("Invalidated {} user sessions due to changed group memberships.", keysToDelete.size())
   }
 }
