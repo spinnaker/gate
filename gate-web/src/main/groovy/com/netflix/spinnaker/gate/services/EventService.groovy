@@ -33,4 +33,8 @@ class EventService {
     echoService.webhooks(type, source, event)
   }
 
+  void webhooks(String type, Map event) {
+    echoService.webhooks(type, event)
+  }
+
 }
