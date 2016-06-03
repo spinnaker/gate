@@ -25,6 +25,10 @@ interface EchoService {
   @POST("/webhooks/{type}/{source}")
   Response webhooks(@Path('type') String type, @Path('source') String source, @Body Map event)
 
+  @Headers("Accept: application/json")
+  @POST("/webhooks/{type}")
+  Response webhooks(@Path('type') String type, @Body Map event)
+
   @GET("/validateCronExpression")
   Map validateCronExpression(@Query("cronExpression") String cronExpression)
 

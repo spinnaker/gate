@@ -32,4 +32,9 @@ class EventController {
   void webhooks(@PathVariable("type") String type, @PathVariable("source") String source, @RequestBody Map event) {
     eventService.webhooks(type, source, event)
   }
+
+  @RequestMapping(value = "/webhooks/{type}", method = RequestMethod.POST)
+  void webhooks(@PathVariable("type") String type, @RequestBody Map event) {
+    eventService.webhooks(type, event)
+  }
 }
