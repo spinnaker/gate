@@ -17,17 +17,19 @@ allprojects {
   apply plugin: 'groovy'
 
   spinnaker {
-    dependenciesVersion = "0.42.0"
+    dependenciesVersion = "0.45.0"
   }
 
   configurations.all {
     exclude group: 'javax.servlet', module: 'servlet-api'
     exclude group: 'javax.servlet', module: 'javax.servlet-api'
     resolutionStrategy {
-      force 'org.codehaus.groovy:groovy-all:2.4.5'
-      force 'org.spockframework:spock-core:1.0-groovy-2.4'
+      force 'org.codehaus.groovy:groovy-all:2.4.7'
       eachDependency {
-        if (it.requested.group == 'org.springframework') {
+        if (it.requested.group == 'org.spockframework') {
+          it.useVersion '1.1-groovy-2.4-rc-1'
+        }
+        if (it.requested.group == 'org.springframework.boot') {
           it.useVersion '1.2.8.RELEASE'
         }
         if (it.requested.group == 'org.springframework') {

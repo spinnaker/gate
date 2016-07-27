@@ -77,7 +77,7 @@ class CanaryController {
   }
 
   @ExceptionHandler(UpstreamBadRequest.class)
-  Map<String, Object> upstreamBadRequestHandler(
+  Map<String, ?> upstreamBadRequestHandler(
     HttpServletRequest request,
     HttpServletResponse response,
     UpstreamBadRequest error) {
