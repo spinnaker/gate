@@ -154,7 +154,7 @@ class ApplicationService {
       expandClusterNames
     )
 
-    return [new ApplicationListRetriever(front50Service, allApplicationsCache), clouddriverApplicationsRetriever]
+    return [new ApplicationListRetriever(front50Service, allApplicationsCache), clouddriverApplicationsRetriever] as Collection<Callable<List<Map>>>
   }
 
   private Collection<Callable<Map>> buildApplicationRetrievers(String applicationName) {
@@ -162,7 +162,7 @@ class ApplicationService {
     return [
       new Front50ApplicationRetriever(applicationName, front50Service, allApplicationsCache),
       clouddriverApplicationRetriever
-    ]
+    ] as Collection<Callable<Map>>
   }
 
   @CompileDynamic
