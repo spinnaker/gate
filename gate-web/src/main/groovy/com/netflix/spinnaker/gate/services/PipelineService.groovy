@@ -52,6 +52,10 @@ class PipelineService {
     front50Service.savePipelineConfig(pipeline)
   }
 
+  void batchUpdate(List<Map> pipelines) {
+    front50Service.batchUpdatePipelineConfig(pipelines)
+  }
+
   void move(Map moveCommand) {
     front50Service.movePipelineConfig(moveCommand)
   }

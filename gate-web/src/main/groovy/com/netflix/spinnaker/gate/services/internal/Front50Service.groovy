@@ -52,6 +52,9 @@ interface Front50Service {
   @POST('/pipelines')
   Response savePipelineConfig(@Body Map pipelineConfig)
 
+  @POST('/pipelines/batchUpdate')
+  Response batchUpdatePipelineConfig(@Body List<Map> pipelineConfig)
+
   @POST('/pipelines/move')
   Response movePipelineConfig(@Body Map moveCommand)
 

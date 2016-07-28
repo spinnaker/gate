@@ -52,6 +52,11 @@ class PipelineController {
     pipelineService.save(pipeline)
   }
 
+  @RequestMapping(value = 'batchUpdate', method = RequestMethod.POST)
+  void batchUpdatePipeline(@RequestBody List<Map> pipelines) {
+    pipelineService.batchUpdate(pipelines)
+  }
+
   @RequestMapping(value = 'move', method = RequestMethod.POST)
   void renamePipeline(@RequestBody Map renameCommand) {
     pipelineService.move(renameCommand)
