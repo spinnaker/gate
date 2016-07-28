@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.security.saml
 
+import com.netflix.spinnaker.gate.services.PermissionService
 import groovy.util.logging.Slf4j
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
@@ -57,6 +58,9 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   ServerProperties serverProperties
+
+  @Autowired
+  AuthConfig authConfig
 
   @Component
   @ConfigurationProperties("saml")
@@ -100,7 +104,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       .and()
       .authorizeRequests().antMatchers("/saml/**").permitAll()
 
-    AuthConfig.configure(http)
+    authConfig.configure(http)
 
     configurers?.each {
       it.configure(http)
@@ -147,6 +151,9 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       @Autowired
       UserRolesProvider userRolesProvider
 
+      @Autowired
+      PermissionService permissionService
+
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
         def assertion = credential.authenticationAssertion
@@ -154,6 +161,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
 
         def email = assertion.getSubject().nameID.value
+        String username = attributes[userAttributeMapping.username] ?: email
         def roles = extractRoles(email, attributes, userAttributeMapping)
 
         if (samlSecurityConfigProperties.requiredRoles) {
@@ -162,12 +170,14 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           }
         }
 
+        permissionService.loginSAML(username, roles)
+
         new User(email: email,
           firstName: attributes[userAttributeMapping.firstName]?.get(0),
           lastName: attributes[userAttributeMapping.lastName]?.get(0),
           roles: roles,
           allowedAccounts: credentialsService.getAccountNames(roles),
-          username: attributes[userAttributeMapping.username] ?: email).asImmutable()
+          username: username).asImmutable()
       }
 
       Set<String> extractRoles(String email,
