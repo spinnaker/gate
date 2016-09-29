@@ -28,6 +28,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import org.springframework.web.bind.annotation.ExceptionHandler
 import retrofit.RetrofitError
 import retrofit.converter.ConversionException
 import rx.Observable
@@ -36,6 +37,7 @@ import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -93,7 +95,12 @@ class ApplicationService {
   List<Map<String, Object>> tick(boolean expandClusterNames = true) {
     def applicationListRetrievers = buildApplicationListRetrievers(expandClusterNames)
     List<Future<List<Map>>> futures = executorService.invokeAll(applicationListRetrievers)
-    List<List<Map>> all = futures.collect { it.get() }
+    List<List<Map>> all
+    try {
+      all = futures.collect { it.get() }
+    } catch (ExecutionException ee) {
+      throw ee.cause;
+    }
     List<Map> flat = (List<Map>) all?.flatten()?.toList()
     return mergeApps(flat, serviceConfiguration.getService('front50')).collect {
       it.attributes
@@ -118,7 +125,12 @@ class ApplicationService {
   Map getApplication(String name) {
     def applicationRetrievers = buildApplicationRetrievers(name)
     def futures = executorService.invokeAll(applicationRetrievers)
-    List<Map> applications = (List<Map>) futures.collect { it.get() }
+    List<Map> applications
+    try {
+      applications = (List<Map>) futures.collect { it.get() }
+    } catch (ExecutionException ee) {
+      throw ee.cause;
+    }
 
     List<Map> mergedApps = mergeApps(applications, serviceConfiguration.getService('front50'))
     return mergedApps ? mergedApps[0] : null
