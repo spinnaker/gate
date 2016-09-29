@@ -99,7 +99,7 @@ class ApplicationService {
     try {
       all = futures.collect { it.get() }
     } catch (ExecutionException ee) {
-      throw ee.cause;
+      throw ee.cause
     }
     List<Map> flat = (List<Map>) all?.flatten()?.toList()
     return mergeApps(flat, serviceConfiguration.getService('front50')).collect {
@@ -129,7 +129,7 @@ class ApplicationService {
     try {
       applications = (List<Map>) futures.collect { it.get() }
     } catch (ExecutionException ee) {
-      throw ee.cause;
+      throw ee.cause
     }
 
     List<Map> mergedApps = mergeApps(applications, serviceConfiguration.getService('front50'))
@@ -180,7 +180,7 @@ class ApplicationService {
     try {
       Map<String, Map<String, Object>> merged = [:]
       for (Map<String, Object> app in applications) {
-        if (!app || !app.name) {
+        if (!app?.name) {
           continue
         }
 
