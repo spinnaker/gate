@@ -19,8 +19,8 @@ package com.netflix.spinnaker.gate.services
 import com.netflix.spinnaker.gate.config.Service
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory
-import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -66,7 +66,7 @@ class ApplicationService {
   @PostConstruct
   void startMonitoring() {
     Observable
-      .timer(60000, TimeUnit.MILLISECONDS, scheduler)
+      .timer(60, TimeUnit.SECONDS, scheduler)
       .repeat()
       .subscribe({ Long interval ->
       try {
@@ -80,13 +80,14 @@ class ApplicationService {
   }
 
   /**
-   * Fetching cluster details is a potentially expensive call to cloud driver, but allows us to provide a definitive
-   * list of accounts that an application has a presence in.
+   * Fetching cluster details is a potentially expensive call to clouddriver, but allows us to
+   * provide a definitive list of accounts that an application has a presence in.
    *
-   * As a trade-off, we'll fetch cluster details on the background refresh loop and merge in the account details
-   * when applications are requested on-demand.
+   * As a trade-off, we'll fetch cluster details on the background refresh loop and merge in the
+   * account details when applications are requested on-demand.
    *
-   * @param expandClusterNames Should cluster details (for each application) be fetched from cloud driver
+   * @param expandClusterNames Should cluster details (for each application) be fetched from
+   * clouddriver
    * @return Applications
    */
   List<Map<String, Object>> tick(boolean expandClusterNames = true) {
@@ -148,20 +149,16 @@ class ApplicationService {
   }
 
   private Collection<Callable<List<Map>>> buildApplicationListRetrievers(boolean expandClusterNames) {
-    def clouddriverApplicationsRetriever = new ClouddriverApplicationsRetriever(
-      clouddriverService,
-      allApplicationsCache,
-      expandClusterNames
-    )
-
-    return [new ApplicationListRetriever(front50Service, allApplicationsCache), clouddriverApplicationsRetriever]
+    return [
+        new Front50ApplicationListRetriever(front50Service, allApplicationsCache),
+        new ClouddriverApplicationListRetriever(clouddriverService, allApplicationsCache, expandClusterNames
+    )]
   }
 
   private Collection<Callable<Map>> buildApplicationRetrievers(String applicationName) {
-    def clouddriverApplicationRetriever = new ClouddriverApplicationRetriever(applicationName, clouddriverService)
     return [
       new Front50ApplicationRetriever(applicationName, front50Service, allApplicationsCache),
-      clouddriverApplicationRetriever
+      new ClouddriverApplicationRetriever(applicationName, clouddriverService)
     ]
   }
 
@@ -171,11 +168,15 @@ class ApplicationService {
     try {
       Map<String, Map<String, Object>> merged = [:]
       for (Map<String, Object> app in applications) {
-        if (!app || !app.name) continue
+        if (!app || !app.name) {
+          continue
+        }
+
         String key = (app.name as String)?.toLowerCase()
         if (key && !merged.containsKey(key)) {
           merged[key] = [name: key, attributes: [:], clusters: [:]] as Map<String, Object>
         }
+
         Map mergedApp = (Map) merged[key]
         if (app.containsKey("clusters") || app.containsKey("clusterNames")) {
           // Clouddriver
@@ -234,12 +235,12 @@ class ApplicationService {
     }.flatten().toSet().sort().join(',')
   }
 
-  static class ApplicationListRetriever implements Callable<List<Map>> {
+  static class Front50ApplicationListRetriever implements Callable<List<Map>> {
     private final Front50Service front50
     private final AtomicReference<List<Map>> allApplicationsCache
     private final Object principal
 
-    ApplicationListRetriever(Front50Service front50, AtomicReference<List<Map>> allApplicationsCache) {
+    Front50ApplicationListRetriever(Front50Service front50, AtomicReference<List<Map>> allApplicationsCache) {
       this.front50 = front50
       this.allApplicationsCache = allApplicationsCache
       this.principal = SecurityContextHolder.context?.authentication?.principal
@@ -303,15 +304,15 @@ class ApplicationService {
     }
   }
 
-  static class ClouddriverApplicationsRetriever implements Callable<List<Map>> {
+  static class ClouddriverApplicationListRetriever implements Callable<List<Map>> {
     private final ClouddriverService clouddriver
     private final Object principal
     private final AtomicReference<List<Map>> allApplicationsCache
     private final boolean expandClusterNames
 
-    ClouddriverApplicationsRetriever(ClouddriverService clouddriver,
-                                     AtomicReference<List<Map>> allApplicationsCache,
-                                     boolean expandClusterNames) {
+    ClouddriverApplicationListRetriever(ClouddriverService clouddriver,
+                                        AtomicReference<List<Map>> allApplicationsCache,
+                                        boolean expandClusterNames) {
       this.clouddriver = clouddriver
       this.allApplicationsCache = allApplicationsCache
       this.expandClusterNames = expandClusterNames
