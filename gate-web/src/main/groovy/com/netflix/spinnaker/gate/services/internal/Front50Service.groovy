@@ -92,12 +92,6 @@ interface Front50Service {
   @POST('/notifications/{type}/{app}')
   Response saveNotificationConfig(@Path('type') String type, @Path('app') String app, @Body Map notificationConfig)
 
-  //
-  // Project-related
-  //
-  @GET('/v2/projects')
-  HalList legacyGetAllProjects() //TODO: remove this when front50 is updated to return a list of POJO Projects
-
   @GET('/v2/projects')
   List<Map> getAllProjects()
 
