@@ -69,7 +69,7 @@ class OAuth2SsoConfig {
   }
 
   @Bean
-  OAuth2SsoConfigurerAdapter ssoConfigurerAdapter() {
+  Adapter oauth2SsoAdapter() {
     new Adapter()
   }
 
