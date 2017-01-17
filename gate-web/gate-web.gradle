@@ -44,6 +44,8 @@ dependencies {
     exclude group: 'org.springframework.boot'
     exclude group: 'org.springframework.security'
   }
+  compile("org.springframework.cloud:spring-cloud-starter-config:1.0.6.RELEASE")
+  compile("org.springframework.cloud:spring-cloud-config-server:1.0.4.RELEASE")
 
   compile 'com.squareup.retrofit:converter-simplexml:1.9.0'
   testCompile "com.squareup.okhttp:mockwebserver:${spinnaker.version('okHttp')}"
