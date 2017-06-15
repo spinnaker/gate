@@ -53,26 +53,27 @@ swagger:
   description:
   contact:
   patterns:
-    - .*tasks.*
     - .*auth.*
     - .*applications.*
-    - .*securityGroups.*
-    - /search
-    - .*pipelines.*
-    - .*loadBalancers.*
+    - .*bakery.*
+    - .*builds.*
+    - .*credentials.*
+    - .*elasticIps.*
+    - .*events.*
+    - .*executions.*
     - .*instances.*
     - .*images.*
-    - .*elasticIps.*
-    - .*credentials.*
-    - .*events.*
-    - .*builds.*
     - .*instanceTypes.*
-    - .*vpcs.*
-    - .*subnets.*
+    - .*loadBalancers.*
     - .*networks.*
-    - .*bakery.*
-    - .*executions.*
-
+    - .*pipelines.*
+    - /search
+    - .*securityGroups.*
+    - .*subnets.*
+    - .*tasks.*
+    - .*vpcs.*
+    - .*webhooks.*
+    
 hystrix:
   command:
 ## Hystrix Global Defaults
