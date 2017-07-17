@@ -49,4 +49,14 @@ class V2CanaryController {
       throw new NotFoundException("Canary configuration not found (id: ${id})")
     }
   }
+
+  @ApiOperation(value = "Delete a canary configuration")
+  @RequestMapping(value = "/v2/canaryConfig/{id}", method = RequestMethod.DELETE)
+  void deleteCanaryConfig(@PathVariable String id) {
+    if (canaryConfigService) {
+      canaryConfigService.deleteCanaryConfig(id)
+    } else {
+      throw new NotFoundException("Canary configuration not found (id: ${id})")
+    }
+  }
 }

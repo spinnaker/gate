@@ -46,4 +46,10 @@ class KayentaCanaryConfigService implements CanaryConfigService {
       kayentaService.getCanaryConfig(id)
     } execute()
   }
+
+  void deleteCanaryConfig(String id) {
+    HystrixFactory.newMapCommand(GROUP, "deleteCanaryConfig") {
+      kayentaService.deleteCanaryConfig(id)
+    } execute()
+  }
 }

@@ -16,6 +16,8 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import retrofit.client.Response
+import retrofit.http.DELETE
 import retrofit.http.GET
 import retrofit.http.Path
 
@@ -25,4 +27,7 @@ interface KayentaService {
 
   @GET("/canaryConfig/{id}")
   Map getCanaryConfig(@Path("id") String id)
+
+  @DELETE("/canaryConfig/{id}")
+  Response deleteCanaryConfig(@Path("id") String id)
 }
