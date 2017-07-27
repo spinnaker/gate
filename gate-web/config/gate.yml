@@ -98,6 +98,8 @@ spring:
 
 spring:
   profiles: googleOAuth
+
+security:
   oauth2:
     client:
       # Set these values in your own config file (e.g. spinnaker-local.yml or gate-googleOAuth.yml).
@@ -117,6 +119,8 @@ spring:
 
 spring:
   profiles: azureOAuth
+
+security:
   oauth2:
     client:
       # Set these values in your own config file (e.g. spinnaker-local.yml or gate-azureOAuth.yml).
@@ -137,6 +141,8 @@ spring:
 
 spring:
   profiles: githubOAuth
+
+security:
   oauth2:
     client:
       # Set these values in your own config file (e.g. spinnaker-local.yml or gate-githubOAuth.yml).
