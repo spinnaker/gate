@@ -94,6 +94,8 @@ spring:
     serialization:
       ORDER_MAP_ENTRIES_BY_KEYS: true
 
+spring.session.store-type: redis
+
 ---
 
 spring:
