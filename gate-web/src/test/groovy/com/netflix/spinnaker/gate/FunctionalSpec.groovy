@@ -16,9 +16,11 @@
 
 package com.netflix.spinnaker.gate
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.controllers.ApplicationController
+import com.netflix.spinnaker.gate.controllers.GenericExceptionHandlers
 import com.netflix.spinnaker.gate.controllers.PipelineController
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.ApplicationService
@@ -26,11 +28,14 @@ import com.netflix.spinnaker.gate.services.CredentialsService
 import com.netflix.spinnaker.gate.services.ExecutionHistoryService
 import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
+import com.netflix.spinnaker.gate.services.commands.ServerErrorException
+import com.netflix.spinnaker.gate.services.commands.ServiceUnavailableException
 import com.netflix.spinnaker.gate.services.commands.ThrottledRequestException
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.OrcaService
+import com.netflix.spinnaker.kork.web.exceptions.GenericExceptionHandlers
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
@@ -38,15 +43,19 @@ import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import retrofit.RestAdapter
 import retrofit.RetrofitError
 import retrofit.client.OkClient
+import retrofit.mime.TypedInput
 import spock.lang.Shared
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutorService
 
 class FunctionalSpec extends Specification {
+  @Shared
+  ObjectMapper objectMapper = new ObjectMapper()
 
   @Shared
   Api api
@@ -135,6 +144,49 @@ class FunctionalSpec extends Specification {
       name = "foo"
   }
 
+  void "should 429 if ThrottledRequestException is raised"() {
+    when:
+      api.getApplication(name)
+
+    then:
+      1 * applicationService.getApplication(name, true) >> { throw new ThrottledRequestException("throttled!") }
+
+      RetrofitError exception = thrown()
+      exception.response.status == 429
+      toMap(exception.response.body).message == "throttled!"
+
+    where:
+      name = "foo"
+  }
+
+  void "should 503 on ServiceUnavailableException"() {
+    when:
+    api.getApplication(name)
+
+    then:
+    1 * applicationService.getApplication(name, true) >> { throw new ServiceUnavailableException() }
+    RetrofitError exception = thrown()
+    exception.response.status == 503
+    toMap(exception.response.body).message == HttpStatus.SERVICE_UNAVAILABLE.reasonPhrase
+
+    where:
+    name = "foo"
+  }
+
+  void "should 500 on ServerErrorException"() {
+    when:
+    api.getApplication(name)
+
+    then:
+    1 * applicationService.getApplication(name, true) >> { throw new ServerErrorException() }
+    RetrofitError exception = thrown()
+    exception.response.status == 500
+    toMap(exception.response.body).message == HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
+
+    where:
+    name = "foo"
+  }
+
   void "should call ApplicationService for an application's tasks"() {
     when:
       api.getTasks(name, null, "RUNNING,TERMINAL")
@@ -158,7 +210,7 @@ class FunctionalSpec extends Specification {
       task = [type: "deploy"]
   }
 
-  void "should throw ThrottledRequestException if result served from hystrix fallback"() {
+  void "should throw ServerErrorException(500) on a random thrown exception"() {
     when:
     def tasks = executionHistoryService.getTasks("app", 5, null)
 
@@ -171,14 +223,18 @@ class FunctionalSpec extends Specification {
 
     then:
       1 * orcaService.getTasks("app", 10, "RUNNING") >> { throw new IllegalStateException() }
-      thrown(ThrottledRequestException)
+      thrown(ServerErrorException)
 
     when:
     executionHistoryService.getPipelines("app", 5, "TERMINAL")
 
     then:
     1 * orcaService.getPipelines("app", 5, "TERMINAL") >> { throw new IllegalStateException() }
-    thrown(ThrottledRequestException)
+    thrown(ServerErrorException)
+  }
+
+  Map toMap(TypedInput typedInput) {
+    return objectMapper.readValue(typedInput.in().text, Map)
   }
 
   @EnableAutoConfiguration(exclude = [SecurityAutoConfiguration, GroovyTemplateAutoConfiguration])
@@ -258,6 +314,11 @@ class FunctionalSpec extends Specification {
     @Bean
     FiatClientConfigurationProperties fiatClientConfigurationProperties() {
       new FiatClientConfigurationProperties(enabled: false)
+    }
+
+    @Bean
+    GenericExceptionHandlers genericExceptionHandlers() {
+      new GenericExceptionHandlers()
     }
   }
 }

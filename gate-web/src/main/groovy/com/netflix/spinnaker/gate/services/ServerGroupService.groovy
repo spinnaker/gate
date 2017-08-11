@@ -47,6 +47,12 @@ class ServerGroupService {
     } execute()
   }
 
+  List getForApplications(List<String> applications, String cloudProvider, String selectorKey) {
+    HystrixFactory.newListCommand(GROUP, "getServerGroupsForApplications") {
+      clouddriverServiceSelector.select(selectorKey).getServerGroups(applications, cloudProvider)
+    } execute()
+  }
+
   Map getForApplicationAndAccountAndRegion(String applicationName, String account, String region, String serverGroupName, String selectorKey) {
     HystrixFactory.newMapCommand(GROUP, "getServerGroupsForApplicationAccountAndRegion-${providerLookupService.providerForAccount(account)}") {
       try {
@@ -57,7 +63,7 @@ class ServerGroupService {
 
         def context = getContext(applicationName, account, region, serverGroupName) + serverGroupContext
         return serverGroupDetails + [
-          "insightActions": insightConfiguration.serverGroup.collect { it.applyContext(context) }
+          "insightActions": insightConfiguration.serverGroup.findResults { it.applyContext(context) }
         ]
       } catch (RetrofitError e) {
         if (e.response?.status == 404) {

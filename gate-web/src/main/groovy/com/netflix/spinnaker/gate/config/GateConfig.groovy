@@ -16,6 +16,8 @@
 
 package com.netflix.spinnaker.gate.config
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
@@ -33,6 +35,7 @@ import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.IgorService
+import com.netflix.spinnaker.gate.services.internal.KayentaService
 import com.netflix.spinnaker.gate.services.internal.MineService
 import com.netflix.spinnaker.gate.services.internal.OrcaService
 import com.netflix.spinnaker.gate.services.internal.RoscoService
@@ -195,6 +198,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
     createClient "mine", MineService, okHttpClient
   }
 
+  @Bean
+  @ConditionalOnProperty('services.kayenta.enabled')
+  KayentaService kayentaService(OkHttpClient okHttpClient) {
+    createClient "kayenta", KayentaService, okHttpClient
+  }
+
   private <T> T createClient(String serviceName, Class<T> type, OkHttpClient okHttpClient, String dynamicName = null) {
     Service service = serviceConfiguration.getService(serviceName)
     if (service == null) {
@@ -218,11 +227,16 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
     def client = new EurekaOkClient(okHttpClient, registry, serviceName, eurekaLookupService)
 
+    // New role providers break deserialization if this is not enabled.
+    ObjectMapper objectMapper = new ObjectMapper()
+        .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+
     new RestAdapter.Builder()
       .setRequestInterceptor(spinnakerRequestInterceptor)
       .setEndpoint(endpoint)
       .setClient(client)
-      .setConverter(new JacksonConverter())
+      .setConverter(new JacksonConverter(objectMapper))
       .setLogLevel(RestAdapter.LogLevel.valueOf(retrofitLogLevel))
       .setLog(new Slf4jRetrofitLogger(type))
       .build()
@@ -247,10 +261,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   /**
    * This AuthenticatedRequestFilter pulls the email and accounts out of the Spring
    * security context in order to enabling forwarding them to downstream components.
+   *
+   * Additionally forwards request origin metadata (deck vs api).
    */
   @Bean
   FilterRegistrationBean authenticatedRequestFilter() {
-    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(false))
+    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(false, true))
     frb.order = Ordered.LOWEST_PRECEDENCE
     return frb
   }

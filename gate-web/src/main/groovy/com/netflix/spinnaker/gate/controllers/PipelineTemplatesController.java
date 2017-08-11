@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.gate.services.PipelineTemplateService;
 import com.netflix.spinnaker.gate.services.TaskService;
+import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,7 @@ public class PipelineTemplatesController {
     Map<String, Object> job = new HashMap<>();
     job.put("type", "createPipelineTemplate");
     job.put("pipelineTemplate", pipelineTemplate);
+    job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
@@ -113,11 +115,31 @@ public class PipelineTemplatesController {
     job.put("type", "updatePipelineTemplate");
     job.put("id", id);
     job.put("pipelineTemplate", pipelineTemplate);
+    job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
     operation.put("description", "Update pipeline template '" + getNameFromTemplate(template) + "'");
     operation.put("application", getApplicationFromTemplate(template));
+    operation.put("job", jobs);
+
+    return taskService.create(operation);
+  }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+  @ResponseStatus(value = HttpStatus.ACCEPTED)
+  public Map delete(@PathVariable String id,
+                    @RequestParam(value = "application", required = false) String application) {
+    List<Map<String, Object>> jobs = new ArrayList<>();
+    Map<String, Object> job = new HashMap<>();
+    job.put("type", "deletePipelineTemplate");
+    job.put("pipelineTemplateId", id);
+    job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
+    jobs.add(job);
+
+    Map<String, Object> operation = new HashMap<>();
+    operation.put("description", "Delete pipeline template '" + id + "'");
+    operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
     return taskService.create(operation);

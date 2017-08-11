@@ -109,6 +109,11 @@ interface ClouddriverService {
                        @Query("clusters") String clusters)
 
   @Headers("Accept: application/json")
+  @GET("/serverGroups")
+  List getServerGroups(@Query("applications") List applications,
+                       @Query("cloudProvider") String cloudProvider)
+
+  @Headers("Accept: application/json")
   @GET("/applications/{name}/jobs")
   List getJobs(@Path("name") String name, @Query("expand") String expand)
 
@@ -256,4 +261,10 @@ interface ClouddriverService {
 
   @GET('/tags/{id}')
   Map getEntityTags(@Path('id') String id)
+
+  @GET('/certificates')
+  List<Map> getCertificates()
+
+  @GET('/certificates/{cloudProvider}')
+  List<Map> getCertificates(@Path("cloudProvider") String cloudProvider)
 }
