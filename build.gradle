@@ -1,6 +1,6 @@
 buildscript {
   ext {
-    springBootVersion = "1.5.4.RELEASE" // Introduces breaking change in oauth config.
+    springBootVersion = "1.5.4.RELEASE" // Introduces breaking change in oauth config: `spring.oauth2` to `security.oauth2` 
   }
   repositories {
     jcenter()
