@@ -74,6 +74,12 @@ class ServerGroupService {
     } execute()
   }
 
+  List getServerGroupsDetailsForList(String serverGroupList, String selectorKey) {
+    HystrixFactory.newListCommand(GROUP, "getServerGroupsDetailsForList") {
+      clouddriverServiceSelector.select(selectorKey).getServerGroupsDetailsForList(serverGroupList)
+    } execute()
+  }
+
   static Map<String, String> getContext(String application, String account, String region, String serverGroup) {
     String cluster = Names.parseName(serverGroup).cluster
     return [
