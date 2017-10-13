@@ -47,8 +47,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.context.embedded.FilterRegistrationBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
@@ -266,7 +266,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
    */
   @Bean
   FilterRegistrationBean authenticatedRequestFilter() {
-    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(false, true))
+    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(false, true, true))
     frb.order = Ordered.LOWEST_PRECEDENCE
     return frb
   }

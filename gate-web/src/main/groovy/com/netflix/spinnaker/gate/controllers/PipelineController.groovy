@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import retrofit.RetrofitError
 
+import static net.logstash.logback.argument.StructuredArguments.value
+
 @Slf4j
 @CompileStatic
 @RestController
@@ -130,7 +132,7 @@ class PipelineController {
       throw new PipelineException("Pipeline save operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})")
     }
 
-    return front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"))?.find { id == (String) it.get("id") }
+    return front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), true)?.find { id == (String) it.get("id") }
   }
 
   @ApiOperation(value = "Retrieve pipeline execution logs")
@@ -207,7 +209,8 @@ class PipelineController {
     } catch (NotFoundException e) {
       throw e
     } catch (e) {
-      log.error("Unable to trigger pipeline (application: ${application}, pipelineName: ${pipelineNameOrId})", e)
+      log.error("Unable to trigger pipeline (application: {}, pipelineId: {})",
+        value("application", application), value("pipelineId", pipelineNameOrId), e)
       new ResponseEntity([message: e.message], new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY)
     }
   }

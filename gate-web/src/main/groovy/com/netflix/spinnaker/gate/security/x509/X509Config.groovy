@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.security.x509
 import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.oauth2.OAuth2SsoConfig
+import com.netflix.spinnaker.gate.security.oauth2.OAuthSsoConfigurer
 import com.netflix.spinnaker.gate.security.saml.SamlSsoConfig
 import com.netflix.spinnaker.gate.security.saml.SamlSsoConfigurer
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,13 +27,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContext
@@ -47,11 +47,14 @@ import javax.servlet.http.HttpServletResponse
 @ConditionalOnExpression('${x509.enabled:false}')
 @Configuration
 @SpinnakerAuthConfig
-@EnableWebMvcSecurity
+@EnableWebSecurity
 class X509Config {
 
   @Value('${x509.subjectPrincipalRegex:}')
   String subjectPrincipalRegex
+
+  @Value('${x509.roleOid:}')
+  String roleOid
 
   @Autowired
   AuthConfig authConfig
@@ -131,16 +134,11 @@ class X509Config {
 
   @ConditionalOnBean(OAuth2SsoConfig)
   @Bean
-  X509OAuthConfig withOauthConfig() {
+  X509OAuthConfig withOAuthConfig() {
     new X509OAuthConfig()
   }
 
-  class X509OAuthConfig implements OAuth2SsoConfigurer {
-    @Override
-    void match(OAuth2SsoConfigurer.RequestMatchers matchers) {
-      matchers.antMatchers('/**')
-    }
-
+  class X509OAuthConfig implements OAuthSsoConfigurer {
     @Override
     void configure(HttpSecurity http) throws Exception {
       X509Config.this.configure(http)

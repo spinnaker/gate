@@ -16,10 +16,10 @@
 
 package com.netflix.spinnaker.gate.security.x509
 
-import com.netflix.spinnaker.gate.security.rolesprovider.UserRolesProvider
 import com.netflix.spinnaker.gate.services.CredentialsService
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
@@ -35,15 +35,13 @@ import java.security.cert.X509Certificate
  * `spring.x509.subjectPrincipalRegex` property.
  */
 @Component
+@Slf4j
 class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
   private static final String RFC822_NAME_ID = "1"
 
   @Autowired
   CredentialsService credentialsService
-
-  @Autowired
-  UserRolesProvider userRolesProvider
 
   @Autowired
   PermissionService permissionService
@@ -56,6 +54,7 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
 
   @Override
   UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
+
     if (!(token.credentials instanceof X509Certificate)) {
       return null
     }
@@ -70,13 +69,22 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
       email = emailFromSubjectAlternativeName(x509) ?: token.principal
     }
 
-    def roles = userRolesProvider.loadRoles(email as String)
+    def roles = []
+    if (email) {
+      log.debug("Adding email {} to roles.", email)
+      roles.add(email)
+    }
     if (rolesExtractor) {
-      roles += rolesExtractor.fromCertificate(x509)
+      def extractedRoles = rolesExtractor.fromCertificate(x509)
+      log.debug("Extracted roles {}", extractedRoles)
+      roles += extractedRoles
+      permissionService.loginWithRoles(email as String, roles)
+    } else {
+      permissionService.login(email as String)
     }
 
-    permissionService.login(email as String)
 
+    log.debug("Roles we have now: {}", roles)
     return new User(
         email: email,
         allowedAccounts: credentialsService.getAccountNames(roles),

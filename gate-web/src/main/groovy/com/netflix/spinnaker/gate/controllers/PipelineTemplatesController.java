@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public class PipelineTemplatesController {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
     job.put("type", "createPipelineTemplate");
-    job.put("pipelineTemplate", pipelineTemplate);
+    job.put("pipelineTemplate", encodeAsBase64(pipelineTemplate));
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
@@ -102,7 +103,9 @@ public class PipelineTemplatesController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.POST)
   @ResponseStatus(value = HttpStatus.ACCEPTED)
-  public Map update(@PathVariable String id, @RequestBody Map<String, Object> pipelineTemplate) {
+  public Map update(@PathVariable String id,
+                    @RequestBody Map<String, Object> pipelineTemplate,
+                    @RequestParam(value = "skipPlanDependents", defaultValue = "false") boolean skipPlanDependents) {
     PipelineTemplate template;
     try {
       template = objectMapper.convertValue(pipelineTemplate, PipelineTemplate.class);
@@ -114,8 +117,9 @@ public class PipelineTemplatesController {
     Map<String, Object> job = new HashMap<>();
     job.put("type", "updatePipelineTemplate");
     job.put("id", id);
-    job.put("pipelineTemplate", pipelineTemplate);
+    job.put("pipelineTemplate", encodeAsBase64(pipelineTemplate));
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
+    job.put("skipPlanDependents", skipPlanDependents);
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
@@ -152,6 +156,14 @@ public class PipelineTemplatesController {
   private String getApplicationFromTemplate(PipelineTemplate template) {
     List<String> scopes = template.metadata.scopes;
     return (scopes.isEmpty() || scopes.size() > 1) ? DEFAULT_APPLICATION : scopes.get(0);
+  }
+
+  private String encodeAsBase64(Object value) {
+    try {
+      return Base64.getEncoder().encodeToString(objectMapper.writeValueAsString(value).getBytes());
+    } catch (Exception e) {
+      throw new RuntimeException("Could not encode pipeline template", e);
+    }
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)

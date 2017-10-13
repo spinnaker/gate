@@ -17,11 +17,13 @@
 package com.netflix.spinnaker.gate.services.internal
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import retrofit.client.Response
 import retrofit.http.GET
 import retrofit.http.Headers
 import retrofit.http.Path
 import retrofit.http.Query
 import retrofit.http.QueryMap
+import retrofit.http.Streaming
 
 interface ClouddriverService {
 
@@ -39,6 +41,7 @@ interface ClouddriverService {
     String name
     String accountId
     String type
+    String providerVersion
     Collection<String> requiredGroupMembership = []
   }
 
@@ -211,7 +214,8 @@ interface ClouddriverService {
                    @Query("type") String type,
                    @Query("platform") String platform,
                    @Query("pageSize") Integer size,
-                   @Query("page") Integer offset)
+                   @Query("page") Integer offset,
+                   @QueryMap Map filters)
 
   @GET('/securityGroups')
   Map getSecurityGroups()
@@ -267,4 +271,14 @@ interface ClouddriverService {
 
   @GET('/certificates/{cloudProvider}')
   List<Map> getCertificates(@Path("cloudProvider") String cloudProvider)
+
+  @Streaming
+  @GET('/v1/data/static/{id}')
+  Response getStaticData(@Path('id') String id, @QueryMap Map<String, String> filters)
+
+  @Streaming
+  @GET('/v1/data/adhoc/{groupId}/{bucketId}/{objectId}')
+  Response getAdhocData(@Path(value = 'groupId', encode = false) String groupId,
+                        @Path(value = 'bucketId', encode = false) String bucketId,
+                        @Path(value = 'objectId', encode = false) String objectId)
 }
