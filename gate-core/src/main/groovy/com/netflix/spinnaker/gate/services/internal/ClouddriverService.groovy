@@ -281,4 +281,9 @@ interface ClouddriverService {
   Response getAdhocData(@Path(value = 'groupId', encode = false) String groupId,
                         @Path(value = 'bucketId', encode = false) String bucketId,
                         @Path(value = 'objectId', encode = false) String objectId)
+
+  @GET('/roles/{cloudProvider}/{account}/{region}')
+  List<Map> getRoles(@Path("cloudProvider") String cloudProvider,
+                     @Path("account") String account,
+                     @Path("region") String region)
 }
