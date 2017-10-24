@@ -18,12 +18,7 @@ package com.netflix.spinnaker.gate.services.internal
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import retrofit.client.Response
-import retrofit.http.GET
-import retrofit.http.Headers
-import retrofit.http.Path
-import retrofit.http.Query
-import retrofit.http.QueryMap
-import retrofit.http.Streaming
+import retrofit.http.*
 
 interface ClouddriverService {
 
@@ -286,4 +281,8 @@ interface ClouddriverService {
   List<Map> getRoles(@Path("cloudProvider") String cloudProvider,
                      @Path("account") String account,
                      @Path("region") String region)
+
+  @GET('/ecs/{account}/{region}/ecscluster')
+  List<String> getEcsClusters(@Path("account") String account,
+                           @Path("region") String region)
 }
