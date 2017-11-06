@@ -32,9 +32,9 @@ class RoleController {
   RoleService roleService
 
   @ApiOperation(value = "Retrieve a list of roles that can be used by the selected cloud provider")
-  @RequestMapping(value = "/{provider}/{account}/{region}", method = RequestMethod.GET)
-  List all(@PathVariable String provider, @PathVariable String account, @PathVariable String region) {
-    roleService.getRoles(provider, account, region)
+  @RequestMapping(value = "/{cloudProvider}", method = RequestMethod.GET)
+  List all(@PathVariable String cloudProvider) {
+    roleService.getRoles(cloudProvider)
   }
 
 

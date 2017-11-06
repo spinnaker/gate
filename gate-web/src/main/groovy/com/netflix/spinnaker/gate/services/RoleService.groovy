@@ -15,9 +15,9 @@ class RoleService {
     this.clouddriver = clouddriver;
   }
 
-  List getRoles(String provider, String account, String region) {
+  List getRoles(String provider) {
     HystrixFactory.newListCommand("pipelines", "updatePipeline") {
-      clouddriver.getRoles(provider, account, region)
+      clouddriver.getRoles(provider)
     } execute()
   }
 }

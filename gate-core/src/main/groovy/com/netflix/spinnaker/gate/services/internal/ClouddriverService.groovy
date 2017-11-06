@@ -277,10 +277,8 @@ interface ClouddriverService {
                         @Path(value = 'bucketId', encode = false) String bucketId,
                         @Path(value = 'objectId', encode = false) String objectId)
 
-  @GET('/roles/{cloudProvider}/{account}/{region}')
-  List<Map> getRoles(@Path("cloudProvider") String cloudProvider,
-                     @Path("account") String account,
-                     @Path("region") String region)
+  @GET('/roles/{cloudProvider}')
+  List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
 
   @GET('/ecs/{account}/{region}/ecscluster')
   List<String> getEcsClusters(@Path("account") String account,
