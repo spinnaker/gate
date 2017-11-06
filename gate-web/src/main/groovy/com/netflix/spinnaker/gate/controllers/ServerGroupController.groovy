@@ -23,6 +23,7 @@ import groovy.transform.CompileStatic
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -67,5 +68,12 @@ class ServerGroupController {
     }
 
     return serverGroupDetails
+  }
+
+  @ApiOperation(value = "Retrieve the details of a list of server groups", hidden = true)
+  @RequestMapping(value = "/getServerGroupsDetailsForList", method = RequestMethod.POST)
+  List getServerGroupList(@RequestBody String serverGroupList,
+                          @RequestHeader(value = "X-RateLimit-App", required = false) String sourceApp) {
+    serverGroupService.getServerGroupsDetailsForList(serverGroupList, sourceApp)
   }
 }

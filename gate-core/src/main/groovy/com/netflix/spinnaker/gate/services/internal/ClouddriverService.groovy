@@ -18,8 +18,10 @@ package com.netflix.spinnaker.gate.services.internal
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import retrofit.client.Response
+import retrofit.http.Body
 import retrofit.http.GET
 import retrofit.http.Headers
+import retrofit.http.POST
 import retrofit.http.Path
 import retrofit.http.Query
 import retrofit.http.QueryMap
@@ -115,6 +117,10 @@ interface ClouddriverService {
   @GET("/serverGroups")
   List getServerGroups(@Query("applications") List applications,
                        @Query("cloudProvider") String cloudProvider)
+
+  @Headers("Accept: application/json")
+  @POST("/serverGroupsDetailsForList")
+  List getServerGroupsDetailsForList(@Body String getServerGroupsDetailsForList)
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}/jobs")
