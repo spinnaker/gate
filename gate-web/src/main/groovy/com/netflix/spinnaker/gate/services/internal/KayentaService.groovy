@@ -24,16 +24,16 @@ interface KayentaService {
   List getCredentials()
 
   @GET("/canaryConfig")
-  List getCanaryConfigs()
+  List getCanaryConfigs(@Query("application") String application)
 
   @GET("/canaryConfig/{id}")
   Map getCanaryConfig(@Path("id") String id)
 
   @POST("/canaryConfig")
-  Response createCanaryConfig(@Body Map config)
+  Map createCanaryConfig(@Body Map config)
 
   @PUT("/canaryConfig/{id}")
-  Response updateCanaryConfig(@Path("id") String id, @Body Map config)
+  Map updateCanaryConfig(@Path("id") String id, @Body Map config)
 
   @DELETE("/canaryConfig/{id}")
   Response deleteCanaryConfig(@Path("id") String id)
