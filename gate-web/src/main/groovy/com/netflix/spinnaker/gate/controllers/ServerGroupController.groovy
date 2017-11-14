@@ -48,17 +48,17 @@ class ServerGroupController {
   @ApiOperation(value = "Retrieve a list of server groups for a list of applications or a list of servergroups by 'account:region:name'")
   @RequestMapping(value = "/serverGroups", method = RequestMethod.GET)
   List getServerGroups(@RequestParam(required = false, value = 'applications') List<String> applications,
-                       @RequestParam(required = false, value = 'serverGroupNames') List<String> serverGroupNames,
+                       @RequestParam(required = false, value = 'ids') List<String> ids,
                        @RequestParam(required = false, value = 'cloudProvider') String cloudProvider,
                        @RequestHeader(value = "X-RateLimit-App", required = false) String sourceApp) {
-    if ((applications && serverGroupNames) || (!applications && !serverGroupNames)) {
+    if ((applications && ids) || (!applications && !ids)) {
       throw new IllegalArgumentException("Provide either 'applications' or 'serverGroupNames' parameter, but not both");
     }
 
     if (applications) {
       return serverGroupService.getForApplications(applications, cloudProvider, sourceApp)
     } else {
-      return serverGroupService.getForNames(serverGroupNames, cloudProvider, sourceApp)
+      return serverGroupService.getForIds(ids, cloudProvider, sourceApp)
     }
   }
 
