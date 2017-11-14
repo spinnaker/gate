@@ -52,7 +52,7 @@ class ServerGroupController {
                        @RequestParam(required = false, value = 'cloudProvider') String cloudProvider,
                        @RequestHeader(value = "X-RateLimit-App", required = false) String sourceApp) {
     if ((applications && ids) || (!applications && !ids)) {
-      throw new IllegalArgumentException("Provide either 'applications' or 'serverGroupNames' parameter, but not both");
+      throw new IllegalArgumentException("Provide either 'applications' or 'ids' parameter, but not both");
     }
 
     if (applications) {
