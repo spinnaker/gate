@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/ecsClusters")
 class EcsClusterController {
   @Autowired
   EcsClusterService ecsClusterService
 
   @ApiOperation(value = "Retrieve a list of ECS clusters that can be used for the account and region.")
-  @RequestMapping(value = "/{account}/{region}", method = RequestMethod.GET)
-  List all(@PathVariable String account, @PathVariable String region) {
-    ecsClusterService.getEcsClusters(account, region)
+  @RequestMapping(value = "/ecs/ecsClusters", method = RequestMethod.GET)
+  List all() {
+    ecsClusterService.getAllEcsClusters()
   }
 }
