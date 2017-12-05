@@ -114,6 +114,7 @@ interface ClouddriverService {
   @Headers("Accept: application/json")
   @GET("/serverGroups")
   List getServerGroups(@Query("applications") List applications,
+                       @Query("ids") List ids,
                        @Query("cloudProvider") String cloudProvider)
 
   @Headers("Accept: application/json")
@@ -227,6 +228,9 @@ interface ClouddriverService {
   Map getSecurityGroup(@Path("account") String account, @Path("type") String type, @Path("name") String name,
                        @Path("region") String region, @Query("vpcId") String vpcId)
 
+  @GET("/applications/{application}/serverGroupManagers")
+  List<Map> getServerGroupManagersForApplication(@Path("application") String application)
+
   @GET('/instanceTypes')
   List<Map> getInstanceTypes()
 
@@ -284,4 +288,9 @@ interface ClouddriverService {
 
   @GET('/storage')
   List<String> getStorageAccounts()
+
+  @GET('/manifests/{account}/{location}/{name}')
+  Map getManifest(@Path(value = 'account') String account,
+                  @Path(value = 'location') String location,
+                  @Path(value = 'name') String name)
 }
