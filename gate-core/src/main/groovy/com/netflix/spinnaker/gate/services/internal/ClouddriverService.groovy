@@ -18,7 +18,12 @@ package com.netflix.spinnaker.gate.services.internal
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import retrofit.client.Response
-import retrofit.http.*
+import retrofit.http.GET
+import retrofit.http.Headers
+import retrofit.http.Path
+import retrofit.http.Query
+import retrofit.http.QueryMap
+import retrofit.http.Streaming
 
 interface ClouddriverService {
 
@@ -109,6 +114,7 @@ interface ClouddriverService {
   @Headers("Accept: application/json")
   @GET("/serverGroups")
   List getServerGroups(@Query("applications") List applications,
+                       @Query("ids") List ids,
                        @Query("cloudProvider") String cloudProvider)
 
   @Headers("Accept: application/json")
@@ -222,6 +228,9 @@ interface ClouddriverService {
   Map getSecurityGroup(@Path("account") String account, @Path("type") String type, @Path("name") String name,
                        @Path("region") String region, @Query("vpcId") String vpcId)
 
+  @GET("/applications/{application}/serverGroupManagers")
+  List<Map> getServerGroupManagersForApplication(@Path("application") String application)
+
   @GET('/instanceTypes')
   List<Map> getInstanceTypes()
 
@@ -277,6 +286,14 @@ interface ClouddriverService {
                         @Path(value = 'bucketId', encode = false) String bucketId,
                         @Path(value = 'objectId', encode = false) String objectId)
 
+  @GET('/storage')
+  List<String> getStorageAccounts()
+
+  @GET('/manifests/{account}/{location}/{name}')
+  Map getManifest(@Path(value = 'account') String account,
+                  @Path(value = 'location') String location,
+                  @Path(value = 'name') String name)
+
   @GET('/roles/{cloudProvider}')
   List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
 
@@ -285,7 +302,4 @@ interface ClouddriverService {
 
   @GET('/ecs/cloudmetrics/alarms')
   List<Map> getEcsAllMetricAlarms()
-
-  @GET('/storage')
-  List<String> getStorageAccounts()
 }

@@ -46,7 +46,7 @@ class AuthController {
       "Roads? Where we're going we don't need roads!",
       "Say hello to my little friend!",
       "I wish we could chat longer, but I'm having an old friend for dinner. Bye!",
-      "Hodor.",
+      "Hodor. :(",
   ]
   private final Random r = new Random()
   private final URL deckBaseUrl
@@ -126,7 +126,10 @@ class AuthController {
       return matcher.matches()
     }
 
+    def toURLPort = (toURL.port == -1 && toURL.protocol == 'https') ? 443 : toURL.port
+    def deckBaseUrlPort = (deckBaseUrl.port == -1 && deckBaseUrl.protocol == 'https') ? 443 : deckBaseUrl.port
+
     return toURL.host == deckBaseUrl.host &&
-        toURL.port == deckBaseUrl.port
+        toURLPort == deckBaseUrlPort
   }
 }
