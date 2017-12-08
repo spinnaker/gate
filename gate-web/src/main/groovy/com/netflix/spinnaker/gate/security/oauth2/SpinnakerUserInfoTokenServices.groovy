@@ -23,10 +23,18 @@ import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor
+import org.springframework.boot.autoconfigure.security.oauth2.resource.FixedAuthoritiesExtractor
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices
 import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.oauth2.client.OAuth2RestOperations
+import org.springframework.security.oauth2.client.OAuth2RestTemplate
+import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException
 import org.springframework.security.oauth2.provider.OAuth2Authentication
@@ -68,14 +76,25 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
   @Autowired
   Front50Service front50Service
 
+  String userInfoEndpointUrl
+  String clientId
+
+  private String tokenType = DefaultOAuth2AccessToken.BEARER_TYPE
+  private OAuth2RestOperations restTemplate
+
   @Override
   OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
-    OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
+    Map<String, Object> map = getMap(this.userInfoEndpointUrl, accessToken)
+    if (map.containsKey("error")) {
+      log.debug("userinfo returned error: " + map.get("error"))
+      throw new InvalidTokenException(accessToken)
+    }
+    OAuth2Authentication oAuth2Authentication = userInfoTokenServices.extractAuthentication(map)
 
     Map details = oAuth2Authentication.userAuthentication.details as Map
 
     if (log.isDebugEnabled()) {
-      log.debug("UserInfo details: ", entries(details))
+      log.debug("UserInfo details: " + entries(details))
     }
 
     def isServiceAccount = isServiceAccount(details)
@@ -112,6 +131,40 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
     return new OAuth2Authentication(storedRequest, authentication)
   }
 
+  private Map<String, Object> getMap(String path, String accessToken) {
+    log.debug("Getting user info from: " + path);
+    try {
+      OAuth2RestOperations restTemplate = this.restTemplate;
+      if (restTemplate == null) {
+        BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
+        resource.setClientId(this.clientId)
+        restTemplate = new OAuth2RestTemplate(resource)
+      }
+      OAuth2AccessToken existingToken = restTemplate.getOAuth2ClientContext()
+        .getAccessToken()
+      if (existingToken == null || !accessToken.equals(existingToken.getValue())) {
+        DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(
+          accessToken)
+        token.setTokenType(this.tokenType)
+        restTemplate.getOAuth2ClientContext().setAccessToken(token)
+      }
+      Map<String, Object> ret = restTemplate.getForEntity(path, Map.class).getBody()
+      if (userInfoRequirements.containsKey("organization") && ret.containsKey("organizations_url")) {
+        String org_url = ret["organizations_url"] as String
+        log.debug("Getting user organizations from: " + org_url)
+        List<Map<String, String>> organizations = restTemplate.getForEntity(org_url, List.class).getBody()
+        ret["organizations"] = organizations
+      }
+      return ret
+    }
+    catch (Exception ex) {
+      log.warn("Could not fetch user details: " + ex.getClass() + ", "
+        + ex.getMessage())
+      return Collections.<String, Object>singletonMap("error",
+        "Could not fetch user details")
+    }
+  }
+
   @Override
   OAuth2AccessToken readAccessToken(String accessToken) {
     return userInfoTokenServices.readAccessToken(accessToken)
@@ -131,19 +184,40 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
     return false
   }
 
+  boolean githubOrganizationMember(String organization, List<Map<String,String>> organizations) {
+    for (int i = 0; i < organizations.size(); i++) {
+      if (organization == organizations[i]["login"]) {
+        return true
+      }
+    }
+    return false
+  }
+
   boolean hasAllUserInfoRequirements(Map details) {
     if (!userInfoRequirements) {
       return true
     }
 
     def invalidFields = userInfoRequirements.findAll { String reqKey, String reqVal ->
+      if (reqKey == "organization") {
+        if (details.containsKey("organizations")) {
+          return !this.githubOrganizationMember(reqVal, details['organizations'])
+        }
+        return true
+      }
       if (details[reqKey] && isRegexExpression(reqVal)) {
         return !String.valueOf(details[reqKey]).matches(mutateRegexPattern(reqVal))
       }
       return details[reqKey] != reqVal
     }
     if (invalidFields && log.debugEnabled) {
-      log.debug "Invalid userInfo response: " + invalidFields.collect({k, v -> "got $k=${details[k]}, wanted $v"}).join(", ")
+      String invalidSummary = invalidFields.collect({k, v ->
+        if (k == "organization") {
+          "missing required organization $v"
+        } else {
+          "got $k=${details[k]}, wanted $v"
+        }}).join(", ")
+      log.debug "Invalid userInfo response: " + invalidSummary
     }
 
     return !invalidFields

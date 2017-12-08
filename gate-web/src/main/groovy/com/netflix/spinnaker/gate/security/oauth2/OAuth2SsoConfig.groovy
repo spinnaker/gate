@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2SsoProperties
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -65,10 +66,13 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired(required = false)
   List<OAuthSsoConfigurer> configurers
 
+  @Autowired
+  ResourceServerProperties sso;
+
   @Primary
   @Bean
   ResourceServerTokenServices spinnakerUserInfoTokenServices() {
-    new SpinnakerUserInfoTokenServices()
+    new SpinnakerUserInfoTokenServices(userInfoEndpointUrl: sso.getUserInfoUri(), clientId: sso.getClientId())
   }
 
   @Bean
