@@ -23,7 +23,7 @@ class SpinnakerUserInfoTokenServicesSpec extends Specification {
 
   def "should check restricted domain flag if set"() {
     setup:
-      def userInfoRequirements = new OAuth2SsoConfig.UserInfoRequirements();
+      def userInfoRequirements = new OAuth2SsoConfig.UserInfoRequirements()
       @Subject tokenServices = new SpinnakerUserInfoTokenServices(userInfoRequirements: userInfoRequirements)
 
     expect: "no domain restriction means everything matches"
@@ -58,5 +58,19 @@ class SpinnakerUserInfoTokenServicesSpec extends Specification {
       !tokenServices.hasAllUserInfoRequirements(["hd": "foo.com"])
       !tokenServices.hasAllUserInfoRequirements(["bar": "bar.com"])
       tokenServices.hasAllUserInfoRequirements(["hd": "foo.com", "bar": "bar.com"])
+  }
+
+  def "should check restricted organizations if set"() {
+    setup:
+    def userInfoRequirements = new OAuth2SsoConfig.UserInfoRequirements()
+    userInfoRequirements.organization = "testorg"
+    @Subject tokenServices = new SpinnakerUserInfoTokenServices(userInfoRequirements: userInfoRequirements)
+
+    expect: "no organization in response doesn't match"
+      !tokenServices.hasAllUserInfoRequirements([:])
+
+    and: "organization in response does match"
+      tokenServices.hasAllUserInfoRequirements(['organizations':[['login':'testorg']]])
+      tokenServices.hasAllUserInfoRequirements(['organizations':[['login':'dummy'],['login':'testorg']]])
   }
 }
