@@ -42,6 +42,7 @@ interface ClouddriverService {
     String accountId
     String type
     String providerVersion
+    boolean enabled
     Collection<String> requiredGroupMembership = []
   }
 
