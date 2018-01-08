@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class EcsClusterService {
+  private static final String GROUP = "ecsClusterService"
 
   ClouddriverService clouddriver
 
@@ -16,7 +17,7 @@ class EcsClusterService {
   }
 
   List getAllEcsClusters() {
-    HystrixFactory.newListCommand("pipelines", "updatePipeline") {
+    HystrixFactory.newListCommand(GROUP, "getAllEcsClusters") {
       clouddriver.getAllEcsClusters()
     } execute()
   }
