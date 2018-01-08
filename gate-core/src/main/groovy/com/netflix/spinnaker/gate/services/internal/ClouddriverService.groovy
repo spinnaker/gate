@@ -43,6 +43,7 @@ interface ClouddriverService {
     String type
     String providerVersion
     Collection<String> requiredGroupMembership = []
+    Map<String, Collection<String>> permissions
   }
 
 
@@ -289,17 +290,12 @@ interface ClouddriverService {
   @GET('/storage')
   List<String> getStorageAccounts()
 
+  @GET('/artifacts/credentials')
+  List<Map> getArtifactCredentials()
+
+
   @GET('/manifests/{account}/{location}/{name}')
   Map getManifest(@Path(value = 'account') String account,
                   @Path(value = 'location') String location,
                   @Path(value = 'name') String name)
-
-  @GET('/roles/{cloudProvider}')
-  List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
-
-  @GET('/ecs/ecsclusters')
-  List<Map> getAllEcsClusters()
-
-  @GET('/ecs/cloudmetrics/alarms')
-  List<Map> getEcsAllMetricAlarms()
 }
