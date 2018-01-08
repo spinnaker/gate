@@ -43,6 +43,8 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
+import org.springframework.security.saml.websso.WebSSOProfileConsumer
+import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
 import org.springframework.stereotype.Component
@@ -50,7 +52,7 @@ import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 import java.security.KeyStore
 
-import static org.springframework.security.extensions.saml2.config.SAMLConfigurer.saml
+import static com.netflix.spinnaker.gate.security.saml.SAMLConfigurer.saml
 
 @ConditionalOnExpression('${saml.enabled:false}')
 @Configuration
@@ -81,6 +83,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
     String redirectBasePath = "/"
     // The application identifier given to the IdP for this app.
     String issuerId
+    // The max time between now and last successful authentication.
+    long maxAuthenticationAge = 7200
 
     List<String> requiredRoles
     UserAttributeMapping userAttributeMapping = new UserAttributeMapping()
@@ -140,6 +144,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     http
       .apply(saml())
+        .webSSOProfileConsumer(webSSOProfileConsumer())
         .userDetailsService(samlUserDetailsService)
         .identityProvider()
           .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
@@ -164,6 +169,13 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
     configurers?.each {
       it.configure(http)
     }
+  }
+
+  WebSSOProfileConsumer webSSOProfileConsumer() {
+    WebSSOProfileConsumerImpl consumer = new WebSSOProfileConsumerImpl()
+    consumer.setMaxAuthenticationAge(samlSecurityConfigProperties.maxAuthenticationAge)
+
+    return consumer
   }
 
   @Bean
