@@ -293,6 +293,8 @@ interface ClouddriverService {
   @GET('/artifacts/credentials')
   List<Map> getArtifactCredentials()
 
+  @GET('/roles/{cloudProvider}')
+  List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
 
   @GET('/manifests/{account}/{location}/{name}')
   Map getManifest(@Path(value = 'account') String account,
