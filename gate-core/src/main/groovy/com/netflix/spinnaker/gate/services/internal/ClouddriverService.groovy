@@ -296,6 +296,12 @@ interface ClouddriverService {
   @GET('/roles/{cloudProvider}')
   List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
 
+  @GET('/ecs/ecsclusters')
+  List<Map> getAllEcsClusters()
+
+  @GET('/ecs/cloudmetrics/alarms')
+  List<Map> getEcsAllMetricAlarms()
+
   @GET('/manifests/{account}/{location}/{name}')
   Map getManifest(@Path(value = 'account') String account,
                   @Path(value = 'location') String location,
