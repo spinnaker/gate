@@ -16,7 +16,11 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter
+import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import retrofit.client.Response
 import retrofit.http.GET
 import retrofit.http.Headers
@@ -30,13 +34,17 @@ interface ClouddriverService {
   @GET('/credentials')
   List<Account> getAccounts()
 
+  @GET('/credentials?expand=true')
+  List<AccountDetails> getAccountDetails()
+
   @GET('/credentials/{account}')
-  Map getAccount(@Path("account") String account)
+  AccountDetails getAccount(@Path("account") String account)
 
   @GET('/task/{taskDetailsId}')
   Map getTaskDetails(@Path("taskDetailsId") String taskDetailsId)
 
   @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonInclude(Include.NON_NULL)
   static class Account {
     String name
     String accountId
@@ -44,6 +52,26 @@ interface ClouddriverService {
     String providerVersion
     Collection<String> requiredGroupMembership = []
     Map<String, Collection<String>> permissions
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = false)
+  static class AccountDetails extends Account {
+    String accountType
+    String environment
+    Boolean challengeDestructiveActions
+    Boolean primaryAccount
+    String cloudProvider
+    private Map<String, Object> details = new HashMap<String, Object>()
+
+    @JsonAnyGetter
+    public Map<String,Object> details() {
+      return details
+    }
+
+    @JsonAnySetter
+    public void set(String name, Object value) {
+      details.put(name, value)
+    }
   }
 
 
@@ -296,10 +324,10 @@ interface ClouddriverService {
   @GET('/roles/{cloudProvider}')
   List<Map> getRoles(@Path("cloudProvider") String cloudProvider)
 
-  @GET('/ecs/ecsclusters')
+  @GET('/ecs/ecsClusters')
   List<Map> getAllEcsClusters()
 
-  @GET('/ecs/cloudmetrics/alarms')
+  @GET('/ecs/cloudMetrics/alarms')
   List<Map> getEcsAllMetricAlarms()
 
   @GET('/manifests/{account}/{location}/{name}')

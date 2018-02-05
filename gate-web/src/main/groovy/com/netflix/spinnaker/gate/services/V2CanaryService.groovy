@@ -46,6 +46,16 @@ class V2CanaryService {
     }).execute() as List
   }
 
+  List listMetricsServiceMetadata(String filter, String metricsAccountName) {
+    return HystrixFactory.newListCommand(HYSTRIX_GROUP, "listMetricsServiceMetadata", {
+      try {
+        return kayentaService.listMetricsServiceMetadata(filter, metricsAccountName)
+      } catch (RetrofitError error) {
+        throw classifyError(error)
+      }
+    }).execute() as List
+  }
+
   List listJudges() {
     return HystrixFactory.newListCommand(HYSTRIX_GROUP, "listCanaryJudges", {
       try {
@@ -64,6 +74,16 @@ class V2CanaryService {
         throw classifyError(error)
       }
     }).execute() as Map
+  }
+
+  List getCanaryResultsByApplication(String application, int limit, String statuses, String storageAccountName) {
+    return HystrixFactory.newMapCommand(HYSTRIX_GROUP, "getCanaryResultsByApplication", {
+      try {
+        return kayentaService.getCanaryResultsByApplication(application, limit, statuses, storageAccountName)
+      } catch (RetrofitError error) {
+        throw classifyError(error)
+      }
+    }).execute() as List<String>
   }
 
   List getMetricSetPairList(String metricSetPairListId, String storageAccountName) {

@@ -44,12 +44,22 @@ interface KayentaService {
   Response deleteCanaryConfig(@Path("id") String id,
                               @Query("configurationAccountName") String configurationAccountName)
 
+  @GET("/metadata/metricsService")
+  List listMetricsServiceMetadata(@Query("filter") String filter,
+                                  @Query("metricsAccountName") String metricsAccountName)
+
   @GET("/judges")
   List listJudges()
 
   @GET("/canary/{canaryExecutionId}")
   Map getCanaryResult(@Path("canaryExecutionId") String canaryExecutionId,
                       @Query("storageAccountName") String storageAccountName)
+
+  @GET("/canary/executions")
+  List getCanaryResultsByApplication(@Query("application") String application,
+                                     @Query("limit") int limit,
+                                     @Query("statuses") String statuses,
+                                     @Query("storageAccountName") String storageAccountName)
 
   @GET("/metricSetPairList/{metricSetPairListId}")
   List getMetricSetPairList(@Path("metricSetPairListId") metricSetPairListId,
