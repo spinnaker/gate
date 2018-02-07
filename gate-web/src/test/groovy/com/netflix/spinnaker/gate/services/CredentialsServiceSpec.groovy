@@ -17,7 +17,7 @@
 package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
@@ -27,35 +27,43 @@ class CredentialsServiceSpec extends Specification {
   @Unroll
   def "should return allowed account names"() {
     setup:
-      AccountLookupService accountLookupService = Mock(AccountLookupService) {
-        getAccounts() >> accounts
-      }
-      FiatClientConfigurationProperties fiatConfig = new FiatClientConfigurationProperties(enabled: false)
+    AccountLookupService accountLookupService = Mock(AccountLookupService) {
+      getAccounts() >> accounts
+    }
+    FiatClientConfigurationProperties fiatConfig = new FiatClientConfigurationProperties(enabled: false)
 
-      @Subject
-      CredentialsService credentialsService = new CredentialsService(accountLookupService: accountLookupService,
-                                                                     fiatConfig: fiatConfig)
+    @Subject
+    CredentialsService credentialsService = new CredentialsService(accountLookupService: accountLookupService,
+      fiatConfig: fiatConfig)
 
     when:
-      def allowedAccounts = credentialsService.getAccountNames(roles)
+    def allowedAccounts = credentialsService.getAccountNames(roles)
 
     then:
-      allowedAccounts == expectedAccounts
+    allowedAccounts == expectedAccounts
 
     where:
-      roles              | accounts                       || expectedAccounts
-      null               | []                             || []
-      []                 | []                             || []
-      [null]             | []                             || []
-      ["roleA"]          | [acnt("acntA")]                || ["acntA"]
-      ["roleA"]          | [acnt("acntB")]                || ["acntB"]
-      ["roleA", "roleB"] | [acnt("acntA"), acnt("acntB")] || ["acntA", "acntB"]
-      ["roleA"]          | [acnt("acntA", "roleA")]       || ["acntA"]
-      ["ROLEA"]          | [acnt("acntA", "rolea")]       || ["acntA"]
-      ["roleA"]          | [acnt("acntA", "roleB")]       || []
+    roles              | accounts                                                      || expectedAccounts
+    null               | []                                                            || []
+    []                 | []                                                            || []
+    [null]             | []                                                            || []
+    ["roleA"]          | [acnt("acntA")]                                               || ["acntA"]
+    ["roleA"]          | [acnt("acntB")]                                               || ["acntB"]
+    ["roleA", "roleB"] | [acnt("acntA"), acnt("acntB")]                                || ["acntA", "acntB"]
+    ["roleA"]          | [acnt("acntA", "roleA")]                                      || ["acntA"]
+    ["ROLEA"]          | [acnt("acntA", "rolea")]                                      || ["acntA"]
+    ["roleA"]          | [acnt("acntA", "roleB")]                                      || []
+    ["roleA"]          | [acnt("acntA", [:])]                                          || ["acntA"]
+    ["roleA"]          | [acnt("acntA", [WRITE: []])]                                  || []
+    ["roleA"]          | [acnt("acntA", [READ: ['roleA'], WRITE: null])]               || []
+    ["roleA"]          | [acnt("acntA", [READ: ['roleA']])]                            || []
+    ["roleA"]          | [acnt("acntA", [READ: ['roleA'], WRITE: ['roleA']])]          || ['acntA']
+    ["ROLEA"]          | [acnt("acntA", [READ: ['roleA'], WRITE: ['roleA']])]          || ['acntA']
+    ["roleA"]          | [acnt("acntA", [READ: ['roleA'], WRITE: ['ROLEA']])]          || ['acntA']
+    ["roleB"]          | [acnt("acntA", [READ: ['roleA'], WRITE: ['roleA']], 'roleB')] || []
   }
 
-  static ClouddriverService.Account acnt(String name, String... reqGroupMembership) {
-    new ClouddriverService.Account(name: name, requiredGroupMembership: reqGroupMembership)
+  static AccountDetails acnt(String name, Map<String, List<String>> permissions = null, String... reqGroupMembership) {
+    new AccountDetails(name: name, requiredGroupMembership: reqGroupMembership, permissions: permissions)
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Netflix, Inc.
+ * Copyright 2017 Armory, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.services
+package com.netflix.spinnaker.gate.security.oauth2.provider
 
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
+import org.springframework.stereotype.Component
 
-interface AccountLookupService {
-  List<AccountDetails> getAccounts()
+@Component
+interface SpinnakerProviderTokenServices {
+  boolean hasAllProviderRequirements(String token, Map details)
 }
