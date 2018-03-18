@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.controllers
 import com.netflix.spinnaker.gate.services.ApplicationService
 import com.netflix.spinnaker.gate.services.ExecutionHistoryService
 import com.netflix.spinnaker.gate.services.TaskService
+import com.netflix.spinnaker.gate.services.internal.OrcaService
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
@@ -57,6 +58,9 @@ class ApplicationController {
 
   @Autowired
   Environment environment
+
+  @Autowired
+  OrcaService orcaService
 
   @ApiOperation(value = "Retrieve a list of applications")
   @RequestMapping(method = RequestMethod.GET)
@@ -142,6 +146,19 @@ class ApplicationController {
     applicationService.getPipelineConfigsForApplication(application).find {
       it.name == pipelineName
     }
+  }
+
+  @ApiOperation(value = "Generate a template from the pipeline configuration")
+  @RequestMapping(value = "/{application}/pipelineConfigs/{pipelineName:.+}/convertToTemplate", method = RequestMethod.GET)
+  String convertPipelineConfigToPipelineTemplate(
+    @PathVariable("application") String application, @PathVariable("pipelineName") String pipelineName) {
+    Map pipelineConfig = applicationService.getPipelineConfigsForApplication(application).find {
+      it.name == pipelineName
+    }
+    if (pipelineConfig == null) {
+      throw new NotFoundException("Pipeline config '${pipelineConfigId}' could not be found")
+    }
+    return orcaService.convertToPipelineTemplate(pipelineConfig).body.in().text
   }
 
   @ApiOperation(value = "Retrieve a list of an application's pipeline strategy configurations")
