@@ -156,7 +156,7 @@ class ApplicationController {
       it.name == pipelineName
     }
     if (pipelineConfig == null) {
-      throw new NotFoundException("Pipeline config '${pipelineConfigId}' could not be found")
+      throw new NotFoundException("Pipeline config '${pipelineName}' could not be found")
     }
     return orcaService.convertToPipelineTemplate(pipelineConfig).body.in().text
   }
