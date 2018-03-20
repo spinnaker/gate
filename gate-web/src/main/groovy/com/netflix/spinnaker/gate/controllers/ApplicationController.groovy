@@ -19,7 +19,6 @@ package com.netflix.spinnaker.gate.controllers
 import com.netflix.spinnaker.gate.services.ApplicationService
 import com.netflix.spinnaker.gate.services.ExecutionHistoryService
 import com.netflix.spinnaker.gate.services.TaskService
-import com.netflix.spinnaker.gate.services.internal.OrcaService
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
@@ -58,9 +57,6 @@ class ApplicationController {
 
   @Autowired
   Environment environment
-
-  @Autowired
-  OrcaService orcaService
 
   @ApiOperation(value = "Retrieve a list of applications")
   @RequestMapping(method = RequestMethod.GET)
@@ -158,7 +154,7 @@ class ApplicationController {
     if (pipelineConfig == null) {
       throw new NotFoundException("Pipeline config '${pipelineName}' could not be found")
     }
-    return orcaService.convertToPipelineTemplate(pipelineConfig).body.in().text
+    return applicationService.convertToPipelineTemplate(pipelineConfig);
   }
 
   @ApiOperation(value = "Retrieve a list of an application's pipeline strategy configurations")
