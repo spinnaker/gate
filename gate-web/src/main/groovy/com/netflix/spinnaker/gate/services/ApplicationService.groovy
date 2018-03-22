@@ -21,6 +21,7 @@ import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.gate.services.internal.OrcaService
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -59,6 +60,9 @@ class ApplicationService {
 
   @Autowired
   Front50Service front50Service
+
+  @Autowired
+  OrcaService orcaService
 
   @Autowired
   ExecutorService executorService
@@ -251,6 +255,12 @@ class ApplicationService {
     return [accounts1, accounts2].collect { String s ->
       s?.split(',')?.toList()?.findResults { it.trim() ?: null } ?: []
     }.flatten().toSet().sort().join(',')
+  }
+
+  String convertToPipelineTemplate(Map pipelineConfig) {
+    return HystrixFactory.newStringCommand(GROUP, "convertToPipelineTemplate") {
+      orcaService.convertToPipelineTemplate(pipelineConfig).body.in().text;
+    }.execute()
   }
 
   static class Front50ApplicationListRetriever implements Callable<List<Map>> {

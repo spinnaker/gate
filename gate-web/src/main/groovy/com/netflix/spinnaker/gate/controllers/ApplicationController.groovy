@@ -144,6 +144,19 @@ class ApplicationController {
     }
   }
 
+  @ApiOperation(value = "Generate a template from the pipeline configuration")
+  @RequestMapping(value = "/{application}/pipelineConfigs/{pipelineName:.+}/convertToTemplate", method = RequestMethod.GET)
+  String convertPipelineConfigToPipelineTemplate(
+    @PathVariable("application") String application, @PathVariable("pipelineName") String pipelineName) {
+    Map pipelineConfig = applicationService.getPipelineConfigsForApplication(application).find {
+      it.name == pipelineName
+    }
+    if (pipelineConfig == null) {
+      throw new NotFoundException("Pipeline config '${pipelineName}' could not be found")
+    }
+    return applicationService.convertToPipelineTemplate(pipelineConfig);
+  }
+
   @ApiOperation(value = "Retrieve a list of an application's pipeline strategy configurations")
   @RequestMapping(value = "/{application}/strategyConfigs", method = RequestMethod.GET)
   List getStrategyConfigsForApplication(@PathVariable("application") String application) {
