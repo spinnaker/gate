@@ -50,6 +50,11 @@ dependencies {
     exclude group: 'org.springframework.security'
   }
 
+  // IAP
+  compile('com.nimbusds:nimbus-jose-jwt:5.2')
+
+  compileOnly spinnaker.dependency("lombok")
+
   testCompile "com.squareup.okhttp:mockwebserver:${spinnaker.version('okHttp')}"
   testCompile apachedsDependencies
   testCompile spinnaker.dependency("korkJedisTest")
@@ -61,7 +66,6 @@ dependencies {
 configurations.all {
   exclude group: 'javax.servlet', module: 'servlet-api'
   exclude group: "org.slf4j", module: "slf4j-log4j12"
-  exclude group: "org.springframework.boot", module: "spring-boot-starter-data-rest"
 }
 tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
   classpath configurations.runtime + file('config')
