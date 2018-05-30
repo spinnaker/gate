@@ -43,6 +43,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
+import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
 import org.springframework.stereotype.Component
@@ -84,6 +85,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
     List<String> requiredRoles
     UserAttributeMapping userAttributeMapping = new UserAttributeMapping()
+    // Maximum time between users authentication and processing of the AuthNResponse message. (in seconds)
+    long maxAuthenticationAge = 7200
 
     /**
      * Ensure that the keystore exists and can be accessed with the given keyStorePassword and keyStoreAliasName
@@ -145,6 +148,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
           .discoveryEnabled(false)
           .and()
+        .webSSOProfileConsumer(webSSOProfileConsumer())
         .serviceProvider()
           .entityId(samlSecurityConfigProperties.issuerId)
           .protocol(samlSecurityConfigProperties.redirectProtocol)
@@ -246,5 +250,12 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         return attributes
       }
     }
+  }
+
+  @Bean
+  WebSSOProfileConsumerImpl webSSOProfileConsumer() {
+    WebSSOProfileConsumerImpl webSSOProfileConsumer = new WebSSOProfileConsumerImpl()
+    webSSOProfileConsumer.setMaxAuthenticationAge(samlSecurityConfigProperties.maxAuthenticationAge)
+    webSSOProfileConsumer
   }
 }
