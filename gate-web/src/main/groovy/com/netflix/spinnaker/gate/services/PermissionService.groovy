@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
+import com.netflix.spinnaker.fiat.model.resources.ServiceAccount
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
@@ -114,8 +115,7 @@ class PermissionService {
     }.execute() as Set<Role>
   }
 
-  List<String> getServiceAccounts(@SpinnakerUser User user) {
-
+  Set<ServiceAccount.View> getServiceAccounts(@SpinnakerUser User user) {
     if (!user) {
       log.debug("getServiceAccounts: Spinnaker user is null.")
       return []
@@ -129,10 +129,10 @@ class PermissionService {
     return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getServiceAccounts") {
       try {
         UserPermission.View view = permissionEvaluator.getPermission(user.username)
-        return view.getServiceAccounts().collect { it.name }
+        return view.getServiceAccounts()
       } catch (RetrofitError re) {
         throw classifyError(re)
       }
-    }.execute() as List<String>
+    }.execute() as Set<ServiceAccount.View>
   }
 }
