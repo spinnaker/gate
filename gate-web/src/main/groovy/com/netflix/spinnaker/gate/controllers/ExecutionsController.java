@@ -45,10 +45,10 @@ public class ExecutionsController {
   }
 
   @ApiOperation(value = "Search for pipeline executions using a combination of criteria")
-  @RequestMapping(value = "/applications/{application}/executions/{triggerType}", method = RequestMethod.GET)
+  @RequestMapping(value = "/applications/{application}/executions/search", method = RequestMethod.GET)
   List searchForPipelineExecutions(
     @PathVariable(value = "application") String application,
-    @PathVariable(value = "triggerType") String triggerType,
+    @RequestParam(value = "triggerTypes", required = false) String triggerTypes,
     @RequestParam(value = "pipelineName", required = false) String pipelineName,
     @RequestParam(value = "eventId", required = false) String eventId,
     @RequestParam(value = "trigger", required = false) String trigger,
@@ -60,6 +60,6 @@ public class ExecutionsController {
     @RequestParam(value = "reverse", defaultValue = "false") boolean reverse,
     @RequestParam(value = "expand", defaultValue = "false") boolean expand
   ) {
-    return orcaServiceSelector.withContext(RequestContext.get()).searchForPipelineExecutions(application, triggerType, pipelineName, eventId, trigger, triggerTimeStartBoundary, triggerTimeEndBoundary, statuses, startIndex, size, reverse, expand);
+    return orcaServiceSelector.withContext(RequestContext.get()).searchForPipelineExecutions(application, triggerTypes, pipelineName, eventId, trigger, triggerTimeStartBoundary, triggerTimeEndBoundary, statuses, startIndex, size, reverse, expand);
   }
 }
