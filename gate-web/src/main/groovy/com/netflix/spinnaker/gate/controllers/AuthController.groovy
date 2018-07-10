@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.netflix.spinnaker.fiat.model.resources.ServiceAccount
 import com.netflix.spinnaker.gate.security.SpinnakerUser
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
@@ -80,10 +81,10 @@ class AuthController {
     return user
   }
 
-  @ApiOperation(value = "Get service accounts", response = List.class)
+  @ApiOperation(value = "Get service accounts", response = Set.class)
   @RequestMapping(value = "/user/serviceAccounts", method = RequestMethod.GET)
-  List<String> getServiceAccounts(@ApiIgnore @SpinnakerUser User user) {
-    permissionService.getServiceAccounts(user)
+  Set<ServiceAccount.View> getServiceAccounts(@ApiIgnore @SpinnakerUser User user) {
+    return permissionService.getServiceAccounts(user)
   }
 
   @ApiOperation(value = "Get logged out message", response = String.class)
