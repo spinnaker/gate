@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
 
+import java.util.concurrent.TimeUnit
+
 @Configuration
 class RetrofitConfig {
   @Value('${okHttpClient.connectionPool.maxIdleConnections:5}')
@@ -39,6 +41,12 @@ class RetrofitConfig {
   @Value('${okHttpClient.retryOnConnectionFailure:true}')
   boolean retryOnConnectionFailure
 
+  @Value('${okHttpClient.connectTimeoutMs:15000}')
+  int connectTimeoutMs
+
+  @Value('${okHttpClient.readTimeoutMs:20000}')
+  int readTimeoutMs
+
   @Autowired
   OkHttpClientConfiguration okHttpClientConfig
 
@@ -49,6 +57,8 @@ class RetrofitConfig {
     okHttpClient.connectionPool = new ConnectionPool(maxIdleConnections, keepAliveDurationMs)
     okHttpClient.retryOnConnectionFailure = retryOnConnectionFailure
     okHttpClient.interceptors().add(new OkHttpMetricsInterceptor(registry))
+    okHttpClient.setConnectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS)
+    okHttpClient.setReadTimeout(readTimeoutMs, TimeUnit.MILLISECONDS)
     return okHttpClient
   }
 
