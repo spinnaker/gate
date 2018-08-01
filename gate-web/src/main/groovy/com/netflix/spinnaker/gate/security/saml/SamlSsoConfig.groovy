@@ -21,6 +21,7 @@ import com.netflix.spinnaker.gate.security.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.saml.SamlSsoConfig.UserAttributeMapping
 import com.netflix.spinnaker.gate.services.PermissionService
+import com.netflix.spinnaker.kork.core.RetrySupport
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.opensaml.saml2.core.Assertion
@@ -190,6 +191,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       @Autowired
       AllowedAccountsSupport allowedAccountsSupport
 
+      RetrySupport retrySupport = new RetrySupport()
+
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
         def assertion = credential.authenticationAssertion
@@ -206,14 +209,24 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           }
         }
 
-        permissionService.loginWithRoles(username, roles)
+        try {
+          retrySupport.retry({ ->
+            permissionService.loginWithRoles(username, roles)
+          }, 5, 2000, false)
+          log.debug("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
+        } catch (Exception e) {
+          log.debug("Unsuccessful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
+          throw e
+        }
 
-        new User(email: email,
+        return new User(
+          email: email,
           firstName: attributes[userAttributeMapping.firstName]?.get(0),
           lastName: attributes[userAttributeMapping.lastName]?.get(0),
           roles: roles,
           allowedAccounts: allowedAccountsSupport.filterAllowedAccounts(username, roles),
-          username: username)
+          username: username
+        )
       }
 
       Set<String> extractRoles(String email,

@@ -23,6 +23,7 @@ import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
+import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.filters.CorsFilter
 import com.netflix.spinnaker.gate.filters.GateOriginValidator
@@ -151,7 +152,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
   @Bean
   FiatService fiatService(OkHttpClient okHttpClient) {
-    createClient "fiat", FiatService, okHttpClient
+    // always create the fiat service even if 'services.fiat.enabled' is 'false' (it can be enabled dynamically)
+    createClient "fiat", FiatService, okHttpClient, null, true
   }
 
   @Bean
@@ -171,7 +173,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
     if (serviceConfiguration.getService("clouddriver").getConfig().containsKey("dynamicEndpoints")) {
       def endpoints = (Map<String, String>) serviceConfiguration.getService("clouddriver").getConfig().get("dynamicEndpoints")
       dynamicServices = (Map<String, ClouddriverService>) endpoints.collectEntries { k, v ->
-        [k, createClient("clouddriver", ClouddriverService, okHttpClient, k)]
+        [k, createClient("clouddriver", ClouddriverService, okHttpClient, k, false)]
       }
     }
 
@@ -210,12 +212,17 @@ class GateConfig extends RedisHttpSessionConfiguration {
     createClient "kayenta", KayentaService, okHttpClient
   }
 
-  private <T> T createClient(String serviceName, Class<T> type, OkHttpClient okHttpClient, String dynamicName = null) {
+  private <T> T createClient(String serviceName,
+                             Class<T> type,
+                             OkHttpClient okHttpClient,
+                             String dynamicName = null,
+                             boolean forceEnabled = false) {
     Service service = serviceConfiguration.getService(serviceName)
     if (service == null) {
       throw new IllegalArgumentException("Unknown service ${serviceName} requested of type ${type}")
     }
-    if (!service.enabled) {
+
+    if (!service.enabled && !forceEnabled) {
       return null
     }
 
@@ -283,8 +290,9 @@ class GateConfig extends RedisHttpSessionConfiguration {
   OriginValidator gateOriginValidator(
     @Value('${services.deck.baseUrl}') String deckBaseUrl,
     @Value('${services.deck.redirectHostPattern:#{null}}') String redirectHostPattern,
-    @Value('${cors.allowedOriginsPattern:#{null}}') String allowedOriginsPattern) {
-    return new GateOriginValidator(deckBaseUrl, redirectHostPattern, allowedOriginsPattern)
+    @Value('${cors.allowedOriginsPattern:#{null}}') String allowedOriginsPattern,
+    @Value('${cors.expectLocalhost:false}') boolean expectLocalhost) {
+    return new GateOriginValidator(deckBaseUrl, redirectHostPattern, allowedOriginsPattern, expectLocalhost)
   }
 
   @Bean
@@ -322,11 +330,18 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  FiatPermissionEvaluator fiatPermissionEvaluator(DynamicConfigService dynamicConfigService,
+  FiatStatus fiatStatus(DynamicConfigService dynamicConfigService,
+                        Registry registry,
+                        FiatClientConfigurationProperties fiatClientConfigurationProperties) {
+    return new FiatStatus(registry, dynamicConfigService, fiatClientConfigurationProperties)
+  }
+
+  @Bean
+  FiatPermissionEvaluator fiatPermissionEvaluator(FiatStatus fiatStatus,
                                                   Registry registry,
                                                   FiatService fiatService,
                                                   FiatClientConfigurationProperties fiatClientConfigurationProperties) {
-    return new FiatPermissionEvaluator(dynamicConfigService, registry, fiatService, fiatClientConfigurationProperties)
+    return new FiatPermissionEvaluator(registry, fiatService, fiatClientConfigurationProperties, fiatStatus)
   }
 
   @Component

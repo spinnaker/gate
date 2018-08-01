@@ -17,6 +17,8 @@
 package com.netflix.spinnaker.gate.filters
 
 import com.netflix.spinnaker.gate.config.Headers
+import groovy.util.logging.Slf4j
+import net.logstash.logback.argument.StructuredArguments
 
 import javax.servlet.Filter
 import javax.servlet.FilterChain
@@ -27,6 +29,7 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+@Slf4j
 class CorsFilter implements Filter {
 
   private final OriginValidator originValidator
@@ -43,6 +46,10 @@ class CorsFilter implements Filter {
     String origin = request.getHeader("Origin")
     if (!originValidator.isValidOrigin(origin)) {
       origin = '*'
+    } else if (!originValidator.isExpectedOrigin(origin)) {
+      log.debug("CORS request with full authentication support from non-default origin header. Request Method: {}. Origin header: {}.",
+        StructuredArguments.kv("requestMethod", request.getMethod()),
+        StructuredArguments.kv("origin", origin))
     }
     response.setHeader("Access-Control-Allow-Credentials", "true")
     response.setHeader("Access-Control-Allow-Origin", origin)

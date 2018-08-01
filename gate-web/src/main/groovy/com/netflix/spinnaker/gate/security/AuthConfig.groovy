@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.security
 
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
+import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.gate.filters.FiatSessionFilter
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
@@ -56,6 +57,9 @@ class AuthConfig {
   FiatClientConfigurationProperties configProps
 
   @Autowired
+  FiatStatus fiatStatus
+
+  @Autowired
   FiatPermissionEvaluator permissionEvaluator
 
   @Value('${security.debug:false}')
@@ -65,11 +69,8 @@ class AuthConfig {
   boolean fiatSessionFilterEnabled
 
   void configure(HttpSecurity http) throws Exception {
-    Filter fiatSessionFilter = new FiatSessionFilter(fiatSessionFilterEnabled,
-                                                     configProps,
-                                                     permissionEvaluator)
     // @formatter:off
-    SecurityBuilder result = http
+    SecurityBuilder securityBuilder = http
       .authorizeRequests()
         .antMatchers('/**/favicon.ico').permitAll()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -79,8 +80,16 @@ class AuthConfig {
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
         .and()
-      .addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
-      .logout()
+    if (fiatSessionFilterEnabled) {
+      Filter fiatSessionFilter = new FiatSessionFilter(
+        fiatSessionFilterEnabled,
+        fiatStatus,
+        permissionEvaluator)
+
+      securityBuilder.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
+    }
+
+    securityBuilder.logout()
         .logoutUrl("/auth/logout")
         .logoutSuccessHandler(permissionRevokingLogoutSuccessHandler)
         .permitAll()
@@ -90,7 +99,7 @@ class AuthConfig {
     // @formatter:on
 
     if (securityProperties.basic.enabled) {
-      result.httpBasic()
+      securityBuilder.httpBasic()
     }
   }
 

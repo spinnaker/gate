@@ -18,9 +18,9 @@ package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
-import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
+import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.gate.security.SpinnakerUser
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.security.User
@@ -41,75 +41,75 @@ class PermissionService {
   FiatService fiatService
 
   @Autowired
-  FiatClientConfigurationProperties fiatConfig
-
-  @Autowired
   FiatPermissionEvaluator permissionEvaluator
 
+  @Autowired
+  FiatStatus fiatStatus
+
   boolean isEnabled() {
-    return fiatConfig.enabled
+    return fiatStatus.isEnabled()
   }
 
   void login(String userId) {
-    if (fiatConfig.enabled) {
+    if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "login") {
         try {
           fiatService.loginUser(userId, "")
           permissionEvaluator.invalidatePermission(userId)
         } catch (RetrofitError e) {
-          classifyError(e)
+          throw classifyError(e)
         }
       }.execute()
     }
   }
 
   void loginWithRoles(String userId, Collection<String> roles) {
-    if (fiatConfig.enabled) {
+    if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "loginWithRoles") {
         try {
           fiatService.loginWithRoles(userId, roles)
           permissionEvaluator.invalidatePermission(userId)
         } catch (RetrofitError e) {
-          classifyError(e)
+          throw classifyError(e)
         }
       }.execute()
     }
   }
 
   void logout(String userId) {
-    if (fiatConfig.enabled) {
+    if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "logout") {
         try {
           fiatService.logoutUser(userId)
           permissionEvaluator.invalidatePermission(userId)
         } catch (RetrofitError e) {
-          classifyError(e)
+          throw classifyError(e)
         }
       }.execute()
     }
   }
 
   void sync() {
-    if (fiatConfig.enabled) {
+    if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "sync") {
         try {
           fiatService.sync()
         } catch (RetrofitError e) {
-          classifyError(e)
+          throw classifyError(e)
         }
       }.execute()
     }
   }
 
   Set<Role> getRoles(String userId) {
-    if (!fiatConfig.enabled) {
+    if (!fiatStatus.isEnabled()) {
       return []
     }
     return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getRoles") {
       try {
         return permissionEvaluator.getPermission(userId)?.roles ?: []
       } catch (RetrofitError e) {
-        classifyError(e)
+        throw classifyError(e)
       }
     }.execute() as Set<Role>
   }
@@ -121,7 +121,7 @@ class PermissionService {
       return []
     }
 
-    if (!fiatConfig.enabled) {
+    if (!fiatStatus.isEnabled()) {
       log.debug("getServiceAccounts: Fiat disabled.")
       return []
     }

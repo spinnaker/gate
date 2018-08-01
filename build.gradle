@@ -20,7 +20,7 @@ allprojects {
   apply plugin: 'groovy'
 
   ext {
-    spinnakerDependenciesVersion = project.hasProperty('spinnakerDependenciesVersion') ? project.property('spinnakerDependenciesVersion') : '0.157.5'
+    spinnakerDependenciesVersion = project.hasProperty('spinnakerDependenciesVersion') ? project.property('spinnakerDependenciesVersion') : '1.0.2'
   }
 
   def checkLocalVersions = [spinnakerDependenciesVersion: spinnakerDependenciesVersion]
@@ -46,6 +46,12 @@ allprojects {
   configurations.all {
     exclude group: 'javax.servlet', module: 'servlet-api'
     exclude group: 'javax.servlet', module: 'javax.servlet-api'
+  }
+
+  tasks.withType(JavaExec) {
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+      jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8184'
+    }
   }
 
   group = "com.netflix.spinnaker.gate"
