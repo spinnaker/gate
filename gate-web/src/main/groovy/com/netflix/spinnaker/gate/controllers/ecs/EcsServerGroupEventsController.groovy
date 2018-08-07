@@ -12,7 +12,7 @@ class EcsServerGroupEventsController {
   EcsServerGroupEventsService ecsServerGroupEventsService
 
   @ApiOperation(value = "Retrieves a list of events for a server group")
-  @RequestMapping(value = "applications/{application}/{account}/{serverGroupName}/events", method = RequestMethod.GET)
+  @RequestMapping(value = "applications/{application}/serverGroups/{account}/{serverGroupName}/events", method = RequestMethod.GET)
   List getEvents(@PathVariable String application,
                  @PathVariable String account,
                  @PathVariable String serverGroupName,
