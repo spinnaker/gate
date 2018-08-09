@@ -337,7 +337,7 @@ interface ClouddriverService {
                   @Path(value = 'location') String location,
                   @Path(value = 'name') String name)
 
-  @GET('/applications/{application}/{account}/{serverGroupName}/events')
+  @GET('/applications/{application}/serverGroups/{account}/{serverGroupName}/events')
   List<Map> getServerGroupEvents(
     @Path(value = 'application') String application,
     @Path(value = 'account') String account,
