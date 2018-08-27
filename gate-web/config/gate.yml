@@ -64,6 +64,8 @@ swagger:
     - .*securityGroups.*
     - /search
     - .*pipeline.*
+    - .*pipelineConfigs.*
+    - .*pipelines.*
     - .*loadBalancers.*
     - .*instances.*
     - .*images.*
