@@ -227,6 +227,28 @@ class PipelineController {
     }
   }
 
+  @ApiOperation(value = "Trigger a pipeline execution")
+  @RequestMapping(value = "/v2/{application}/{pipelineNameOrId:.+}", method = RequestMethod.POST)
+  HttpEntity invokePipelineConfigViaEcho(@PathVariable("application") String application,
+                                  @PathVariable("pipelineNameOrId") String pipelineNameOrId,
+                                  @RequestBody(required = false) Map trigger) {
+    trigger = trigger ?: [:]
+    trigger.user = trigger.user ?: AuthenticatedRequest.getSpinnakerUser().orElse('anonymous')
+    trigger.notifications = trigger.notifications ?: []
+
+    RequestContext.setApplication(application)
+    try {
+      def body = pipelineService.triggerViaEcho(application, pipelineNameOrId, trigger)
+      new ResponseEntity(body, HttpStatus.ACCEPTED)
+    } catch (NotFoundException e) {
+      throw e
+    } catch (e) {
+      log.error("Unable to trigger pipeline (application: {}, pipelineId: {})",
+        value("application", application), value("pipelineId", pipelineNameOrId), e)
+      new ResponseEntity([message: e.message], new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY)
+    }
+  }
+
   @ApiOperation(value = "Evaluate a pipeline expression using the provided execution as context", response = HashMap.class)
   @RequestMapping(value = "{id}/evaluateExpression")
   Map evaluateExpressionForExecution(@PathVariable("id") String id,

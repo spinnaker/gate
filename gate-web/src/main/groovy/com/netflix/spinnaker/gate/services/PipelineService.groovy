@@ -96,6 +96,26 @@ class PipelineService {
     orcaServiceSelector.withContext(RequestContext.get()).startPipeline(pipelineConfig, trigger.user?.toString())
   }
 
+  Map triggerViaEcho(String application, String pipelineNameOrId, Map parameters) {
+    String user = parameters.remove("user")
+    def eventId = UUID.randomUUID()
+    parameters.put("eventId", eventId)
+
+    Map eventMap = [
+      content: [
+        application: application,
+        pipelineNameOrId: pipelineNameOrId,
+        trigger: parameters,
+        user: user
+      ],
+      details: [
+        type: "manual"
+      ]
+    ]
+    echoService.postEvent(eventMap)
+    return [eventId: eventId]
+  }
+
   Map startPipeline(Map pipelineConfig, String user) {
     orcaServiceSelector.withContext(RequestContext.get()).startPipeline(pipelineConfig, user)
   }
