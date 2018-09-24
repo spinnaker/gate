@@ -24,6 +24,7 @@ import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import com.netflix.spinnaker.kork.core.RetrySupport
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -97,7 +98,7 @@ class PipelineService {
   }
 
   Map triggerViaEcho(String application, String pipelineNameOrId, Map parameters) {
-    String user = parameters.remove("user")
+    def user = AuthenticatedRequest.getSpinnakerUser()
     def eventId = UUID.randomUUID()
     parameters.put("eventId", eventId)
 
@@ -105,8 +106,9 @@ class PipelineService {
       content: [
         application: application,
         pipelineNameOrId: pipelineNameOrId,
+        runAsUser: user.orElse(""),
         trigger: parameters,
-        user: user
+        user: user.orElse("anonymous")
       ],
       details: [
         type: "manual"
