@@ -98,7 +98,6 @@ class PipelineService {
   }
 
   Map triggerViaEcho(String application, String pipelineNameOrId, Map parameters) {
-    def user = AuthenticatedRequest.getSpinnakerUser()
     def eventId = UUID.randomUUID()
     parameters.put("eventId", eventId)
 
@@ -106,9 +105,8 @@ class PipelineService {
       content: [
         application: application,
         pipelineNameOrId: pipelineNameOrId,
-        runAsUser: user.orElse(""),
         trigger: parameters,
-        user: user.orElse("anonymous")
+        user: AuthenticatedRequest.getSpinnakerUser().orElse("anonymous")
       ],
       details: [
         type: "manual"
