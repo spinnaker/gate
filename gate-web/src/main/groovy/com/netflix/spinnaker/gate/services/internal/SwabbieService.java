@@ -29,4 +29,12 @@ public interface SwabbieService {
   Map optOut(@Path("namespace") String namespace,
              @Path("resourceId") String resourceId,
              @Body String ignored);
+
+  @Headers("Accept: application/json")
+  @PUT("/resources/state/{namespace}/{resourceId}/restore")
+  void restore(@Path("namespace") String namespace,
+               @Path("resourceId") String resourceId,
+               @Body String ignored);
+
+  // todo eb: add method to get the state of a resource by namespace/resourceId
 }
