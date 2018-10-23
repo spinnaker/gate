@@ -46,6 +46,20 @@ public class CleanupService {
     }).execute();
   }
 
+  public Map get(String namespace, String resourceId) {
+    return (Map) HystrixFactory.newMapCommand(GROUP, "get", () -> {
+      try {
+        return swabbieService.get(namespace, resourceId);
+      } catch (RetrofitError e) {
+        if (e.getResponse().getStatus() == 404) {
+          return Collections.emptyMap();
+        } else {
+          throw e;
+        }
+      }
+    }).execute();
+  }
+
   public String restore(String namespace, String resourceId) {
     HystrixFactory.newStringCommand(GROUP, "restore", () -> {
       try {

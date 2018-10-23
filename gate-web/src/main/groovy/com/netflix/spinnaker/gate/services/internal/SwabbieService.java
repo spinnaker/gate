@@ -16,10 +16,7 @@
 
 package com.netflix.spinnaker.gate.services.internal;
 
-import retrofit.http.Body;
-import retrofit.http.Headers;
-import retrofit.http.PUT;
-import retrofit.http.Path;
+import retrofit.http.*;
 
 import java.util.Map;
 
@@ -36,5 +33,8 @@ public interface SwabbieService {
                @Path("resourceId") String resourceId,
                @Body String ignored);
 
-  // todo eb: add method to get the state of a resource by namespace/resourceId
+  @Headers("Accept: application/json")
+  @GET("/resources/marked/{namespace}/{resourceId}")
+  Map get(@Path("namespace") String namespace,
+          @Path("resourceId") String resourceId);
 }
