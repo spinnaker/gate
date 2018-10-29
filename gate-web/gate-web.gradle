@@ -53,6 +53,7 @@ dependencies {
   runtime project(":gate-auth-iap")
   runtime project(":gate-auth-ldap")
   runtime project(":gate-auth-oauth2")
+  runtime project(":gate-auth-saml")
 }
 
 configurations.all {

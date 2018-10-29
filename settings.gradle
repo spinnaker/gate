@@ -22,7 +22,9 @@ include "gate-web",
   "gate-security",
   "gate-auth-iap",
   "gate-auth-ldap",
-  "gate-auth-oauth2"
+  "gate-auth-oauth2",
+  "gate-auth-saml"
+  "gate-auth-x509"
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"
