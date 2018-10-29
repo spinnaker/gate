@@ -15,13 +15,6 @@ dependencies {
   compile spinnaker.dependency("korkExceptions")
   compileOnly spinnaker.dependency("lombok")
 
-  // OAuth2
-  compile 'org.springframework.security.oauth:spring-security-oauth2:2.1.1.RELEASE'
-  compile 'com.squareup.retrofit:converter-simplexml:1.9.0' // Github OAuth
-
-  // LDAP
-
-
   // SAML
   compile('org.opensaml:opensaml:2.6.4')
   compile("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")

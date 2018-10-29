@@ -52,6 +52,7 @@ dependencies {
   runtime 'org.eclipse.jetty:jetty-servlets:9.2.11.v20150529'
   runtime project(":gate-auth-iap")
   runtime project(":gate-auth-ldap")
+  runtime project(":gate-auth-oauth2")
 }
 
 configurations.all {
