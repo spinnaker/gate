@@ -23,7 +23,7 @@ include "gate-web",
   "gate-auth-iap",
   "gate-auth-ldap",
   "gate-auth-oauth2",
-  "gate-auth-saml"
+  "gate-auth-saml",
   "gate-auth-x509"
 
 def setBuildFile(project) {
