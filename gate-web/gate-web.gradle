@@ -43,6 +43,7 @@ dependencies {
 
   compileOnly spinnaker.dependency("lombok")
 
+  testCompile project(":gate-auth-ldap") // TODO: Move system tests to own module
   testCompile "com.squareup.okhttp:mockwebserver:${spinnaker.version('okHttp')}"
   testCompile apachedsDependencies
   testCompile spinnaker.dependency("korkJedisTest")
@@ -50,6 +51,7 @@ dependencies {
   //this brings in the jetty GzipFilter which boot will autoconfigure
   runtime 'org.eclipse.jetty:jetty-servlets:9.2.11.v20150529'
   runtime project(":gate-auth-iap")
+  runtime project(":gate-auth-ldap")
 }
 
 configurations.all {
