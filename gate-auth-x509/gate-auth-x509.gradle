@@ -1,17 +1,4 @@
-repositories {
-  maven {
-    url 'https://repo.spring.io/libs-snapshot'
-  }
-}
-
 dependencies {
-
-  compile project(':gate-core')
   compile project(':gate-security')
-  compile spinnaker.dependency("kork")
-  compileOnly spinnaker.dependency("lombok")
-
   compile 'org.bouncycastle:bcprov-jdk16:1.46'
-
-  spinnaker.group('test')
 }

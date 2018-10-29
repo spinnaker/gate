@@ -5,10 +5,9 @@ repositories {
 }
 
 dependencies{
-  compile project(':gate-core')
   compile project(':gate-security')
-  compile spinnaker.dependency("kork")
-  compileOnly spinnaker.dependency("lombok")
+  // RetrySupport is in kork-exceptions and not kork-core!
+  compile spinnaker.dependency("korkExceptions")
 
   compile('org.opensaml:opensaml:2.6.4')
   compile("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
@@ -16,7 +15,5 @@ dependencies{
     exclude group: 'org.springframework.boot'
     exclude group: 'org.springframework.security'
   }
-
-  spinnaker.group('test')
 }
 

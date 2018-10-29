@@ -1,20 +1,5 @@
-repositories {
-  maven {
-    url 'https://repo.spring.io/libs-snapshot'
-  }
-}
-
 dependencies {
-  spinnaker.group('fiat')
-
-  compileOnly spinnaker.dependency("lombok")
-
   compile project(":gate-security")
-  compile project(":gate-core")
-  compile spinnaker.dependency("kork")
-
   compile 'org.springframework.security.oauth:spring-security-oauth2:2.1.1.RELEASE'
   compile 'com.squareup.retrofit:converter-simplexml:1.9.0' // Github OAuth
-
-  spinnaker.group('test')
 }
