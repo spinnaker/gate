@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/pipelineTemplates")
 public class PipelineTemplatesController {
+
+  private static Logger log = LoggerFactory.getLogger(PipelineTemplatesController.class);
 
   // TODO rz - make configurable?
   private static final String DEFAULT_APPLICATION = "spinnaker";
@@ -95,6 +99,7 @@ public class PipelineTemplatesController {
   @ApiOperation(value = "Resolve a pipeline template.", response = HashMap.class)
   @RequestMapping(value = "/resolve", method = RequestMethod.GET)
   public Map resolveTemplates(@RequestParam String source, @RequestParam(required = false) String executionId, @RequestParam(required = false) String pipelineConfigId) {
+    log.info(",, source: {}", source);
     return pipelineTemplateService.resolve(source, executionId, pipelineConfigId);
   }
 

@@ -21,7 +21,6 @@ import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import lombok.Data
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -39,9 +38,9 @@ class PipelineTemplateService {
   private final OrcaServiceSelector orcaServiceSelector
 
   @Autowired
-  public PipelineTemplateService(Front50Service front50Service, OrcaServiceSelector orcaServiceSelector) {
-    this.front50Service = front50Service;
-    this.orcaServiceSelector = orcaServiceSelector;
+  PipelineTemplateService(Front50Service front50Service, OrcaServiceSelector orcaServiceSelector) {
+    this.front50Service = front50Service
+    this.orcaServiceSelector = orcaServiceSelector
   }
 
   Map get(String id) {

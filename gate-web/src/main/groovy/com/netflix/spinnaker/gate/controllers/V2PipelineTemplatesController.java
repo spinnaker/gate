@@ -112,7 +112,7 @@ public class V2PipelineTemplatesController {
   @ApiOperation(value = "Resolve a pipeline template.", response = HashMap.class)
   @RequestMapping(value = "/resolve", method = RequestMethod.GET)
   public Map resolveTemplates(@RequestParam String source, @RequestParam(required = false) String executionId, @RequestParam(required = false) String pipelineConfigId) {
-    return null;
+    return v2PipelineTemplateService.resolve(source, executionId, pipelineConfigId);
   }
 
   @ApiOperation(value = "Get a pipeline template.", response = HashMap.class)
