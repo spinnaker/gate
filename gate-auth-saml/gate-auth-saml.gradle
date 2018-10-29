@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies{
-  compile project(':gate-security')
+  compile project(':gate-core')
   // RetrySupport is in kork-exceptions and not kork-core!
   compile spinnaker.dependency("korkExceptions")
 

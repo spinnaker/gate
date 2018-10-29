@@ -1,4 +1,4 @@
 dependencies {
-  compile project(':gate-security')
+  compile project(':gate-core')
   compile 'org.bouncycastle:bcprov-jdk16:1.46'
 }

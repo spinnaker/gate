@@ -23,7 +23,6 @@ include "gate-auth-iap",
   "gate-auth-x509",
   "gate-core",
   "gate-proxy",
-  "gate-security",
   "gate-web"
 
 def setBuildFile(project) {
