@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component
 import retrofit.RetrofitError
 
 import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyError
+import java.util.ArrayList;
 
 @Slf4j
 @Component
@@ -93,7 +94,7 @@ class PermissionService {
     if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "sync") {
         try {
-          fiatService.sync()
+          fiatService.sync(new ArrayList<String>())
         } catch (RetrofitError e) {
           throw classifyError(e)
         }
