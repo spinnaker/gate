@@ -93,7 +93,7 @@ class PermissionService {
     if (fiatStatus.isEnabled()) {
       HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "sync") {
         try {
-          fiatService.sync()
+          fiatService.sync(new ArrayList())
         } catch (RetrofitError e) {
           throw classifyError(e)
         }
