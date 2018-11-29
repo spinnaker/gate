@@ -23,7 +23,8 @@ include "gate-core",
   "gate-proxy",
   "gate-saml",
   "gate-web",
-  "gate-x509"
+  "gate-x509",
+  "gate-basic"
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"
