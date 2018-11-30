@@ -16,10 +16,8 @@
 
 package com.netflix.spinnaker.gate.security.basic
 
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.config.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityProperties
@@ -36,15 +34,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
-@SuppportsMultiAuth
 @Order(Ordered.LOWEST_PRECEDENCE)
-class BasicSsoConfig extends WebSecurityConfigurerAdapter {
+class BasicConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   AuthConfig authConfig
-
-  @Autowired(required = false)
-  List<MultiAuthConfigurer> additionalAuthProviders
 
   @Autowired
   SecurityProperties securityProperties
@@ -61,9 +55,6 @@ class BasicSsoConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.formLogin()
     authConfig.configure(http)
-    additionalAuthProviders?.each {
-      it.configure(http)
-    }
   }
 
   @Override
