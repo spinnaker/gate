@@ -17,14 +17,14 @@
 rootProject.name = "gate"
 
 include "gate-core",
+  "gate-basic",
   "gate-iap",
   "gate-ldap",
   "gate-oauth2",
   "gate-proxy",
   "gate-saml",
   "gate-web",
-  "gate-x509",
-  "gate-basic"
+  "gate-x509"
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"

@@ -35,7 +35,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @SpinnakerAuthConfig
 @EnableWebSecurity
 @Order(Ordered.LOWEST_PRECEDENCE)
-class BasicConfig extends WebSecurityConfigurerAdapter {
+class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   AuthConfig authConfig
