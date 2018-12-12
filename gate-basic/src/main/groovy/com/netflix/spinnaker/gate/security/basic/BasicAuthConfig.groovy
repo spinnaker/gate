@@ -20,7 +20,6 @@ import com.netflix.spinnaker.gate.config.AuthConfig
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -41,14 +40,11 @@ class BasicAuthConfig extends WebSecurityConfigurerAdapter {
   AuthConfig authConfig
 
   @Autowired
-  SecurityProperties securityProperties
+  BasicAuthProvider authProvider
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.inMemoryAuthentication()
-        .withUser(securityProperties.user.name)
-        .password(securityProperties.user.password)
-        .roles("USER")
+    auth.authenticationProvider(authProvider)
   }
 
   @Override
