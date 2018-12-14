@@ -125,9 +125,17 @@ interface OrcaService {
   List preconfiguredWebhooks()
 
   @Headers("Accept: application/json")
+  @GET("/jobs/preconfigured")
+  List getPreconfiguredJobs()
+
+  @Headers("Accept: application/json")
   @GET("/pipelineTemplate")
   Map resolvePipelineTemplate(@Query("source") String source, @Query("executionId") String executionId, @Query("pipelineConfigId") String pipelineConfigId)
 
   @POST("/convertPipelineToTemplate")
   Response convertToPipelineTemplate(@Body Map<String, ? extends Object> pipelineConfig)
+
+  @Headers("Accept: application/json")
+  @POST("/v2/pipelineTemplates/plan")
+  Map<String, Object> plan(@Body Map<String, Object> pipelineConfig)
 }
