@@ -63,7 +63,7 @@ interface OrcaService {
 
   @Headers("Accept: application/json")
   @GET("/pipelines")
-  List getLatestExecutionsByConfigIds(@Query("pipelineConfigIds") String pipelineConfigIds, @Query("limit") Integer limit, @Query("statuses") String statuses)
+  List getSubsetOfExecutions(@Query("pipelineConfigIds") String pipelineConfigIds, @Query("executionIds") String executionIds, @Query("limit") Integer limit, @Query("statuses") String statuses, @Query("expand") boolean expand)
 
   @Headers("Accept: application/json")
   @GET("/applications/{application}/pipelines/search")
@@ -125,9 +125,17 @@ interface OrcaService {
   List preconfiguredWebhooks()
 
   @Headers("Accept: application/json")
+  @GET("/jobs/preconfigured")
+  List getPreconfiguredJobs()
+
+  @Headers("Accept: application/json")
   @GET("/pipelineTemplate")
   Map resolvePipelineTemplate(@Query("source") String source, @Query("executionId") String executionId, @Query("pipelineConfigId") String pipelineConfigId)
 
   @POST("/convertPipelineToTemplate")
   Response convertToPipelineTemplate(@Body Map<String, ? extends Object> pipelineConfig)
+
+  @Headers("Accept: application/json")
+  @POST("/v2/pipelineTemplates/plan")
+  Map<String, Object> plan(@Body Map<String, Object> pipelineConfig)
 }

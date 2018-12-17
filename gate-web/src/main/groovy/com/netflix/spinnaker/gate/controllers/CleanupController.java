@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.CleanupService;
@@ -6,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,51 +36,51 @@ public class CleanupController {
     this.cleanupService = cleanupService;
   }
 
-  @ApiOperation(value = "Opt out of clean up for a marked resource.", response = String.class)
+  @ApiOperation(value = "Opt out of clean up for a marked resource.", response = Map.class)
   @RequestMapping(method = RequestMethod.GET,
                   value = "/resources/{namespace}/{resourceId}/optOut",
-                  produces = "text/html")
-  String optOut(@PathVariable String namespace,
+                  produces = "application/json")
+  Map optOut(@PathVariable String namespace,
                 @PathVariable String resourceId) {
     Map markedResource = cleanupService.optOut(namespace, resourceId);
     if (markedResource.isEmpty()) {
-      return getHtmlWithMessage(namespace, resourceId, "Resource does not exist. Please try a valid resource.");
+      return getJsonWithMessage(namespace, resourceId, "Resource does not exist. Please try a valid resource.");
     }
 
-    return getHtmlWithMessage(namespace, resourceId, "Resource has been restored, and opted out of future deletion!");
+    return getJsonWithMessage(namespace, resourceId, "Resource has been opted out of automated deletion.");
   }
 
-  @ApiOperation(value = "Get information about a marked resource.", response = String.class)
+  @ApiOperation(value = "Get information about a marked resource.", response = Map.class)
   @RequestMapping(method = RequestMethod.GET,
-                  value = "/resources/{namespace}/{resourceId}",
-                  produces = "text/html")
-  String getMarkedResource(@PathVariable String namespace,
+    value = "/resources/{namespace}/{resourceId}",
+    produces = "application/json")
+  Map getMarkedResource(@PathVariable String namespace,
                         @PathVariable String resourceId) {
     Map markedResource = cleanupService.get(namespace, resourceId);
     if (markedResource.isEmpty()) {
-      return getHtmlWithMessage(namespace, resourceId, "Resource does not exist. Please try a valid resource.");
+      return getJsonWithMessage(namespace, resourceId, "Resource does not exist. Please try a valid resource.");
     }
-    return markedResource.toString();
+    return markedResource;
   }
 
-  // todo eb: expose once AWS gives us soft delete
-//  @ApiOperation(value = "Restore a resource that has been soft deleted.", response = HashMap.class)
-//  @RequestMapping(method = RequestMethod.PUT,
-//                  value = "/resources/{namespace}/{resourceId}/restore",
-//                  produces= "text/html")
-  String restore(String namespace, String resourceId) {
-    String status = cleanupService.restore(namespace, resourceId);
-    if (status.equals("404")) {
-      return getHtmlWithMessage(namespace, resourceId, "Resource does not exist. Please try a valid resource.");
-    }
-
-    return getHtmlWithMessage(namespace, resourceId, "Resource has been opted out!");
+  @ApiOperation(value = "Get all marked resources.", response = List.class)
+  @RequestMapping(method = RequestMethod.GET, value = "/resources/marked", produces = "application/json")
+  List getAllMarkedResources() {
+    return cleanupService.getMarkedList();
   }
 
-  private String getHtmlWithMessage(String namespace, String resourceId, String message) {
-    return "<body>\n" +
-      "Swabbie Resource: [namespace=" + namespace + ", resourceId=" + resourceId + "] <br>\n" +
-      "Message: " + message + "\n" +
-      "</body>";
+  @ApiOperation(value = "Get all deleted resources.", response = List.class)
+  @RequestMapping(method = RequestMethod.GET, value = "/resources/deleted", produces = "application/json")
+  List getAllDeletedResources() {
+    return cleanupService.getDeletedList();
+  }
+
+  private Map<String, String> getJsonWithMessage(String namespace, String resourceId, String message) {
+    Map<String, String> json = new HashMap();
+
+    json.put("swabbieNamespace", namespace);
+    json.put("swabbieResourceId", resourceId);
+    json.put("message", message);
+    return json;
   }
 }

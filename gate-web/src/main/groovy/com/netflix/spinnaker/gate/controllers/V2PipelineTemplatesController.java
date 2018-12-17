@@ -69,11 +69,16 @@ public class V2PipelineTemplatesController {
     this.objectMapper = objectMapper;
   }
 
-  // TODO(jacobkiefer): Un-stub
-  @ApiOperation(value = "List pipeline templates.", response = HashMap.class, responseContainer = "List")
+  @ApiOperation(value = "List pipeline templates.", response = List.class)
   @RequestMapping(method = RequestMethod.GET)
   public Collection<Map> list(@RequestParam(required = false) List<String> scopes) {
     return v2PipelineTemplateService.findByScope(scopes);
+  }
+
+  @ApiOperation(value = "Plan a pipeline template configuration.", response = HashMap.class)
+  @RequestMapping(value = "/plan", method = RequestMethod.POST)
+  public Map<String, Object> plan(@RequestBody Map<String, Object> pipeline) {
+    return v2PipelineTemplateService.plan(pipeline);
   }
 
   @ApiOperation(value = "Create a pipeline template.", response = HashMap.class)
@@ -107,12 +112,6 @@ public class V2PipelineTemplatesController {
     operation.put("job", jobs);
 
     return taskService.create(operation);
-  }
-
-  @ApiOperation(value = "Resolve a pipeline template.", response = HashMap.class)
-  @RequestMapping(value = "/resolve", method = RequestMethod.GET)
-  public Map resolveTemplates(@RequestParam String source, @RequestParam(required = false) String executionId, @RequestParam(required = false) String pipelineConfigId) {
-    return null;
   }
 
   @ApiOperation(value = "Get a pipeline template.", response = HashMap.class)
