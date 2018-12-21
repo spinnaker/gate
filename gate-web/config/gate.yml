@@ -141,11 +141,15 @@ security:
       clientAuthenticationScheme: query
     resource:
       userInfoUri: https://graph.windows.net/me?api-version=1.6
+      userRoleInfoUri: https://graph.windows.net/me/getMemberGroups?api-version=1.6
+      userRoleInfoRequestPayload: "{securityEnabledOnly: true}"
     userInfoMapping:
       username: userPrincipalName
       email: userPrincipalName
       firstName: givenName
       lastName: surname
+    userRoleInfoMapping: value
+
 
 ---
 

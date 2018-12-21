@@ -35,8 +35,15 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.OAuth2Request
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.web.client.RestTemplate
+import org.springframework.http.MediaType
+import org.springframework.beans.factory.annotation.Value
 import retrofit.RetrofitError
 
+import java.util.ArrayList
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -76,6 +83,17 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
   @Autowired
   AllowedAccountsSupport allowedAccountsSupport
 
+  RestTemplate restTemplate = new RestTemplate()
+
+  @Value('${security.oauth2.resource.userRoleInfoUri:}')
+  String userRoleInfoUri
+
+  @Value('${security.oauth2.userRoleInfoMapping:}')
+  String userRoleInfoMapping
+
+  @Value('${security.oauth2.resource.userRoleInfoRequestPayload:}')
+  String userRoleInfoRequestPayload
+
   @Override
   OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
     OAuth2Authentication oAuth2Authentication = userInfoTokenServices.loadAuthentication(accessToken)
@@ -98,6 +116,10 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
 
     def username = details[userInfoMapping.username] as String
     def roles = []
+
+    if(!userRoleInfoUri.isEmpty()) {
+      roles = getUserInfo(accessToken)[userRoleInfoMapping] as ArrayList
+    }
 
     // Service accounts are already logged in.
     if (!isServiceAccount) {
@@ -128,6 +150,14 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
   @Override
   OAuth2AccessToken readAccessToken(String accessToken) {
     return userInfoTokenServices.readAccessToken(accessToken)
+  }
+
+  Map<String, ?> getUserInfo(String accessToken) {
+      HttpHeaders headers = new HttpHeaders()
+      headers.set("Authorization", "Bearer " + accessToken)
+      headers.setContentType(MediaType.APPLICATION_JSON)
+      Map map = restTemplate.exchange(userRoleInfoUri, HttpMethod.POST, new HttpEntity<String>(userRoleInfoRequestPayload, headers), Map.class).getBody()
+      return (Map<String, String>) map
   }
 
   boolean isServiceAccount(Map details) {
