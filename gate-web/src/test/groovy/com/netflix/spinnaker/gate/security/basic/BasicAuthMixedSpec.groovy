@@ -19,8 +19,8 @@ package com.netflix.spinnaker.gate.security.basic
 import org.springframework.test.context.TestPropertySource
 
 /**
- * Tests for when security.basicform is enabled and security.basic is disabled.
+ * Tests for when security.basicform and security.basic are both enabled.
  */
-@TestPropertySource("/basic-auth.properties")
-class BasicAuthSpec extends AbstractAuthSpec {
+@TestPropertySource("/basic-auth-mixed.properties")
+class BasicAuthMixedSpec extends AbstractAuthSpec {
 }

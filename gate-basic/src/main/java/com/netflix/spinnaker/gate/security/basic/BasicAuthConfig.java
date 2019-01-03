@@ -51,7 +51,7 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.formLogin();
+    http.formLogin().and().httpBasic();
     authConfig.configure(http);
   }
 
