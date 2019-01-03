@@ -28,7 +28,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 
-@ConditionalOnExpression("${security.basic.enabled:false}")
+@ConditionalOnExpression("${security.basicform.enabled:false}")
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity

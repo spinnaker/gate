@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-@ConditionalOnExpression("${security.basic.enabled:false}")
+@ConditionalOnExpression("${security.basicform.enabled:false}")
 @Component
 public class BasicAuthProvider implements AuthenticationProvider {
 
