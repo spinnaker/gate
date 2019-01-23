@@ -35,7 +35,8 @@ services:
             packageType: RPM
 # optional services:
   echo:
-    enabled: false
+    baseUrl: http://localhost:8089
+    enabled: true
   fiat:
     enabled: false
   flapjack:
@@ -48,6 +49,9 @@ services:
     enabled: false
     canaryConfigStore: true
     baseUrl: http://localhost:8090
+  gremlin:
+    enabled: true
+    baseUrl: https://api.gremlin.com/v1
 
 redis:
   connection: redis://localhost:6379
