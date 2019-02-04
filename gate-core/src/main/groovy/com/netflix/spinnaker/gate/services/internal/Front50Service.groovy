@@ -132,6 +132,12 @@ interface Front50Service {
   @GET('/v2/projects/{projectId}')
   Map getProject(@Path('projectId') String projectId)
 
+  @POST('/v2/projects')
+  Map createProject(@Body Map project)
+
+  @PUT('/v2/projects/{projectId}')
+  Map updateProject(@Path('projectId') String projectId, @Body Map project)
+
   //
   // Snapshot-related
   //

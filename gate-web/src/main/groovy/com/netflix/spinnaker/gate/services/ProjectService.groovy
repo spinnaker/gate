@@ -54,6 +54,18 @@ class ProjectService {
     } execute()
   }
 
+  Map create(Map project) {
+    HystrixFactory.newMapCommand(GROUP, "create") {
+      front50Service.createProject(project)
+    } execute()
+  }
+
+  Map update(String projectId, Map project) {
+    HystrixFactory.newMapCommand(GROUP, "update") {
+      front50Service.updateProject(projectId, project)
+    } execute()
+  }
+
   List<Map> getAllPipelines(String projectId, int limit, String statuses) {
     RequestContext requestContext = RequestContext.get()
     HystrixFactory.newListCommand(GROUP, "getAllPipelines") {

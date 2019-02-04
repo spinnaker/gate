@@ -56,4 +56,16 @@ class ProjectController {
                                    @RequestParam(value = "statuses", required = false) String statuses) {
     return projectService.getAllPipelines(projectId, limit, statuses)
   }
+
+  @ApiOperation(value = "Create a project")
+  @RequestMapping(method = RequestMethod.POST)
+  Map createProject(@RequestBody Map body) {
+    return projectService.create(body)
+  }
+
+  @ApiOperation(value = "Update an existing project")
+  @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
+  Map updateProject(@PathVariable("id") final String projectId, @RequestBody Map project) {
+    return projectService.update(projectId, project)
+  }
 }
