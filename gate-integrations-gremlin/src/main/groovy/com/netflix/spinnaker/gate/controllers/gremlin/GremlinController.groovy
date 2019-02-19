@@ -1,8 +1,9 @@
-package com.netflix.spinnaker.gate.controllers
+package com.netflix.spinnaker.gate.controllers.gremlin
 
-import com.netflix.spinnaker.gate.services.GremlinService
+import com.netflix.spinnaker.gate.services.gremlin.GremlinService
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping('/gremlin')
+@ConditionalOnExpression('${integrations.gremlin.enabled:true}')
+
 class GremlinController {
   final static String APIKEY_KEY = "apiKey";
 

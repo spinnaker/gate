@@ -32,7 +32,6 @@ import com.netflix.spinnaker.gate.filters.OriginValidator
 import com.netflix.spinnaker.gate.retrofit.EurekaOkClient
 import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
-import com.netflix.spinnaker.gate.services.GremlinService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.EchoService
@@ -233,12 +232,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty('services.swabbie.enabled')
   SwabbieService swabbieService(OkHttpClient okHttpClient) {
     createClient("swabbie", SwabbieService, okHttpClient)
-  }
-
-  @Bean
-  @ConditionalOnProperty('services.gremlin.enabled')
-  GremlinService gremlinService(OkHttpClient okHttpClient) {
-    createClient('gremlin', GremlinService, okHttpClient)
   }
 
   private <T> T createClient(String serviceName,

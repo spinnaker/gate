@@ -1,4 +1,4 @@
-package com.netflix.spinnaker.gate.services;
+package com.netflix.spinnaker.gate.services.gremlin;
 
 import retrofit.http.*;
 
