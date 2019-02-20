@@ -1,5 +1,3 @@
-apply plugin: 'spinnaker.application'
-
 dependencies {
   compile project(":gate-core")
   compile spinnaker.dependency("korkSwagger")

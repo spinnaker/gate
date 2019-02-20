@@ -40,11 +40,11 @@ import retrofit.converter.JacksonConverter
 
 import static retrofit.Endpoints.newFixedEndpoint
 
+@Slf4j
 @CompileStatic
 @Configuration
-@Slf4j
-class GremlinGateConfig {
-
+@ConditionalOnProperty('integrations.gremlin.enabled')
+class GremlinConfig {
   @Value('${retrofit.logLevel:BASIC}')
   String retrofitLogLevel
 
@@ -61,43 +61,29 @@ class GremlinGateConfig {
   RequestInterceptor spinnakerRequestInterceptor
 
   @Bean
-  @ConditionalOnProperty('integrations.gremlin.enabled')
   GremlinService gremlinService(OkHttpClient okHttpClient) {
     createClient('gremlin', GremlinService, okHttpClient)
   }
 
   private <T> T createClient(String serviceName,
                              Class<T> type,
-                             OkHttpClient okHttpClient,
-                             String dynamicName = null,
-                             boolean forceEnabled = false) {
+                             OkHttpClient okHttpClient) {
     Service service = serviceConfiguration.getService(serviceName)
     if (service == null) {
       throw new IllegalArgumentException("Unknown service ${serviceName} requested of type ${type}")
     }
 
-    if (!service.enabled && !forceEnabled) {
+    if (!service.enabled) {
       return null
     }
 
-    Endpoint endpoint
-    if (dynamicName == null) {
-      endpoint = serviceConfiguration.discoveryHosts && service.vipAddress ?
-        newFixedEndpoint("niws://${service.vipAddress}")
-        : newFixedEndpoint(service.baseUrl)
-    } else {
-      if (!service.getConfig().containsKey("dynamicEndpoints")) {
-        throw new IllegalArgumentException("Unknown dynamicEndpoint ${dynamicName} for service ${serviceName} of type ${type}")
-      }
-      endpoint = newFixedEndpoint(((Map<String, String>) service.getConfig().get("dynamicEndpoints")).get(dynamicName))
-    }
+    Endpoint endpoint = newFixedEndpoint(service.baseUrl)
 
     def client = new EurekaOkClient(okHttpClient, registry, serviceName, eurekaLookupService)
     buildService(client, type, endpoint)
   }
 
   private <T> T buildService(EurekaOkClient client, Class<T> type, Endpoint endpoint) {
-    // New role providers break deserialization if this is not enabled.
     ObjectMapper objectMapper = new ObjectMapper()
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
