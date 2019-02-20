@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping('/gremlin')
-@ConditionalOnExpression('${integrations.gremlin.enabled:true}')
+@ConditionalOnExpression('${integrations.gremlin.enabled:false}')
 
 class GremlinController {
   final static String APIKEY_KEY = "apiKey";
