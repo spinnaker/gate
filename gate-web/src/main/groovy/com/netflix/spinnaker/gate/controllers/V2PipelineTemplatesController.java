@@ -111,7 +111,7 @@ public class V2PipelineTemplatesController {
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
-    return taskService.create(operation);
+    return taskService.createAndWaitForCompletion(operation);
   }
 
   @ApiOperation(value = "Get a pipeline template.", response = HashMap.class)
@@ -147,7 +147,7 @@ public class V2PipelineTemplatesController {
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
-    return taskService.create(operation);
+    return taskService.createAndWaitForCompletion(operation);
   }
 
   @ApiOperation(value = "Delete a pipeline template.", response = HashMap.class)
@@ -167,7 +167,7 @@ public class V2PipelineTemplatesController {
     operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
-    return taskService.create(operation);
+    return taskService.createAndWaitForCompletion(operation);
   }
 
   @ApiOperation(value = "List all pipelines that implement a pipeline template", response = List.class)
