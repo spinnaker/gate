@@ -18,31 +18,30 @@ package com.netflix.spinnaker.gate.security.iap;
 
 import com.google.common.base.Preconditions;
 import com.netflix.spinnaker.gate.config.AuthConfig;
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders;
 import com.netflix.spinnaker.gate.security.MultiAuthConfigurer;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth;
 import com.netflix.spinnaker.gate.security.iap.IAPSsoConfig.IAPSecurityConfigProperties;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
-import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import java.util.List;
 
 /**
  * This Web Security configuration supports the Google Cloud Identity-Aware Proxy authentication
@@ -53,10 +52,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @SpinnakerAuthConfig
 @EnableWebSecurity
 @ConditionalOnExpression("${google.iap.enabled:false}")
-@Import(SecurityAutoConfiguration.class)
 @SuppportsMultiAuth
 @EnableConfigurationProperties(IAPSecurityConfigProperties.class)
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(WebSecurityConfigurerOrders.IAP)
 public class IAPSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired

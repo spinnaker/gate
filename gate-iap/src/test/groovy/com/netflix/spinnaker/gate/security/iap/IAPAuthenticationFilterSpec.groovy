@@ -38,6 +38,7 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
+import java.time.Instant
 
 class IAPAuthenticationFilterSpec extends Specification {
 
@@ -198,8 +199,8 @@ class IAPAuthenticationFilterSpec extends Specification {
 
     where:
     invalidClaims                                                       | _
-    createValidClaimsBuilder().issueTime(new Date() + 100).build()      | _
-    createValidClaimsBuilder().expirationTime(new Date() - 100).build() | _
+    createValidClaimsBuilder().issueTime(Date.from(Instant.now().plusSeconds(100))).build()      | _
+    createValidClaimsBuilder().expirationTime(Date.from(Instant.now().minusSeconds(100))).build() | _
     createValidClaimsBuilder().audience(null).build()                   | _
     createValidClaimsBuilder().issuer(null).build()                     | _
     createValidClaimsBuilder().subject(null).build()                    | _
@@ -208,8 +209,8 @@ class IAPAuthenticationFilterSpec extends Specification {
 
   JWTClaimsSet.Builder createValidClaimsBuilder() {
     return new JWTClaimsSet.Builder()
-      .issueTime(new Date() - 1)
-      .expirationTime(new Date() + 1)
+      .issueTime(Date.from(Instant.now().minusSeconds(1)))
+      .expirationTime(Date.from(Instant.now().plusSeconds(1)))
       .audience("test_audience")
       .issuer("https://cloud.google.com/iap")
       .subject("subject")

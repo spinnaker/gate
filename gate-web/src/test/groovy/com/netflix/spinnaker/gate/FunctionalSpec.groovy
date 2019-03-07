@@ -43,7 +43,6 @@ import com.netflix.spinnaker.kork.web.exceptions.GenericExceptionHandlers
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
@@ -250,7 +249,7 @@ class FunctionalSpec extends Specification {
     return objectMapper.readValue(typedInput.in().text, Map)
   }
 
-  @EnableAutoConfiguration(exclude = [SecurityAutoConfiguration, GroovyTemplateAutoConfiguration])
+  @EnableAutoConfiguration(exclude = [GroovyTemplateAutoConfiguration])
   private static class FunctionalConfiguration {
 
     @Bean

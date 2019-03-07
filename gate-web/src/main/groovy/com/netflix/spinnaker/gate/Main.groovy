@@ -20,11 +20,10 @@ import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServl
 import com.netflix.spinnaker.hystrix.spectator.HystrixSpectatorConfig
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.ServletRegistrationBean
-import org.springframework.boot.web.support.SpringBootServletInitializer
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -36,17 +35,17 @@ import org.springframework.scheduling.annotation.EnableAsync
 @EnableConfigurationProperties
 @Import([HystrixSpectatorConfig])
 @ComponentScan(["com.netflix.spinnaker.gate", "com.netflix.spinnaker.config"])
-@EnableAutoConfiguration(exclude = [SecurityAutoConfiguration, GroovyTemplateAutoConfiguration])
+@EnableAutoConfiguration(exclude = [GroovyTemplateAutoConfiguration])
 class Main extends SpringBootServletInitializer {
 
   static final Map<String, String> DEFAULT_PROPS = [
-          'netflix.environment': 'test',
-          'netflix.account': '${netflix.environment}',
-          'netflix.stack': 'test',
-          'spring.config.location': '${user.home}/.spinnaker/',
-          'spring.application.name': 'gate',
-          'spring.config.name': 'spinnaker,${spring.application.name}',
-          'spring.profiles.active': '${netflix.environment},local'
+    'netflix.environment': 'test',
+    'netflix.account': '${netflix.environment}',
+    'netflix.stack': 'test',
+    'spring.config.location': '${user.home}/.spinnaker/',
+    'spring.application.name': 'gate',
+    'spring.config.name': 'spinnaker,${spring.application.name}',
+    'spring.profiles.active': '${netflix.environment},local'
   ]
 
   static void main(String... args) {

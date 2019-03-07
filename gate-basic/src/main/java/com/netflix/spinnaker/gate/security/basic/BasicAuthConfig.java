@@ -17,10 +17,12 @@
 package com.netflix.spinnaker.gate.security.basic;
 
 import com.netflix.spinnaker.gate.config.AuthConfig;
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -32,6 +34,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
+@Order(WebSecurityConfigurerOrders.BASIC)
 public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   private final AuthConfig authConfig;

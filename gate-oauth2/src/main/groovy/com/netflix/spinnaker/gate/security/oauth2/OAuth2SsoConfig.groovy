@@ -17,12 +17,12 @@
 package com.netflix.spinnaker.gate.security.oauth2
 
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
 import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2SsoProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -50,11 +49,10 @@ import javax.servlet.http.HttpServletResponse
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
-@Import(SecurityAutoConfiguration)
 @EnableOAuth2Sso
 @EnableConfigurationProperties
 @SuppportsMultiAuth
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(WebSecurityConfigurerOrders.OAUTH2)
 // Note the 4 single-quotes below - this is a raw groovy string, because SpEL and groovy
 // string syntax overlap!
 @ConditionalOnExpression(''''${security.oauth2.client.clientId:}'!=""''')

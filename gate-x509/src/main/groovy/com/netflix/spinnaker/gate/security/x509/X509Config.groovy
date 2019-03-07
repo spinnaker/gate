@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.security.x509
 
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
 import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
@@ -27,7 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
+@Order(WebSecurityConfigurerOrders.X509)
 class X509Config implements MultiAuthConfigurer {
 
   @Value('${x509.subjectPrincipalRegex:}')
@@ -91,7 +92,7 @@ class X509Config implements MultiAuthConfigurer {
     }
   }
 
-  @Order(Ordered.LOWEST_PRECEDENCE)
+  @Order(WebSecurityConfigurerOrders.X509_STANDALONE)
   class X509StandaloneAuthConfig extends WebSecurityConfigurerAdapter {
     void configure(HttpSecurity http) {
       authConfig.configure(http)

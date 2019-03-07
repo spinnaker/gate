@@ -16,9 +16,10 @@
 
 package com.netflix.spinnaker.gate.security.ldap
 
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
-import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
+import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
+import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import com.netflix.spinnaker.gate.services.PermissionService
@@ -29,7 +30,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.ldap.core.DirContextOperations
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component
 @SpinnakerAuthConfig
 @EnableWebSecurity
 @SuppportsMultiAuth
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(WebSecurityConfigurerOrders.LDAP)
 class LdapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired

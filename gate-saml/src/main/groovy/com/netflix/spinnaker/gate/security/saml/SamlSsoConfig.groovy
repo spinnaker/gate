@@ -16,9 +16,10 @@
 
 package com.netflix.spinnaker.gate.security.saml
 
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
-import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
+import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
+import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import com.netflix.spinnaker.gate.services.PermissionService
@@ -31,13 +32,10 @@ import org.opensaml.xml.schema.XSAny
 import org.opensaml.xml.schema.XSString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -61,10 +59,9 @@ import static org.springframework.security.extensions.saml2.config.SAMLConfigure
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
-@Import(SecurityAutoConfiguration)
 @SuppportsMultiAuth
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(WebSecurityConfigurerOrders.SAML)
 class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
