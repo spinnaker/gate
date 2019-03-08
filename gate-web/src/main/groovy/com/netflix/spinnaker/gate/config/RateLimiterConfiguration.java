@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@ConfigurationProperties("rateLimit")
+@ConfigurationProperties("rate-limit")
 public class RateLimiterConfiguration {
 
   /**

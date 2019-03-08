@@ -42,11 +42,19 @@ allprojects {
     }
   }
 
+  repositories {
+    maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases/' }
+    maven { url 'https://repository.mulesoft.org/releases/' }
+  }
+
   spinnaker {
     dependenciesVersion = spinnakerDependenciesVersion
   }
 
   dependencies {
+    runtime "org.springframework.boot:spring-boot-properties-migrator:${spinnaker.version("springBoot")}"
+    testRuntime "org.springframework.boot:spring-boot-properties-migrator:${spinnaker.version("springBoot")}"
+
     compileOnly spinnaker.dependency("lombok")
     spinnaker.group('test')
   }

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.SecurityProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.SecurityBuilder
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Slf4j
 @Configuration
+@EnableConfigurationProperties(SpringBoot1SecurityShimProperties)
 class AuthConfig {
 
   @Autowired
@@ -65,8 +67,11 @@ class AuthConfig {
   @Value('${security.debug:false}')
   boolean securityDebug
 
-  @Value('${fiat.sessionFilter.enabled:true}')
+  @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
+
+  @Autowired
+  SpringBoot1SecurityShimProperties springBoot1SecurityShimProperties
 
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
@@ -98,7 +103,7 @@ class AuthConfig {
         .disable()
     // @formatter:on
 
-    if (securityProperties.basic.enabled) {
+    if (springBoot1SecurityShimProperties.basic.enabled) {
       securityBuilder.httpBasic()
     }
   }

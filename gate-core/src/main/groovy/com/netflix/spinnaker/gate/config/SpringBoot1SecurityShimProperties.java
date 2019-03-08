@@ -15,12 +15,23 @@
  */
 package com.netflix.spinnaker.gate.config;
 
-public class WebSecurityConfigurerOrders {
-  public static final int BASIC = 1000;
-  public static final int IAP = 2000;
-  public static final int LDAP = 3000;
-  public static final int OAUTH2 = 4000;
-  public static final int SAML = 5000;
-  public static final int X509 = 6000;
-  public static final int X509_STANDALONE = 6001;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * Provides a shim to migrate users from Spring Boot 1 Security configs to Spring Boot 2 way of doing things.
+ */
+@Getter
+@Setter
+@ConfigurationProperties("security")
+public class SpringBoot1SecurityShimProperties {
+
+  private BasicProperties basic = new BasicProperties();
+
+  @Getter
+  @Setter
+  public static class BasicProperties {
+    private boolean enabled;
+  }
 }

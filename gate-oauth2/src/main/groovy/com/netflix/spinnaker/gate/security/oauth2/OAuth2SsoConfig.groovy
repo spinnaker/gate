@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse
 @Order(WebSecurityConfigurerOrders.OAUTH2)
 // Note the 4 single-quotes below - this is a raw groovy string, because SpEL and groovy
 // string syntax overlap!
-@ConditionalOnExpression(''''${security.oauth2.client.clientId:}'!=""''')
+@ConditionalOnExpression(''''${security.oauth2.client.client-id:}'!=""''')
 class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
@@ -106,7 +106,7 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
    * Use this class to specify how to map fields from the userInfoUri response to what's expected to be in the User.
    */
   @Component
-  @ConfigurationProperties("security.oauth2.userInfoMapping")
+  @ConfigurationProperties("security.oauth2.user-info-mapping")
   static class UserInfoMapping {
     String email = "email"
     String firstName = "given_name"
@@ -116,7 +116,7 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Component
-  @ConfigurationProperties("security.oauth2.userInfoRequirements")
+  @ConfigurationProperties("security.oauth2.user-info-requirements")
   static class UserInfoRequirements extends HashMap<String, String> {
   }
 
@@ -125,7 +125,7 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
    * preEstablishedRedirectUri, if set, where the SSL is terminated outside of this server.
    */
   @Component
-  @ConditionalOnExpression(''''${security.oauth2.client.clientId:}'!=""''')
+  @ConditionalOnExpression(''''${security.oauth2.client.client-id:}'!=""''')
   static class ExternalSslAwareEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
     @Autowired

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component
 import java.security.cert.X509Certificate
 
 @Component
-@ConditionalOnProperty("x509.roleOid")
+@ConditionalOnProperty("x509.role-oid")
 class OidRolesExtractor implements X509RolesExtractor {
 
   @Autowired

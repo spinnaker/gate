@@ -52,10 +52,10 @@ import javax.servlet.http.HttpServletResponse
 @Order(WebSecurityConfigurerOrders.X509)
 class X509Config implements MultiAuthConfigurer {
 
-  @Value('${x509.subjectPrincipalRegex:}')
+  @Value('${x509.subject-principal-regex:}')
   String subjectPrincipalRegex
 
-  @Value('${x509.roleOid:}')
+  @Value('${x509.role-oid:}')
   String roleOid
 
   @Autowired

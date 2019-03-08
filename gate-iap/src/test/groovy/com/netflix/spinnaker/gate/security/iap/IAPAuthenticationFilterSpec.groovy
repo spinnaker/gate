@@ -198,13 +198,13 @@ class IAPAuthenticationFilterSpec extends Specification {
     0 * permissionService.login("test-email")
 
     where:
-    invalidClaims                                                       | _
-    createValidClaimsBuilder().issueTime(Date.from(Instant.now().plusSeconds(100))).build()      | _
+    invalidClaims                                                                                 | _
+    createValidClaimsBuilder().issueTime(Date.from(Instant.now().plusSeconds(100))).build()       | _
     createValidClaimsBuilder().expirationTime(Date.from(Instant.now().minusSeconds(100))).build() | _
-    createValidClaimsBuilder().audience(null).build()                   | _
-    createValidClaimsBuilder().issuer(null).build()                     | _
-    createValidClaimsBuilder().subject(null).build()                    | _
-    createValidClaimsBuilder().claim("email", null).build()             | _
+    createValidClaimsBuilder().audience(null).build()                                             | _
+    createValidClaimsBuilder().issuer(null).build()                                               | _
+    createValidClaimsBuilder().subject(null).build()                                              | _
+    createValidClaimsBuilder().claim("email", null).build()                                       | _
   }
 
   JWTClaimsSet.Builder createValidClaimsBuilder() {

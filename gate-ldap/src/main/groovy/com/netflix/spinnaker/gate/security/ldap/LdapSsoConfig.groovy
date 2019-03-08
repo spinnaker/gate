@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.security.ldap
 
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.config.SpringBoot1SecurityShimProperties
 import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
@@ -66,13 +67,16 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SecurityProperties securityProperties
 
+  @Autowired
+  SpringBoot1SecurityShimProperties springBoot1SecurityShimProperties
+
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
     // In order for the HttpBasic user to have its creds checked first (and to keep unnecessary calls
     // from hitting the LDAP server), this must be configured before the full LDAP config.
     // See https://github.com/spinnaker/spinnaker/issues/3589
-    if (securityProperties.basic.enabled) {
+    if (springBoot1SecurityShimProperties.basic.enabled) {
       auth.inMemoryAuthentication()
           .withUser(securityProperties.user.name)
           .password(securityProperties.user.password)

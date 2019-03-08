@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference
 @CompileStatic
 @RequestMapping("/pagerDuty")
 @RestController
-@ConditionalOnProperty('pagerDuty.token')
+@ConditionalOnProperty('pager-duty.token')
 @Slf4j
 class PagerDutyController {
   AtomicReference<List<Map>> pagerDutyServicesCache = new AtomicReference<>([])

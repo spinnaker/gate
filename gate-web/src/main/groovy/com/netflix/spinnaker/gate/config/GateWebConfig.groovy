@@ -65,10 +65,10 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Autowired
   Registry spectatorRegistry
 
-  @Value('${rateLimit.learning:true}')
+  @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
 
-  @Value('${requestLogging.enabled:false}')
+  @Value('${request-logging.enabled:false}')
   Boolean requestLogging
 
   @Override

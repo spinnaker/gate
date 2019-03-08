@@ -70,7 +70,7 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
   @Autowired
   FiatPermissionEvaluator fiatPermissionEvaluator
 
-  @Value('${x509.requiredRoles:}#{T(java.util.Collections).emptyList()}')
+  @Value('${x509.required-roles:}#{T(java.util.Collections).emptyList()}')
   List<String> requiredRoles = []
 
   final Cache<String, Instant> loginDebounce = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
