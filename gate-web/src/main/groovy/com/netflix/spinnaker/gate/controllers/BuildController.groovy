@@ -17,7 +17,6 @@
 
 package com.netflix.spinnaker.gate.controllers
 
-
 import com.netflix.spinnaker.gate.services.BuildService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
