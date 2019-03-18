@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.IgorService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +29,9 @@ import java.util.List;
 @RequestMapping("/artifactory")
 public class ArtifactoryController {
 
+  @Autowired(required = false)
   private IgorService igorService;
 
-  public ArtifactoryController(IgorService igorService) {
-    this.igorService = igorService;
-  }
 
   @ApiOperation(value = "Retrieve the list of artifactory names available to triggers", response = List.class)
   @GetMapping(value = "/names")

@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.IgorService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +29,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/concourse")
 public class ConcourseController {
-  private final IgorService igorService;
 
-  public ConcourseController(IgorService igorService) {
-    this.igorService = igorService;
-  }
+  @Autowired(required = false)
+  private IgorService igorService;
 
   @ApiOperation(value = "Retrieve the list of team names available to triggers", response = List.class)
   @GetMapping(value = "/{buildMaster}/teams")
