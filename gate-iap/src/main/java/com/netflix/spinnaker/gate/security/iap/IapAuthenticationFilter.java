@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.security.iap;
 
 import com.google.common.base.Preconditions;
 import com.netflix.spinnaker.fiat.model.resources.ServiceAccount;
+import com.netflix.spinnaker.gate.security.iap.IapSsoConfig.IapSecurityConfigProperties;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import com.netflix.spinnaker.security.User;
@@ -62,7 +63,7 @@ public class IapAuthenticationFilter extends OncePerRequestFilter {
 
   private static final Clock CLOCK = Clock.systemUTC();
 
-  private IapSsoConfig.IAPSecurityConfigProperties configProperties;
+  private IapSecurityConfigProperties configProperties;
 
   private PermissionService permissionService;
 
@@ -72,7 +73,7 @@ public class IapAuthenticationFilter extends OncePerRequestFilter {
 
 
   public IapAuthenticationFilter(
-    IapSsoConfig.IAPSecurityConfigProperties configProperties,
+    IapSecurityConfigProperties configProperties,
     PermissionService permissionService,
     Front50Service front50Service) {
     this.configProperties = configProperties;

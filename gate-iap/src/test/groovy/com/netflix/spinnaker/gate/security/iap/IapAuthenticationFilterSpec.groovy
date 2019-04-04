@@ -56,7 +56,7 @@ class IapAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IapSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -98,7 +98,7 @@ class IapAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IapSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -152,7 +152,7 @@ class IapAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IapSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -213,7 +213,7 @@ class IapAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IapSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
     config.issuedAtTimeAllowedSkew = 30000L
     config.expirationTimeAllowedSkew = 30000L

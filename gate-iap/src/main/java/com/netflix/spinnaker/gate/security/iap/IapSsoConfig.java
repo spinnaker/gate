@@ -21,7 +21,7 @@ import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.MultiAuthConfigurer;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
 import com.netflix.spinnaker.gate.security.SuppportsMultiAuth;
-import com.netflix.spinnaker.gate.security.iap.IapSsoConfig.IAPSecurityConfigProperties;
+import com.netflix.spinnaker.gate.security.iap.IapSsoConfig.IapSecurityConfigProperties;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import java.util.List;
@@ -55,7 +55,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @ConditionalOnExpression("${google.iap.enabled:false}")
 @Import(SecurityAutoConfiguration.class)
 @SuppportsMultiAuth
-@EnableConfigurationProperties(IAPSecurityConfigProperties.class)
+@EnableConfigurationProperties(IapSecurityConfigProperties.class)
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class IapSsoConfig extends WebSecurityConfigurerAdapter {
 
@@ -69,7 +69,7 @@ public class IapSsoConfig extends WebSecurityConfigurerAdapter {
   Front50Service front50Service;
 
   @Autowired
-  IAPSecurityConfigProperties configProperties;
+  IapSecurityConfigProperties configProperties;
 
   @Bean
   public IapAuthenticationFilter iapAuthenticationFilter() {
@@ -89,7 +89,7 @@ public class IapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @ConfigurationProperties("google.iap")
   @Data
-  public static class IAPSecurityConfigProperties {
+  public static class IapSecurityConfigProperties {
 
     String jwtHeader = "x-goog-iap-jwt-assertion";
     String issuerId = "https://cloud.google.com/iap";
