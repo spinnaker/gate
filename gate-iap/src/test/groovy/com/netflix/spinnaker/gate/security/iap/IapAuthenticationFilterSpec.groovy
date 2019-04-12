@@ -40,7 +40,7 @@ import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.time.Instant
 
-class IAPAuthenticationFilterSpec extends Specification {
+class IapAuthenticationFilterSpec extends Specification {
 
   /**
    * The security context Authentication is set in the filter. If this is not cleared between tests,
@@ -57,7 +57,7 @@ class IAPAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IAPSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -75,7 +75,7 @@ class IAPAuthenticationFilterSpec extends Specification {
 
     request.addHeader(config.jwtHeader, jwt.serialize())
 
-    @Subject IAPAuthenticationFilter filter = new IAPAuthenticationFilter(
+    @Subject IapAuthenticationFilter filter = new IapAuthenticationFilter(
       config, permissionService, front50Service)
 
     // Add public key to key cache
@@ -99,7 +99,7 @@ class IAPAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IAPSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -117,7 +117,7 @@ class IAPAuthenticationFilterSpec extends Specification {
 
     request.addHeader(config.jwtHeader, jwt.serialize())
 
-    @Subject IAPAuthenticationFilter filter = new IAPAuthenticationFilter(
+    @Subject IapAuthenticationFilter filter = new IapAuthenticationFilter(
       config, permissionService, front50Service)
 
     // Add public key to key cache
@@ -134,7 +134,7 @@ class IAPAuthenticationFilterSpec extends Specification {
     1 * permissionService.isEnabled()
     1 * permissionService.login("test-email")
     request.getSession(false)
-      .getAttribute(IAPAuthenticationFilter.signatureAttribute) == jwt.signature
+      .getAttribute(IapAuthenticationFilter.SIGNATURE_ATTRIBUTE) == jwt.signature
 
     when:
     filter.doFilterInternal(request, response, chain)
@@ -153,7 +153,7 @@ class IAPAuthenticationFilterSpec extends Specification {
     def chain = Mock(FilterChain)
     def permissionService = Mock(PermissionService)
     def front50Service = Mock(Front50Service)
-    def config = new IAPSsoConfig.IAPSecurityConfigProperties()
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
     config.audience = "test_audience"
 
     // Create key to sign JWT Token
@@ -163,7 +163,7 @@ class IAPAuthenticationFilterSpec extends Specification {
     def publicKey = BaseEncoding.base64().encode(keyPair.public.encoded)
     def header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(publicKey).build()
 
-    @Subject IAPAuthenticationFilter filter = new IAPAuthenticationFilter(
+    @Subject IapAuthenticationFilter filter = new IapAuthenticationFilter(
       config, permissionService, front50Service)
 
     // Add public key to key cache
@@ -205,6 +205,52 @@ class IAPAuthenticationFilterSpec extends Specification {
     createValidClaimsBuilder().issuer(null).build()                                               | _
     createValidClaimsBuilder().subject(null).build()                                              | _
     createValidClaimsBuilder().claim("email", null).build()                                       | _
+  }
+
+  def "validations for should take clock skew into account"() {
+
+    def request = new MockHttpServletRequest()
+    def response = new MockHttpServletResponse()
+    def chain = Mock(FilterChain)
+    def permissionService = Mock(PermissionService)
+    def front50Service = Mock(Front50Service)
+    def config = new IapSsoConfig.IapSecurityConfigProperties()
+    config.audience = "test_audience"
+    config.issuedAtTimeAllowedSkew = 30000L
+    config.expirationTimeAllowedSkew = 30000L
+
+    // Create key to sign JWT Token
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC")
+    gen.initialize(Curve.P_256.toECParameterSpec())
+    KeyPair keyPair = gen.generateKeyPair()
+    def publicKey = BaseEncoding.base64().encode(keyPair.public.encoded)
+
+    // Create the JWT Token
+    def header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(publicKey).build()
+    def claims = createValidClaimsBuilder()
+      .issueTime(use (groovy.time.TimeCategory) {new Date() + 15.second})
+      .expirationTime(use (groovy.time.TimeCategory) {new Date() - 15.second})
+      .build()
+    def jwt = new SignedJWT(header, claims)
+
+    jwt.sign(new ECDSASigner((ECPrivateKey) keyPair.private))
+
+    request.addHeader(config.jwtHeader, jwt.serialize())
+
+    @Subject IapAuthenticationFilter filter = new IapAuthenticationFilter(
+      config, permissionService, front50Service)
+
+    // Add public key to key cache
+    ECKey key = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.public)
+      .algorithm(JWSAlgorithm.ES256)
+      .build()
+    filter.keyCache.put(publicKey, key)
+
+    when:
+    filter.doFilterInternal(request, response, chain)
+
+    then:
+    1 * chain.doFilter(request, response)
   }
 
   JWTClaimsSet.Builder createValidClaimsBuilder() {

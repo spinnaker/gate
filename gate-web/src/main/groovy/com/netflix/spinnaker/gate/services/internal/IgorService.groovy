@@ -51,4 +51,23 @@ interface IgorService {
 
   @GET('/builds/status/{number}/{buildMaster}/{job}')
   Map getBuild(@Path("buildMaster") String buildMaster, @EncodedPath("job") String job, @Path("number") String number)
+
+  @GET('/artifactory/names')
+  List<String> getArtifactoryNames()
+
+  @GET('/concourse/{buildMaster}/teams')
+  List<String> getConcourseTeams(@Path("buildMaster") String buildMaster)
+
+  @GET('/concourse/{buildMaster}/teams/{team}/pipelines')
+  List<String> getConcoursePipelines(@Path("buildMaster") String buildMaster, @Path("team") String team);
+
+  @GET('/concourse/{buildMaster}/teams/{team}/pipelines/{pipeline}/jobs')
+  List<String> getConcourseJobs(@Path("buildMaster") String buildMaster, @Path("team") String team, @Path("pipeline") String pipeline);
+
+  @GET('/gcb/accounts')
+  List<String> getGoogleCloudBuildAccounts();
+
+  @GET('/artifacts/{provider}/{packageName}')
+  List<String> getArtifactVersions(@Path("provider") String provider,
+                                   @Path("packageName") String packageName);
 }
