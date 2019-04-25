@@ -16,8 +16,9 @@
 
 package com.netflix.spinnaker.gate.security.x509
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
@@ -78,10 +79,10 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
   @Autowired
   Registry registry
 
-  @Value('${x509.requiredRoles:}#{T(java.util.Collections).emptyList()}')
+  @Value('${x509.required-roles:}#{T(java.util.Collections).emptyList()}')
   List<String> requiredRoles = []
 
-  final Cache<String, Instant> loginDebounce = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
+  final Cache<String, Instant> loginDebounce = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
   final Clock clock
 
   X509AuthenticationUserDetailsService() {

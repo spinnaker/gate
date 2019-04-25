@@ -75,7 +75,7 @@ class AuthConfig {
 
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
-    SecurityBuilder securityBuilder = http
+    http
       .authorizeRequests()
         .antMatchers('/**/favicon.ico').permitAll()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -84,17 +84,16 @@ class AuthConfig {
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
-        .and()
     if (fiatSessionFilterEnabled) {
       Filter fiatSessionFilter = new FiatSessionFilter(
         fiatSessionFilterEnabled,
         fiatStatus,
         permissionEvaluator)
 
-      securityBuilder.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
+      http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    securityBuilder.logout()
+    http.logout()
         .logoutUrl("/auth/logout")
         .logoutSuccessHandler(permissionRevokingLogoutSuccessHandler)
         .permitAll()
@@ -104,7 +103,7 @@ class AuthConfig {
     // @formatter:on
 
     if (springBoot1SecurityShimProperties.basic.enabled) {
-      securityBuilder.httpBasic()
+      http.httpBasic()
     }
   }
 

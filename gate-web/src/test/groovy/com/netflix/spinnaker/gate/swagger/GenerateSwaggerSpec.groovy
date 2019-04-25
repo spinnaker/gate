@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import spock.lang.Specification
 
-import javax.ws.rs.core.MediaType
+import org.springframework.http.MediaType
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 

@@ -17,10 +17,7 @@
 package com.netflix.spinnaker.gate.security.oauth2
 
 import com.netflix.spinnaker.gate.config.AuthConfig
-import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
@@ -29,9 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
-import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -51,8 +46,6 @@ import javax.servlet.http.HttpServletResponse
 @EnableWebSecurity
 @EnableOAuth2Sso
 @EnableConfigurationProperties
-@SuppportsMultiAuth
-@Order(WebSecurityConfigurerOrders.OAUTH2)
 // Note the 4 single-quotes below - this is a raw groovy string, because SpEL and groovy
 // string syntax overlap!
 @ConditionalOnExpression(''''${security.oauth2.client.client-id:}'!=""''')
@@ -66,9 +59,6 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   ExternalSslAwareEntryPoint entryPoint
-
-  @Autowired(required = false)
-  List<MultiAuthConfigurer> additionalAuthProviders
 
   @Primary
   @Bean
@@ -92,10 +82,6 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
 
     http.exceptionHandling().authenticationEntryPoint(entryPoint)
     http.addFilterBefore(externalAuthTokenFilter, AbstractPreAuthenticatedProcessingFilter.class)
-
-    additionalAuthProviders?.each {
-      it.configure(http)
-    }
   }
 
   void configure(WebSecurity web) throws Exception {

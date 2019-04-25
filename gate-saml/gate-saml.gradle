@@ -1,8 +1,11 @@
 dependencies{
-  compile project(':gate-core')
+  implementation project(':gate-core')
   // RetrySupport is in kork-exceptions and not kork-core!
-  compile spinnaker.dependency("korkExceptions")
+  implementation "com.netflix.spinnaker.fiat:fiat-api:$fiatVersion"
+  implementation "com.netflix.spinnaker.kork:kork-exceptions"
+  implementation "com.netflix.spinnaker.kork:kork-security"
+  implementation "com.netflix.spectator:spectator-api"
 
-  compile("org.springframework.security.extensions:spring-security-saml2-core:1.0.6.RELEASE")
-  compile("org.springframework.security.extensions:spring-security-saml-dsl:1.0.2.RELEASE")
+  implementation "org.springframework.security.extensions:spring-security-saml2-core:1.0.9.RELEASE"
+  implementation "org.springframework.security.extensions:spring-security-saml-dsl-core:1.0.5.RELEASE"
 }

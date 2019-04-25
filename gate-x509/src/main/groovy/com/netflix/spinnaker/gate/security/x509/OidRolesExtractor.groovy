@@ -17,7 +17,7 @@ package com.netflix.spinnaker.gate.security.x509
 
 import org.bouncycastle.asn1.ASN1InputStream
 import org.bouncycastle.asn1.ASN1OctetString
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -27,12 +27,12 @@ import java.security.cert.X509Certificate
 @ConditionalOnProperty("x509.role-oid")
 class OidRolesExtractor implements X509RolesExtractor {
 
-  @Autowired
-  X509Config config
+  @Value('${x509.role-oid:}')
+  String roleOid
 
   @Override
   Collection<String> fromCertificate(X509Certificate cert) {
-    byte[] bytes = cert.getExtensionValue(config.roleOid)
+    byte[] bytes = cert.getExtensionValue(roleOid)
 
     if (bytes == null) {
       return []

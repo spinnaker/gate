@@ -17,10 +17,10 @@ package com.netflix.spinnaker.gate.config;
 
 public class WebSecurityConfigurerOrders {
   public static final int BASIC = 1000;
-  public static final int IAP = 2000;
-  public static final int LDAP = 3000;
-  public static final int OAUTH2 = 4000;
-  public static final int SAML = 5000;
-  public static final int X509 = 6000;
-  public static final int X509_STANDALONE = 6001;
+  public static final int IAP = 1000;
+  public static final int LDAP = 1000;
+  public static final int OAUTH2 = 1000;
+  public static final int SAML = 1000;
+  public static final int X509 = 1001;
+  public static final int X509_STANDALONE = 1000;
 }

@@ -18,10 +18,7 @@ package com.netflix.spinnaker.gate.security.iap;
 
 import com.google.common.base.Preconditions;
 import com.netflix.spinnaker.gate.config.AuthConfig;
-import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders;
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
-import com.netflix.spinnaker.gate.security.SuppportsMultiAuth;
 import com.netflix.spinnaker.gate.security.iap.IapSsoConfig.IapSecurityConfigProperties;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
@@ -34,14 +31,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import java.util.List;
 
 /**
  * This Web Security configuration supports the Google Cloud Identity-Aware Proxy authentication
@@ -52,9 +46,7 @@ import java.util.List;
 @SpinnakerAuthConfig
 @EnableWebSecurity
 @ConditionalOnExpression("${google.iap.enabled:false}")
-@SuppportsMultiAuth
 @EnableConfigurationProperties(IapSecurityConfigProperties.class)
-@Order(WebSecurityConfigurerOrders.IAP)
 public class IapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
@@ -81,9 +73,6 @@ public class IapSsoConfig extends WebSecurityConfigurerAdapter {
     registration.setEnabled(false);
     return registration;
   }
-
-  @Autowired(required = false)
-  List<MultiAuthConfigurer> additionalAuthProviders;
 
   @ConfigurationProperties("google.iap")
   @Data
@@ -112,12 +101,6 @@ public class IapSsoConfig extends WebSecurityConfigurerAdapter {
 
     authConfig.configure(http);
     http.addFilterBefore(iapAuthenticationFilter(), BasicAuthenticationFilter.class);
-
-    if (additionalAuthProviders != null) {
-      for (MultiAuthConfigurer provider : additionalAuthProviders) {
-        provider.configure(http);
-      }
-    }
   }
 
   @Override
