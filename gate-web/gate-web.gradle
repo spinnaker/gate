@@ -36,7 +36,7 @@ dependencies {
   compile spinnaker.dependency('cglib')
   compile spinnaker.dependency('jedis')
 
-  compile spinnaker.dependency('commonsIo')
+  compile 'commons-io:commons-io:2.6'
   compile('org.springframework.session:spring-session-data-redis:2.1.4.RELEASE')
   compile "org.springframework.data:spring-data-redis:2.1.5.RELEASE"
   compile "org.springframework.session:spring-session:1.3.5.RELEASE"

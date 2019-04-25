@@ -16,6 +16,10 @@
 
 package com.netflix.spinnaker.gate.security.saml
 
+import com.netflix.spectator.api.Registry
+import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
+import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
+import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.config.AuthConfig
 import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
@@ -194,6 +198,12 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       @Autowired
       AllowedAccountsSupport allowedAccountsSupport
 
+      @Autowired
+      FiatClientConfigurationProperties fiatClientConfigurationProperties
+
+      @Autowired
+      Registry registry
+
       RetrySupport retrySupport = new RetrySupport()
 
       @Override
@@ -212,14 +222,32 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           }
         }
 
+        def id = registry
+            .createId("fiat.login")
+            .withTag("type", "saml")
+
         try {
           retrySupport.retry({ ->
             permissionService.loginWithRoles(username, roles)
           }, 5, 2000, false)
+
           log.debug("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
+          id = id.withTag("success", true).withTag("fallback", "none")
         } catch (Exception e) {
-          log.debug("Unsuccessful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
-          throw e
+          log.debug(
+              "Unsuccessful SAML authentication (user: {}, roleCount: {}, roles: {}, legacyFallback: {})",
+              username,
+              roles.size(),
+              roles,
+              fiatClientConfigurationProperties.legacyFallback
+          )
+          id = id.withTag("success", false).withTag("fallback", fiatClientConfigurationProperties.legacyFallback)
+
+          if (!fiatClientConfigurationProperties.legacyFallback) {
+            throw e
+          }
+        } finally {
+          registry.counter(id).increment()
         }
 
         return new User(
