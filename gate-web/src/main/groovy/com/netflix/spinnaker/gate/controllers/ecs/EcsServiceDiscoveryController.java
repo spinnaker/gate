@@ -13,24 +13,26 @@
  * the License.
  */
 
-package com.netflix.spinnaker.gate.controllers.ecs
+package com.netflix.spinnaker.gate.controllers.ecs;
 
-import com.netflix.spinnaker.gate.services.EcsServiceDiscoveryService
-import io.swagger.annotations.ApiOperation
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
+import com.netflix.spinnaker.gate.services.EcsServiceDiscoveryService;
+import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class EcsServiceDiscoveryController {
+public class EcsServiceDiscoveryController {
   @Autowired
-  EcsServiceDiscoveryService ecsServiceDiscoveryService
+  private EcsServiceDiscoveryService ecsServiceDiscoveryService;
 
   @ApiOperation(value = "Retrieve a list of Cloud Map services that can be used for the account and region.")
   @RequestMapping(value = "/ecs/serviceDiscoveryRegistries", method = RequestMethod.GET)
-  List all() {
-    ecsServiceDiscoveryService.getAllEcsServiceDiscoveryRegistries()
+  public List<Map> all() {
+    return ecsServiceDiscoveryService.getAllEcsServiceDiscoveryRegistries();
   }
 }
