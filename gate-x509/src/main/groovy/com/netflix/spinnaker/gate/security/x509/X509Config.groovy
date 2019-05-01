@@ -17,7 +17,6 @@
 package com.netflix.spinnaker.gate.security.x509
 
 import com.netflix.spinnaker.gate.config.AuthConfig
-import com.netflix.spinnaker.gate.config.WebSecurityConfigurerOrders
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -29,12 +28,17 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.web.context.NullSecurityContextRepository
+import org.springframework.security.web.util.matcher.AnyRequestMatcher
 
 @ConditionalOnExpression('${x509.enabled:false}')
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
-@Order(WebSecurityConfigurerOrders.X509)
+//ensure this configures after a standard WebSecurityConfigurerAdapter (1000) so
+// it becomes the fallthrough for a mixed mode of some SSO + x509 for API calls
+// and otherwise will just work(tm) if it is the only WebSecurityConfigurerAdapter
+// present as well
+@Order(2000)
 class X509Config extends WebSecurityConfigurerAdapter {
 
   @Value('${x509.subject-principal-regex:}')
@@ -55,6 +59,10 @@ class X509Config extends WebSecurityConfigurerAdapter {
       http.x509().subjectPrincipalRegex(subjectPrincipalRegex)
     }
     authConfig.configure(http)
+    //x509 is the catch-all if configured, this will auth apiPort connections and
+    // any additional ports that get installed and removes the requestMatcher
+    // installed by authConfig
+    http.requestMatcher(AnyRequestMatcher.INSTANCE)
   }
 
   @Override

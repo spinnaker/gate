@@ -71,11 +71,6 @@ class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
     new ExternalAuthTokenFilter()
   }
 
-  @Bean
-  OAuth2SsoProperties oAuth2SsoProperties() {
-    new OAuth2SsoProperties()
-  }
-
   @Override
   void configure(HttpSecurity http) throws Exception {
     authConfig.configure(http)

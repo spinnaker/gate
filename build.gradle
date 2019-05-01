@@ -1,8 +1,8 @@
 buildscript {
   ext {
-    kotlinVersion = "1.3.20"
-    korkVersion = "5.0.0"
-    fiatVersion = "1.0.0"
+    kotlinVersion = "1.3.21"
+    korkVersion = "5.2.2"
+    fiatVersion = "1.0.1"
   }
   repositories {
     jcenter()

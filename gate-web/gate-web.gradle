@@ -50,12 +50,7 @@ dependencies {
 
   testImplementation "com.squareup.retrofit:retrofit-mock"
   testImplementation "org.springframework.security:spring-security-ldap"
-  testImplementation "org.apache.directory.server:apacheds-core:1.5.7"
-  testImplementation "org.apache.directory.server:apacheds-core-entry:1.5.7"
-  testImplementation "org.apache.directory.server:apacheds-protocol-shared:1.5.7"
-  testImplementation "org.apache.directory.server:apacheds-protocol-ldap:1.5.7"
-  testImplementation "org.apache.directory.server:apacheds-server-jndi:1.5.7"
-  testImplementation "org.apache.directory.shared:shared-ldap:0.9.19"
+  testImplementation "com.unboundid:unboundid-ldapsdk"
   testImplementation "com.netflix.spinnaker.kork:kork-jedis-test"
 
   //this brings in the jetty GzipFilter which boot will autoconfigure

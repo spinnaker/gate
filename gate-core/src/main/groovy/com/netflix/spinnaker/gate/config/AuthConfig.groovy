@@ -30,7 +30,6 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.security.config.annotation.SecurityBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.core.Authentication
@@ -64,18 +63,20 @@ class AuthConfig {
   @Autowired
   FiatPermissionEvaluator permissionEvaluator
 
+  @Autowired
+  RequestMatcherProvider requestMatcherProvider
+
   @Value('${security.debug:false}')
   boolean securityDebug
 
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
-  @Autowired
-  SpringBoot1SecurityShimProperties springBoot1SecurityShimProperties
-
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http
+//      .anonymous().disable()
+      .requestMatcher(requestMatcherProvider.requestMatcher())
       .authorizeRequests()
         .antMatchers('/**/favicon.ico').permitAll()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -101,10 +102,6 @@ class AuthConfig {
       .csrf()
         .disable()
     // @formatter:on
-
-    if (springBoot1SecurityShimProperties.basic.enabled) {
-      http.httpBasic()
-    }
   }
 
   void configure(WebSecurity web) throws Exception {

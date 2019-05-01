@@ -354,7 +354,7 @@ class FunctionalSpec extends Specification {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
-        .httpBasic().disable()
+        .csrf().disable()
         .authorizeRequests().antMatchers("/**").permitAll()
     }
   }
