@@ -22,7 +22,6 @@ import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAuto
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -34,7 +33,7 @@ import org.springframework.scheduling.annotation.EnableAsync
 @Import([HystrixSpectatorConfig])
 @ComponentScan(["com.netflix.spinnaker.gate", "com.netflix.spinnaker.config"])
 @EnableAutoConfiguration(exclude = [GroovyTemplateAutoConfiguration, GsonAutoConfiguration])
-class Main extends SpringBootServletInitializer {
+class Main {
 
   static final Map<String, String> DEFAULT_PROPS = [
     'netflix.environment': 'test',
@@ -48,10 +47,5 @@ class Main extends SpringBootServletInitializer {
 
   static void main(String... args) {
     new SpringApplicationBuilder().properties(DEFAULT_PROPS).sources(Main).run(args)
-  }
-
-  @Override
-  SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-    builder.properties(DEFAULT_PROPS).sources(Main)
   }
 }

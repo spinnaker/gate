@@ -40,7 +40,7 @@ class PagerDutyConfig {
 
   @Bean
   Endpoint pagerDutyEndpoint(
-    @Value('${pager-duty.baseUrl}') String pagerBaseUrl) {
+    @Value('${pager-duty.base-url}') String pagerBaseUrl) {
     newFixedEndpoint(pagerBaseUrl)
   }
 
