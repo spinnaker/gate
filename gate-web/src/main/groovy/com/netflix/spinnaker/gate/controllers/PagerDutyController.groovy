@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.services.PagerDutyService
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -91,7 +92,7 @@ class PagerDutyController {
   }
 
   List<Map> fetchAllServices() {
-    PagerDutyService.PagerDutyServiceResult response = pagerDutyService.getServices(0)
+    PagerDutyService.PagerDutyServiceResult response = AuthenticatedRequest.allowAnonymous({pagerDutyService.getServices(0)})
     List<Map> services = response?.services
     while (response?.more) {
       response = pagerDutyService.getServices(services.size())
@@ -101,7 +102,7 @@ class PagerDutyController {
   }
 
   List<Map> fetchAllOnCalls() {
-    PagerDutyService.PagerDutyOnCallResult response = pagerDutyService.getOnCalls(0)
+    PagerDutyService.PagerDutyOnCallResult response = AuthenticatedRequest.allowAnonymous({pagerDutyService.getOnCalls(0)})
     List<Map> onCalls = response?.oncalls
     while (response?.more) {
       response = pagerDutyService.getOnCalls(onCalls.size())
