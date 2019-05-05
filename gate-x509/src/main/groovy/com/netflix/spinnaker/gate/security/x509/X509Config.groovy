@@ -52,13 +52,13 @@ class X509Config extends WebSecurityConfigurerAdapter {
 
   @Override
   void configure(HttpSecurity http) {
+    authConfig.configure(http)
     http.securityContext().securityContextRepository(new NullSecurityContextRepository())
     http.x509().authenticationUserDetailsService(x509AuthenticationUserDetailsService)
 
     if (subjectPrincipalRegex) {
       http.x509().subjectPrincipalRegex(subjectPrincipalRegex)
     }
-    authConfig.configure(http)
     //x509 is the catch-all if configured, this will auth apiPort connections and
     // any additional ports that get installed and removes the requestMatcher
     // installed by authConfig

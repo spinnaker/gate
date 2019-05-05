@@ -5,8 +5,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public interface RequestMatcherProvider {
 
-  class AnyProvider implements RequestMatcherProvider {}
-
   default RequestMatcher requestMatcher() {
     return AnyRequestMatcher.INSTANCE;
   }

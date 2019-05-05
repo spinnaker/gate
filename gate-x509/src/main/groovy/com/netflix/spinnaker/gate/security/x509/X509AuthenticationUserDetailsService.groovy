@@ -26,6 +26,7 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
@@ -120,6 +121,7 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
 
     if (requiredRoles) {
       if (!requiredRoles.any { it in roles }) {
+        log.debug("User $email does not have all roles $requiredRoles")
         throw new BadCredentialsException("User $email does not have all roles $requiredRoles")
       }
     }
@@ -141,7 +143,7 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
     if (loginDebounceEnabled) {
       final Duration debounceWindow = Duration.ofSeconds(dynamicConfigService.getConfig(Long, 'x509.loginDebounce.debounceWindowSeconds', TimeUnit.MINUTES.toSeconds(5)))
       final Optional<Instant> lastDebounced = Optional.ofNullable(loginDebounce.getIfPresent(email))
-      UserPermission.View fiatPermission = fiatPermissionEvaluator.getPermission(email)
+      UserPermission.View fiatPermission = AuthenticatedRequest.allowAnonymous { fiatPermissionEvaluator.getPermission(email) }
       shouldLogin = fiatPermission == null ||
         lastDebounced.map({ now.isAfter(it.plus(debounceWindow)) }).orElse(true)
     } else {

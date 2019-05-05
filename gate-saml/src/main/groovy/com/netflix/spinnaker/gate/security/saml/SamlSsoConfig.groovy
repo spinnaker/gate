@@ -44,6 +44,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.extensions.saml2.config.SAMLConfigurer
 import org.springframework.security.saml.SAMLCredential
+import org.springframework.security.saml.storage.EmptyStorageFactory
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
@@ -129,12 +130,11 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   void configure(HttpSecurity http) {
+    authConfig.configure(http)
+
     http
       .rememberMe()
         .rememberMeServices(rememberMeServices(userDetailsService()))
-        .and()
-      .authorizeRequests()
-        .antMatchers("/saml/**").permitAll()
 
     // @formatter:off
       SAMLConfigurer saml = saml()
@@ -149,6 +149,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .protocol(samlSecurityConfigProperties.redirectProtocol)
           .hostname(samlSecurityConfigProperties.redirectHostname ?: serverProperties?.address?.hostName)
           .basePath(samlSecurityConfigProperties.redirectBasePath)
+          .storageFactory(new EmptyStorageFactory())
           .keyStore()
           .storeFilePath(samlSecurityConfigProperties.keyStore)
           .password(samlSecurityConfigProperties.keyStorePassword)
@@ -159,9 +160,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
     // @formatter:on
 
-    // We must do the default auth configuration AFTER the SAML one, because otherwise an HTTP Basic
-    // (if enabled) auth window might appear in the browser before the SAML filter is hit.
-    authConfig.configure(http)
   }
 
   void configure(WebSecurity web) throws Exception {
