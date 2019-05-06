@@ -13,7 +13,7 @@ buildscript {
     classpath 'com.netflix.spinnaker.gradle:spinnaker-dev-plugin:6.0.0'
     classpath "com.netflix.nebula:nebula-kotlin-plugin:${kotlinVersion}"
     if (Boolean.valueOf(enablePublishing)) {
-      classpath 'com.netflix.spinnaker.gradle:spinnaker-dev-plugin:6.0.0'
+      classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:6.0.0'
     }
   }
 }
