@@ -18,7 +18,9 @@ package com.netflix.spinnaker.gate.security.x509
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.model.UserPermission
+import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.services.PermissionService
@@ -27,6 +29,8 @@ import com.netflix.spinnaker.security.User
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -68,6 +72,15 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
   @Autowired
   FiatPermissionEvaluator fiatPermissionEvaluator
 
+  @Autowired
+  FiatClientConfigurationProperties fiatClientConfigurationProperties
+
+  @Autowired
+  Registry registry
+
+  @Value('${x509.requiredRoles:}#{T(java.util.Collections).emptyList()}')
+  List<String> requiredRoles = []
+
   final Cache<String, Instant> loginDebounce = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
   final Clock clock
 
@@ -104,6 +117,12 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
 
     def roles = handleLogin(email, x509)
 
+    if (requiredRoles) {
+      if (!requiredRoles.any { it in roles }) {
+        throw new BadCredentialsException("User $email does not have all roles $requiredRoles")
+      }
+    }
+
     log.debug("Roles for user {}: {}", email, roles)
     return new User(
         email: email,
@@ -137,11 +156,37 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
     }
 
     if (shouldLogin) {
-      if (rolesExtractor) {
-        permissionService.loginWithRoles(email, roles)
-      } else {
-        permissionService.login(email)
+      def id = registry
+          .createId("fiat.login")
+          .withTag("type", "x509")
+
+      try {
+        if (rolesExtractor) {
+          permissionService.loginWithRoles(email, roles)
+          log.debug("Successful X509 authentication (user: {}, roleCount: {}, roles: {})", email, roles.size(), roles)
+        } else {
+          permissionService.login(email)
+          log.debug("Successful X509 authentication (user: {})", email)
+        }
+
+        id = id.withTag("success", true).withTag("fallback", "none")
+      } catch (Exception e) {
+        log.debug(
+            "Unsuccessful X509 authentication (user: {}, roleCount: {}, roles: {}, legacyFallback: {})",
+            email,
+            roles.size(),
+            roles,
+            fiatClientConfigurationProperties.legacyFallback
+        )
+        id = id.withTag("success", false).withTag("fallback", fiatClientConfigurationProperties.legacyFallback)
+
+        if (!fiatClientConfigurationProperties.legacyFallback) {
+          throw e
+        }
+      } finally {
+        registry.counter(id).increment()
       }
+
       if (loginDebounceEnabled) {
         loginDebounce.put(email, now)
       }

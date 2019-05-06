@@ -25,6 +25,7 @@ import retrofit.client.Response
 import retrofit.http.Body
 import retrofit.http.GET
 import retrofit.http.Headers
+import retrofit.http.POST
 import retrofit.http.PUT
 import retrofit.http.Path
 import retrofit.http.Query
@@ -154,15 +155,12 @@ interface ClouddriverService {
                        @Query("cloudProvider") String cloudProvider)
 
   @Headers("Accept: application/json")
-  @GET("/applications/{name}/jobs")
-  List getJobs(@Path("name") String name, @Query("expand") String expand)
-
-  @Headers("Accept: application/json")
-  @GET("/applications/{name}/jobs/{account}/{region}/{jobName}")
+  @POST("/applications/{name}/jobs/{account}/{region}/{jobName}")
   Map getJobDetails(@Path("name") String name,
                     @Path("account") String account,
                     @Path("region") String region,
-                    @Path("jobName") String jobName)
+                    @Path("jobName") String jobName,
+                    @Body String emptyStringForRetrofit)
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}/serverGroups/{account}/{region}/{serverGroupName}")
@@ -372,5 +370,11 @@ interface ClouddriverService {
   List<Map> listServices(@Query(value = "cloudProvider") String cloudProvider,
                          @Query(value = "region") String region,
                          @Path(value = "account") String account)
+
+  @GET("/servicebroker/{account}/serviceInstance")
+  Map getServiceInstance(@Path(value = "account") String account,
+                         @Query(value = "cloudProvider") String cloudProvider,
+                         @Query(value = "region") String region,
+                         @Query(value = "serviceInstanceName") String serviceInstanceName)
 
 }

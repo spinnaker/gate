@@ -44,13 +44,6 @@ class JobService {
   @Autowired
   ProviderLookupService providerLookupService
 
-  List getForApplication(String applicationName, String expand, String selectorKey) {
-    String commandKey = Boolean.valueOf(expand) ? "getExpandedJobsForApplication" : "getJobsForApplication"
-    HystrixFactory.newListCommand(GROUP, commandKey) {
-      clouddriverServiceSelector.select(selectorKey).getJobs(applicationName, expand)
-    } execute()
-  }
-
   List getPreconfiguredJobs() {
     RequestContext requestContext = RequestContext.get()
     HystrixFactory.newListCommand(GROUP, "getPreconfiguredJobs") {
@@ -62,7 +55,7 @@ class JobService {
     HystrixFactory.newMapCommand(GROUP, "getJobsForApplicationAccountAndRegion-${providerLookupService.providerForAccount(account)}", {
       try {
         def context = getContext(applicationName, account, region, name)
-        return clouddriverServiceSelector.select(selectorKey).getJobDetails(applicationName, account, region, name) + [
+        return clouddriverServiceSelector.select(selectorKey).getJobDetails(applicationName, account, region, name, "") + [
             "insightActions": insightConfiguration.job.collect { it.applyContext(context) }
         ]
       } catch (RetrofitError e) {

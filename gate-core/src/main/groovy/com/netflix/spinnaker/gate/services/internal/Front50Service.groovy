@@ -101,7 +101,7 @@ interface Front50Service {
   // v2
   @GET('/v2/pipelineTemplates/{pipelineTemplateId}')
   Map getV2PipelineTemplate(@Path("pipelineTemplateId") String pipelineTemplateId,
-                            @Query("version") String version,
+                            @Query("tag") String tag,
                             @Query("digest") String digest)
 
   @GET('/v2/pipelineTemplates')
@@ -149,4 +149,13 @@ interface Front50Service {
 
   @GET('/serviceAccounts')
   List<ServiceAccount> getServiceAccounts()
+
+  //
+  // Delivery-related
+  //
+  @GET('/deliveries')
+  List<Map> getDeliveries()
+
+  @GET('/deliveries/{id}')
+  Map getDelivery(@Path('id') String id)
 }

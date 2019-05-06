@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.services;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector;
+import com.netflix.spinnaker.gate.services.internal.IgorService;
 import groovy.transform.CompileStatic;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import retrofit.client.Response;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 @CompileStatic
@@ -35,8 +37,15 @@ import java.util.concurrent.Callable;
 public class ArtifactService {
   private static final String GROUP = "artifacts";
 
-  @Autowired
   private ClouddriverServiceSelector clouddriverServiceSelector;
+  private Optional<IgorService> igorService;
+
+
+  @Autowired
+  public ArtifactService(ClouddriverServiceSelector clouddriverServiceSelector, Optional<IgorService> igorService) {
+    this.clouddriverServiceSelector = clouddriverServiceSelector;
+    this.igorService = igorService;
+  }
 
   private static HystrixCommand<List<Map>> mapListCommand(String type, Callable<List<Map>> work) {
     return HystrixFactory.newListCommand(GROUP, type, work);
@@ -74,5 +83,15 @@ public class ArtifactService {
       IOUtils.copy(contentResponse.getBody().in(), outputStream);
       return null;
     }).execute();
+  }
+
+  public List<String> getVersionsOfArtifactForProvider(String provider, String packageName) {
+    if (!igorService.isPresent()) {
+      throw new IllegalStateException("Cannot fetch artifact versions because Igor is not enabled.");
+    }
+
+    return stringListCommand("artifactVersionsByProvider",
+      () -> igorService.get().getArtifactVersions(provider, packageName))
+      .execute();
   }
 }
