@@ -17,13 +17,11 @@ package com.netflix.spinnaker.gate.services;
 
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
-import groovy.transform.CompileStatic;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@CompileStatic
 @Component
 public class EcsServiceDiscoveryService {
   private static final String GROUP = "ecsServiceDiscoveryService";
