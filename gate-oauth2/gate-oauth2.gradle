@@ -1,7 +1,6 @@
 dependencies {
   implementation project(":gate-core")
-  implementation "org.springframework.security.oauth:spring-security-oauth2:2.3.5.RELEASE"
-  implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.4.RELEASE"
+  implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
   implementation "com.squareup.retrofit:converter-simplexml"
   implementation "com.netflix.spinnaker.kork:kork-security"
 }

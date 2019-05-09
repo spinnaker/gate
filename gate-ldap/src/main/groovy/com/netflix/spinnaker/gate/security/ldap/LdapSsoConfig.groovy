@@ -17,7 +17,6 @@
 package com.netflix.spinnaker.gate.security.ldap
 
 import com.netflix.spinnaker.gate.config.AuthConfig
-import com.netflix.spinnaker.gate.config.SpringBoot1SecurityShimProperties
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
@@ -57,9 +56,6 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   SecurityProperties securityProperties
-
-  @Autowired
-  SpringBoot1SecurityShimProperties springBoot1SecurityShimProperties
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {

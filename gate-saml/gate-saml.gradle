@@ -6,6 +6,6 @@ dependencies{
   implementation "com.netflix.spinnaker.kork:kork-security"
   implementation "com.netflix.spectator:spectator-api"
 
-  implementation "org.springframework.security.extensions:spring-security-saml2-core:1.0.9.RELEASE"
-  implementation "org.springframework.security.extensions:spring-security-saml-dsl-core:1.0.5.RELEASE"
+  implementation "org.springframework.security.extensions:spring-security-saml2-core"
+  implementation "org.springframework.security.extensions:spring-security-saml-dsl-core"
 }
