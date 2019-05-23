@@ -55,7 +55,8 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
     http.formLogin()
         .and()
         .httpBasic()
-        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/spinnakerlogin"));
     authConfig.configure(http);
   }
 
