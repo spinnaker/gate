@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.Body
 import retrofit.http.GET
@@ -304,6 +305,18 @@ interface ClouddriverService {
 
   @GET('/tags')
   List<Map> listEntityTags(@QueryMap Map allParameters)
+
+  @GET('/tags')
+  List<Map> listEntityTags(@RequestParam(value = "cloudProvider", required = false) String cloudProvider,
+                           @RequestParam(value = "application", required = false) String application,
+                           @RequestParam(value = "entityType", required = false) String entityType,
+                           @RequestParam(value = "entityId", required = false) String entityId,
+                           @RequestParam(value = "idPrefix", required = false) String idPrefix,
+                           @RequestParam(value = "account", required = false) String account,
+                           @RequestParam(value = "region", required = false) String region,
+                           @RequestParam(value = "namespace", required = false) String namespace,
+                           @RequestParam(value = "maxResults", required = false, defaultValue = "5000") int maxResults,
+                           @QueryMap Map allParameters)
 
   @GET('/tags/{id}')
   Map getEntityTags(@Path('id') String id)
