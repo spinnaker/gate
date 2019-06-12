@@ -43,6 +43,7 @@ import com.netflix.spinnaker.gate.services.internal.MineService
 import com.netflix.spinnaker.gate.services.internal.OrcaService
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import com.netflix.spinnaker.gate.services.internal.RoscoService
+import com.netflix.spinnaker.gate.services.internal.RoscoServiceSelector
 import com.netflix.spinnaker.gate.services.internal.SwabbieService
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.selector.DefaultServiceSelector
@@ -93,7 +94,7 @@ import static retrofit.Endpoints.newFixedEndpoint
 @EnableConfigurationProperties(FiatClientConfigurationProperties)
 class GateConfig extends RedisHttpSessionConfiguration {
 
-  @Value('${server.session.timeoutInSeconds:3600}')
+  @Value('${server.session.timeout-in-seconds:3600}')
   void setSessionTimeout(int maxInactiveIntervalInSeconds) {
     super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
   }
@@ -192,6 +193,15 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty('services.rosco.enabled')
   RoscoService roscoService(OkHttpClient okHttpClient) {
     createClient "rosco", RoscoService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty('services.rosco.enabled')
+  RoscoServiceSelector roscoServiceSelector(OkHttpClient okHttpClient, RoscoService defaultService) {
+    return new RoscoServiceSelector(
+      createClientSelector("rosco", RoscoService, okHttpClient),
+      defaultService
+    )
   }
 
   //---- optional backend components:
@@ -313,10 +323,10 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
   @Bean
   OriginValidator gateOriginValidator(
-    @Value('${services.deck.baseUrl}') String deckBaseUrl,
-    @Value('${services.deck.redirectHostPattern:#{null}}') String redirectHostPattern,
-    @Value('${cors.allowedOriginsPattern:#{null}}') String allowedOriginsPattern,
-    @Value('${cors.expectLocalhost:false}') boolean expectLocalhost) {
+    @Value('${services.deck.base-url:}') String deckBaseUrl,
+    @Value('${services.deck.redirect-host-pattern:#{null}}') String redirectHostPattern,
+    @Value('${cors.allowed-origins-pattern:#{null}}') String allowedOriginsPattern,
+    @Value('${cors.expect-localhost:false}') boolean expectLocalhost) {
     return new GateOriginValidator(deckBaseUrl, redirectHostPattern, allowedOriginsPattern, expectLocalhost)
   }
 

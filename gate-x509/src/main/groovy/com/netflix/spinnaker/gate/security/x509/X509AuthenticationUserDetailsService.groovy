@@ -16,8 +16,9 @@
 
 package com.netflix.spinnaker.gate.security.x509
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
@@ -25,6 +26,7 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
@@ -78,10 +80,10 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
   @Autowired
   Registry registry
 
-  @Value('${x509.requiredRoles:}#{T(java.util.Collections).emptyList()}')
+  @Value('${x509.required-roles:}#{T(java.util.Collections).emptyList()}')
   List<String> requiredRoles = []
 
-  final Cache<String, Instant> loginDebounce = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
+  final Cache<String, Instant> loginDebounce = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build()
   final Clock clock
 
   X509AuthenticationUserDetailsService() {
@@ -119,7 +121,9 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
 
     if (requiredRoles) {
       if (!requiredRoles.any { it in roles }) {
-        throw new BadCredentialsException("User $email does not have all roles $requiredRoles")
+        String errorMessage = "User $email with roles $roles does not have any of the required roles $requiredRoles"
+        log.debug(errorMessage)
+        throw new BadCredentialsException(errorMessage)
       }
     }
 
@@ -140,7 +144,7 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
     if (loginDebounceEnabled) {
       final Duration debounceWindow = Duration.ofSeconds(dynamicConfigService.getConfig(Long, 'x509.loginDebounce.debounceWindowSeconds', TimeUnit.MINUTES.toSeconds(5)))
       final Optional<Instant> lastDebounced = Optional.ofNullable(loginDebounce.getIfPresent(email))
-      UserPermission.View fiatPermission = fiatPermissionEvaluator.getPermission(email)
+      UserPermission.View fiatPermission = AuthenticatedRequest.allowAnonymous { fiatPermissionEvaluator.getPermission(email) }
       shouldLogin = fiatPermission == null ||
         lastDebounced.map({ now.isAfter(it.plus(debounceWindow)) }).orElse(true)
     } else {
@@ -192,7 +196,13 @@ class X509AuthenticationUserDetailsService implements AuthenticationUserDetailsS
       }
     }
 
-    return roles
+    def permission = fiatPermissionEvaluator.getPermission(email)
+    def roleNames = permission?.getRoles()?.collect { it -> it.getName()}
+    log.debug("Extracted roles from fiat permissions for user {}: {}", email, roleNames)
+    if (roleNames) {
+      roles.addAll(roleNames)
+    }
+    return roles.unique(/* mutate = */false)
   }
 
   /**

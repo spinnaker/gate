@@ -257,7 +257,10 @@ interface ClouddriverService {
   Map getSecurityGroups()
 
   @GET('/securityGroups/{account}/{type}')
-  Map getSecurityGroups(@Path("account") String account, @Path("type") String type, @Query("region") String region)
+  Map getSecurityGroups(@Path("account") String account, @Path("type") String type)
+
+  @GET('/securityGroups/{account}/{type}')
+  List getSecurityGroupsForRegion(@Path("account") String account, @Path("type") String type, @Query("region") String region)
 
   @GET('/securityGroups/{account}/{type}/{region}/{name}')
   Map getSecurityGroup(@Path("account") String account, @Path("type") String type, @Path("name") String name,
@@ -351,6 +354,9 @@ interface ClouddriverService {
 
   @GET('/ecs/secrets')
   List<Map> getAllEcsSecrets()
+
+  @GET('/ecs/serviceDiscoveryRegistries')
+  List<Map> getAllEcsServiceDiscoveryRegistries()
 
   @GET('/manifests/{account}/{location}/{name}')
   Map getManifest(@Path(value = 'account') String account,

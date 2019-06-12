@@ -18,11 +18,9 @@ package com.netflix.spinnaker.gate.security.saml
 
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
-import com.netflix.spinnaker.gate.security.MultiAuthConfigurer
-import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.config.AuthConfig
+import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
-import com.netflix.spinnaker.gate.security.SuppportsMultiAuth
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.kork.core.RetrySupport
 import com.netflix.spinnaker.security.User
@@ -33,14 +31,10 @@ import org.opensaml.xml.schema.XSAny
 import org.opensaml.xml.schema.XSString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
-import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -48,10 +42,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.extensions.saml2.config.SAMLConfigurer
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
+import org.springframework.session.web.http.DefaultCookieSerializer
 import org.springframework.stereotype.Component
 
 import javax.annotation.PostConstruct
@@ -63,14 +59,14 @@ import static org.springframework.security.extensions.saml2.config.SAMLConfigure
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
-@Import(SecurityAutoConfiguration)
-@SuppportsMultiAuth
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE)
 class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   ServerProperties serverProperties
+
+  @Autowired
+  DefaultCookieSerializer defaultCookieSerializer
 
   @Autowired
   AuthConfig authConfig
@@ -135,21 +131,19 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SAMLUserDetailsService samlUserDetailsService
 
-  @Autowired(required = false)
-  List<MultiAuthConfigurer> additionalAuthProviders
-
   @Override
   void configure(HttpSecurity http) {
+    //We need our session cookie to come across when we get redirected back from the IdP:
+    defaultCookieSerializer.setSameSite(null)
+    authConfig.configure(http)
+
     http
       .rememberMe()
         .rememberMeServices(rememberMeServices(userDetailsService()))
-        .and()
-      .authorizeRequests()
-        .antMatchers("/saml/**").permitAll()
 
     // @formatter:off
-    http
-      .apply(saml())
+      SAMLConfigurer saml = saml()
+      saml
         .userDetailsService(samlUserDetailsService)
         .identityProvider()
           .metadataFilePath(samlSecurityConfigProperties.metadataUrl)
@@ -165,15 +159,11 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .password(samlSecurityConfigProperties.keyStorePassword)
           .keyname(samlSecurityConfigProperties.keyStoreAliasName)
           .keyPassword(samlSecurityConfigProperties.keyStorePassword)
+
+      saml.init(http)
+
     // @formatter:on
 
-    // We must do the default auth configuration AFTER the SAML one, because otherwise an HTTP Basic
-    // (if enabled) auth window might appear in the browser before the SAML filter is hit.
-    authConfig.configure(http)
-
-    additionalAuthProviders?.each {
-      it.configure(http)
-    }
   }
 
   void configure(WebSecurity web) throws Exception {
