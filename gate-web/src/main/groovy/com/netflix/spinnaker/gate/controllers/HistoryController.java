@@ -1,7 +1,7 @@
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.KeelService;
-import com.netflix.spinnaker.gate.services.internal.ResourceEvent;
+import com.netflix.spinnaker.kork.manageddelivery.model.ResourceEvent;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
 import java.time.Instant;

@@ -17,6 +17,7 @@
  */
 package com.netflix.spinnaker.gate.services.internal;
 
+import com.netflix.spinnaker.kork.manageddelivery.model.ResourceEvent;
 import java.time.Instant;
 import java.util.List;
 import retrofit.http.GET;
