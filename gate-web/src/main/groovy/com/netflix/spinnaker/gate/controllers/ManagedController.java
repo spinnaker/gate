@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/managedDelivery")
+@RequestMapping("/managed")
 @RestController
 @Slf4j
 @ConditionalOnProperty("services.keel.enabled")
-public class DeliveryController {
+public class ManagedController {
 
-  private static final Logger log = LoggerFactory.getLogger(DeliveryController.class);
+  private static final Logger log = LoggerFactory.getLogger(ManagedController.class);
   private final KeelService keelService;
 
   @Autowired
-  public DeliveryController(KeelService keelService) {
+  public ManagedController(KeelService keelService) {
     this.keelService = keelService;
   }
 
