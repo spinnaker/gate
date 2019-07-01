@@ -1,41 +1,48 @@
 package com.netflix.spinnaker.gate.controllers;
 
-import com.netflix.spinnaker.gate.services.internal.Front50Service;
+import com.netflix.spinnaker.gate.services.internal.KeelService;
+import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/deliveryConfigs")
+@RequestMapping("/managedDelivery")
 @RestController
 @Slf4j
+@ConditionalOnProperty("services.keel.enabled")
 public class DeliveryController {
 
   private static final Logger log = LoggerFactory.getLogger(DeliveryController.class);
-  private final Front50Service front50Service;
+  private final KeelService keelService;
 
   @Autowired
-  public DeliveryController(Front50Service front50Service) {
-    this.front50Service = front50Service;
+  public DeliveryController(KeelService keelService) {
+    this.keelService = keelService;
   }
 
-  @ApiOperation(value = "Get all delivery configs", response = HashMap.class)
-  @RequestMapping(value = "", method = RequestMethod.GET)
-  List<Map> getDeliveries() {
-    return front50Service.getDeliveries();
+  @ApiOperation(value = "Get a resource", response = Resource.class)
+  @RequestMapping(value = "/resources/{name}", method = RequestMethod.GET)
+  Resource getResource(@PathVariable("name") String name) {
+    return keelService.getResource(name);
   }
 
-  @ApiOperation(value = "Get a delivery config", response = HashMap.class)
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  Map getDeliveryConfig(@PathVariable("id") String id) {
-    return front50Service.getDelivery(id);
+  @ApiOperation(value = "Create or update a resource", response = Resource.class)
+  @RequestMapping(value = "/resources", method = RequestMethod.POST)
+  Resource upsertResource(@RequestBody Resource resource) {
+    return keelService.upsertResource(resource);
+  }
+
+  @ApiOperation(value = "Delete a resource", response = Resource.class)
+  @RequestMapping(value = "/resources/{name}", method = RequestMethod.DELETE)
+  Resource deleteResource(@PathVariable("name") String name) {
+    return keelService.deleteResource(name);
   }
 }
