@@ -142,15 +142,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   ServiceConfiguration serviceConfiguration
 
   @Bean
-  AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
-    ObjectMapper objectMapper = new ObjectMapper()
-      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-
-    return new JsonHttpMessageConverter(objectMapper)
-  }
-
-  @Bean
   AbstractJackson2HttpMessageConverter yamlHttpMessageConverter() {
     return new YamlHttpMessageConverter(new YAMLMapper())
   }
