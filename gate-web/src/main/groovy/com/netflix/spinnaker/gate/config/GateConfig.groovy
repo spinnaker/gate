@@ -141,10 +141,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Autowired
   ServiceConfiguration serviceConfiguration
 
-  /**
-   * This needs to be before the yaml converter in order for json to be the default
-   * response type.
-   */
   @Bean
   AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
     ObjectMapper objectMapper = new ObjectMapper()

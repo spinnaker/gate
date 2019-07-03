@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -142,7 +143,9 @@ public class GateWebConfig implements WebMvcConfigurer {
 
   @Override
   void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-    configurer.favorPathExtension(false)
+    configurer
+      .defaultContentType(MediaType.APPLICATION_JSON_UTF8)
+      .favorPathExtension(false)
   }
 
 }
