@@ -383,4 +383,9 @@ interface ClouddriverService {
                          @Query(value = "region") String region,
                          @Query(value = "serviceInstanceName") String serviceInstanceName)
 
+  @GET(value = "/functions")
+  List<Map> getFunctions(@Query(value = "functionName") String functionName,
+                         @Query(value = "region") String region,
+                         @Query(value = "account") String account)
+
 }
