@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -52,5 +53,13 @@ class AmazonInfrastructureController {
   @RequestMapping(value = "/vpcs", method = RequestMethod.GET)
   List<Map> vpcs() {
     infrastructureService.vpcs
+  }
+
+  @ApiOperation(value = "Get Functions", response = List.class)
+  @RequestMapping(value = "/functions", method = RequestMethod.GET)
+  List<Map> functions(@RequestParam(value = "functionName", required = false) String functionName,
+                      @RequestParam(value = "region", required = false) String region,
+                      @RequestParam(value = "account", required = false) String account) {
+    infrastructureService.getFunctions(functionName, region, account)
   }
 }
