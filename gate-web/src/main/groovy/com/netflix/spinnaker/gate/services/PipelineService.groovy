@@ -168,6 +168,10 @@ class PipelineService {
     orcaServiceSelector.withContext(RequestContext.get()).evaluateExpressionForExecution(executionId, pipelineExpression)
   }
 
+  Map evaluateExpressionForExecutionFromStage(String executionId, String stageId, String pipelineExpression) {
+    orcaServiceSelector.withContext(RequestContext.get()).evaluateExpressionForExecutionFromStage(executionId, stageId, pipelineExpression)
+  }
+
   /**
    * Retrieve an orca execution by id to populate RequestContext application
    *

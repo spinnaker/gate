@@ -266,6 +266,20 @@ class PipelineController {
   }
 
   @ApiOperation(value = "Evaluate a pipeline expression using the provided execution as context", response = HashMap.class)
+  @RequestMapping(value = "{id}/{stageId}/evaluateExpression")
+  Map evaluateExpressionForExecutionFromStage(@PathVariable("id") String id,
+                                              @PathVariable("stageId") String stageId,
+                                              @RequestParam("expression") String pipelineExpression) {
+    try {
+      pipelineService.evaluateExpressionForExecutionFromStage(id, stageId, pipelineExpression)
+    } catch (RetrofitError e) {
+      if (e.response?.status == 404) {
+        throw new NotFoundException("Pipeline not found (id: ${id})")
+      }
+    }
+  }
+
+  @ApiOperation(value = "Evaluate a pipeline expression using the provided execution as context", response = HashMap.class)
   @RequestMapping(value = "{id}/evaluateExpression", method = RequestMethod.POST, consumes = "application/json")
   Map evaluateExpressionForExecutionViaPOST(@PathVariable("id") String id,
                                             @RequestBody Map pipelineExpression) {
