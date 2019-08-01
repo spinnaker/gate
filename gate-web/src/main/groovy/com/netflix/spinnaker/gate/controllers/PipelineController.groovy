@@ -274,7 +274,7 @@ class PipelineController {
       pipelineService.evaluateExpressionForExecutionFromStage(id, stageId, pipelineExpression)
     } catch (RetrofitError e) {
       if (e.response?.status == 404) {
-        throw new NotFoundException("Pipeline not found (id: ${id})")
+        throw new NotFoundException("Pipeline not found (id: ${id})", e)
       }
     }
   }
