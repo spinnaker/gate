@@ -267,7 +267,7 @@ class PipelineController {
 
   @ApiOperation(value = "Evaluate a pipeline expression using the provided execution as context", response = HashMap.class)
   @RequestMapping(value = "{id}/{stageId}/evaluateExpression")
-  Map evaluateExpressionForExecutionFromStage(@PathVariable("id") String id,
+  Map evaluateExpressionForExecutionAtStage(@PathVariable("id") String id,
                                               @PathVariable("stageId") String stageId,
                                               @RequestParam("expression") String pipelineExpression) {
     try {
