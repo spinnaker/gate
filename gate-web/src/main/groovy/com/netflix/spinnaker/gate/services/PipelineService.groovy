@@ -106,10 +106,10 @@ class PipelineService {
 
     Map eventMap = [
       content: [
-        application: application,
+        application     : application,
         pipelineNameOrId: pipelineNameOrId,
-        trigger: parameters,
-        user: AuthenticatedRequest.getSpinnakerUser().orElse("anonymous")
+        trigger         : parameters,
+        user            : AuthenticatedRequest.getSpinnakerUser().orElse("anonymous")
       ],
       details: [
         type: "manual"
@@ -118,7 +118,7 @@ class PipelineService {
     echoService.postEvent(eventMap)
     return [
       eventId: eventId,
-      ref: String.format("/pipelines/%s", executionId)
+      ref    : String.format("/pipelines/%s", executionId)
     ]
   }
 
@@ -169,7 +169,7 @@ class PipelineService {
   }
 
   Map evaluateExpressionForExecutionAtStage(String executionId, String stageId, String pipelineExpression) {
-    orcaServiceSelector.withContext(RequestContext.get()).evaluateExpressionForExecutionFromStage(executionId, stageId, pipelineExpression)
+    orcaServiceSelector.withContext(RequestContext.get()).evaluateExpressionForExecutionAtStage(executionId, stageId, pipelineExpression)
   }
 
   /**
@@ -179,7 +179,7 @@ class PipelineService {
    */
   void setApplicationForExecution(String id) {
     try {
-      Map execution = retrySupport.retry({ -> getPipeline(id)}, 5, 1000, false)
+      Map execution = retrySupport.retry({ -> getPipeline(id) }, 5, 1000, false)
       if (execution.containsKey("application")) {
         RequestContext.setApplication(execution.get("application").toString())
       }
