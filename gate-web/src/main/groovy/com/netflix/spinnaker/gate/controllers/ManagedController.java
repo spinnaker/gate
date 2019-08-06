@@ -4,6 +4,7 @@ import com.netflix.spinnaker.gate.services.internal.KeelService;
 import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,17 @@ public class ManagedController {
   @RequestMapping(value = "/resources/{name}", method = RequestMethod.DELETE)
   Resource deleteResource(@PathVariable("name") String name) {
     return keelService.deleteResource(name);
+  }
+
+  @ApiOperation(value = "Check if an application has managed resources", response = Boolean.class)
+  @RequestMapping(value = "/application/{application}", method = RequestMethod.GET)
+  Boolean hasManagedResources(@PathVariable("application") String application) {
+    return keelService.hasManagedResources(application);
+  }
+
+  @ApiOperation(value = "Get managed resources for an application", response = List.class)
+  @RequestMapping(value = "/application/{application}", method = RequestMethod.GET)
+  List<String> getManagedResourcesForApplication(@PathVariable("application") String application) {
+    return keelService.getManagedResources(application);
   }
 }

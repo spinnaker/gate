@@ -41,4 +41,10 @@ public interface KeelService {
 
   @DELETE("/resources/{name}")
   Resource deleteResource(@Path("name") String name);
+
+  @GET("/application/{application}/managed")
+  Boolean hasManagedResources(@Path("application") String application);
+
+  @GET("/application/{application}/resources")
+  List<String> getManagedResources(@Path("application") String application);
 }
