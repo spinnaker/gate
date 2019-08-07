@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.config
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.OkHttpClientConfiguration
@@ -27,24 +28,15 @@ import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.config.PostConnectionConfiguringJedisConnectionFactory.ConnectionPostProcessor
+import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
+import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
 import com.netflix.spinnaker.gate.filters.CorsFilter
 import com.netflix.spinnaker.gate.filters.GateOriginValidator
 import com.netflix.spinnaker.gate.filters.OriginValidator
 import com.netflix.spinnaker.gate.retrofit.EurekaOkClient
 import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService
-import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
-import com.netflix.spinnaker.gate.services.internal.EchoService
-import com.netflix.spinnaker.gate.services.internal.Front50Service
-import com.netflix.spinnaker.gate.services.internal.IgorService
-import com.netflix.spinnaker.gate.services.internal.KayentaService
-import com.netflix.spinnaker.gate.services.internal.MineService
-import com.netflix.spinnaker.gate.services.internal.OrcaService
-import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
-import com.netflix.spinnaker.gate.services.internal.RoscoService
-import com.netflix.spinnaker.gate.services.internal.RoscoServiceSelector
-import com.netflix.spinnaker.gate.services.internal.SwabbieService
+import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.selector.DefaultServiceSelector
 import com.netflix.spinnaker.kork.web.selector.SelectableService
@@ -65,6 +57,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
 import org.springframework.session.data.redis.config.ConfigureRedisAction
 import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
@@ -77,12 +70,7 @@ import retrofit.RequestInterceptor
 import retrofit.RestAdapter
 import retrofit.converter.JacksonConverter
 
-import javax.servlet.Filter
-import javax.servlet.FilterChain
-import javax.servlet.FilterConfig
-import javax.servlet.ServletException
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
+import javax.servlet.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -153,6 +141,24 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Autowired
   ServiceConfiguration serviceConfiguration
 
+  /**
+   * This needs to be before the yaml converter in order for json to be the default
+   * response type.
+   */
+  @Bean
+  AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
+    ObjectMapper objectMapper = new ObjectMapper()
+      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+
+    return new JsonHttpMessageConverter(objectMapper)
+  }
+
+  @Bean
+  AbstractJackson2HttpMessageConverter yamlHttpMessageConverter() {
+    return new YamlHttpMessageConverter(new YAMLMapper())
+  }
+
   @Bean
   OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient) {
     return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient))
@@ -172,6 +178,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Bean
   ClouddriverService clouddriverService(OkHttpClient okHttpClient) {
     createClient "clouddriver", ClouddriverService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.keel.enabled")
+  KeelService keelService(OkHttpClient okHttpClient) {
+    createClient "keel", KeelService, okHttpClient
   }
 
   @Bean
@@ -228,8 +240,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
   KayentaService kayentaService(OkHttpClient defaultClient,
                                 OkHttpClientConfigurationProperties props,
                                 OkHttpMetricsInterceptor interceptor,
-                                @Value('${services.kayenta.externalhttps:false}') boolean kayentaExternalHttps)
-  {
+                                @Value('${services.kayenta.externalhttps:false}') boolean kayentaExternalHttps) {
     if (kayentaExternalHttps) {
       def noSslCustomizationProps = props.clone()
       noSslCustomizationProps.keyStore = null

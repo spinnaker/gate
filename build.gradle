@@ -12,66 +12,71 @@ buildscript {
     classpath "com.netflix.nebula:nebula-kotlin-plugin:$kotlinVersion"
     if (Boolean.valueOf(enablePublishing)) {
       classpath "com.netflix.spinnaker.gradle:spinnaker-gradle-project:$spinnakerGradleVersion"
+// TODO: nebula-publishing-plugin version override should be removed as soon as spinnaker-gradle-project is updated
+// this override is needed to omit compileOnly dependencies from generated pom.xml
+      classpath "com.netflix.nebula:nebula-publishing-plugin:12.0.1"
     }
   }
 }
 
 allprojects {
+  group = "com.netflix.spinnaker.gate"
   apply plugin: 'spinnaker.base-project'
   if (Boolean.valueOf(enablePublishing)) {
     apply plugin: 'spinnaker.project'
   }
-  apply plugin: 'java-library'
-  apply plugin: 'groovy'
 
-  if ([korkVersion, fiatVersion].find { it.endsWith('-SNAPSHOT') }) {
+  if (name != "gate-bom") {
+    apply plugin: 'java-library'
+    apply plugin: 'groovy'
+
+    if ([korkVersion, fiatVersion].find { it.endsWith('-SNAPSHOT') }) {
+      repositories {
+        mavenLocal()
+      }
+    }
+
     repositories {
-      mavenLocal()
+      maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases/' }
+      maven { url 'https://repository.mulesoft.org/releases/' }
     }
-  }
 
-  repositories {
-    maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases/' }
-    maven { url 'https://repository.mulesoft.org/releases/' }
-  }
+    dependencies {
+      implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      compileOnly "org.projectlombok:lombok"
+      annotationProcessor "org.projectlombok:lombok"
+      testAnnotationProcessor "org.projectlombok:lombok"
 
-  dependencies {
-    implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
-    annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
-    testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
-    compileOnly "org.projectlombok:lombok"
-    annotationProcessor "org.projectlombok:lombok"
-    testAnnotationProcessor "org.projectlombok:lombok"
+      implementation "org.codehaus.groovy:groovy-all"
+      implementation "net.logstash.logback:logstash-logback-encoder"
+      runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
+      testRuntime "org.springframework.boot:spring-boot-properties-migrator"
 
-    implementation "org.codehaus.groovy:groovy-all"
-    implementation "net.logstash.logback:logstash-logback-encoder"
-    runtime "org.springframework.boot:spring-boot-properties-migrator"
-    testRuntime "org.springframework.boot:spring-boot-properties-migrator"
-
-    testImplementation "org.spockframework:spock-core"
-    testImplementation "org.spockframework:spock-spring"
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.hamcrest:hamcrest-core"
-    testRuntimeOnly "cglib:cglib-nodep"
-    testRuntimeOnly "org.objenesis:objenesis"
-  }
-
-  configurations.all {
-    exclude group: 'javax.servlet', module: 'servlet-api'
-    exclude group: 'javax.servlet', module: 'javax.servlet-api'
-  }
-
-  tasks.withType(JavaExec) {
-    if (System.getProperty('DEBUG', 'false') == 'true') {
-      jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8184'
+      testImplementation "org.spockframework:spock-core"
+      testImplementation "org.spockframework:spock-spring"
+      testImplementation "org.springframework.boot:spring-boot-starter-test"
+      testImplementation "org.hamcrest:hamcrest-core"
+      testRuntimeOnly "cglib:cglib-nodep"
+      testRuntimeOnly "org.objenesis:objenesis"
     }
-  }
 
-  group = "com.netflix.spinnaker.gate"
+    configurations.all {
+      exclude group: 'javax.servlet', module: 'servlet-api'
+      exclude group: 'javax.servlet', module: 'javax.servlet-api'
+    }
 
-  test {
-    testLogging {
-      exceptionFormat = 'full'
+    tasks.withType(JavaExec) {
+      if (System.getProperty('DEBUG', 'false') == 'true') {
+        jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8184'
+      }
+    }
+
+    test {
+      testLogging {
+        exceptionFormat = 'full'
+      }
     }
   }
 }

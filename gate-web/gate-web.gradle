@@ -9,7 +9,7 @@ run {
   systemProperty('spring.config.additional-location', project.springConfigLocation)
   systemProperty('spring.profiles.active', project.springProfiles)
 }
-mainClassName='com.netflix.spinnaker.gate.Main'
+mainClassName = 'com.netflix.spinnaker.gate.Main'
 
 repositories {
   maven {
@@ -24,6 +24,8 @@ dependencies {
 
   implementation "com.squareup.retrofit:retrofit"
   implementation "com.squareup.retrofit:converter-jackson"
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+
   implementation "com.squareup.okhttp:okhttp"
   implementation "com.squareup.okhttp:okhttp-urlconnection"
   implementation "com.squareup.okhttp:okhttp-apache"
@@ -36,12 +38,14 @@ dependencies {
   implementation "com.netflix.spinnaker.kork:kork-web"
   implementation "com.netflix.spinnaker.kork:kork-secrets-aws"
   implementation "com.netflix.spinnaker.kork:kork-core"
+  implementation "com.netflix.spinnaker.kork:kork-manageddelivery"
   implementation "com.netflix.frigga:frigga"
   implementation "redis.clients:jedis"
   implementation "com.netflix.hystrix:hystrix-core"
 
   implementation 'commons-io:commons-io'
   implementation 'org.springframework.session:spring-session-data-redis'
+  implementation "de.huxhorn.sulky:de.huxhorn.sulky.ulid"
 
   implementation "org.springframework:spring-web"
 
@@ -50,6 +54,7 @@ dependencies {
   testImplementation "com.squareup.okhttp:mockwebserver"
 
   testImplementation "com.squareup.retrofit:retrofit-mock"
+  testImplementation "org.springframework.security:spring-security-test"
   testImplementation "org.springframework.security:spring-security-ldap"
   testImplementation "com.unboundid:unboundid-ldapsdk"
   testImplementation "com.netflix.spinnaker.kork:kork-jedis-test"
