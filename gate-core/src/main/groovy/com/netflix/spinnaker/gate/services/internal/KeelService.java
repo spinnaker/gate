@@ -21,6 +21,7 @@ import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
 import com.netflix.spinnaker.kork.manageddelivery.model.ResourceEvent;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
@@ -42,9 +43,7 @@ public interface KeelService {
   @DELETE("/resources/{name}")
   Resource deleteResource(@Path("name") String name);
 
-  @GET("/application/{application}/managed")
-  Boolean hasManagedResources(@Path("application") String application);
-
-  @GET("/application/{application}/resources")
-  List<String> getManagedResources(@Path("application") String application);
+  @GET("/application/{application}")
+  Map getApplicationDetails(
+      @Path("application") String application, @Query("includeDetails") Boolean includeDetails);
 }

@@ -4,7 +4,7 @@ import com.netflix.spinnaker.gate.services.internal.KeelService;
 import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/managed")
@@ -47,15 +48,12 @@ public class ManagedController {
     return keelService.deleteResource(name);
   }
 
-  @ApiOperation(value = "Check if an application has managed resources", response = Boolean.class)
+  @ApiOperation(value = "Get managed details about an application", response = Map.class)
   @RequestMapping(value = "/application/{application}", method = RequestMethod.GET)
-  Boolean hasManagedResources(@PathVariable("application") String application) {
-    return keelService.hasManagedResources(application);
-  }
-
-  @ApiOperation(value = "Get managed resources for an application", response = List.class)
-  @RequestMapping(value = "/application/{application}", method = RequestMethod.GET)
-  List<String> getManagedResourcesForApplication(@PathVariable("application") String application) {
-    return keelService.getManagedResources(application);
+  Map getApplicationDetails(
+      @PathVariable("application") String application,
+      @RequestParam(value = "includeDetails", required = false, defaultValue = "false")
+          Boolean includeDetails) {
+    return keelService.getApplicationDetails(application, includeDetails);
   }
 }
