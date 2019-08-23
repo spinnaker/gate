@@ -69,4 +69,10 @@ class InfrastructureService {
       clouddriverServiceSelector.select(selectorKey).getFunctions(functionName,region, account)
     } execute()
   }
+
+  List<Map> getApplicationFunctions(String selectorKey = null, String application) {
+    command("functions") {
+      clouddriverServiceSelector.select(selectorKey).getApplicationFunctions(application)
+    } execute()
+  }
 }

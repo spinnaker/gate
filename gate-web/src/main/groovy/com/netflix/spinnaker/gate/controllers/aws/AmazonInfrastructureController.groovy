@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.controllers.aws
 import com.netflix.spinnaker.gate.services.aws.InfrastructureService
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -61,5 +62,11 @@ class AmazonInfrastructureController {
                       @RequestParam(value = "region", required = false) String region,
                       @RequestParam(value = "account", required = false) String account) {
     infrastructureService.getFunctions(functionName, region, account)
+  }
+
+  @ApiOperation(value = "Get application functions", response = List.class)
+  @RequestMapping(value = "/applications/{application}/functions", method = RequestMethod.GET)
+  List<Map> applicationFunctions(@PathVariable String application) {
+    infrastructureService.getApplicationFunctions(application)
   }
 }
