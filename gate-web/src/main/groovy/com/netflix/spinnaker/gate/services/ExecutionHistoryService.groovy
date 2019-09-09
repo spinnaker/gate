@@ -47,7 +47,15 @@ class ExecutionHistoryService {
     Preconditions.checkNotNull(app)
     RequestContext requestContext = RequestContext.get()
     def command = HystrixFactory.newListCommand("pipelineExecutionHistory", "getPipelinesForApp-$app") {
-      orcaServiceSelector.withContext(requestContext).getPipelines(app, limit, statuses, expand)
+      try { 
+     orcaServiceSelector.withContext(requestContext).getPipelines(app, limit, statuses, expand)
+      }catch(Exception e){
+			
+                e.message
+                 
+		}   
+
+
     }
     return command.execute()
   }
