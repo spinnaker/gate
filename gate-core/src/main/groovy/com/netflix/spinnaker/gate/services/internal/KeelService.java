@@ -55,4 +55,10 @@ public interface KeelService {
   @GET("/application/{application}")
   Map getApplicationDetails(
       @Path("application") String application, @Query("includeDetails") Boolean includeDetails);
+
+  @POST("/vetos/{name}")
+  Map passVetoMessage(@Path("name") String name, @Body Map<String, Object> message);
+
+  @GET("/vetos/{name}/rejections")
+  List<String> getVetoRejections(@Path("name") String name);
 }
