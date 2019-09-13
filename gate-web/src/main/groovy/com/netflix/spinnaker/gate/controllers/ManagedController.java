@@ -9,6 +9,7 @@ import com.netflix.spinnaker.kork.manageddelivery.model.DeliveryConfig;
 import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
+import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,14 @@ public class ManagedController {
   @RequestMapping(value = "/resources/{name}", method = GET)
   Resource getResource(@PathVariable("name") String name) {
     return keelService.getResource(name);
+  }
+
+  @ApiOperation(value = "Get status of a resource", response = Map.class)
+  @RequestMapping(value = "/resources/{name}/status", method = GET)
+  Map getResourceStatus(@PathVariable("name") String name) {
+    Map<String, String> status = new HashMap<>();
+    status.put("status", keelService.getResourceStatus(name));
+    return status;
   }
 
   @ApiOperation(value = "Create or update a resource", response = Resource.class)
