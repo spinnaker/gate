@@ -87,8 +87,9 @@ public class ManagedController {
 
   @ApiOperation(value = "Pass a message to a veto plugin", response = Map.class)
   @RequestMapping(value = "/vetos/{name}", method = POST)
-  Map passVetoMessage(@PathVariable("name") String name, @RequestBody Map<String, Object> message) {
-    return keelService.passVetoMessage(name, message);
+  void passVetoMessage(
+      @PathVariable("name") String name, @RequestBody Map<String, Object> message) {
+    keelService.passVetoMessage(name, message);
   }
 
   @ApiOperation(value = "Get everything a specific veto plugin will reject", response = List.class)
