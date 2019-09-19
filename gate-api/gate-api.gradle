@@ -1,0 +1,3 @@
+dependencies {
+  api "com.netflix.spinnaker.kork:kork-plugins-api"
+}

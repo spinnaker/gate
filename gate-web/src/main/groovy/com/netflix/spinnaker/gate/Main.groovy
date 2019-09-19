@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate
 
+import com.netflix.spinnaker.config.PluginsAutoConfiguration
 import com.netflix.spinnaker.hystrix.spectator.HystrixSpectatorConfig
 import org.springframework.boot.actuate.autoconfigure.ldap.LdapHealthIndicatorAutoConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -31,7 +32,7 @@ import org.springframework.scheduling.annotation.EnableAsync
 @EnableAsync
 @Configuration
 @EnableConfigurationProperties
-@Import([HystrixSpectatorConfig])
+@Import([HystrixSpectatorConfig, PluginsAutoConfiguration])
 @ComponentScan(["com.netflix.spinnaker.gate", "com.netflix.spinnaker.config"])
 @EnableAutoConfiguration(exclude = [GroovyTemplateAutoConfiguration, GsonAutoConfiguration, LdapHealthIndicatorAutoConfiguration])
 class Main {

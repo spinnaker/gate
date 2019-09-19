@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Netflix, Inc.
+ * Copyright 2019 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.netflix.spinnaker.gate;
 
-rootProject.name = "gate"
+import com.netflix.spinnaker.gate.api.Greeting;
+import org.pf4j.Extension;
 
-include "gate-core",
-  "gate-basic",
-  "gate-bom",
-  "gate-iap",
-  "gate-ldap",
-  "gate-oauth2",
-  "gate-proxy",
-  "gate-saml",
-  "gate-web",
-  "gate-x509",
-  "gate-integrations-gremlin",
-  "gate-plugins",
-  "gate-api"
-
-def setBuildFile(project) {
-  project.buildFileName = "${project.name}.gradle"
-  project.children.each {
-    setBuildFile(it)
+@Extension
+public class HelloGreeting implements Greeting {
+  @Override
+  public String getGreeting() {
+    return "Hello from a system (builtin) extension!";
   }
 }
-
-rootProject.children.each {
-  setBuildFile(it)
-}
-
-gradle.ext.includedProviderProjects = includeProviders.split(',').collect{ ':gate-' + it.toLowerCase() }

@@ -1,0 +1,51 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+ext.pluginsDir = rootProject.rootDir.path + '/plugins'
+
+if ([korkVersion, fiatVersion].find { it.endsWith('-SNAPSHOT') }) {
+  repositories {
+    mavenLocal()
+  }
+}
+
+dependencies {
+  implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+  annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+  testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+
+  compileOnly project(":gate-api")
+  implementation "com.netflix.spinnaker.kork:kork-plugins-api"
+  annotationProcessor "org.pf4j:pf4j"
+}
+
+jar {
+  manifest {
+    attributes 'Plugin-Class': "com.netflix.spinnaker.gate.plugins.WelcomePlugin",
+      'Plugin-Id': "welcome-plugin",
+      'Plugin-Version': "0.0.1",
+      'Plugin-Provider': "Netflix"
+  }
+}
+
+shadowJar {
+  baseName = "welcome-plugin"
+  classifier = null
+  version = "0.0.2"
+}
+
+task assemblePlugin(type: Copy) {
+  from shadowJar
+  into pluginsDir
+}
+
+assemble.dependsOn project.tasks.assemblePlugin
