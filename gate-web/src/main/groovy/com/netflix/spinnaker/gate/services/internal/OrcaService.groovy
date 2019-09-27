@@ -77,10 +77,6 @@ interface OrcaService {
   Map getPipeline(@Path("id") String id)
 
   @Headers("Accept: application/json")
-  @GET("/pipelines/{id}/logs")
-  List<Map> getPipelineLogs(@Path("id") String id)
-
-  @Headers("Accept: application/json")
   @PUT("/pipelines/{id}/cancel")
   Map cancelPipeline(@Path("id") String id, @Query("reason") reason, @Query("force") force, @Body String ignored)
 
@@ -137,4 +133,7 @@ interface OrcaService {
 
   @POST("/concourse/stage/start")
   Response concourseStageExecution(@Query("stageId") String stageId, @Query("job") String job, @Query("buildNumber") Integer buildNumber, @Body String emptyBody);
+
+  @GET("/capabilities/deploymentMonitors")
+  List<Object> getDeploymentMonitors();
 }
