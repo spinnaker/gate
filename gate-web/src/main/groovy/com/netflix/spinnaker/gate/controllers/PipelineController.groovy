@@ -23,6 +23,7 @@ import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
+import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
@@ -312,7 +313,7 @@ class PipelineController {
 
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @InheritConstructors
-  class PipelineExecutionException extends RuntimeException {
+  class PipelineExecutionException extends InvalidRequestException {
     PipelineExecutionException(String message) {
       super(message)
     }
