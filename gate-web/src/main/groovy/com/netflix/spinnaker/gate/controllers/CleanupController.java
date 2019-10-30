@@ -18,15 +18,22 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.CleanupService;
 import io.swagger.annotations.ApiOperation;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cleanup")
 public class CleanupController {
+
+  private static final Logger log = LoggerFactory.getLogger(CleanupController.class);
 
   private CleanupService cleanupService;
 
@@ -35,20 +42,32 @@ public class CleanupController {
     this.cleanupService = cleanupService;
   }
 
-  @ApiOperation(value = "Opt out of clean up for a marked resource.", response = Map.class)
+  @ApiOperation(value = "Opt out of clean up for a marked resource.", response = String.class)
   @RequestMapping(
       method = RequestMethod.GET,
       value = "/resources/{namespace}/{resourceId}/optOut",
-      produces = "application/json")
-  Map optOut(@PathVariable String namespace, @PathVariable String resourceId) {
+      produces = "text/html")
+  String optOut(@PathVariable String namespace, @PathVariable String resourceId) {
     Map markedResource = cleanupService.optOut(namespace, resourceId);
-    if (markedResource.isEmpty()) {
-      return getJsonWithMessage(
-          namespace, resourceId, "Resource does not exist. Please try a valid resource.");
+    String confirmationHtml = null;
+    try {
+      if (!markedResource.isEmpty()) {
+        File optOutsuccessHtml =
+            ResourceUtils.getFile("classpath:cleanupservice/optoutSuccess.html");
+        confirmationHtml =
+            FileUtils.readFileToString(optOutsuccessHtml, "UTF-8")
+                .replace("{{resourceId}}", resourceId);
+      } else {
+        File optOutfailureHtml =
+            ResourceUtils.getFile("classpath:cleanupservice/optoutFailure.html");
+        confirmationHtml =
+            FileUtils.readFileToString(optOutfailureHtml, "UTF-8")
+                .replace("{{resourceId}}", resourceId);
+      }
+    } catch (Exception e) {
+      log.error("Error while opting out resource from cleanup", e);
     }
-
-    return getJsonWithMessage(
-        namespace, resourceId, "Resource has been opted out of automated deletion.");
+    return confirmationHtml;
   }
 
   @ApiOperation(value = "Get information about a marked resource.", response = Map.class)
