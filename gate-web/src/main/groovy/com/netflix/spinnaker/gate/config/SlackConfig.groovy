@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.config
 
-import com.netflix.spinnaker.gate.services.PagerDutyService
 import com.netflix.spinnaker.gate.services.SlackService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value

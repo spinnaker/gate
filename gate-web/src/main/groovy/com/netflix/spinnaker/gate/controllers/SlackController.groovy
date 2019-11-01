@@ -21,6 +21,7 @@ import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.RequestMapping
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference
 @CompileStatic
 @RequestMapping("/slack")
 @RestController
+@ConfigurationProperties('slack')
 @ConditionalOnProperty('slack.token')
 @Slf4j
 class SlackController {
@@ -38,9 +40,11 @@ class SlackController {
   @Autowired
   SlackService slackService
 
+  String token
+
   @RequestMapping("/channels")
   List<Map> getChannels() {
-    return slackChannelsCache.get()
+    return slackChannelsCache.get().flatten() as List<Map>
   }
 
 
@@ -57,8 +61,14 @@ class SlackController {
   }
 
   List<Map> fetchChannels() {
-    SlackService.SlackChannelsResult response = AuthenticatedRequest.allowAnonymous { slackService.getChannels() }
+    SlackService.SlackChannelsResult response = AuthenticatedRequest.allowAnonymous { slackService.getChannels(token, null) }
     List<Map> channels = response?.channels
+    String cursor = response?.response_metadata.next_cursor
+    while (cursor) {
+      response = AuthenticatedRequest.allowAnonymous { slackService.getChannels(token, cursor) }
+      channels += response?.channels
+    }
+
     return channels
   }
 }
