@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.concurrent.atomic.AtomicReference
 
@@ -39,7 +40,7 @@ class PagerDutyController {
   @Autowired
   PagerDutyService pagerDutyService
 
-  @RequestMapping("/services")
+  @RequestMapping(value = "/services", method = RequestMethod.GET)
   List<Map> getServices() {
     return pagerDutyServicesCache.get().collect {
       def policyId = it.escalation_policy != null ? it["escalation_policy"]["id"] : null
@@ -58,7 +59,7 @@ class PagerDutyController {
     return (service.integrations as List<Map>).find { it.type == "generic_events_api_inbound_integration" }?.integration_key
   }
 
-  @RequestMapping("/oncalls")
+  @RequestMapping(value = "/oncalls", method = RequestMethod.GET)
   Map<String, List<Map>> getOnCalls() {
     // Map by escalation policy
     Map<String, List<Map>> groupedByPolicy = pagerDutyOnCallCache.get().groupBy { (it.escalation_policy as Map)?.id as String }
