@@ -44,7 +44,7 @@ class SlackController {
 
   @RequestMapping("/channels")
   List<Map> getChannels() {
-    return slackChannelsCache.get().flatten() as List<Map>
+    return slackChannelsCache.get() as List<Map>
   }
 
 
@@ -66,6 +66,7 @@ class SlackController {
     String cursor = response?.response_metadata.next_cursor
     while (cursor) {
       response = AuthenticatedRequest.allowAnonymous { slackService.getChannels(token, cursor) }
+      cursor = response?.response_metadata.next_cursor
       channels += response?.channels
     }
 

@@ -21,7 +21,7 @@ import retrofit.http.GET
 import retrofit.http.Query
 
 interface SlackService {
-  @GET('/conversations.list?limit=100') // https://api.slack.com/methods/conversations.list
+  @GET('/conversations.list?limit=1000&exclude_archived=true&pretty=1') // https://api.slack.com/methods/conversations.list
   SlackChannelsResult getChannels(@Query("token") String token, @Query("cursor") String cursor)
 
   @JsonIgnoreProperties(ignoreUnknown = true)
