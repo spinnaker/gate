@@ -17,11 +17,11 @@
 package com.netflix.spinnaker.gate.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import retrofit.http.GET;
-import retrofit.http.Query;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import retrofit.http.GET;
+import retrofit.http.Query;
 
 public interface SlackService {
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,12 +31,13 @@ public interface SlackService {
     public ResponseMetadata response_metadata;
   }
 
-  @JsonIgnoreProperties(ignoreUnknown =  true)
+  @JsonIgnoreProperties(ignoreUnknown = true)
   @Data
   class ResponseMetadata {
     public String next_cursor;
   }
 
-  @GET("/conversations.list?limit=1000&exclude_archived=true&pretty=1") // https://api.slack.com/methods/conversations.list
+  @GET(
+      "/conversations.list?limit=1000&exclude_archived=true&pretty=1") // https://api.slack.com/methods/conversations.list
   SlackChannelsResult getChannels(@Query("token") String token, @Query("cursor") String cursor);
 }
