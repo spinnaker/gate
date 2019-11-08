@@ -82,6 +82,23 @@ class BuildService {
     } execute()
   }
 
+  List<IgorService.GoogleCloudBuildTrigger> getGoogleCloudBuildTriggersForAccount(String account) {
+    if (!igorService) {
+      return []
+    }
+    HystrixFactory.newListCommand(GROUP, "triggersForGcbAccount") {
+      try {
+        igorService.getGoogleCloudBuildTriggers(account)
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new GCBAccountNotFound("Account '${account}' not found")
+        }
+
+        throw e
+      }
+    } execute()
+  }
+
   Map getJobConfig(String buildMaster, String job) {
     if (!igorService) {
       return [:]
@@ -135,5 +152,17 @@ class BuildService {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @InheritConstructors
-  static class BuildMasterNotFound extends HystrixBadRequestException {}
+  static class BuildMasterNotFound extends HystrixBadRequestException {
+    BuildMasterNotFound(String message) {
+      super(message)
+    }
+  }
+
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @InheritConstructors
+  static class GCBAccountNotFound extends HystrixBadRequestException {
+    GCBAccountNotFound(String message) {
+      super(message)
+    }
+  }
 }
