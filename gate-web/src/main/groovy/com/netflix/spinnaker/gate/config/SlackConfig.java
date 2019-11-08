@@ -16,8 +16,9 @@
 
 package com.netflix.spinnaker.gate.config;
 
+import static retrofit.Endpoints.newFixedEndpoint;
+
 import com.netflix.spinnaker.gate.services.SlackService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +29,6 @@ import retrofit.RestAdapter;
 import retrofit.client.OkClient;
 import retrofit.converter.JacksonConverter;
 
-import static retrofit.Endpoints.newFixedEndpoint;
-
 @Configuration
 @ConditionalOnProperty("slack.token")
 public class SlackConfig {
@@ -38,21 +37,21 @@ public class SlackConfig {
   String token;
 
   @Bean
-  Endpoint slackEndpoint(
-    @Value("${slack.base-url}") String slackBaseUrl) {
+  Endpoint slackEndpoint(@Value("${slack.base-url}") String slackBaseUrl) {
     return newFixedEndpoint(slackBaseUrl);
   }
 
-  RequestInterceptor requestInterceptor = new RequestInterceptor() {
-    @Override
-    public void intercept(RequestInterceptor.RequestFacade request) {
-      request.addHeader("Authorization", "Token token=${token}");
-    }
-  };
+  RequestInterceptor requestInterceptor =
+      new RequestInterceptor() {
+        @Override
+        public void intercept(RequestInterceptor.RequestFacade request) {
+          request.addHeader("Authorization", "Token token=${token}");
+        }
+      };
 
   @Bean
   SlackService slackService(Endpoint slackEndpoint) {
-     return new RestAdapter.Builder()
+    return new RestAdapter.Builder()
         .setEndpoint(slackEndpoint)
         .setClient(new OkClient())
         .setConverter(new JacksonConverter())

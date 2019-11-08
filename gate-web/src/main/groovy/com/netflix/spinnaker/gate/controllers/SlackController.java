@@ -17,23 +17,20 @@
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.SlackService;
-import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.swagger.annotations.ApiOperation;
-// import com.netflix.spinnaker.security.AuthenticatedRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/slack")
@@ -42,13 +39,13 @@ import org.slf4j.LoggerFactory;
 public class SlackController {
 
   private static final Logger log = LoggerFactory.getLogger(SlackController.class);
-  private final AtomicReference<List<Map>> slackChannelsCache = new AtomicReference<>(new ArrayList<>());
+  private final AtomicReference<List<Map>> slackChannelsCache =
+      new AtomicReference<>(new ArrayList<>());
 
   @Value("${slack.token}")
   String token;
 
-  @Autowired
-  SlackService slackService;
+  @Autowired SlackService slackService;
 
   @ApiOperation("Retrieve a list of public slack channels")
   @RequestMapping("/channels")
@@ -57,7 +54,7 @@ public class SlackController {
   }
 
   @Scheduled(fixedDelay = 300000L)
-   void refreshSlack() {
+  void refreshSlack() {
     try {
       log.info("Refreshing Slack channels list");
       List<Map> channels = fetchChannels();
@@ -70,8 +67,6 @@ public class SlackController {
 
   List<Map> fetchChannels() {
     SlackService.SlackChannelsResult response = slackService.getChannels(token, null);
-    // Not sure if I need this yet
-    // SlackChannelsResult response = AuthenticatedRequest.allowAnonymous{ slackService.getChannels(token, null) }
     List<Map> channels = response.channels;
     String cursor = response.response_metadata.next_cursor;
     while (cursor != null & cursor.length() > 0) {
@@ -82,5 +77,4 @@ public class SlackController {
 
     return channels;
   }
-
 }
