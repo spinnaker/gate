@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.services
+package com.netflix.spinnaker.gate.services;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import retrofit.http.GET
-import retrofit.http.Query
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import retrofit.http.GET;
+import retrofit.http.Query;
+import java.util.List;
+import java.util.Map;
+import lombok.Data;
 
-interface SlackService {
-  @GET('/conversations.list?limit=1000&exclude_archived=true&pretty=1') // https://api.slack.com/methods/conversations.list
-  SlackChannelsResult getChannels(@Query("token") String token, @Query("cursor") String cursor)
-
+public interface SlackService {
   @JsonIgnoreProperties(ignoreUnknown = true)
+  @Data
   class SlackChannelsResult {
-    List<Map> channels
-    ResponseMetadata response_metadata
+    public List<Map> channels;
+    public ResponseMetadata response_metadata;
   }
 
   @JsonIgnoreProperties(ignoreUnknown =  true)
+  @Data
   class ResponseMetadata {
-    String next_cursor
+    public String next_cursor;
   }
+
+  @GET("/conversations.list?limit=1000&exclude_archived=true&pretty=1") // https://api.slack.com/methods/conversations.list
+  SlackChannelsResult getChannels(@Query("token") String token, @Query("cursor") String cursor);
 }
