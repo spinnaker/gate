@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
+import com.netflix.spinnaker.gate.config.SlackConfigProperties;
 import com.netflix.spinnaker.gate.services.SlackService;
 import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
@@ -25,16 +26,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/slack")
-@ConfigurationProperties("slack")
 @ConditionalOnProperty("slack.token")
 public class SlackController {
 
@@ -42,10 +40,14 @@ public class SlackController {
   private final AtomicReference<List<Map>> slackChannelsCache =
       new AtomicReference<>(new ArrayList<>());
 
-  @Value("${slack.token}")
-  String token;
+  SlackConfigProperties slackConfigProperties;
+  SlackService slackService;
 
-  @Autowired SlackService slackService;
+  @Autowired
+  public SlackController(SlackService slackService, SlackConfigProperties slackConfigProperties) {
+    this.slackService = slackService;
+    this.slackConfigProperties = slackConfigProperties;
+  }
 
   @ApiOperation("Retrieve a list of public slack channels")
   @RequestMapping("/channels")
@@ -66,11 +68,12 @@ public class SlackController {
   }
 
   List<Map> fetchChannels() {
-    SlackService.SlackChannelsResult response = slackService.getChannels(token, null);
+    SlackService.SlackChannelsResult response =
+        slackService.getChannels(slackConfigProperties.getToken(), null);
     List<Map> channels = response.channels;
     String cursor = response.response_metadata.next_cursor;
     while (cursor != null & cursor.length() > 0) {
-      response = slackService.getChannels(token, cursor);
+      response = slackService.getChannels(slackConfigProperties.getToken(), cursor);
       cursor = response.response_metadata.next_cursor;
       channels.addAll(response.channels);
     }
