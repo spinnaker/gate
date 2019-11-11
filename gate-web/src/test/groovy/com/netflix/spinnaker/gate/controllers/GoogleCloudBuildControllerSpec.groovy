@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Netflix, Inc.
+ * Copyright 2019 Andres Castano
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.gate.services.BuildService
+import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger
 import com.netflix.spinnaker.gate.services.internal.IgorService
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import org.springframework.http.MediaType
@@ -39,7 +40,7 @@ class GoogleCloudBuildControllerSpec extends Specification {
 
   def server = new MockWebServer()
 
-  @Shared def objectMapper = new ObjectMapper();
+  @Shared def objectMapper = new ObjectMapper()
   @Shared def ACCOUNT = 'myAccount'
 
   void cleanup() {
@@ -56,8 +57,8 @@ class GoogleCloudBuildControllerSpec extends Specification {
 
   void 'should get a list of triggers for a given account'() {
     def triggers = [
-      new IgorService.GoogleCloudBuildTrigger("trigger1", "myTrigger1", "My desc 1"),
-      new IgorService.GoogleCloudBuildTrigger("trigger2", "myTrigger2", "My desc 2")
+      new GoogleCloudBuildTrigger("trigger1", "myTrigger1", "My desc 1"),
+      new GoogleCloudBuildTrigger("trigger2", "myTrigger2", "My desc 2")
       ]
     given:
     1 * igorService.getGoogleCloudBuildTriggers(ACCOUNT) >> triggers
@@ -88,7 +89,7 @@ class GoogleCloudBuildControllerSpec extends Specification {
     def downstreamResponse = new Response("blah", 404, "Not found", [], null)
     given:
     1 * igorService.getGoogleCloudBuildTriggers(ACCOUNT) >> {String account ->
-      throw new RetrofitError("Error", "blah", downstreamResponse, null, null, null, null);
+      throw RetrofitError.httpError("blah", downstreamResponse, null, null)
     }
 
     when:

@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.BuildService;
+import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger;
 import com.netflix.spinnaker.gate.services.internal.IgorService;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -50,7 +51,7 @@ public class GoogleCloudBuildController {
       value = "Retrieve the list of Google Cloud Build triggers for a given account",
       response = List.class)
   @GetMapping(value = "/triggers/{account}")
-  List<IgorService.GoogleCloudBuildTrigger> getGoogleCloudBuildTriggers(
+  List<GoogleCloudBuildTrigger> getGoogleCloudBuildTriggers(
       @PathVariable("account") String account) {
     return buildService.getGoogleCloudBuildTriggersForAccount(account);
   }

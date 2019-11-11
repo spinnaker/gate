@@ -87,22 +87,4 @@ interface IgorService {
   @GET('/concourse/{buildMaster}/teams/{team}/pipelines/{pipeline}/resources')
   List<String> getConcourseResources(@Path("buildMaster") String buildMaster, @Path("team") String team, @Path("pipeline") String pipeline);
 
-  static class GoogleCloudBuildTrigger {
-    GoogleCloudBuildTrigger() {}
-
-    GoogleCloudBuildTrigger(String triggerId, String name, String description) {
-      this.triggerId = triggerId
-      this.name = name
-      this.description = description
-    }
-
-    @JsonProperty
-    String triggerId
-
-    @JsonProperty
-    String name
-
-    @JsonProperty
-    String description
-  }
 }
