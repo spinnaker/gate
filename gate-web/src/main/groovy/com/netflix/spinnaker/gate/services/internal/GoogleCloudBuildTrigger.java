@@ -21,13 +21,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class GoogleCloudBuildTrigger {
   GoogleCloudBuildTrigger() {}
 
-  public GoogleCloudBuildTrigger(String triggerId, String name, String description) {
-    this.triggerId = triggerId;
+  public GoogleCloudBuildTrigger(String id, String name, String description) {
+    this.id = id;
     this.name = name;
     this.description = description;
   }
 
-  @JsonProperty private String triggerId;
+  @JsonProperty private String id;
 
   @JsonProperty private String name;
 
