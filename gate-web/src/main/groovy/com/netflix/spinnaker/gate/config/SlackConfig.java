@@ -42,7 +42,7 @@ public class SlackConfig {
 
   @Bean
   public Endpoint slackEndpoint() {
-    return newFixedEndpoint(slackConfigProperties.baseUrl);
+    return newFixedEndpoint(slackConfigProperties.getBaseUrl());
   }
 
   private RequestInterceptor requestInterceptor =

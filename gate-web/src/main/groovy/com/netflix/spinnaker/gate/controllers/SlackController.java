@@ -35,7 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/slack")
-@ConditionalOnProperty("slack.token")
+@ConditionalOnProperty(
+    prefix = "slack",
+    name = {"token", "baseUrl"})
 public class SlackController {
 
   private static final Logger log = LoggerFactory.getLogger(SlackController.class);
