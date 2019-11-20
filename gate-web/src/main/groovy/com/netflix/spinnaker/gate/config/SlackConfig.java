@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.config;
 
 import static retrofit.Endpoints.newFixedEndpoint;
 
+import com.jakewharton.retrofit.Ok3Client;
 import com.netflix.spinnaker.gate.services.SlackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,7 +27,6 @@ import org.springframework.context.annotation.Configuration;
 import retrofit.Endpoint;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
-import retrofit.client.OkClient;
 import retrofit.converter.JacksonConverter;
 
 @Configuration
@@ -41,11 +41,11 @@ public class SlackConfig {
   }
 
   @Bean
-  Endpoint slackEndpoint() {
+  public Endpoint slackEndpoint() {
     return newFixedEndpoint(slackConfigProperties.baseUrl);
   }
 
-  RequestInterceptor requestInterceptor =
+  private RequestInterceptor requestInterceptor =
       new RequestInterceptor() {
         @Override
         public void intercept(RequestInterceptor.RequestFacade request) {
@@ -58,7 +58,7 @@ public class SlackConfig {
   SlackService slackService(Endpoint slackEndpoint) {
     return new RestAdapter.Builder()
         .setEndpoint(slackEndpoint)
-        .setClient(new OkClient())
+        .setClient(new Ok3Client())
         .setConverter(new JacksonConverter())
         .setRequestInterceptor(requestInterceptor)
         .build()

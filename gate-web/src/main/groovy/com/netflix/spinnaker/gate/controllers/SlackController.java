@@ -16,8 +16,10 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
+import com.netflix.spectator.api.Registry;
 import com.netflix.spinnaker.gate.config.SlackConfigProperties;
 import com.netflix.spinnaker.gate.services.SlackService;
+import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,21 +39,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class SlackController {
 
   private static final Logger log = LoggerFactory.getLogger(SlackController.class);
+  private final Registry registry;
   private final AtomicReference<List<Map>> slackChannelsCache =
       new AtomicReference<>(new ArrayList<>());
 
-  SlackConfigProperties slackConfigProperties;
-  SlackService slackService;
+  private final SlackConfigProperties slackConfigProperties;
+  private final SlackService slackService;
 
   @Autowired
-  public SlackController(SlackService slackService, SlackConfigProperties slackConfigProperties) {
+  public SlackController(
+      SlackService slackService, SlackConfigProperties slackConfigProperties, Registry registry) {
     this.slackService = slackService;
     this.slackConfigProperties = slackConfigProperties;
+    this.registry = registry;
   }
 
   @ApiOperation("Retrieve a list of public slack channels")
   @RequestMapping("/channels")
-  List<Map> getChannels() {
+  public List<Map> getChannels() {
     return slackChannelsCache.get();
   }
 
@@ -63,13 +68,15 @@ public class SlackController {
       log.info("Fetched {} Slack channels", channels.size());
       slackChannelsCache.set(channels);
     } catch (Exception e) {
+      registry.counter("slack.channels.errors").increment();
       log.error("Unable to refresh Slack service list", e);
     }
   }
 
   List<Map> fetchChannels() {
     SlackService.SlackChannelsResult response =
-        slackService.getChannels(slackConfigProperties.getToken(), null);
+        AuthenticatedRequest.allowAnonymous(
+            () -> slackService.getChannels(slackConfigProperties.getToken(), null));
     List<Map> channels = response.channels;
     String cursor = response.response_metadata.next_cursor;
     while (cursor != null & cursor.length() > 0) {
