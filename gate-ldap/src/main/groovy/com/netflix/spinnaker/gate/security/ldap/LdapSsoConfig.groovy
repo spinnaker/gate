@@ -60,6 +60,9 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   SecurityProperties securityProperties
 
+  @Autowired
+  DefaultCookieSerializer defaultCookieSerializer
+
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -86,9 +89,6 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
       ldapConfigurer.userSearchFilter(ldapConfigProps.userSearchFilter)
     }
   }
-
-  @Autowired
-  DefaultCookieSerializer defaultCookieSerializer
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
