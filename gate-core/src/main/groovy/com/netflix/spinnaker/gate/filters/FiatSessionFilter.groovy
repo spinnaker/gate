@@ -75,7 +75,11 @@ class FiatSessionFilter implements Filter {
             session.invalidate()
             SecurityContextHolder.clearContext()
           }
+        } else {
+          log.debug("Unable to get permission from from permission evaluator for user: ${user}.")
         }
+      } else {
+        log.debug("Authenticated user was not present in authenticated request. Check authentication settings.")
       }
     } else {
       if (log.isDebugEnabled()) {
@@ -103,3 +107,4 @@ class FiatSessionFilter implements Filter {
   void destroy() {
   }
 }
+
