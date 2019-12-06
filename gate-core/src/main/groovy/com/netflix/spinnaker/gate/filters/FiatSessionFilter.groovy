@@ -76,7 +76,7 @@ class FiatSessionFilter implements Filter {
             SecurityContextHolder.clearContext()
           }
         } else {
-          log.debug("Unable to get permission from from permission evaluator for user=${user}.")
+          log.debug("Unable to get permission from permission evaluator for user=${user}.")
         }
       } else {
         log.debug("Authenticated user was not present in authenticated request. Check authentication settings.")
