@@ -63,7 +63,7 @@ public class SlackController {
   }
 
   @Scheduled(
-      fixedDelayString = "${slack.channelRefreshIntervalInMs:1200000}",
+      fixedDelayString = "${slack.channel-refresh-interval-millis:1200000}",
       initialDelayString = "${random.int(600000)}")
   void refreshSlack() {
     try {
