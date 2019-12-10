@@ -8,5 +8,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SlackConfigProperties {
   String token;
   String baseUrl;
-  Integer channelRefreshIntervalInMs;
+  Long channelRefreshIntervalInMs;
 }

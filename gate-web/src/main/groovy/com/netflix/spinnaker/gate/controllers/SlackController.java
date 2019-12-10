@@ -47,7 +47,6 @@ public class SlackController {
 
   private final SlackConfigProperties slackConfigProperties;
   private final SlackService slackService;
-  private final Integer refreshDelay;
 
   @Autowired
   public SlackController(
@@ -55,7 +54,6 @@ public class SlackController {
     this.slackService = slackService;
     this.slackConfigProperties = slackConfigProperties;
     this.registry = registry;
-    this.refreshDelay = slackConfigProperties.getChannelRefreshIntervalInMs();
   }
 
   @ApiOperation("Retrieve a list of public slack channels")
@@ -66,7 +64,7 @@ public class SlackController {
 
   @Scheduled(
       fixedDelayString = "${slack.channelRefreshIntervalInMs:1200000}",
-      initialDelayString = "${random.int(1200000)}")
+      initialDelayString = "${random.int(300000)}")x
   void refreshSlack() {
     try {
       log.info("Refreshing Slack channels list");
@@ -75,7 +73,7 @@ public class SlackController {
       slackChannelsCache.set(channels);
     } catch (Exception e) {
       registry.counter("slack.channels.errors").increment();
-      log.error("Unable to refresh Slack service list", e);
+      log.error("Unable to refresh Slack channels list", e);
     }
   }
 
