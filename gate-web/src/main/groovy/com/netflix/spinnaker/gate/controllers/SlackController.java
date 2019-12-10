@@ -28,12 +28,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/slack")
+@ConditionalOnProperty(
+    prefix = "slack",
+    name = {"token", "baseUrl"})
 public class SlackController {
 
   private static final Logger log = LoggerFactory.getLogger(SlackController.class);
