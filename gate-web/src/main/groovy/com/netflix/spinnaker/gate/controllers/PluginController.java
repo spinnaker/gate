@@ -82,11 +82,6 @@ public class PluginController {
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
-    Map<String, Object> operation = new HashMap<>();
-    operation.put("description", "Delete Plugin metadata");
-    operation.put("application", DEFAULT_APPLICATION);
-    operation.put("job", jobs);
-
     initiateTask("Delete Plugin metadata", jobs);
   }
 
