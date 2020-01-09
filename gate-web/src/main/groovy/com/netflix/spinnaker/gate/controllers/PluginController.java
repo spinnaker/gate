@@ -94,7 +94,7 @@ public class PluginController {
 
   private void initiateTask(String description, List<Map<String, Object>> jobs) {
     Map<String, Object> operation = new HashMap<>();
-    operation.put("description", "Delete Plugin metadata");
+    operation.put("description", description);
     operation.put("application", DEFAULT_APPLICATION);
     operation.put("job", jobs);
     Map result = taskService.createAndWaitForCompletion(operation);
