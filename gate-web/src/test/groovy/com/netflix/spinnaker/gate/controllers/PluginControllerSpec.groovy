@@ -61,50 +61,39 @@ class PluginControllerSpec extends Specification {
 
   def 'upsert api should succeed when sent content'() {
     setup:
-    when(taskService.createAndWaitForCompletion(any())).thenReturn(['status': 'SUCCEEDED'])
+    when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/1'])
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginArtifacts")
                 .header('Content-Type', "application/json")
                 .content(objectMapper.writeValueAsString(requestContent)))
-                .andExpect(status().isOk())
-  }
-
-  def 'upsert api should fail when sent content and api call fails'() {
-    setup:
-    when(taskService.createAndWaitForCompletion(any())).thenReturn(['status': 'TERMINAL'])
-
-    expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginArtifacts")
-      .header('Content-Type', "application/json")
-      .content(objectMapper.writeValueAsString(requestContent)))
-      .andExpect(status().isBadRequest())
+                .andExpect(status().isAccepted())
   }
 
   def 'upsert api should succeed with put method'() {
     setup:
-    when(taskService.createAndWaitForCompletion(any())).thenReturn(['status': 'SUCCEEDED'])
+    when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/2'])
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.put("/pluginArtifacts")
       .header('Content-Type', "application/json")
       .content(objectMapper.writeValueAsString(requestContent)))
-      .andExpect(status().isOk())
+      .andExpect(status().isAccepted())
   }
 
   def 'delete api should succeed'() {
     setup:
-    when(taskService.createAndWaitForCompletion(any())).thenReturn(['status': 'SUCCEEDED'])
+    when(taskService.createAndWaitForCompletion(any())).thenReturn(['ref': '/tasks/ref/3'])
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.delete("/pluginArtifacts/testPlugin")
       .header('Content-Type', "application/json"))
-      .andExpect(status().isNoContent())
+      .andExpect(status().isAccepted())
   }
 
   def 'get api should succeed'() {
     setup:
-    when(front50Service.getPluginArtifacts(any())).thenReturn([['status': 'SUCCEEDED']])
+    when(front50Service.getPluginArtifacts(any())).thenReturn([['Id': 'test-plugin-id']])
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.get("/pluginArtifacts")

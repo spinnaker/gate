@@ -18,7 +18,6 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.TaskService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
-import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/pluginArtifacts")
 public class PluginController {
 
-  // TODO: configurable.
+  // TODO: Make it configurable.
   private static final String DEFAULT_APPLICATION = "spinnaker";
 
   private TaskService taskService;
@@ -52,57 +51,51 @@ public class PluginController {
     this.front50Service = front50Service;
   }
 
-  @ApiOperation(value = "Persist plugin metadata")
+  @ApiOperation(value = "Persist plugin artifact information")
   @RequestMapping(
       method = {RequestMethod.POST, RequestMethod.PUT},
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(value = HttpStatus.OK)
-  void persistPluginMetadata(@RequestBody Map pluginMetaData) {
+  @ResponseStatus(value = HttpStatus.ACCEPTED)
+  Map persistPluginArtifactInfo(@RequestBody Map pluginArtifactData) {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
     job.put("type", "upsertPluginArtifact");
-    job.put("pluginArtifact", pluginMetaData);
+    job.put("pluginArtifact", pluginArtifactData);
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
-    initiateTask("Create/Update plugin", jobs);
+    return initiateTask("Create/Update plugin with Id: " + pluginArtifactData.get("Id"), jobs);
   }
 
-  @ApiOperation(value = "Delete plugin metadata with the provided Id")
+  @ApiOperation(value = "Delete plugin artifact info with the provided Id")
   @RequestMapping(
-      value = "/{Id}",
+      value = "/{id}",
       method = {RequestMethod.DELETE},
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(value = HttpStatus.NO_CONTENT)
-  void deletePluginMetadata(@PathVariable String Id) {
+  @ResponseStatus(value = HttpStatus.ACCEPTED)
+  Map deletePluginArtifactInfo(@PathVariable String id) {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
     job.put("type", "deletePluginArtifact");
-    job.put("pluginArtifactId", Id);
+    job.put("pluginArtifactId", id);
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
-    initiateTask("Delete Plugin metadata", jobs);
+    return initiateTask("Delete Plugin metadata with Id: " + id, jobs);
   }
 
-  @ApiOperation(value = "Get all plugin metadata")
+  @ApiOperation(value = "Get all plugin artifacts info.")
   @RequestMapping(method = RequestMethod.GET)
-  List<Map> getAllPluginMetadata(
+  List<Map> getAllPluginArtifacts(
       @RequestParam(value = "service", required = false) String service) {
     return front50Service.getPluginArtifacts(service);
   }
 
-  private void initiateTask(String description, List<Map<String, Object>> jobs) {
+  private Map initiateTask(String description, List<Map<String, Object>> jobs) {
     Map<String, Object> operation = new HashMap<>();
     operation.put("description", description);
     operation.put("application", DEFAULT_APPLICATION);
     operation.put("job", jobs);
-    Map result = taskService.createAndWaitForCompletion(operation);
-    String resultStatus = (String) result.get("status");
-
-    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
-      throw new InvalidRequestException(
-          "Operation: '" + description + "' failed with Status: " + resultStatus);
-    }
+    return taskService.create(operation);
   }
 }
