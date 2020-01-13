@@ -93,7 +93,7 @@ class PluginControllerSpec extends Specification {
 
   def 'get api should succeed'() {
     setup:
-    when(front50Service.getPluginArtifacts(any())).thenReturn([['Id': 'test-plugin-id']])
+    when(front50Service.getPluginInfo(any())).thenReturn([['Id': 'test-plugin-id']])
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.get("/pluginInfo")

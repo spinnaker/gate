@@ -56,15 +56,15 @@ public class PluginController {
       method = {RequestMethod.POST, RequestMethod.PUT},
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(value = HttpStatus.ACCEPTED)
-  Map persistPluginArtifactInfo(@RequestBody Map pluginArtifactData) {
+  Map persistPluginInfo(@RequestBody Map pluginInfo) {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
-    job.put("type", "upsertPluginArtifact");
-    job.put("pluginArtifact", pluginArtifactData);
+    job.put("type", "upsertPluginInfo");
+    job.put("pluginInfo", pluginInfo);
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
-    return initiateTask("Create/Update plugin with Id: " + pluginArtifactData.get("Id"), jobs);
+    return initiateTask("Create/Update plugin with Id: " + pluginInfo.get("Id"), jobs);
   }
 
   @ApiOperation(value = "Delete plugin artifact info with the provided Id")
@@ -73,11 +73,11 @@ public class PluginController {
       method = {RequestMethod.DELETE},
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(value = HttpStatus.ACCEPTED)
-  Map deletePluginArtifactInfo(@PathVariable String id) {
+  Map deletePluginInfo(@PathVariable String id) {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
-    job.put("type", "deletePluginArtifact");
-    job.put("pluginArtifactId", id);
+    job.put("type", "deletePluginInfo");
+    job.put("pluginInfoId", id);
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
@@ -86,9 +86,8 @@ public class PluginController {
 
   @ApiOperation(value = "Get all plugin artifacts info.")
   @RequestMapping(method = RequestMethod.GET)
-  List<Map> getAllPluginArtifactsInfo(
-      @RequestParam(value = "service", required = false) String service) {
-    return front50Service.getPluginArtifacts(service);
+  List<Map> getAllPluginInfo(@RequestParam(value = "service", required = false) String service) {
+    return front50Service.getPluginInfo(service);
   }
 
   private Map initiateTask(String description, List<Map<String, Object>> jobs) {

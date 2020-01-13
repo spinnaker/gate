@@ -159,5 +159,5 @@ interface Front50Service {
 
   // Plugins related
   @GET('/pluginInfo')
-  List<Map> getPluginArtifacts(@Query("service") String service)
+  List<Map> getPluginInfo(@Query("service") String service)
 }
