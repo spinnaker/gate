@@ -56,7 +56,7 @@ class PluginControllerSpec extends Specification {
 
   def 'upsert api should fail when sent no content'() {
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginArtifacts")).andExpect(status().isInternalServerError())
+    this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginInfo")).andExpect(status().isInternalServerError())
   }
 
   def 'upsert api should succeed when sent content'() {
@@ -64,7 +64,7 @@ class PluginControllerSpec extends Specification {
     when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/1'])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginArtifacts")
+    this.mockMvc.perform(MockMvcRequestBuilders.post("/pluginInfo")
                 .header('Content-Type', "application/json")
                 .content(objectMapper.writeValueAsString(requestContent)))
                 .andExpect(status().isAccepted())
@@ -75,7 +75,7 @@ class PluginControllerSpec extends Specification {
     when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/2'])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.put("/pluginArtifacts")
+    this.mockMvc.perform(MockMvcRequestBuilders.put("/pluginInfo")
       .header('Content-Type', "application/json")
       .content(objectMapper.writeValueAsString(requestContent)))
       .andExpect(status().isAccepted())
@@ -86,7 +86,7 @@ class PluginControllerSpec extends Specification {
     when(taskService.createAndWaitForCompletion(any())).thenReturn(['ref': '/tasks/ref/3'])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.delete("/pluginArtifacts/testPlugin")
+    this.mockMvc.perform(MockMvcRequestBuilders.delete("/pluginInfo/testPlugin")
       .header('Content-Type', "application/json"))
       .andExpect(status().isAccepted())
   }
@@ -96,7 +96,7 @@ class PluginControllerSpec extends Specification {
     when(front50Service.getPluginArtifacts(any())).thenReturn([['Id': 'test-plugin-id']])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.get("/pluginArtifacts")
+    this.mockMvc.perform(MockMvcRequestBuilders.get("/pluginInfo")
       .header('Content-Type', "application/json"))
       .andExpect(status().isOk())
   }

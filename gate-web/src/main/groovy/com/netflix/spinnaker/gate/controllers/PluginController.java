@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/pluginArtifacts")
+@RequestMapping(value = "/pluginInfo")
 public class PluginController {
 
   // TODO: Make it configurable.
@@ -86,7 +86,7 @@ public class PluginController {
 
   @ApiOperation(value = "Get all plugin artifacts info.")
   @RequestMapping(method = RequestMethod.GET)
-  List<Map> getAllPluginArtifacts(
+  List<Map> getAllPluginArtifactsInfo(
       @RequestParam(value = "service", required = false) String service) {
     return front50Service.getPluginArtifacts(service);
   }
