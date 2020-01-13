@@ -3,6 +3,7 @@ package com.netflix.spinnaker.gate.controllers;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintState;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
@@ -133,6 +134,30 @@ public class ManagedController {
       produces = {APPLICATION_JSON_VALUE})
   List<Map> diffManifest(@RequestBody DeliveryConfig manifest) {
     return keelService.diffManifest(manifest);
+  }
+
+  @ApiOperation(
+      value = "List up-to {limit} current constraint states for an environment",
+      response = ConstraintState.class)
+  @GetMapping(path = "/delivery-configs/{name}/environment/{environment}/constraints")
+  List<ConstraintState> getConstraintState(
+      @PathVariable("name") String name,
+      @PathVariable("environment") String environment,
+      @RequestParam(value = "limit", required = false, defaultValue = "10") String limit) {
+    return keelService.getConstraintState(name, environment, Integer.valueOf(limit));
+  }
+
+  @ApiOperation(value = "Update the status of an environment constraint")
+  @PostMapping(path = "/delivery-configs/{name}/environment/{environment}/constraint/{type}")
+  void updateConstraintStatus(
+      @PathVariable("name") String name,
+      @PathVariable("environment") String environment,
+      @PathVariable("type") String type,
+      @RequestParam(value = "artifactVersion") String artifactVersion,
+      @RequestParam(value = "status") String status,
+      @RequestParam(value = "comment", required = false, defaultValue = "") String comment) {
+    keelService.updateConstraintStatus(
+        name, environment, type, artifactVersion, status, "".equals(comment) ? null : comment);
   }
 
   @ApiOperation(value = "Get managed details about an application", response = Map.class)
