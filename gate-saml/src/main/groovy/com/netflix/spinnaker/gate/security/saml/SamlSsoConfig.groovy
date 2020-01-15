@@ -74,7 +74,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Component
   @ConfigurationProperties("saml")
-  @ConditionalOnExpression('${saml.enabled:false}')
   static class SAMLSecurityConfigProperties {
     String keyStore
     String keyStorePassword
