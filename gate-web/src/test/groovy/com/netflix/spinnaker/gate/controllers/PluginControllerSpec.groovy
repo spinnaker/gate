@@ -17,15 +17,18 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.gate.config.SpinnakerExtensionsConfigProperties
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.web.exceptions.GenericExceptionHandlers
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import spock.lang.Specification
@@ -36,8 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = [PluginController])
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = [PluginController, GenericExceptionHandlers])
+@ContextConfiguration(classes = [PluginController, GenericExceptionHandlers, SpinnakerExtensionsConfigProperties])
 @ActiveProfiles("test")
+@TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
 class PluginControllerSpec extends Specification {
 
   @Autowired
@@ -46,6 +50,9 @@ class PluginControllerSpec extends Specification {
   @Autowired
   ObjectMapper objectMapper
 
+  @Autowired
+  SpinnakerExtensionsConfigProperties spinnakerExtensionsConfigProperties
+
   @MockBean
   private TaskService taskService
 
@@ -53,6 +60,11 @@ class PluginControllerSpec extends Specification {
   private Front50Service front50Service
 
   private Map requestContent = ['name': 'test plugin', provider: 'Test Co']
+
+  def 'should load configuration bean with expected values'() {
+    expect:
+    spinnakerExtensionsConfigProperties.applicationName == 'spinnakerpluginstest'
+  }
 
   def 'upsert api should fail when sent no content'() {
     expect:
