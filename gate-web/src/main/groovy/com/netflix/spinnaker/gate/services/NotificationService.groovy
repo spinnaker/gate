@@ -72,21 +72,28 @@ class NotificationService {
 
     final MediaType mediaType = MediaType.parse(contentType)
 
-    // We use the "raw" OkHttpClient here instead of a RestAdapter because retrofit messes up with the encoding
+    // We use the "raw" OkHttpClient here instead of EchoService because retrofit messes up with the encoding
     // of the body for the x-www-form-urlencoded content type, which is what Slack uses. This allows us to pass
     // the original body unmodified along to echo.
     Endpoint echoEndpoint = GateConfig.createEndpoint(serviceConfiguration, "echo")
 
-    Request echoRequest = new Request.Builder()
+    Request.Builder builder = new Request.Builder()
       .url(echoEndpoint.url + request.url.path)
       .post(RequestBody.create(mediaType, request.body))
-      .header("Accept", accept)
-      .build();
 
+    request.getHeaders().each { String name, List values ->
+      values.each { value ->
+        builder.addHeader(name, value.toString())
+      }
+    }
+
+    Request echoRequest = builder.build();
     Response response = okHttpClient.newCall(echoRequest).execute()
-    String body = response.body().string()
-    Map headers = response.headers().toMultimap()
 
-    return new ResponseEntity(body, new HttpHeaders(headers as MultiValueMap), HttpStatus.valueOf(response.code()))
+    // convert retrofit response to Spring format
+    String body = response.body().string()
+    HttpHeaders headers = new HttpHeaders()
+    headers.putAll(response.headers().toMultimap())
+    return new ResponseEntity(body, headers, HttpStatus.valueOf(response.code()))
   }
 }
