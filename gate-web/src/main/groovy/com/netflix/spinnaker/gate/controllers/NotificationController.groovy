@@ -20,6 +20,9 @@ package com.netflix.spinnaker.gate.controllers
 import com.netflix.spinnaker.gate.services.NotificationService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
+import org.springframework.http.RequestEntity
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -48,4 +51,21 @@ class NotificationController {
     notificationService.getNotificationConfigs(type, application)
   }
 
+  /**
+   * Provides a generic callback API for notification services to call, primarily in response to interactive user
+   * action (e.g. clicking a button in a message).
+   *
+   * @param source The unique ID of the calling notification service (e.g. "slack")
+   * @param request The callback request
+   * @return
+   */
+  @RequestMapping(
+    value = '/callbacks/{source}',
+    method = RequestMethod.POST,
+    consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  ResponseEntity<String> processNotificationCallback(@PathVariable String source, RequestEntity<String> request) {
+    return notificationService.processNotificationCallback(source, request)
+  }
 }
