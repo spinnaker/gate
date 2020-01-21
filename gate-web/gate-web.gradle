@@ -15,6 +15,7 @@ repositories {
   maven {
     url 'https://repo.spring.io/libs-snapshot'
   }
+  mavenCentral()
 }
 
 dependencies {
@@ -62,6 +63,9 @@ dependencies {
   testImplementation "org.springframework.security:spring-security-oauth2-jose"
   testImplementation "com.unboundid:unboundid-ldapsdk"
   testImplementation "com.netflix.spinnaker.kork:kork-jedis-test"
+//  testImplementation "org.powermock:powermock-core:2.0.4"
+//  testImplementation "org.powermock:powermock-api-mockito2:1.7.4"
+//  testImplementation "org.powermock:powermock-module-junit4:2.0.4"
 
   // Add each included authz provider as a runtime dependency
   gradle.includedProviderProjects.each {

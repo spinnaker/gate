@@ -34,7 +34,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import org.springframework.util.MultiValueMap
 import retrofit.Endpoint
 
 @CompileStatic
@@ -63,7 +62,6 @@ class NotificationService {
   }
 
   ResponseEntity<String> processNotificationCallback(String source, RequestEntity<String> request) {
-    String accept = request.getHeaders().getFirst("Accept")?.toLowerCase()
     String contentType = request.getHeaders().getFirst("Content-Type")?.toLowerCase()
 
     if (!contentType) {
@@ -75,7 +73,7 @@ class NotificationService {
     // We use the "raw" OkHttpClient here instead of EchoService because retrofit messes up with the encoding
     // of the body for the x-www-form-urlencoded content type, which is what Slack uses. This allows us to pass
     // the original body unmodified along to echo.
-    Endpoint echoEndpoint = GateConfig.createEndpoint(serviceConfiguration, "echo")
+    Endpoint echoEndpoint = serviceConfiguration.getServiceEndpoint("echo")
 
     Request.Builder builder = new Request.Builder()
       .url(echoEndpoint.url + request.url.path)
