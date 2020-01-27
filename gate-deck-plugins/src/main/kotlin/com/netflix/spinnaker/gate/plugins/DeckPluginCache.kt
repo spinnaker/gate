@@ -59,7 +59,9 @@ class DeckPluginCache(
     registry.timer(refreshDurationId).record {
       log.info("Refreshing plugin cache")
 
-      updateManager.refresh()
+      // TODO(jonsie): Switch back to calling just `updateManager.refresh() after
+      // github.com/pf4j/pf4j-update/pull/48 is released
+      updateManager.repositories.forEach { it.refresh() }
 
       val newCache = updateManager.plugins
         .mapNotNull { pluginInfo ->
