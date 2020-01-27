@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Netflix, Inc.
+ * Copyright 2020 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.netflix.spinnaker.gate.plugins
 
-package com.netflix.spinnaker.gate.model.manageddelivery;
-
-import java.util.Collection;
-import java.util.Map;
-import lombok.Data;
-
-@Data
-public class DeliveryConfig {
-  String apiVersion;
-  String name;
-  String application;
-  String serviceAccount;
-  Collection<Map<String, Object>> artifacts;
-  Collection<Environment> environments;
-}
+/**
+ * A plugin manifest used by Deck to know what plugins should be installed and at what version.
+ *
+ * @param id The plugin ID
+ * @param version The plugin version
+ */
+data class DeckPluginVersion(
+  val id: String,
+  val version: String
+)

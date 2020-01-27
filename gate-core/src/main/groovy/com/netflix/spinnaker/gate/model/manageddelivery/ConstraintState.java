@@ -1,7 +1,7 @@
 /*
- * Copyright 2019 Netflix, Inc.
+ * Copyright 2020 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,16 +16,20 @@
 
 package com.netflix.spinnaker.gate.model.manageddelivery;
 
-import java.util.Collection;
+import java.time.Instant;
 import java.util.Map;
 import lombok.Data;
 
 @Data
-public class DeliveryConfig {
-  String apiVersion;
-  String name;
-  String application;
-  String serviceAccount;
-  Collection<Map<String, Object>> artifacts;
-  Collection<Environment> environments;
+public class ConstraintState {
+  String deliveryConfigName;
+  String environmentName;
+  String artifactVersion;
+  String type;
+  String status;
+  Instant createdAt;
+  String judgedBy;
+  Instant judgedAt;
+  String comment;
+  Map<String, Object> attributes;
 }

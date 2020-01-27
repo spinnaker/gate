@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Netflix, Inc.
+ * Copyright 2020 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.model.manageddelivery;
+apply from: "${project.rootDir}/gradle/kotlin.gradle"
+apply from: "${project.rootDir}/gradle/kotlin-test.gradle"
 
-import java.util.Collection;
-import java.util.Map;
-import lombok.Data;
+dependencies {
+  implementation project(":gate-core")
 
-@Data
-public class DeliveryConfig {
-  String apiVersion;
-  String name;
-  String application;
-  String serviceAccount;
-  Collection<Map<String, Object>> artifacts;
-  Collection<Environment> environments;
+  implementation "com.netflix.spinnaker.kork:kork-plugins"
+  implementation "com.netflix.spinnaker.kork:kork-swagger"
+  implementation "com.netflix.spinnaker.kork:kork-web"
+
+  implementation "org.springframework:spring-web"
+  implementation "org.pf4j:pf4j-update"
 }
