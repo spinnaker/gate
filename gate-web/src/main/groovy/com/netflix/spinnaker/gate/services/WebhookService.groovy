@@ -56,7 +56,7 @@ class WebhookService {
 
   List preconfiguredWebhooks() {
     return AuthenticatedRequest.allowAnonymous({
-      orcaServiceSelector.withContext(RequestContext.get()).preconfiguredWebhooks()
+      orcaServiceSelector.select().preconfiguredWebhooks()
     })
   }
 }

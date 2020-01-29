@@ -53,7 +53,7 @@ class PipelineTemplateService {
   }
 
   Map resolve(String source, String executionId, String pipelineConfigId) {
-    orcaServiceSelector.withContext(RequestContext.get()).resolvePipelineTemplate(source, executionId, pipelineConfigId)
+    orcaServiceSelector.select().resolvePipelineTemplate(source, executionId, pipelineConfigId)
   }
 
   List<PipelineTemplateDependent> getTemplateDependents(@Nonnull String templateId, boolean recursive) {
