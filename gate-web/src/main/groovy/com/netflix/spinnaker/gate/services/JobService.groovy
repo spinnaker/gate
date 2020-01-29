@@ -17,7 +17,6 @@
 package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.gate.config.InsightConfiguration
-import com.netflix.spinnaker.gate.security.RequestContext
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
@@ -45,7 +44,6 @@ class JobService {
   ProviderLookupService providerLookupService
 
   List getPreconfiguredJobs() {
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newListCommand(GROUP, "getPreconfiguredJobs") {
         orcaServiceSelector.select().getPreconfiguredJobs()
     } execute()

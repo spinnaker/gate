@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services
 
-import com.netflix.spinnaker.gate.security.RequestContext
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import com.netflix.spinnaker.security.AuthenticatedRequest

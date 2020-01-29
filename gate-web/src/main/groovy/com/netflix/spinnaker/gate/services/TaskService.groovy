@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.gate.services
 
-import com.netflix.spinnaker.gate.security.RequestContext
+
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
@@ -59,7 +59,6 @@ class TaskService {
   }
 
   Map getTask(String id) {
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newMapCommand(GROUP, "getTask") {
       orcaServiceSelector.select().getTask(id)
     } execute()
@@ -67,7 +66,6 @@ class TaskService {
 
   Map deleteTask(String id) {
     setApplicationForTask(id)
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newMapCommand(GROUP, "deleteTask") {
       orcaServiceSelector.select()deleteTask(id)
     } execute()
@@ -81,7 +79,6 @@ class TaskService {
 
   Map cancelTask(String id) {
     setApplicationForTask(id)
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newMapCommand(GROUP, "cancelTask") {
       orcaServiceSelector.select().cancelTask(id, "")
     } execute()
@@ -89,7 +86,6 @@ class TaskService {
 
   Map cancelTasks(List<String> taskIds) {
     setApplicationForTask(taskIds.get(0))
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newMapCommand(GROUP, "cancelTasks") {
       orcaServiceSelector.select().cancelTasks(taskIds)
     } execute()
@@ -130,7 +126,6 @@ class TaskService {
    */
   @Deprecated
   Map cancelPipeline(String id, String reason) {
-    RequestContext requestContext = RequestContext.get()
     HystrixFactory.newMapCommand(GROUP, "cancelPipeline") {
       orcaServiceSelector.select().cancelPipeline(id, reason, false, "")
     } execute()
