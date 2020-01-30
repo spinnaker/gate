@@ -67,7 +67,7 @@ class TaskService {
   Map deleteTask(String id) {
     setApplicationForTask(id)
     HystrixFactory.newMapCommand(GROUP, "deleteTask") {
-      orcaServiceSelector.select()deleteTask(id)
+      orcaServiceSelector.select().deleteTask(id)
     } execute()
   }
 

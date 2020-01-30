@@ -357,6 +357,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
         def selectorClass = it.config?.selectorClass as Class<ServiceSelector>
         if (selectorClass) {
+          log.debug("Initializing selector class {} with baseUrl={}, priority={}, config={}", selectorClass, it.baseUrl, it.priority, it.config)
           selector = selectorClass.getConstructors()[0].newInstance(
             selector.service, it.priority, it.config
           )
