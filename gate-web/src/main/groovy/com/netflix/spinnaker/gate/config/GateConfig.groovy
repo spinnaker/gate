@@ -31,15 +31,14 @@ import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.config.PostConnectionConfiguringJedisConnectionFactory.ConnectionPostProcessor
 import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
 import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
-import com.netflix.spinnaker.gate.filters.CorsFilter
-import com.netflix.spinnaker.gate.filters.GateOriginValidator
-import com.netflix.spinnaker.gate.filters.OriginValidator
 import com.netflix.spinnaker.gate.plugins.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.retrofit.EurekaOkClient
 import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
+import com.netflix.spinnaker.kork.web.context.AuthenticatedRequestContextProvider
+import com.netflix.spinnaker.kork.web.context.RequestContextProvider
 import com.netflix.spinnaker.kork.web.selector.DefaultServiceSelector
 import com.netflix.spinnaker.kork.web.selector.SelectableService
 import com.netflix.spinnaker.kork.web.selector.ServiceSelector
@@ -82,7 +81,7 @@ import static retrofit.Endpoints.newFixedEndpoint
 @CompileStatic
 @Configuration
 @Slf4j
-@EnableConfigurationProperties(FiatClientConfigurationProperties)
+@EnableConfigurationProperties([FiatClientConfigurationProperties, DynamicRoutingConfigProperties])
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
@@ -164,8 +163,13 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient) {
-    return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient))
+  RequestContextProvider requestContextProvider() {
+    return new AuthenticatedRequestContextProvider();
+  }
+
+  @Bean
+  OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient, RequestContextProvider contextProvider) {
+    return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient), contextProvider)
   }
 
   @Bean
@@ -191,17 +195,43 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService, OkHttpClient okHttpClient) {
-    // support named clouddriver service clients
-    Map<String, ClouddriverService> dynamicServices = [:]
+  ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
+                                                        OkHttpClient okHttpClient,
+                                                        DynamicConfigService dynamicConfigService,
+                                                        DynamicRoutingConfigProperties properties,
+                                                        RequestContextProvider contextProvider
+  ) {
     if (serviceConfiguration.getService("clouddriver").getConfig().containsKey("dynamicEndpoints")) {
       def endpoints = (Map<String, String>) serviceConfiguration.getService("clouddriver").getConfig().get("dynamicEndpoints")
-      dynamicServices = (Map<String, ClouddriverService>) endpoints.collectEntries { k, v ->
-        [k, createClient("clouddriver", ClouddriverService, okHttpClient, k, false)]
+      // translates the following config:
+      //   dynamicEndpoints:
+      //     deck: url
+
+      // into a SelectableService that would be produced by an equivalent config:
+      //   baseUrl: url
+      //   config:
+      //     selectorClass: com.netflix.spinnaker.kork.web.selector.ByUserOriginSelector
+      //     priority: 2
+      //     origin: deck
+
+      def defaultSelector = new DefaultServiceSelector(
+        defaultClouddriverService,
+        1,
+        null)
+
+      List<ServiceSelector> selectors = []
+      endpoints.each { sourceApp, url ->
+        def client = new EurekaOkClient(okHttpClient, registry, "clouddriver", eurekaLookupService)
+        def service = buildService(client, ClouddriverService, newFixedEndpoint(url))
+        selectors << new ByUserOriginSelector(service, 2, sourceApp)
       }
+
+      return new ClouddriverServiceSelector(
+          new SelectableService(selectors + defaultSelector), dynamicConfigService, contextProvider)
     }
 
-    return new ClouddriverServiceSelector(defaultClouddriverService, dynamicServices)
+    SelectableService selectableService = createClientSelector("clouddriver", ClouddriverService, okHttpClient)
+    return new ClouddriverServiceSelector(selectableService, dynamicConfigService, contextProvider)
   }
 
   //---- semi-optional components:
@@ -327,6 +357,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
         def selectorClass = it.config?.selectorClass as Class<ServiceSelector>
         if (selectorClass) {
+          log.debug("Initializing selector class {} with baseUrl={}, priority={}, config={}", selectorClass, it.baseUrl, it.priority, it.config)
           selector = selectorClass.getConstructors()[0].newInstance(
             selector.service, it.priority, it.config
           )
