@@ -91,6 +91,9 @@ interface ClouddriverService {
   @GET("/applications/{name}")
   Map getApplication(@Path("name") String name)
 
+  @GET("/applications/{application}/autoscalers")
+  List<Map> getAutoscalersForApplication(@Path("application") String application)
+
   @Headers("Accept: application/json")
   @GET("/applications/{name}/clusters")
   Map getClusters(@Path("name") String name)
