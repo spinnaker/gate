@@ -1,3 +1,7 @@
+spring:
+  application:
+    name: gate
+
 services:
   clouddriver.baseUrl: "http://localhost:7002"
 
@@ -40,3 +44,12 @@ spring:
 cors:
   allowedOriginsPattern: '^https?://(?:localhost|[^/]+\.somewhere\.net)(?::[1-9]\d*)?/?$'
   expectLocalhost: true
+
+---
+
+spring:
+  profiles: test
+
+spinnaker:
+  extensions:
+    applicationName: spinnakerpluginstest

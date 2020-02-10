@@ -17,6 +17,8 @@
  */
 package com.netflix.spinnaker.gate.services.internal;
 
+import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintState;
+import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import java.util.List;
@@ -59,8 +61,23 @@ public interface KeelService {
   @POST("/delivery-configs")
   DeliveryConfig upsertManifest(@Body DeliveryConfig manifest);
 
+  @DELETE("/delivery-configs/{name}")
+  DeliveryConfig deleteManifest(@Path("name") String name);
+
   @POST("/delivery-configs/diff")
   List<Map> diffManifest(@Body DeliveryConfig manifest);
+
+  @GET("/delivery-configs/{name}/environment/{environment}/constraints")
+  List<ConstraintState> getConstraintState(
+      @Path("name") String name,
+      @Path("environment") String environment,
+      @Query("limit") Integer limit);
+
+  @POST("/delivery-configs/{name}/environment/{environment}/constraint")
+  Response updateConstraintStatus(
+      @Path("name") String name,
+      @Path("environment") String environment,
+      @Body ConstraintStatus status);
 
   @GET("/application/{application}")
   Map getApplicationDetails(
