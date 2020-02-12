@@ -67,6 +67,9 @@ allprojects {
     configurations.all {
       exclude group: 'javax.servlet', module: 'servlet-api'
       exclude group: 'javax.servlet', module: 'javax.servlet-api'
+      resolutionStrategy {
+        force group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.+' // remove CVE-2019-10173, bump xstream dependency
+      }
     }
 
     tasks.withType(JavaExec) {
