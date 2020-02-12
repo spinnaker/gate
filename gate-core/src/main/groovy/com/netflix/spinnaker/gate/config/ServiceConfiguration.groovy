@@ -63,6 +63,7 @@ class ServiceConfiguration {
 
     Endpoint endpoint
     if (dynamicName == null) {
+      // TODO: move Netflix-specific logic out of the OSS implementation
       endpoint = discoveryHosts && service.vipAddress ?
         newFixedEndpoint("niws://${service.vipAddress}")
         : newFixedEndpoint(service.baseUrl)
