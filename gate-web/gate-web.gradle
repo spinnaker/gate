@@ -15,7 +15,6 @@ repositories {
   maven {
     url 'https://repo.spring.io/libs-snapshot'
   }
-  mavenCentral()
 }
 
 dependencies {
