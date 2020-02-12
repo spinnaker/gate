@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.spinnaker.gate.plugins
+package com.netflix.spinnaker.gate.plugins.deck
 
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.kork.plugins.bundle.PluginBundleExtractor
@@ -34,7 +34,7 @@ open class DeckPluginConfiguration {
     updateManager: SpinnakerUpdateManager,
     registry: Registry
   ): DeckPluginCache =
-    DeckPluginCache(updateManager, PluginBundleExtractor(), registry)
+      DeckPluginCache(updateManager, PluginBundleExtractor(), registry)
 
   @Bean
   open fun deckPluginService(
@@ -44,5 +44,5 @@ open class DeckPluginConfiguration {
 
   @Bean
   open fun deckPluginsController(pluginService: DeckPluginService): DeckPluginsController =
-    DeckPluginsController(pluginService)
+      DeckPluginsController(pluginService)
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.spinnaker.gate.plugins
+package com.netflix.spinnaker.gate.plugins.deck
 
 /**
  * A plugin manifest used by Deck to know what plugins should be installed and at what version.
