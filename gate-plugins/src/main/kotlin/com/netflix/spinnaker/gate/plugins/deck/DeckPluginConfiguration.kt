@@ -26,7 +26,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @Configuration
 @ConditionalOnProperty("spinnaker.extensibility.deck-proxy.enabled", matchIfMissing = true)
-@ComponentScan("com.netflix.spinnaker.gate.plugins")
+@ComponentScan("com.netflix.spinnaker.gate.plugins.deck")
 @EnableScheduling
 open class DeckPluginConfiguration {
   @Bean
