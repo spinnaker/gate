@@ -43,7 +43,7 @@ class NotificationService {
   @Autowired(required = false)
   Front50Service front50Service
 
-  @Autowired(required = false)
+  @Autowired
   OkHttpClient okHttpClient
 
   @Autowired
