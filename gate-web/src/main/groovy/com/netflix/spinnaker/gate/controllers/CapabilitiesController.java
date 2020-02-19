@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
+import com.netflix.spinnaker.gate.services.internal.EchoService;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CapabilitiesController {
 
   private final OrcaServiceSelector orcaService;
+  private final EchoService echoService;
 
   @ApiOperation(value = "Retrieve the list configured deployment monitors", response = List.class)
   @GetMapping(value = "/deploymentMonitors")
@@ -44,5 +46,11 @@ public class CapabilitiesController {
   @GetMapping(value = "/expressions")
   Map getExpressionCapabilities() {
     return orcaService.select().getExpressionCapabilities();
+  }
+
+  @ApiOperation(value = "Retrieve the current state of the quiet period", response = Map.class)
+  @GetMapping(value = "/quietPeriod")
+  Map getQuietPeriodState() {
+    return echoService.getQuietPeriodState();
   }
 }
