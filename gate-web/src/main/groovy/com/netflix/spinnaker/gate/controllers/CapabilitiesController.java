@@ -21,18 +21,23 @@ import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/capabilities")
-@RequiredArgsConstructor
 public class CapabilitiesController {
-
   private final OrcaServiceSelector orcaService;
-  private final EchoService echoService;
+  private final Optional<EchoService> echoService;
+
+  @Autowired
+  CapabilitiesController(OrcaServiceSelector orcaService, Optional<EchoService> echoService) {
+    this.orcaService = orcaService;
+    this.echoService = echoService;
+  }
 
   @ApiOperation(value = "Retrieve the list configured deployment monitors", response = List.class)
   @GetMapping(value = "/deploymentMonitors")
@@ -51,6 +56,6 @@ public class CapabilitiesController {
   @ApiOperation(value = "Retrieve the current state of the quiet period", response = Map.class)
   @GetMapping(value = "/quietPeriod")
   Map getQuietPeriodState() {
-    return echoService.getQuietPeriodState();
+    return echoService.map(EchoService::getQuietPeriodState).orElse(null);
   }
 }
