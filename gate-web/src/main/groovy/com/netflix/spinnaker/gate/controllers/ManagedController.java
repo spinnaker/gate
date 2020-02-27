@@ -10,7 +10,6 @@ import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -146,8 +145,8 @@ public class ManagedController {
         try {
           return ResponseEntity.badRequest()
               .body(objectMapper.readValue(e.getResponse().getBody().in(), Map.class));
-        } catch (IOException ioe) {
-          log.error("Error parsing error response from keel: {}", ioe.getMessage(), ioe);
+        } catch (Exception ex) {
+          log.error("Error parsing error response from keel: {}", ex.getMessage(), ex);
           return ResponseEntity.badRequest().body(Collections.emptyMap());
         }
       } else {
