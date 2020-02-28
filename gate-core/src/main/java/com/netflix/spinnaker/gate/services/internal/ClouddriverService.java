@@ -384,6 +384,9 @@ public interface ClouddriverService {
   @GET("/installedPlugins")
   List<SpinnakerPluginDescriptor> getInstalledPlugins();
 
+  @GET("/yandex/serviceAcounts/{account}")
+  List<Map> getServiceAccounts(@Path(value = "account") String account);
+
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   class Account {
