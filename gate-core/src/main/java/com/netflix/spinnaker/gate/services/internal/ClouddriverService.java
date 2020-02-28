@@ -381,6 +381,9 @@ public interface ClouddriverService {
   @GET("/applications/{name}/functions")
   List<Map> getApplicationFunctions(@Path("name") String appName);
 
+  @GET("/yandex/serviceAcounts/{account}")
+  List<Map> getServiceAccounts(@Path(value = "account") String account);
+
   @GET("/installedPlugins")
   List<SpinnakerPluginDescriptor> getInstalledPlugins();
 

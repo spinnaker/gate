@@ -57,7 +57,14 @@ class CorsFilter implements Filter {
     response.setHeader("Access-Control-Max-Age", "3600")
     response.setHeader("Access-Control-Allow-Headers", "x-requested-with, content-type, authorization, X-RateLimit-App, X-Spinnaker-Priority")
     response.setHeader("Access-Control-Expose-Headers", [Headers.AUTHENTICATION_REDIRECT_HEADER_NAME].join(", "))
-    chain.doFilter(req, res)
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+//      https://stackoverflow.com/questions/40418441/spring-security-cors-filter
+      //https://stackoverflow.com/questions/49717573/property-security-basic-enabled-is-deprecated-the-security-auto-configuration
+      //https://github.com/spring-projects/spring-boot/issues/5834
+      response.setStatus(HttpServletResponse.SC_OK)
+    } else {
+      chain.doFilter(req, res)
+    }
   }
 
   @Override
