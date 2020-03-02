@@ -37,7 +37,7 @@ public class CiController {
 
   @RequestMapping(value = "/builds", method = RequestMethod.GET)
   List getBuilds(
-      @RequestParam(value = "projectKey", required = false) String projectKey,
+      @RequestParam(value = "projectKey") String projectKey,
       @RequestParam(value = "repoSlug") String repoSlug,
       @RequestParam(value = "completionStatus", required = false) String completionStatus) {
     return ciService.getBuilds(projectKey, repoSlug, completionStatus);
