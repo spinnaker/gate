@@ -28,7 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ci")
 public class CiController {
 
-  @Autowired private CiService ciService;
+  private CiService ciService;
+
+  @Autowired
+  public CiController(CiService ciService) {
+    this.ciService = ciService;
+  }
 
   @RequestMapping(value = "/builds", method = RequestMethod.GET)
   List getBuilds(

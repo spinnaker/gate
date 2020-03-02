@@ -18,13 +18,11 @@ package com.netflix.spinnaker.gate.services;
 
 import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.IgorService;
-import groovy.transform.CompileStatic;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@CompileStatic
 @Component
 public class CiService {
 
@@ -39,7 +37,8 @@ public class CiService {
 
   public List getBuilds(String projectKey, String repoSlug, String completionStatus) {
     if (!igorService.isPresent()) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Operation not supported because igor service is not configured");
     }
     return HystrixFactory.newListCommand(
             GROUP,
