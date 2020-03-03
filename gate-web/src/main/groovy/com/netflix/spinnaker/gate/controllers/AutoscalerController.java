@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/applications/{application}/autoscalers")
-public class AutoscalerController {
+final class AutoscalerController {
   private final AutoscalerService autoscalerService;
 
   @Autowired

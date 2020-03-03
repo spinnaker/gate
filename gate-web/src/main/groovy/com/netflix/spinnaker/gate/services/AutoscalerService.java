@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AutoscalerService {
+public final class AutoscalerService {
   private final ClouddriverService clouddriverService;
 
   @Autowired
