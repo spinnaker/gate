@@ -190,7 +190,8 @@ public class ManagedController {
       @PathVariable("application") String application,
       @RequestParam(name = "includeDetails", required = false, defaultValue = "false")
           Boolean includeDetails,
-      @RequestParam(name = "entities", required = false, defaultValue = "") List<String> entities) {
+      @RequestParam(name = "entities", required = false, defaultValue = "resources")
+          List<String> entities) {
     return keelService.getApplicationDetails(application, includeDetails, entities);
   }
 
