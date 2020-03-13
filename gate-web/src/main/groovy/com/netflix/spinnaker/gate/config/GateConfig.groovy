@@ -19,9 +19,12 @@ package com.netflix.spinnaker.gate.config
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.jakewharton.retrofit.Ok3Client
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spectator.api.Registry
-import com.netflix.spinnaker.config.OkHttpClientConfiguration
+import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
+import com.netflix.spinnaker.config.PluginsAutoConfiguration
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
@@ -30,22 +33,22 @@ import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.config.PostConnectionConfiguringJedisConnectionFactory.ConnectionPostProcessor
 import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
 import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
-import com.netflix.spinnaker.gate.filters.CorsFilter
-import com.netflix.spinnaker.gate.filters.GateOriginValidator
-import com.netflix.spinnaker.gate.filters.OriginValidator
-import com.netflix.spinnaker.gate.retrofit.EurekaOkClient
+import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
+import com.netflix.spinnaker.gate.plugins.publish.PluginPublishConfiguration
 import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
+import com.netflix.spinnaker.kork.web.context.AuthenticatedRequestContextProvider
+import com.netflix.spinnaker.kork.web.context.RequestContextProvider
 import com.netflix.spinnaker.kork.web.selector.DefaultServiceSelector
 import com.netflix.spinnaker.kork.web.selector.SelectableService
 import com.netflix.spinnaker.kork.web.selector.ServiceSelector
+import com.netflix.spinnaker.okhttp.OkHttp3MetricsInterceptor
 import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
-import com.netflix.spinnaker.okhttp.OkHttpMetricsInterceptor
-import com.squareup.okhttp.OkHttpClient
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -55,6 +58,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
@@ -79,7 +83,8 @@ import static retrofit.Endpoints.newFixedEndpoint
 @CompileStatic
 @Configuration
 @Slf4j
-@EnableConfigurationProperties(FiatClientConfigurationProperties)
+@EnableConfigurationProperties([FiatClientConfigurationProperties, DynamicRoutingConfigProperties])
+@Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginPublishConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
   @Value('${server.session.timeout-in-seconds:3600}')
@@ -150,6 +155,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
     ObjectMapper objectMapper = new ObjectMapper()
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+      .registerModule(new JavaTimeModule())
 
     return new JsonHttpMessageConverter(objectMapper)
   }
@@ -160,8 +166,13 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient) {
-    return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient))
+  RequestContextProvider requestContextProvider() {
+    return new AuthenticatedRequestContextProvider();
+  }
+
+  @Bean
+  OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient, RequestContextProvider contextProvider) {
+    return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient), contextProvider)
   }
 
   @Bean
@@ -187,17 +198,42 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService, OkHttpClient okHttpClient) {
-    // support named clouddriver service clients
-    Map<String, ClouddriverService> dynamicServices = [:]
+  ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
+                                                        OkHttpClient okHttpClient,
+                                                        DynamicConfigService dynamicConfigService,
+                                                        DynamicRoutingConfigProperties properties,
+                                                        RequestContextProvider contextProvider
+  ) {
     if (serviceConfiguration.getService("clouddriver").getConfig().containsKey("dynamicEndpoints")) {
       def endpoints = (Map<String, String>) serviceConfiguration.getService("clouddriver").getConfig().get("dynamicEndpoints")
-      dynamicServices = (Map<String, ClouddriverService>) endpoints.collectEntries { k, v ->
-        [k, createClient("clouddriver", ClouddriverService, okHttpClient, k, false)]
+      // translates the following config:
+      //   dynamicEndpoints:
+      //     deck: url
+
+      // into a SelectableService that would be produced by an equivalent config:
+      //   baseUrl: url
+      //   config:
+      //     selectorClass: com.netflix.spinnaker.kork.web.selector.ByUserOriginSelector
+      //     priority: 2
+      //     origin: deck
+
+      def defaultSelector = new DefaultServiceSelector(
+        defaultClouddriverService,
+        1,
+        null)
+
+      List<ServiceSelector> selectors = []
+      endpoints.each { sourceApp, url ->
+        def service = buildService(okHttpClient, ClouddriverService, newFixedEndpoint(url))
+        selectors << new ByUserOriginSelector(service, 2, ['origin': (Object) sourceApp])
       }
+
+      return new ClouddriverServiceSelector(
+        new SelectableService(selectors + defaultSelector), dynamicConfigService, contextProvider)
     }
 
-    return new ClouddriverServiceSelector(defaultClouddriverService, dynamicServices)
+    SelectableService selectableService = createClientSelector("clouddriver", ClouddriverService, okHttpClient)
+    return new ClouddriverServiceSelector(selectableService, dynamicConfigService, contextProvider)
   }
 
   //---- semi-optional components:
@@ -239,13 +275,13 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty('services.kayenta.enabled')
   KayentaService kayentaService(OkHttpClient defaultClient,
                                 OkHttpClientConfigurationProperties props,
-                                OkHttpMetricsInterceptor interceptor,
+                                OkHttp3MetricsInterceptor interceptor,
                                 @Value('${services.kayenta.externalhttps:false}') boolean kayentaExternalHttps) {
     if (kayentaExternalHttps) {
       def noSslCustomizationProps = props.clone()
       noSslCustomizationProps.keyStore = null
       noSslCustomizationProps.trustStore = null
-      def okHttpClient = new OkHttpClientConfiguration(noSslCustomizationProps, interceptor).create()
+      def okHttpClient = new OkHttp3ClientConfiguration(noSslCustomizationProps, interceptor).create().build()
       createClient "kayenta", KayentaService, okHttpClient
     } else {
       createClient "kayenta", KayentaService, defaultClient
@@ -272,32 +308,22 @@ class GateConfig extends RedisHttpSessionConfiguration {
       return null
     }
 
-    Endpoint endpoint
-    if (dynamicName == null) {
-      endpoint = serviceConfiguration.discoveryHosts && service.vipAddress ?
-        newFixedEndpoint("niws://${service.vipAddress}")
-        : newFixedEndpoint(service.baseUrl)
-    } else {
-      if (!service.getConfig().containsKey("dynamicEndpoints")) {
-        throw new IllegalArgumentException("Unknown dynamicEndpoint ${dynamicName} for service ${serviceName} of type ${type}")
-      }
-      endpoint = newFixedEndpoint(((Map<String, String>) service.getConfig().get("dynamicEndpoints")).get(dynamicName))
-    }
+    Endpoint endpoint = serviceConfiguration.getServiceEndpoint(serviceName, dynamicName)
 
-    def client = new EurekaOkClient(okHttpClient, registry, serviceName, eurekaLookupService)
-    buildService(client, type, endpoint)
+    buildService(okHttpClient, type, endpoint)
   }
 
-  private <T> T buildService(EurekaOkClient client, Class<T> type, Endpoint endpoint) {
+  private <T> T buildService(OkHttpClient client, Class<T> type, Endpoint endpoint) {
     // New role providers break deserialization if this is not enabled.
     ObjectMapper objectMapper = new ObjectMapper()
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+      .registerModule(new JavaTimeModule())
 
     new RestAdapter.Builder()
       .setRequestInterceptor(spinnakerRequestInterceptor)
       .setEndpoint(endpoint)
-      .setClient(client)
+      .setClient(new Ok3Client(client))
       .setConverter(new JacksonConverter(objectMapper))
       .setLogLevel(RestAdapter.LogLevel.valueOf(retrofitLogLevel))
       .setLog(new Slf4jRetrofitLogger(type))
@@ -315,7 +341,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       service.getBaseUrls().collect {
         def selector = new DefaultServiceSelector(
           buildService(
-            new EurekaOkClient(okHttpClient, registry, serviceName, eurekaLookupService),
+            okHttpClient,
             type,
             newFixedEndpoint(it.baseUrl)),
           it.priority,
@@ -323,6 +349,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
         def selectorClass = it.config?.selectorClass as Class<ServiceSelector>
         if (selectorClass) {
+          log.debug("Initializing selector class {} with baseUrl={}, priority={}, config={}", selectorClass, it.baseUrl, it.priority, it.config)
           selector = selectorClass.getConstructors()[0].newInstance(
             selector.service, it.priority, it.config
           )

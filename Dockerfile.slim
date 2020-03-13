@@ -1,7 +1,8 @@
-FROM openjdk:8-jre-alpine
-MAINTAINER delivery-engineering@netflix.com
-COPY --from=compile /compiled_sources/gate-web/build/install/gate /opt/gate
-RUN apk --no-cache add --update bash
+FROM alpine:3.11
+MAINTAINER sig-platform@spinnaker.io
+COPY gate-web/build/install/gate /opt/gate
+RUN apk --no-cache add --update bash openjdk11-jre
 RUN adduser -D -S spinnaker
+RUN mkdir -p /opt/gate/plugins && chown -R spinnaker:nogroup /opt/gate/plugins
 USER spinnaker
 CMD ["/opt/gate/bin/gate"]

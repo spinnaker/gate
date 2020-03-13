@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services;
 
-import com.netflix.spinnaker.gate.security.RequestContext;
 import com.netflix.spinnaker.gate.services.PipelineTemplateService.PipelineTemplateDependent;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
@@ -47,11 +46,17 @@ public class V2PipelineTemplateService {
   }
 
   public Map<String, Object> plan(Map<String, Object> pipeline) {
-    return orcaServiceSelector.withContext(RequestContext.get()).plan(pipeline);
+    return orcaServiceSelector.select().plan(pipeline);
   }
 
+  // TODO(louisjimenez): Deprecated. Will be replaced with /versions endpoint starting with 1.19.
   public List<Map> findByScope(List<String> scopes) {
     return front50Service.getV2PipelineTemplates(
+        scopes == null ? null : (String[]) scopes.toArray());
+  }
+
+  public Map<String, List<Map>> findVersionsByScope(List<String> scopes) {
+    return front50Service.getV2PipelineTemplatesVersions(
         scopes == null ? null : (String[]) scopes.toArray());
   }
 
