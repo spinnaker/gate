@@ -44,6 +44,7 @@ allprojects {
     dependencies {
       implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
       annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
       testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
       compileOnly "org.projectlombok:lombok"
       annotationProcessor "org.projectlombok:lombok"
@@ -51,6 +52,7 @@ allprojects {
 
       implementation "org.codehaus.groovy:groovy-all"
       implementation "net.logstash.logback:logstash-logback-encoder"
+      implementation "org.jetbrains.kotlin:kotlin-reflect"
       runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
       testRuntime "org.springframework.boot:spring-boot-properties-migrator"
 

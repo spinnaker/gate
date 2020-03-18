@@ -16,25 +16,33 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
-import com.netflix.spinnaker.gate.security.RequestContext;
+import com.netflix.spinnaker.gate.services.internal.EchoService;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/capabilities")
-@RequiredArgsConstructor
 public class CapabilitiesController {
-
   private final OrcaServiceSelector orcaService;
+  private final Optional<EchoService> echoService;
+
+  @Autowired
+  CapabilitiesController(OrcaServiceSelector orcaService, Optional<EchoService> echoService) {
+    this.orcaService = orcaService;
+    this.echoService = echoService;
+  }
 
   @ApiOperation(value = "Retrieve the list configured deployment monitors", response = List.class)
   @GetMapping(value = "/deploymentMonitors")
   List<Object> getDeploymentMonitors() {
-    return orcaService.withContext(RequestContext.get()).getDeploymentMonitors();
+    return orcaService.select().getDeploymentMonitors();
   }
 
   @ApiOperation(
@@ -42,6 +50,12 @@ public class CapabilitiesController {
       response = Map.class)
   @GetMapping(value = "/expressions")
   Map getExpressionCapabilities() {
-    return orcaService.withContext(RequestContext.get()).getExpressionCapabilities();
+    return orcaService.select().getExpressionCapabilities();
+  }
+
+  @ApiOperation(value = "Retrieve the current state of the quiet period", response = Map.class)
+  @GetMapping(value = "/quietPeriod")
+  Map getQuietPeriodState() {
+    return echoService.map(EchoService::getQuietPeriodState).orElse(null);
   }
 }

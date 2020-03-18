@@ -17,14 +17,17 @@
  */
 package com.netflix.spinnaker.gate.services.internal;
 
-import com.netflix.spinnaker.kork.manageddelivery.model.DeliveryConfig;
-import com.netflix.spinnaker.kork.manageddelivery.model.Resource;
+import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintState;
+import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
+import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
+import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -53,21 +56,52 @@ public interface KeelService {
   @GET("/delivery-configs/{name}")
   DeliveryConfig getManifest(@Path("name") String name);
 
+  @GET("/delivery-configs/{name}/artifacts")
+  List<Map<String, Object>> getManifestArtifacts(@Path("name") String name);
+
   @POST("/delivery-configs")
+  @Headers("Accept: application/json")
   DeliveryConfig upsertManifest(@Body DeliveryConfig manifest);
+
+  @DELETE("/delivery-configs/{name}")
+  DeliveryConfig deleteManifest(@Path("name") String name);
 
   @POST("/delivery-configs/diff")
   List<Map> diffManifest(@Body DeliveryConfig manifest);
 
+  @POST("/delivery-configs/validate")
+  @Headers("Accept: application/json")
+  Map validateManifest(@Body DeliveryConfig manifest);
+
+  @GET("/delivery-configs/{name}/environment/{environment}/constraints")
+  List<ConstraintState> getConstraintState(
+      @Path("name") String name,
+      @Path("environment") String environment,
+      @Query("limit") Integer limit);
+
+  @POST("/delivery-configs/{name}/environment/{environment}/constraint")
+  Response updateConstraintStatus(
+      @Path("name") String name,
+      @Path("environment") String environment,
+      @Body ConstraintStatus status);
+
   @GET("/application/{application}")
   Map getApplicationDetails(
-      @Path("application") String application, @Query("includeDetails") Boolean includeDetails);
+      @Path("application") String application,
+      @Query("includeDetails") Boolean includeDetails,
+      @Query("entities") List<String> entities);
 
-  @POST("/vetos/{name}")
-  Response passVetoMessage(@Path("name") String name, @Body Map<String, Object> message);
+  @POST("/application/{application}/pause")
+  Response pauseApplication(@Path("application") String application, @Body Map requestBody);
 
-  @GET("/vetos/{name}/rejections")
-  List<String> getVetoRejections(@Path("name") String name);
+  @DELETE("/application/{application}/pause")
+  Response resumeApplication(@Path("application") String application);
+
+  @POST("/resources/{name}/pause")
+  Response pauseResource(@Path("name") String name, @Body Map requestBody);
+
+  @DELETE("/resources/{name}/pause")
+  Response resumeResource(@Path("name") String name);
 
   @GET("/export/{cloudProvider}/{account}/{type}/{name}")
   Resource exportResource(
