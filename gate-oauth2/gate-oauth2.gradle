@@ -1,3 +1,6 @@
+repositories {
+  maven { url "https://repo.spring.io/milestone" }
+}
 dependencies {
   implementation project(":gate-core")
   implementation "com.netflix.spectator:spectator-api"
@@ -5,6 +8,6 @@ dependencies {
   implementation "com.netflix.spinnaker.kork:kork-exceptions"
   implementation "com.netflix.spinnaker.kork:kork-security"
   implementation "com.squareup.retrofit:converter-simplexml"
-  implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
+  implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.3.0.M2"
   implementation "org.springframework.session:spring-session-core"
 }
