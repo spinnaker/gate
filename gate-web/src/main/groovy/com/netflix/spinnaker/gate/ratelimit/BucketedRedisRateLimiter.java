@@ -17,24 +17,34 @@ package com.netflix.spinnaker.gate.ratelimit;
 
 import java.util.Calendar;
 import java.util.Date;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
-public class RedisRateLimiter implements RateLimiter {
+public class BucketedRedisRateLimiter implements RateLimiter {
 
-  private static final Logger log = LoggerFactory.getLogger(RedisRateLimiter.class);
+  private static final Logger log = LoggerFactory.getLogger(BucketedRedisRateLimiter.class);
 
   JedisPool jedisPool;
 
-  public RedisRateLimiter(JedisPool jedisPool) {
+  public BucketedRedisRateLimiter(JedisPool jedisPool) {
     this.jedisPool = jedisPool;
   }
 
+  private static String getRedisKey(String name) {
+    return "rateLimit:" + name;
+  }
+
   @Override
-  public Rate incrementAndGetRate(RateLimitPrincipal principal) {
+  public Rate incrementRate(
+      @Nonnull RateLimitPrincipal principal,
+      @Nonnull HttpServletRequest request,
+      @Nullable String handlerMethod) {
     String key = getRedisKey(principal.getName());
 
     try (Jedis jedis = jedisPool.getResource()) {
@@ -65,12 +75,9 @@ public class RedisRateLimiter implements RateLimiter {
       rate.capacity = 0;
       rate.remaining = 0;
       rate.reset = new Date().getTime();
+      rate.requestCost = 1;
       return rate;
     }
-  }
-
-  private static String getRedisKey(String name) {
-    return "rateLimit:" + name;
   }
 
   private static class Bucket {
@@ -129,6 +136,7 @@ public class RedisRateLimiter implements RateLimiter {
       rate.remaining = Math.max(remaining, 0);
       rate.reset = reset.getTime();
       rate.throttled = remaining < 0;
+      rate.requestCost = 1;
       return rate;
     }
   }

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("rate-limit")
-public class RateLimiterConfiguration {
+public class RateLimiterConfigProperties {
 
   /**
    * When learning mode is enabled, principals that go over their allocated rate limit will not
@@ -36,6 +36,8 @@ public class RateLimiterConfiguration {
   /**
    * The number of seconds for each rate limit bucket. Capacity will be filled at the beginning of
    * each rate interval.
+   *
+   * <p>If using a sliding window rate limiter, this value will be treated as "3600" - an hour.
    */
   private int rateSeconds = 10;
 

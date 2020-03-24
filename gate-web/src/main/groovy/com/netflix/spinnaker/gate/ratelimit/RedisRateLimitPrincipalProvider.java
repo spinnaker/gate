@@ -17,7 +17,7 @@ package com.netflix.spinnaker.gate.ratelimit;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
 
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration;
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +34,12 @@ public class RedisRateLimitPrincipalProvider extends AbstractRateLimitPrincipalP
   private static final Logger log = LoggerFactory.getLogger(RedisRateLimitPrincipalProvider.class);
 
   private JedisPool jedisPool;
-  private RateLimiterConfiguration rateLimiterConfiguration;
+  private RateLimiterConfigProperties rateLimiterConfiguration;
 
   private boolean supportsDeckSourceApp;
 
   public RedisRateLimitPrincipalProvider(
-      JedisPool jedisPool, RateLimiterConfiguration rateLimiterConfiguration) {
+      JedisPool jedisPool, RateLimiterConfigProperties rateLimiterConfiguration) {
     this.jedisPool = jedisPool;
     this.rateLimiterConfiguration = rateLimiterConfiguration;
 
@@ -196,7 +196,7 @@ public class RedisRateLimitPrincipalProvider extends AbstractRateLimitPrincipalP
 
     return rateLimiterConfiguration.getCapacityBySourceApp().stream()
         .filter(o -> o.getSourceApp().equalsIgnoreCase(sourceApp))
-        .map(RateLimiterConfiguration.SourceAppOverride::getOverride)
+        .map(RateLimiterConfigProperties.SourceAppOverride::getOverride)
         .findFirst();
   }
 

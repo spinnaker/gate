@@ -15,7 +15,7 @@
  */
 package com.netflix.spinnaker.gate.ratelimit;
 
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration.PrincipalOverride;
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties.PrincipalOverride;
 import java.util.List;
 
 public abstract class AbstractRateLimitPrincipalProvider implements RateLimitPrincipalProvider {

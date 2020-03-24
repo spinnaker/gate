@@ -23,12 +23,38 @@ public class Rate {
   static final String REMAINING_HEADER = "X-RateLimit-Remaining";
   static final String RESET_HEADER = "X-RateLimit-Reset";
   static final String LEARNING_HEADER = "X-RateLimit-Learning";
+  static final String REQUEST_COST = "X-RateLimit-RequestCost";
 
   Integer capacity;
   Integer rateSeconds;
   Integer remaining;
   Long reset;
   Boolean throttled;
+  Integer requestCost;
+
+  public void setCapacity(Integer capacity) {
+    this.capacity = capacity;
+  }
+
+  public void setRateSeconds(Integer rateSeconds) {
+    this.rateSeconds = rateSeconds;
+  }
+
+  public void setRemaining(Integer remaining) {
+    this.remaining = remaining;
+  }
+
+  public void setReset(Long reset) {
+    this.reset = reset;
+  }
+
+  public void setThrottled(Boolean throttled) {
+    this.throttled = throttled;
+  }
+
+  public void setRequestCost(Integer requestCost) {
+    this.requestCost = requestCost;
+  }
 
   public boolean isThrottled() {
     return throttled;
@@ -39,5 +65,6 @@ public class Rate {
     response.setIntHeader(REMAINING_HEADER, remaining);
     response.setDateHeader(RESET_HEADER, reset);
     response.setHeader(LEARNING_HEADER, learning.toString());
+    response.setIntHeader(REQUEST_COST, requestCost);
   }
 }

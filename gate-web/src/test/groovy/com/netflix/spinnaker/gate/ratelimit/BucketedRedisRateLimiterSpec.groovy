@@ -21,7 +21,9 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 
-class RedisRateLimiterSpec extends Specification {
+import javax.servlet.http.HttpServletRequest
+
+class BucketedRedisRateLimiterSpec extends Specification {
 
   static int port
 
@@ -41,13 +43,13 @@ class RedisRateLimiterSpec extends Specification {
 
   def 'should create new bucket for unknown principal'() {
     given:
-    RedisRateLimiter subject = new RedisRateLimiter((JedisPool) embeddedRedis.pool)
+    BucketedRedisRateLimiter subject = new BucketedRedisRateLimiter((JedisPool) embeddedRedis.pool)
 
     and:
     RateLimitPrincipal principal = new RateLimitPrincipal('user@example.com', 10, 10, true)
 
     when:
-    Rate rate = subject.incrementAndGetRate(principal)
+    Rate rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     noExceptionThrown()
@@ -59,13 +61,13 @@ class RedisRateLimiterSpec extends Specification {
 
   def 'should fill bucket after expiry'() {
     given:
-    RedisRateLimiter subject = new RedisRateLimiter((JedisPool) embeddedRedis.pool)
+    BucketedRedisRateLimiter subject = new BucketedRedisRateLimiter((JedisPool) embeddedRedis.pool)
 
     and:
     RateLimitPrincipal principal = new RateLimitPrincipal('user@example.com', 1, 10, true)
 
     when:
-    Rate rate = subject.incrementAndGetRate(principal)
+    Rate rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     noExceptionThrown()
@@ -73,7 +75,7 @@ class RedisRateLimiterSpec extends Specification {
     rate.remaining == 9
 
     when:
-    rate = subject.incrementAndGetRate(principal)
+    rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     rate.capacity == 10
@@ -81,7 +83,7 @@ class RedisRateLimiterSpec extends Specification {
 
     when:
     sleep(1000)
-    rate = subject.incrementAndGetRate(principal)
+    rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     rate.remaining == 9
@@ -89,28 +91,28 @@ class RedisRateLimiterSpec extends Specification {
 
   def 'should throttle after bucket empties'() {
     given:
-    RedisRateLimiter subject = new RedisRateLimiter((JedisPool) embeddedRedis.pool)
+    BucketedRedisRateLimiter subject = new BucketedRedisRateLimiter((JedisPool) embeddedRedis.pool)
 
     and:
     RateLimitPrincipal principal = new RateLimitPrincipal('user@example.com', 1, 3, true)
 
     when:
-    subject.incrementAndGetRate(principal)
-    Rate rate = subject.incrementAndGetRate(principal)
+    subject.incrementRate(principal, Mock(HttpServletRequest), null)
+    Rate rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     rate.remaining == 1
     !rate.throttled
 
     when:
-    rate = subject.incrementAndGetRate(principal)
+    rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     rate.remaining == 0
     !rate.throttled
 
     when:
-    rate = subject.incrementAndGetRate(principal)
+    rate = subject.incrementRate(principal, Mock(HttpServletRequest), null)
 
     then:
     rate.remaining == 0

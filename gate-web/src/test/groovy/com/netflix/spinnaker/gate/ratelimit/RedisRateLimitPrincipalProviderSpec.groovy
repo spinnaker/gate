@@ -15,11 +15,10 @@
  */
 package com.netflix.spinnaker.gate.ratelimit
 
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration.PrincipalOverride
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration.SourceAppOverride
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties.PrincipalOverride
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties.SourceAppOverride
 import com.netflix.spinnaker.kork.jedis.EmbeddedRedis
-import redis.clients.jedis.Jedis
 import redis.clients.jedis.JedisPool
 import spock.lang.AutoCleanup
 import spock.lang.Shared
@@ -45,7 +44,7 @@ class RedisRateLimitPrincipalProviderSpec extends Specification {
     given:
     RedisRateLimitPrincipalProvider subject = new RedisRateLimitPrincipalProvider(
       (JedisPool) embeddedRedis.pool,
-      new RateLimiterConfiguration(
+      new RateLimiterConfigProperties(
         capacity: 60,
         capacityByPrincipal: [
           new PrincipalOverride(principal: 'anonymous', override: 5),

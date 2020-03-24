@@ -15,13 +15,13 @@
  */
 package com.netflix.spinnaker.gate.ratelimit;
 
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration;
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties;
 
 public class StaticRateLimitPrincipalProvider extends AbstractRateLimitPrincipalProvider {
 
-  private RateLimiterConfiguration rateLimiterConfiguration;
+  private RateLimiterConfigProperties rateLimiterConfiguration;
 
-  public StaticRateLimitPrincipalProvider(RateLimiterConfiguration rateLimiterConfiguration) {
+  public StaticRateLimitPrincipalProvider(RateLimiterConfigProperties rateLimiterConfiguration) {
     this.rateLimiterConfiguration = rateLimiterConfiguration;
   }
 

@@ -17,7 +17,7 @@ package com.netflix.spinnaker.gate.ratelimit
 
 import com.netflix.spectator.api.NoopRegistry
 import com.netflix.spectator.api.Registry
-import com.netflix.spinnaker.gate.config.RateLimiterConfiguration
+import com.netflix.spinnaker.gate.config.RateLimiterConfigProperties
 import com.netflix.spinnaker.security.User
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
@@ -51,7 +51,7 @@ class RateLimitingInterceptorSpec extends Specification {
   @Unroll
   def 'should conditionally enforce rate limiting'() {
     given:
-    def config = new RateLimiterConfiguration().with {
+    def config = new RateLimiterConfigProperties().with {
       it.learning = learning
       it.enforcing = ['foo@example.com']
       it.ignoring = ['bar@example.com']
@@ -69,18 +69,18 @@ class RateLimitingInterceptorSpec extends Specification {
     then:
     noExceptionThrown()
     2 * authentication.getPrincipal() >> new User(email: principal)
-    1 * rateLimiter.incrementAndGetRate(_) >> {
+    1 * rateLimiter.incrementRate(_, _, _) >> {
       new Rate().with {
         it.capacity = -1
         it.rateSeconds = -1
         it.remaining = -1
         it.reset = -1
         it.throttled = true
+        it.requestCost = 1
         return it
       }
     }
     (shouldEnforce ? 1 : 0) * response.sendError(429, "Rate capacity exceeded")
-
 
     where:
     learning | principal         || shouldEnforce
@@ -94,7 +94,7 @@ class RateLimitingInterceptorSpec extends Specification {
 
   def 'should ignore deck requests'() {
     given:
-    def subject = new RateLimitingInterceptor(rateLimiter, registry, new StaticRateLimitPrincipalProvider(new RateLimiterConfiguration()))
+    def subject = new RateLimitingInterceptor(rateLimiter, registry, new StaticRateLimitPrincipalProvider(new RateLimiterConfigProperties()))
 
     and:
     def request = Mock(HttpServletRequest)

@@ -21,6 +21,7 @@ import com.netflix.spectator.api.BasicTag;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Tag;
+import com.netflix.spinnaker.gate.ratelimit.scoring.ScoringRateLimiter;
 import com.netflix.spinnaker.security.User;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -81,7 +83,8 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
     RateLimitPrincipal principal =
         rateLimitPrincipalProvider.getPrincipal(principalName, sourceApp);
 
-    Rate rate = rateLimiter.incrementAndGetRate(principal);
+    final String handlerMethod = (handler instanceof HandlerMethod) ? handler.toString() : null;
+    final Rate rate = rateLimiter.incrementRate(principal, request, handlerMethod);
 
     rate.assignHttpHeaders(response, principal.isLearning());
     recordPrincipalMetrics(principal, rate);
@@ -119,6 +122,18 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
       Object handler,
       ModelAndView modelAndView)
       throws Exception {
+    // If we're using a ScoringRateLimiter, calculate the actual cost of the request and update the
+    // request cost header.
+    if (rateLimiter instanceof ScoringRateLimiter) {
+      String handlerMethod = (handler instanceof HandlerMethod) ? handler.toString() : null;
+      if (handlerMethod != null) {
+        response.setIntHeader(
+            Rate.REQUEST_COST,
+            ((ScoringRateLimiter) rateLimiter)
+                .calculateTotalCost(request, response, handlerMethod));
+      }
+    }
+
     // Hystrix et-al can return 429's, which we'll want to intercept to provide a reset header
     if (response.getStatus() == 429 && !response.getHeaderNames().contains(Rate.RESET_HEADER)) {
       response.setIntHeader(Rate.CAPACITY_HEADER, -1);
