@@ -16,23 +16,32 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
-import com.netflix.spinnaker.gate.config.GateLoginImageConfigProperties;
-import io.swagger.annotations.ApiOperation;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.netflix.spinnaker.gate.config.GateLoginImageConfigProperties;
+
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/image")
 public class LoginImageController {
 
-  @Autowired GateLoginImageConfigProperties gateLoginLogoConfigProperties;
+	private GateLoginImageConfigProperties gateLoginLogoConfigProperties;
 
-  @ApiOperation(value = "Login Logo Positions", response = Map.class)
-  @RequestMapping(value = "/loginlogo", method = RequestMethod.GET)
-  GateLoginImageConfigProperties loginPosition() {
-    return gateLoginLogoConfigProperties;
-  }
+	@Autowired
+	public LoginImageController(GateLoginImageConfigProperties gateLoginLogoConfigProperties) {
+
+		this.gateLoginLogoConfigProperties = gateLoginLogoConfigProperties;
+	}
+
+	@ApiOperation(value = "Login Logo Positions", response = Map.class)
+	@RequestMapping(value = "/loginlogo", method = RequestMethod.GET)
+	GateLoginImageConfigProperties.Style loginPosition() {
+		return gateLoginLogoConfigProperties.getStyle();
+	}
 }

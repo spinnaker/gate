@@ -16,48 +16,48 @@
 
 package com.netflix.spinnaker.gate.config;
 
-import com.netflix.spinnaker.gate.services.LoginImageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@ConditionalOnExpression("${security.login.image.enabled:false}")
+import com.netflix.spinnaker.gate.services.LoginImageService;
+
+@ConditionalOnProperty("security.login.image.enabled")
 @Configuration
 @EnableConfigurationProperties(GateLoginImageConfigProperties.class)
 public class GateWebLoginImageConfig implements WebMvcConfigurer {
 
-  private static final Logger log = LoggerFactory.getLogger(GateWebLoginImageConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(GateWebLoginImageConfig.class);
 
-  @Value("${security.login.image.resourcepath:/opt/spinnaker/config/}")
-  private String imageResourcePath;
+	private GateLoginImageConfigProperties gateLoginLogoConfigProperties;
 
-  @Value("${security.login.image.url:image.png}")
-  private String imageUrl;
+	@Autowired
+	public GateWebLoginImageConfig(GateLoginImageConfigProperties gateLoginLogoConfigProperties) {
+		this.gateLoginLogoConfigProperties = gateLoginLogoConfigProperties;
+	}
 
-  @Autowired(required = false)
-  LoginImageService loginImageService;
+	@Autowired(required = false)
+	LoginImageService loginImageService;
 
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-    if (imageResourcePath != null) {
-      registry
-          .addResourceHandler("/images/**")
-          .addResourceLocations("file:" + imageResourcePath)
-          .setCachePeriod(0);
-      log.info("Login form image Resource path : " + imageResourcePath);
-    }
-    if (!imageUrl.equalsIgnoreCase("image.png")) {
-      log.info("Login form image Resource URL : " + imageUrl);
-      loginImageService.saveImage(imageUrl, imageResourcePath + "logo.png");
-    }
+		if (gateLoginLogoConfigProperties.getResourcePath() != null) {
+			registry.addResourceHandler("/images/**")
+					.addResourceLocations("file:" + gateLoginLogoConfigProperties.getResourcePath()).setCachePeriod(0);
+			log.debug("Login form image Resource path : " + gateLoginLogoConfigProperties.getResourcePath());
+		}
+		if (!gateLoginLogoConfigProperties.getUrl().equalsIgnoreCase("image.png")) {
+			log.debug("Login form image Resource URL : " + gateLoginLogoConfigProperties.getUrl());
+			loginImageService.saveImage(gateLoginLogoConfigProperties.getUrl(),
+					gateLoginLogoConfigProperties.getResourcePath() + "logo.png");
+		}
 
-    log.info("Image ResourcePath is registered with Resource Handler");
-  }
+		log.info("Image ResourcePath is registered with Resource Handler");
+	}
 }

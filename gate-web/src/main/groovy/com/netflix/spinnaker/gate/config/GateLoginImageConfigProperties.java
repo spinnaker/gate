@@ -16,15 +16,23 @@
 
 package com.netflix.spinnaker.gate.config;
 
-import lombok.Data;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConditionalOnExpression("${security.login.image.enabled:false}")
+import lombok.Data;
+
+@ConditionalOnProperty("security.login.image.enabled")
 @Data
-@ConfigurationProperties("security.login.image.style")
+@ConfigurationProperties("security.login.image")
 public class GateLoginImageConfigProperties {
-  String maxWidth;
-  String width;
-  String position;
+	private String resourcePath;
+	private String url;
+	private Style style;
+
+	@Data
+	public static class Style {
+		String maxWidth;
+		String width;
+		String position;
+	}
 }

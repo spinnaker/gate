@@ -15,7 +15,6 @@
  */
 package com.netflix.spinnaker.gate.services;
 
-import groovy.transform.CompileStatic;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@CompileStatic
 @Component
 public class LoginImageService {
   private static final Logger log = LoggerFactory.getLogger(LoginImageService.class);
