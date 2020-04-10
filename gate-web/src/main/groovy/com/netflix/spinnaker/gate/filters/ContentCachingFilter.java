@@ -27,9 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 /**
- * This filter simply buffers/caches the response so that the Content-Length header can be set
- * Setting the Content-Length header prevent the response from being transferred in a chunked way
- * which not all clients can handle
+ * This filter simply buffers/caches the response so that the Content-Length header can be set.
+ * Setting the Content-Length header prevents a response from being transferred with chunked
+ * encoding which may be problematic for some http clients.
  */
 public class ContentCachingFilter implements Filter {
   @Override
