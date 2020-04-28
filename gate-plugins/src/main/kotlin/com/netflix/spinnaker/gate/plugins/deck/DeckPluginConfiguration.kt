@@ -25,6 +25,7 @@ import com.netflix.spinnaker.kork.plugins.update.release.provider.AggregatePlugi
 import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
 import com.netflix.spinnaker.kork.plugins.update.release.source.LatestPluginInfoReleaseSource
 import com.netflix.spinnaker.kork.plugins.update.release.source.SpringPluginInfoReleaseSource
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -38,13 +39,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 open class DeckPluginConfiguration {
 
   @Bean
-  open fun deckSpringPluginStatusProvider(
-    dynamicConfigService: DynamicConfigService
-  ): SpringPluginStatusProvider {
-    return SpringPluginStatusProvider(dynamicConfigService, "spinnaker.extensibility.deck-proxy.plugins")
-  }
-
-  @Bean
+  @Qualifier("deckAggregateSpringPluginInfoReleaseProvider")
   open fun deckAggregateSpringPluginInfoReleaseProvider(
     deckSpringPluginStatusProvider: SpringPluginStatusProvider,
     updateManager: SpinnakerUpdateManager,
@@ -60,11 +55,23 @@ open class DeckPluginConfiguration {
     updateManager: SpinnakerUpdateManager,
     registry: Registry,
     springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider,
-    deckSpringPluginStatusProvider: SpringPluginStatusProvider,
-    deckAggregateSpringPluginInfoReleaseProvider: PluginInfoReleaseProvider
-  ): DeckPluginCache =
-      DeckPluginCache(updateManager, PluginBundleExtractor(springStrictPluginLoaderStatusProvider),
-        deckSpringPluginStatusProvider, deckAggregateSpringPluginInfoReleaseProvider, registry)
+    dynamicConfigService: DynamicConfigService
+  ): DeckPluginCache {
+    val springPluginStatusProvider = SpringPluginStatusProvider(dynamicConfigService,
+      "spinnaker.extensibility.deck-proxy.plugins")
+
+    val sources = listOf(
+      LatestPluginInfoReleaseSource(updateManager, "deck"),
+      SpringPluginInfoReleaseSource(springPluginStatusProvider)
+    )
+
+    return DeckPluginCache(
+      updateManager,
+      PluginBundleExtractor(springStrictPluginLoaderStatusProvider),
+      springPluginStatusProvider,
+      AggregatePluginInfoReleaseProvider(sources, springStrictPluginLoaderStatusProvider),
+      registry)
+  }
 
   @Bean
   open fun deckPluginService(
