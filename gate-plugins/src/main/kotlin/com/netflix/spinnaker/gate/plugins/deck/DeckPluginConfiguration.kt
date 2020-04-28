@@ -25,7 +25,6 @@ import com.netflix.spinnaker.kork.plugins.update.release.provider.AggregatePlugi
 import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
 import com.netflix.spinnaker.kork.plugins.update.release.source.LatestPluginInfoReleaseSource
 import com.netflix.spinnaker.kork.plugins.update.release.source.SpringPluginInfoReleaseSource
-import org.pf4j.PluginStatusProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -41,12 +40,12 @@ open class DeckPluginConfiguration {
   @Bean
   open fun deckSpringPluginStatusProvider(
     dynamicConfigService: DynamicConfigService
-  ): PluginStatusProvider {
+  ): SpringPluginStatusProvider {
     return SpringPluginStatusProvider(dynamicConfigService, "spinnaker.extensibility.deck-proxy.plugins")
   }
 
   @Bean
-  open fun deckAggregateSpringPluginInfoReleaseSource(
+  open fun deckAggregateSpringPluginInfoReleaseProvider(
     deckSpringPluginStatusProvider: SpringPluginStatusProvider,
     updateManager: SpinnakerUpdateManager,
     springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider
@@ -61,11 +60,11 @@ open class DeckPluginConfiguration {
     updateManager: SpinnakerUpdateManager,
     registry: Registry,
     springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider,
-    deckSpringPluginStatusProvider: PluginStatusProvider,
-    deckAggregateSpringPluginInfoReleaseSource: PluginInfoReleaseProvider
+    deckSpringPluginStatusProvider: SpringPluginStatusProvider,
+    deckAggregateSpringPluginInfoReleaseProvider: PluginInfoReleaseProvider
   ): DeckPluginCache =
       DeckPluginCache(updateManager, PluginBundleExtractor(springStrictPluginLoaderStatusProvider),
-        deckSpringPluginStatusProvider, deckAggregateSpringPluginInfoReleaseSource, registry)
+        deckSpringPluginStatusProvider, deckAggregateSpringPluginInfoReleaseProvider, registry)
 
   @Bean
   open fun deckPluginService(
