@@ -19,6 +19,7 @@ import com.netflix.spectator.api.NoopRegistry
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.kork.plugins.bundle.PluginBundleExtractor
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
+import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
 import dev.minutest.junit.JUnit5Minutests
 import dev.minutest.rootContext
 import io.mockk.every
@@ -26,6 +27,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import java.nio.file.Files
 import java.nio.file.Paths
+import org.pf4j.PluginStatusProvider
 import org.pf4j.update.PluginInfo
 import strikt.api.expectThat
 import strikt.assertions.hasSize
@@ -59,8 +61,10 @@ class DeckPluginCacheTest : JUnit5Minutests {
   private inner class Fixture {
     val updateManager: SpinnakerUpdateManager = mockk(relaxed = true)
     val pluginBundleExtractor: PluginBundleExtractor = mockk(relaxed = true)
+    val pluginStatusProvider: PluginStatusProvider = mockk(relaxed = true)
+    val pluginInfoReleaseProvider: PluginInfoReleaseProvider = mockk(relaxed = true)
     val registry: Registry = NoopRegistry()
-    val subject = DeckPluginCache(updateManager, pluginBundleExtractor, registry)
+    val subject = DeckPluginCache(updateManager, pluginBundleExtractor, pluginStatusProvider, pluginInfoReleaseProvider, registry)
 
     init {
       val plugins = listOf(
