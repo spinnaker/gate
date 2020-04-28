@@ -22,10 +22,8 @@ import com.netflix.spinnaker.kork.plugins.SpringStrictPluginLoaderStatusProvider
 import com.netflix.spinnaker.kork.plugins.bundle.PluginBundleExtractor
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
 import com.netflix.spinnaker.kork.plugins.update.release.provider.AggregatePluginInfoReleaseProvider
-import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
 import com.netflix.spinnaker.kork.plugins.update.release.source.LatestPluginInfoReleaseSource
 import com.netflix.spinnaker.kork.plugins.update.release.source.SpringPluginInfoReleaseSource
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -37,18 +35,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @ComponentScan("com.netflix.spinnaker.gate.plugins.deck")
 @EnableScheduling
 open class DeckPluginConfiguration {
-
-  @Bean
-  @Qualifier("deckAggregateSpringPluginInfoReleaseProvider")
-  open fun deckAggregateSpringPluginInfoReleaseProvider(
-    deckSpringPluginStatusProvider: SpringPluginStatusProvider,
-    updateManager: SpinnakerUpdateManager,
-    springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider
-  ): PluginInfoReleaseProvider {
-    val sources = listOf(LatestPluginInfoReleaseSource(updateManager, "deck"),
-      SpringPluginInfoReleaseSource(deckSpringPluginStatusProvider))
-    return AggregatePluginInfoReleaseProvider(sources, springStrictPluginLoaderStatusProvider)
-  }
 
   @Bean
   open fun deckPluginCache(
