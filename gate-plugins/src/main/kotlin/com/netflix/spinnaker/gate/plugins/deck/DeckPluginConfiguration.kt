@@ -23,6 +23,7 @@ import com.netflix.spinnaker.kork.plugins.bundle.PluginBundleExtractor
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
 import com.netflix.spinnaker.kork.plugins.update.release.provider.AggregatePluginInfoReleaseProvider
 import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
+import com.netflix.spinnaker.kork.plugins.update.release.source.LatestPluginInfoReleaseSource
 import com.netflix.spinnaker.kork.plugins.update.release.source.SpringPluginInfoReleaseSource
 import org.pf4j.PluginStatusProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -50,7 +51,7 @@ open class DeckPluginConfiguration {
     updateManager: SpinnakerUpdateManager,
     springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider
   ): PluginInfoReleaseProvider {
-    val sources = listOf(DeckLatestPluginInfoReleaseSource(updateManager),
+    val sources = listOf(LatestPluginInfoReleaseSource(updateManager, "deck"),
       SpringPluginInfoReleaseSource(deckSpringPluginStatusProvider))
     return AggregatePluginInfoReleaseProvider(sources, springStrictPluginLoaderStatusProvider)
   }
