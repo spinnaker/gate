@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/integrations/gremlin")
-@ConditionalOnProperty("integrations.gremlin.enabled")
 class GremlinController {
   private static final String APIKEY_KEY = "apiKey";
 

@@ -99,7 +99,6 @@ swagger:
 
 integrations:
   gremlin:
-    enabled: false
     baseUrl: https://api.gremlin.com/v1
 
 hystrix:

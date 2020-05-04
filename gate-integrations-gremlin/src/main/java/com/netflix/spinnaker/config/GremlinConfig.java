@@ -31,7 +31,6 @@ import groovy.transform.CompileStatic;
 import groovy.util.logging.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import retrofit.Endpoint;
@@ -42,7 +41,6 @@ import retrofit.converter.JacksonConverter;
 @Slf4j
 @CompileStatic
 @Configuration
-@ConditionalOnProperty("integrations.gremlin.enabled")
 class GremlinConfig {
   @Bean
   GremlinService gremlinService(
