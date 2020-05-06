@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-['fiat', 'kork'].each { prj ->
-  String propName = "${prj}Composite"
-  String projectPath = "../$prj"
-  if (settings.ext.has(propName) && Boolean.parseBoolean(settings.ext.get(propName) as String)) {
-    includeBuild projectPath
+rootProject.name = "gate"
+
+if (!settings.ext.has("${rootProject.name}Composite") ||
+     !Boolean.parseBoolean(settings.ext.get("${rootProject.name}Composite") as String)) {
+  ['fiat', 'kork'].each { prj ->
+    String propName = "${prj}Composite"
+    String projectPath = "../$prj"
+    if (settings.ext.has(propName) && Boolean.parseBoolean(settings.ext.get(propName) as String)) {
+      includeBuild projectPath
+    }
   }
 }
-
-rootProject.name = "gate"
 
 include "gate-api",
   "gate-core",
