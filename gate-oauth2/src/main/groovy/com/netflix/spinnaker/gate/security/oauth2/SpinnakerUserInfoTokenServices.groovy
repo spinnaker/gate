@@ -239,7 +239,7 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
     def roles = details[userInfoMapping.roles] ?: []
     if (roles instanceof Collection) {
       // Some providers (Azure AD) return roles in this format: ["[\"role-1\", \"role-2\"]"]
-      if (roles[0][0] == '[') {
+      if (roles[0] instanceof String && roles[0][0] == '[') {
         def js = new JsonSlurper()
         return js.parseText(roles).flatten() as List<String>
       }
