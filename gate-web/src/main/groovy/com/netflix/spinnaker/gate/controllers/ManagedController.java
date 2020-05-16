@@ -249,7 +249,7 @@ public class ManagedController {
 
   @ApiOperation(
       value =
-          "Unpin one or more artifact in an environment. If the `reference` parameter is specified, only "
+          "Unpin one or more artifact(s) in an environment. If the `reference` parameter is specified, only "
               + "the corresponding artifact will be unpinned. If it's omitted, all pinned artifacts in the environment will be "
               + "unpinned.")
   @DeleteMapping(path = "/application/{application}/pin/{targetEnvironment}")
