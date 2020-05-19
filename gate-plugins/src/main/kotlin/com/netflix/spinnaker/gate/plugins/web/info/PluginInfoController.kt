@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/plugins/info")
-open class PluginInfoController(
-  open val pluginService: PluginService,
-  open val front50Service: Front50Service,
-  open val spinnakerExtensionsConfigProperties: SpinnakerExtensionsConfigProperties
+class PluginInfoController(
+  private val pluginService: PluginService,
+  private val front50Service: Front50Service,
+  private val spinnakerExtensionsConfigProperties: SpinnakerExtensionsConfigProperties
 ) {
 
   @ApiOperation(value = "Persist plugin metadata information")
