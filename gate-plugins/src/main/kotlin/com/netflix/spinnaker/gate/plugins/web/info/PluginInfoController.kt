@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.plugins.web.info
 import com.netflix.spinnaker.gate.plugins.web.PluginService
 import com.netflix.spinnaker.gate.plugins.web.SpinnakerExtensionsConfigProperties
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.kork.plugins.update.internal.SpinnakerPluginInfo
 import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController
  * EndPoints supporting CRUD operations for PluginInfo objects.
  */
 @RestController
-@RequestMapping("/plugin/info")
+@RequestMapping("/plugins/info")
 open class PluginInfoController(
   open val pluginService: PluginService,
   open val front50Service: Front50Service,
@@ -46,7 +47,7 @@ open class PluginInfoController(
     method = [RequestMethod.POST, RequestMethod.PUT],
     consumes = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(value = HttpStatus.ACCEPTED)
-  fun persistPluginInfo(@RequestBody pluginInfo: Map<String, Any>): Map<String, Any> {
+  fun persistPluginInfo(@RequestBody pluginInfo: SpinnakerPluginInfo): Map<String, Any> {
     return pluginService.upsertPluginInfo(pluginInfo)
   }
 

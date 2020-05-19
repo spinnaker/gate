@@ -23,7 +23,6 @@ import com.netflix.spinnaker.security.AuthenticatedRequest;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,9 +31,15 @@ public class TaskService {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private static final String GROUP = "tasks";
 
-  @Autowired private OrcaServiceSelector orcaServiceSelector;
+  private OrcaServiceSelector orcaServiceSelector;
+  private ClouddriverServiceSelector clouddriverServiceSelector;
 
-  @Autowired private ClouddriverServiceSelector clouddriverServiceSelector;
+  public TaskService(
+      OrcaServiceSelector orcaServiceSelector,
+      ClouddriverServiceSelector clouddriverServiceSelector) {
+    this.orcaServiceSelector = orcaServiceSelector;
+    this.clouddriverServiceSelector = clouddriverServiceSelector;
+  }
 
   public Map create(Map body) {
     if (body.containsKey("application")) {
