@@ -73,12 +73,12 @@ class PluginInfoControllerSpec extends Specification {
 
   def 'upsert api should fail when sent no content-type'() {
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugin/info")).andExpect(status().isUnsupportedMediaType())
+    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugins/info")).andExpect(status().isUnsupportedMediaType())
   }
 
   def 'upsert api should fail when sent no content'() {
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugin/info")
+    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugins/info")
                 .header('Content-Type', "application/json"))
                 .andExpect(status().isBadRequest())
   }
@@ -88,7 +88,7 @@ class PluginInfoControllerSpec extends Specification {
     when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/1'])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugin/info")
+    this.mockMvc.perform(MockMvcRequestBuilders.post("/plugins/info")
                 .header('Content-Type', "application/json")
                 .content(objectMapper.writeValueAsString(requestContent)))
                 .andExpect(status().isAccepted())
@@ -99,7 +99,7 @@ class PluginInfoControllerSpec extends Specification {
     when(taskService.create(any())).thenReturn(['ref': 'tasks/ref/2'])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.put("/plugin/info")
+    this.mockMvc.perform(MockMvcRequestBuilders.put("/plugins/info")
       .header('Content-Type', "application/json")
       .content(objectMapper.writeValueAsString(requestContent)))
       .andExpect(status().isAccepted())
@@ -114,7 +114,7 @@ class PluginInfoControllerSpec extends Specification {
     }
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.delete("/plugin/info/test.plugin.id")
+    this.mockMvc.perform(MockMvcRequestBuilders.delete("/plugins/info/test.plugin.id")
       .header('Content-Type', "application/json"))
       .andExpect(status().isAccepted())
   }
@@ -124,7 +124,7 @@ class PluginInfoControllerSpec extends Specification {
     when(front50Service.getPluginInfo(any())).thenReturn([['Id': 'test-plugin-id']])
 
     expect:
-    this.mockMvc.perform(MockMvcRequestBuilders.get("/plugin/info")
+    this.mockMvc.perform(MockMvcRequestBuilders.get("/plugins/info")
       .header('Content-Type', "application/json"))
       .andExpect(status().isOk())
   }
