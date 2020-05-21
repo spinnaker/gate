@@ -247,19 +247,17 @@ public class ManagedController {
     keelService.pin(application, pin);
   }
 
-  @ApiOperation(value = "Delete a pin for an artifact in an environment")
-  @DeleteMapping(path = "/application/{application}/pin")
-  void deletePin(
-      @PathVariable("application") String application, @RequestBody EnvironmentArtifactPin pin) {
-    keelService.deletePin(application, pin);
-  }
-
   @ApiOperation(
-      value = "Delete a pin for an artifact in an environment by specifying the environment")
+      value =
+          "Unpin one or more artifact(s) in an environment. If the `reference` parameter is specified, only "
+              + "the corresponding artifact will be unpinned. If it's omitted, all pinned artifacts in the environment will be "
+              + "unpinned.")
   @DeleteMapping(path = "/application/{application}/pin/{targetEnvironment}")
-  void deletePinForEnv(
-      @PathVariable("application") String application, @PathVariable String targetEnvironment) {
-    keelService.deletePinForEnvironment(application, targetEnvironment);
+  void deletePin(
+      @PathVariable("application") String application,
+      @PathVariable("targetEnvironment") String targetEnvironment,
+      @RequestParam(value = "reference", required = false) String reference) {
+    keelService.deletePinForEnvironment(application, targetEnvironment, reference);
   }
 
   @ApiOperation(value = "Veto an artifact version in an environment")
@@ -277,5 +275,10 @@ public class ManagedController {
       @PathVariable("reference") String reference,
       @PathVariable("version") String version) {
     keelService.deleteVeto(application, targetEnvironment, reference, version);
+  }
+
+  @GetMapping(path = "/api-docs")
+  Map<String, Object> getApiDocs() {
+    return keelService.getApiDocs();
   }
 }
