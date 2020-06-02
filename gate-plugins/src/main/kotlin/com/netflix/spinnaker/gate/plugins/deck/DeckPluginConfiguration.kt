@@ -63,7 +63,4 @@ class DeckPluginConfiguration {
     pluginCache: DeckPluginCache,
     registry: Registry
   ): DeckPluginService = DeckPluginService(pluginCache, registry)
-
-  @Bean
-  fun deckPluginController(deckPluginService: DeckPluginService): DeckPluginsController = DeckPluginsController(deckPluginService)
 }
