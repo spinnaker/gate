@@ -20,6 +20,8 @@ package com.netflix.spinnaker.gate.services.internal;
 import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintState;
 import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
+import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
+import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,9 @@ public interface KeelService {
   @DELETE("/delivery-configs/{name}")
   DeliveryConfig deleteManifest(@Path("name") String name);
 
+  @DELETE("/application/{application}/config")
+  DeliveryConfig deleteManifestByAppName(@Path("application") String application);
+
   @POST("/delivery-configs/diff")
   List<Map> diffManifest(@Body DeliveryConfig manifest);
 
@@ -73,15 +78,18 @@ public interface KeelService {
   @Headers("Accept: application/json")
   Map validateManifest(@Body DeliveryConfig manifest);
 
-  @GET("/delivery-configs/{name}/environment/{environment}/constraints")
+  @GET("/application/{application}/config")
+  DeliveryConfig getConfigBy(@Path("application") String application);
+
+  @GET("/application/{application}/environment/{environment}/constraints")
   List<ConstraintState> getConstraintState(
-      @Path("name") String name,
+      @Path("application") String application,
       @Path("environment") String environment,
       @Query("limit") Integer limit);
 
-  @POST("/delivery-configs/{name}/environment/{environment}/constraint")
+  @POST("/application/{application}/environment/{environment}/constraint")
   Response updateConstraintStatus(
-      @Path("name") String name,
+      @Path("application") String application,
       @Path("environment") String environment,
       @Body ConstraintStatus status);
 
@@ -110,4 +118,32 @@ public interface KeelService {
       @Path("type") String type,
       @Path("name") String name,
       @Query("serviceAccount") String serviceAccount);
+
+  @GET("/export/artifact/{cloudProvider}/{account}/{clusterName}")
+  Map<String, Object> exportArtifact(
+      @Path("cloudProvider") String cloudProvider,
+      @Path("account") String account,
+      @Path("clusterName") String clusterName);
+
+  @POST("/application/{application}/pin")
+  Response pin(@Path("application") String application, @Body EnvironmentArtifactPin pin);
+
+  @DELETE("/application/{application}/pin/{targetEnvironment}")
+  Response deletePinForEnvironment(
+      @Path("application") String application,
+      @Path("targetEnvironment") String targetEnvironment,
+      @Query("reference") String reference);
+
+  @POST("/application/{application}/veto")
+  Response veto(@Path("application") String application, @Body EnvironmentArtifactVeto veto);
+
+  @DELETE("/application/{application}/veto/{targetEnvironment}/{reference}/{version}")
+  Response deleteVeto(
+      @Path("application") String application,
+      @Path("targetEnvironment") String targetEnvironment,
+      @Path("reference") String reference,
+      @Path("version") String version);
+
+  @GET("/v3/api-docs")
+  Map<String, Object> getApiDocs();
 }

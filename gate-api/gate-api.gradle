@@ -18,4 +18,8 @@ apply plugin: 'java-library'
 dependencies {
   implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
   api "com.netflix.spinnaker.kork:kork-plugins-api"
+  api "com.netflix.spinnaker.kork:kork-annotations"
+
+  compileOnly("org.projectlombok:lombok")
+  annotationProcessor("org.projectlombok:lombok")
 }

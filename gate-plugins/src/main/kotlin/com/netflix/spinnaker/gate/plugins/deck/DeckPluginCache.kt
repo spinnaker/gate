@@ -17,13 +17,17 @@ package com.netflix.spinnaker.gate.plugins.deck
 
 import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
+import com.netflix.spinnaker.kork.plugins.SpringPluginStatusProvider
+import com.netflix.spinnaker.kork.plugins.SpringStrictPluginLoaderStatusProvider
 import com.netflix.spinnaker.kork.plugins.bundle.PluginBundleExtractor
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
-import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
+import com.netflix.spinnaker.kork.plugins.update.release.provider.PluginInfoReleaseProvider
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import org.pf4j.PluginRuntimeException
+import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 
 /**
  * Responsible for keeping an up-to-date cache of all plugins that Deck needs to know about.
@@ -31,7 +35,10 @@ import java.nio.file.StandardCopyOption
 class DeckPluginCache(
   private val updateManager: SpinnakerUpdateManager,
   private val pluginBundleExtractor: PluginBundleExtractor,
-  private val registry: Registry
+  private val springPluginStatusProvider: SpringPluginStatusProvider,
+  private val pluginInfoReleaseProvider: PluginInfoReleaseProvider,
+  private val registry: Registry,
+  private val springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider
 ) {
 
   private val log by lazy { LoggerFactory.getLogger(javaClass) }
@@ -61,14 +68,16 @@ class DeckPluginCache(
 
       updateManager.refresh()
 
-      val newCache = updateManager.plugins
-        .mapNotNull { pluginInfo ->
-          updateManager.getLastPluginRelease(pluginInfo.id, DECK_REQUIREMENT)?.let { lastRelease ->
-            val plugin = DeckPluginVersion(pluginInfo.id, lastRelease.version)
-            val path = getOrDownload(plugin.id, plugin.version)
-            PluginCacheEntry(plugin, path)
-          }
-        }
+      val releases = updateManager.plugins
+        .filter { springPluginStatusProvider.isPluginEnabled(it.id) }
+        .let { enabledPlugins -> pluginInfoReleaseProvider.getReleases(enabledPlugins) }
+
+      val newCache = releases.mapNotNull { release ->
+            val plugin = DeckPluginVersion(release.pluginId, release.props.version)
+            getOrDownload(plugin.id, plugin.version)?.let {
+              path -> PluginCacheEntry(plugin, path)
+            }
+      }
 
       cache.removeIf { !newCache.contains(it) }
       cache.addAll(newCache)
@@ -91,19 +100,28 @@ class DeckPluginCache(
   /**
    * Get a previously downloaded plugin path, or download the plugin and cache the artifacts for subsequent requests.
    */
-  fun getOrDownload(pluginId: String, pluginVersion: String): Path {
+  fun getOrDownload(pluginId: String, pluginVersion: String): Path? {
     val cachePath = CACHE_ROOT_PATH.resolve("$pluginId/$pluginVersion")
     if (!cachePath.toFile().isDirectory) {
-      registry.timer(downloadDurationId.withPluginTags(pluginId, pluginVersion)).record {
-        log.info("Downloading plugin '$pluginId@$pluginVersion'")
-        val deckPluginPath = pluginBundleExtractor.extractService(
-          updateManager.downloadPluginRelease(pluginId, pluginVersion),
-          "deck"
-        )
+      try {
+        registry.timer(downloadDurationId.withPluginTags(pluginId, pluginVersion)).record {
+          log.info("Downloading plugin '$pluginId@$pluginVersion'")
+          val deckPluginPath = pluginBundleExtractor.extractService(
+            updateManager.downloadPluginRelease(pluginId, pluginVersion),
+            "deck"
+          )
 
-        log.info("Adding plugin '$pluginId@$pluginVersion' to local cache: $cachePath")
-        Files.createDirectories(cachePath)
-        Files.move(deckPluginPath, cachePath, StandardCopyOption.REPLACE_EXISTING)
+          log.info("Adding plugin '$pluginId@$pluginVersion' to local cache: $cachePath")
+          Files.createDirectories(cachePath)
+          Files.move(deckPluginPath, cachePath, StandardCopyOption.REPLACE_EXISTING)
+          }
+      } catch (e: PluginRuntimeException) {
+        log.warn("Unable to download plugin {}@{}", pluginId, pluginVersion)
+        if (springStrictPluginLoaderStatusProvider.isStrictPluginLoading()) {
+          throw PluginRuntimeException(e, "Unable to download plugin {}@{}", pluginId, pluginVersion)
+        } else {
+          return null
+        }
       }
       registry.counter(missesId.withPluginTags(pluginId, pluginVersion)).increment()
     } else {

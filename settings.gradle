@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
+['fiat', 'kork'].each { prj ->
+  String propName = "${prj}Composite"
+  String projectPath = "../$prj"
+  if (settings.ext.has(propName) && Boolean.parseBoolean(settings.ext.get(propName) as String)) {
+    includeBuild projectPath
+  }
+}
+
 rootProject.name = "gate"
 
 include "gate-api",
   "gate-core",
   "gate-plugins",
+  "gate-plugins-test",
   "gate-basic",
   "gate-bom",
   "gate-iap",

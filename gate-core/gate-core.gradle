@@ -35,5 +35,12 @@ dependencies {
   implementation "com.netflix.spinnaker.kork:kork-security"
   implementation "com.netflix.spectator:spectator-api"
   implementation "com.github.ben-manes.caffeine:guava"
-  implementation "com.netflix.hystrix:hystrix-core"
+  implementation "org.apache.commons:commons-lang3"
+}
+
+sourceSets {
+  main {
+    java { srcDirs = [] }
+    groovy { srcDirs += ['src/main/java'] }
+  }
 }

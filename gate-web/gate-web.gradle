@@ -1,4 +1,4 @@
-apply plugin: 'spinnaker.application'
+apply plugin: 'io.spinnaker.package'
 
 ext {
   springConfigLocation = System.getProperty('spring.config.additional-location', "${System.getProperty('user.home')}/.spinnaker/")
@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+  implementation project(":gate-api")
   implementation project(":gate-core")
   implementation project(":gate-proxy")
   implementation project(":gate-plugins")
@@ -44,12 +45,12 @@ dependencies {
   implementation "com.netflix.spinnaker.kork:kork-web"
   implementation "com.netflix.frigga:frigga"
   implementation "redis.clients:jedis"
-  implementation "com.netflix.hystrix:hystrix-core"
 
   implementation 'commons-io:commons-io'
   implementation 'org.springframework.session:spring-session-data-redis'
   implementation "de.huxhorn.sulky:de.huxhorn.sulky.ulid"
   implementation "com.jakewharton.retrofit:retrofit1-okhttp3-client:1.1.0"
+  implementation "org.apache.commons:commons-lang3"
 
   implementation "org.springframework:spring-web"
 
@@ -73,4 +74,16 @@ dependencies {
 configurations.all {
   exclude group: 'javax.servlet', module: 'servlet-api'
   exclude group: "org.slf4j", module: "slf4j-log4j12"
+}
+
+test {
+  //The Implementation-Version is set in the MANIFEST.MF for the JAR produced via testing so that
+  //assertions can be made against the version (see gate-plugins-test, for example).
+  jar {
+    manifest {
+      attributes(
+        'Implementation-Version': '1.0.0'
+      )
+    }
+  }
 }

@@ -16,8 +16,8 @@
 package com.netflix.spinnaker.gate.plugins.deck
 
 import com.netflix.spectator.api.Registry
-import org.slf4j.LoggerFactory
 import java.io.File
+import org.slf4j.LoggerFactory
 
 /**
  * Provides Deck with means of discovering what plugins it needs to download and a standard interface for
@@ -59,8 +59,10 @@ class DeckPluginService(
 
     val sanitizedAssetPath = if (assetPath.startsWith("/")) assetPath.substring(1) else assetPath
 
-    val localAsset = pluginCache.getOrDownload(pluginId, pluginVersion).resolve(sanitizedAssetPath).toFile()
-    if (!localAsset.exists()) {
+    val localAsset = pluginCache.getOrDownload(pluginId, pluginVersion)?.let {
+      path -> path.resolve(sanitizedAssetPath).toFile()
+    }
+    if (localAsset == null || !localAsset.exists()) {
       log.error("Unable to find requested plugin asset '$assetPath' for '$pluginId@$pluginVersion'")
       registry.counter(assetMissesId).increment()
       return null
