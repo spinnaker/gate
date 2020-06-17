@@ -149,5 +149,5 @@ public interface KeelService {
   Map<String, Object> getApiDocs();
 
   @GET("/installedPlugins")
-  public abstract List<SpinnakerPluginDescriptor> getInstalledPlugins();
+  List<SpinnakerPluginDescriptor> getInstalledPlugins();
 }
