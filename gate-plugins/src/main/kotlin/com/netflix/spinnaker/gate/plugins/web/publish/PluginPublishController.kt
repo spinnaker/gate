@@ -68,9 +68,10 @@ class PluginPublishController(
     verifyChecksum(bytes, release.sha512sum)
     uploadToFront50(pluginId, pluginVersion, release.sha512sum, bytes)
 
-    // TODO: Need to change this back to front50Url service endpoint. Doing this temporarily due to the scheme difference
-    // while uploading and downloading binaries.
-    val front50RepoUrl = pluginRepositoriesConfig["front50"]?.url.toString()
+    // TODO: Need to change this back to front50Url service endpoint.
+    //  Doing this temporarily due to the scheme difference while uploading and downloading binaries.
+    val front50RepoUrl: String = pluginRepositoriesConfig["front50"]?.url?.toString() ?: front50Url
+
     release.url = "$front50RepoUrl/pluginBinaries/$pluginId/$pluginVersion"
 
     pluginService.upsertPluginInfo(pluginInfo)
