@@ -17,12 +17,22 @@
 package com.netflix.spinnaker.gate.plugins.web.info
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.config.PluginsAutoConfiguration
 import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
 import com.netflix.spinnaker.gate.plugins.web.SpinnakerExtensionsConfigProperties
 import com.netflix.spinnaker.gate.services.TaskService
+import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.gate.services.internal.EchoService
+import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.gate.services.internal.IgorService
+import com.netflix.spinnaker.gate.services.internal.KeelService
+import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
+import com.netflix.spinnaker.gate.services.internal.RoscoService
+import com.netflix.spinnaker.gate.services.internal.SwabbieService
+import com.netflix.spinnaker.kork.plugins.SpinnakerPluginManager
 import com.netflix.spinnaker.kork.web.exceptions.GenericExceptionHandlers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -41,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = [PluginInfoController])
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = [PluginInfoController, GenericExceptionHandlers, SpinnakerExtensionsConfigProperties, PluginWebConfiguration, ServiceConfiguration])
+@ContextConfiguration(classes = [PluginsAutoConfiguration.class,PluginInfoController, GenericExceptionHandlers, SpinnakerExtensionsConfigProperties,  PluginWebConfiguration, ServiceConfiguration])
 @ActiveProfiles("test")
 @TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
 class PluginInfoControllerSpec extends Specification {
@@ -62,7 +72,34 @@ class PluginInfoControllerSpec extends Specification {
   private TaskService taskService
 
   @MockBean
+  private SpinnakerPluginManager spinnakerPluginManager
+
+  @MockBean
+  private ClouddriverService clouddriverService
+
+  @MockBean
+  private EchoService echoService
+
+  @MockBean
+  private ExtendedFiatService extendedFiatService
+
+  @MockBean
   private Front50Service front50Service
+
+  @MockBean
+  private IgorService igorService
+
+  @MockBean
+  private KeelService keelService
+
+  @MockBean
+  private OrcaServiceSelector orcaServiceSelector
+
+  @MockBean
+  private RoscoService roscoService
+
+  @MockBean
+  private SwabbieService swabbieService
 
   private Map requestContent = ['name': 'test plugin', provider: 'Test Co']
 
