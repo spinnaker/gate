@@ -189,7 +189,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       basicSecConfig.registerSignatureAlgorithmURI("RSA", algo.rsaSignatureMethod)
       basicSecConfig.setSignatureReferenceDigestMethod(algo.digestMethod)
     } else {
-      log.warn("Unable to find global BasicSecurityConfiguration (found '${secConfig}'). Ignoring rsaSignatureDigest configuration value.")
+      log.warn("Unable to find global BasicSecurityConfiguration (found '${secConfig}'). Ignoring signatureDigest configuration value.")
     }
   }
 
