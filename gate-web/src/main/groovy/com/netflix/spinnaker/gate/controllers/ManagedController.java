@@ -6,15 +6,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintState;
 import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
+import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
+import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
 import groovy.util.logging.Slf4j;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
 import io.swagger.annotations.ApiOperation;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,19 +45,38 @@ import retrofit.RetrofitError;
 @ConditionalOnProperty("services.keel.enabled")
 public class ManagedController {
 
-  private final HttpHeaders yamlResponseHeaders;
   private static final Logger log = LoggerFactory.getLogger(ManagedController.class);
+  private static final String APPLICATION_YAML_VALUE = "application/x-yaml";
+
+  private final HttpHeaders yamlResponseHeaders;
   private final KeelService keelService;
   private final ObjectMapper objectMapper;
-  private final String APPLICATION_YAML_VALUE = "application/x-yaml";
+  private final RetryRegistry retryRegistry;
 
   @Autowired
-  public ManagedController(KeelService keelService, ObjectMapper objectMapper) {
+  public ManagedController(
+      KeelService keelService, ObjectMapper objectMapper, RetryRegistry retryRegistry) {
     this.keelService = keelService;
     this.objectMapper = objectMapper;
     this.yamlResponseHeaders = new HttpHeaders();
+    this.retryRegistry = retryRegistry;
     yamlResponseHeaders.setContentType(
         new MediaType("application", "x-yaml", StandardCharsets.UTF_8));
+
+    configureRetry();
+  }
+
+  private void configureRetry() {
+    // TODO(rz): Wire up kork to look in `classpath*:resilience4j-defaults.yml` for service-defined
+    //  defaults rather than doing in-code configuration which is less flexible for end-users.
+    //  These will probably be fine, though.
+    retryRegistry.addConfiguration(
+        "managed-write",
+        RetryConfig.custom()
+            .maxAttempts(5)
+            .waitDuration(Duration.ofSeconds(30))
+            .retryExceptions(RetrofitError.class)
+            .build());
   }
 
   @ApiOperation(value = "Get a resource", response = Resource.class)
@@ -104,6 +129,18 @@ public class ManagedController {
     return new ResponseEntity<>(resource, yamlResponseHeaders, HttpStatus.OK);
   }
 
+  @ApiOperation(
+      value = "Generates an artifact definition based on the artifact used in a running cluster",
+      response = Map.class)
+  @GetMapping(path = "/resources/export/artifact/{cloudProvider}/{account}/{clusterName}")
+  ResponseEntity<Map> exportResource(
+      @PathVariable("cloudProvider") String cloudProvider,
+      @PathVariable("account") String account,
+      @PathVariable("clusterName") String clusterName) {
+    Map<String, Object> artifact = keelService.exportArtifact(cloudProvider, account, clusterName);
+    return new ResponseEntity<>(artifact, yamlResponseHeaders, HttpStatus.OK);
+  }
+
   @ApiOperation(value = "Get a delivery config manifest", response = DeliveryConfig.class)
   @GetMapping(path = "/delivery-configs/{name}")
   DeliveryConfig getManifest(@PathVariable("name") String name) {
@@ -118,12 +155,18 @@ public class ManagedController {
     return keelService.getManifestArtifacts(name);
   }
 
+  @SneakyThrows
   @ApiOperation(
       value = "Create or update a delivery config manifest",
       response = DeliveryConfig.class)
-  @PostMapping(path = "/delivery-configs")
+  @PostMapping(
+      path = "/delivery-configs",
+      consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
+      produces = {APPLICATION_JSON_VALUE})
   DeliveryConfig upsertManifest(@RequestBody DeliveryConfig manifest) {
-    return keelService.upsertManifest(manifest);
+    return retryRegistry
+        .retry("managed-write")
+        .executeCallable(() -> keelService.upsertManifest(manifest));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
@@ -146,7 +189,7 @@ public class ManagedController {
           return ResponseEntity.badRequest()
               .body(objectMapper.readValue(e.getResponse().getBody().in(), Map.class));
         } catch (Exception ex) {
-          log.error("Error parsing error response from keel: {}", ex.getMessage(), ex);
+          log.error("Error parsing error response from keel", ex);
           return ResponseEntity.badRequest().body(Collections.emptyMap());
         }
       } else {
@@ -167,21 +210,37 @@ public class ManagedController {
   @ApiOperation(
       value = "List up-to {limit} current constraint states for an environment",
       response = ConstraintState.class)
-  @GetMapping(path = "/delivery-configs/{name}/environment/{environment}/constraints")
+  @GetMapping(path = "/application/{application}/environment/{environment}/constraints")
   List<ConstraintState> getConstraintState(
-      @PathVariable("name") String name,
+      @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @RequestParam(value = "limit", required = false, defaultValue = "10") String limit) {
-    return keelService.getConstraintState(name, environment, Integer.valueOf(limit));
+    return keelService.getConstraintState(application, environment, Integer.valueOf(limit));
+  }
+
+  @ApiOperation(
+      value = "Get the delivery config associated with an application",
+      response = DeliveryConfig.class)
+  @GetMapping(path = "/application/{application}/config")
+  DeliveryConfig getConfigBy(@PathVariable("application") String application) {
+    return keelService.getConfigBy(application);
+  }
+
+  @ApiOperation(
+      value = "Delete a delivery config manifest for an application",
+      response = DeliveryConfig.class)
+  @DeleteMapping(path = "/application/{application}/config")
+  DeliveryConfig deleteManifestByApp(@PathVariable("application") String application) {
+    return keelService.deleteManifestByAppName(application);
   }
 
   @ApiOperation(value = "Update the status of an environment constraint")
-  @PostMapping(path = "/delivery-configs/{name}/environment/{environment}/constraint")
+  @PostMapping(path = "/application/{application}/environment/{environment}/constraint")
   void updateConstraintStatus(
-      @PathVariable("name") String name,
+      @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @RequestBody ConstraintStatus status) {
-    keelService.updateConstraintStatus(name, environment, status);
+    keelService.updateConstraintStatus(application, environment, status);
   }
 
   @ApiOperation(value = "Get managed details about an application", response = Map.class)
@@ -205,5 +264,47 @@ public class ManagedController {
   @DeleteMapping(path = "/application/{application}/pause")
   void resumeApplication(@PathVariable("application") String application) {
     keelService.resumeApplication(application);
+  }
+
+  @ApiOperation(value = "Create a pin for an artifact in an environment")
+  @PostMapping(path = "/application/{application}/pin")
+  void createPin(
+      @PathVariable("application") String application, @RequestBody EnvironmentArtifactPin pin) {
+    keelService.pin(application, pin);
+  }
+
+  @ApiOperation(
+      value =
+          "Unpin one or more artifact(s) in an environment. If the `reference` parameter is specified, only "
+              + "the corresponding artifact will be unpinned. If it's omitted, all pinned artifacts in the environment will be "
+              + "unpinned.")
+  @DeleteMapping(path = "/application/{application}/pin/{targetEnvironment}")
+  void deletePin(
+      @PathVariable("application") String application,
+      @PathVariable("targetEnvironment") String targetEnvironment,
+      @RequestParam(value = "reference", required = false) String reference) {
+    keelService.deletePinForEnvironment(application, targetEnvironment, reference);
+  }
+
+  @ApiOperation(value = "Veto an artifact version in an environment")
+  @PostMapping(path = "/application/{application}/veto")
+  void veto(
+      @PathVariable("application") String application, @RequestBody EnvironmentArtifactVeto veto) {
+    keelService.veto(application, veto);
+  }
+
+  @ApiOperation(value = "Veto an artifact version in an environment")
+  @DeleteMapping(path = "/application/{application}/veto/{targetEnvironment}/{reference}/{version}")
+  void deleteVeto(
+      @PathVariable("application") String application,
+      @PathVariable("targetEnvironment") String targetEnvironment,
+      @PathVariable("reference") String reference,
+      @PathVariable("version") String version) {
+    keelService.deleteVeto(application, targetEnvironment, reference, version);
+  }
+
+  @GetMapping(path = "/api-docs")
+  Map<String, Object> getApiDocs() {
+    return keelService.getApiDocs();
   }
 }
