@@ -15,6 +15,7 @@
 
 package com.netflix.spinnaker.gate.services;
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EcsServiceDiscoveryService {
+  private static final String GROUP = "ecsServiceDiscoveryService";
 
   private ClouddriverService clouddriver;
 
@@ -32,6 +34,11 @@ public class EcsServiceDiscoveryService {
   }
 
   public List<Map> getAllEcsServiceDiscoveryRegistries() {
-    return clouddriver.getAllEcsServiceDiscoveryRegistries();
+    return (List<Map>)
+        HystrixFactory.newListCommand(
+                GROUP,
+                "getAllEcsServiceDiscoveryRegistries",
+                () -> clouddriver.getAllEcsServiceDiscoveryRegistries())
+            .execute();
   }
 }

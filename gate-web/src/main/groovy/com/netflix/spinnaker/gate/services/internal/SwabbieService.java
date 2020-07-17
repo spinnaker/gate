@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services.internal;
 
-import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
 import java.util.List;
 import java.util.Map;
 import retrofit.http.*;
@@ -47,7 +46,4 @@ public interface SwabbieService {
   @Headers("Accept: application/json")
   @GET("/resources/deleted")
   List getDeletedList();
-
-  @GET("/installedPlugins")
-  List<SpinnakerPluginDescriptor> getInstalledPlugins();
 }

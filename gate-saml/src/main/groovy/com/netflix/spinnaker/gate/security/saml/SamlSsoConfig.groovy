@@ -29,8 +29,6 @@ import org.opensaml.saml2.core.Assertion
 import org.opensaml.saml2.core.Attribute
 import org.opensaml.xml.schema.XSAny
 import org.opensaml.xml.schema.XSString
-import org.opensaml.xml.security.BasicSecurityConfiguration
-import org.opensaml.xml.signature.SignatureConstants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.web.ServerProperties
@@ -94,8 +92,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
     UserAttributeMapping userAttributeMapping = new UserAttributeMapping()
     long maxAuthenticationAge = 7200
 
-    String signatureDigest = "SHA1" // SHA1 is the default registered in DefaultSecurityConfigurationBootstrap.populateSignatureParams
-
     /**
      * Ensure that the keystore exists and can be accessed with the given keyStorePassword and keyStoreAliasName
      */
@@ -119,11 +115,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
             throw new IllegalStateException("Keystore '${keyStore}' does not contain alias '${keyStoreAliasName}'")
           }
         }
-      }
-
-      // Validate signature digest algorithm
-      if (SignatureAlgorithms.fromName(signatureDigest) == null) {
-        throw new IllegalStateException("Invalid saml.signatureDigest value '${signatureDigest}'. Valid values are ${SignatureAlgorithms.values()}")
       }
     }
   }
@@ -174,23 +165,9 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .keyPassword(samlSecurityConfigProperties.keyStorePassword)
 
       saml.init(http)
-      initSignatureDigest() // Need to be after SAMLConfigurer initializes the global SecurityConfiguration
 
     // @formatter:on
 
-  }
-
-  private void initSignatureDigest() {
-    def secConfig = org.opensaml.Configuration.getGlobalSecurityConfiguration()
-    if (secConfig != null && secConfig instanceof BasicSecurityConfiguration) {
-      BasicSecurityConfiguration basicSecConfig = (BasicSecurityConfiguration) secConfig
-      def algo = SignatureAlgorithms.fromName(samlSecurityConfigProperties.signatureDigest)
-      log.info("Using ${algo} digest for signing SAML messages")
-      basicSecConfig.registerSignatureAlgorithmURI("RSA", algo.rsaSignatureMethod)
-      basicSecConfig.setSignatureReferenceDigestMethod(algo.digestMethod)
-    } else {
-      log.warn("Unable to find global BasicSecurityConfiguration (found '${secConfig}'). Ignoring signatureDigest configuration value.")
-    }
   }
 
   void configure(WebSecurity web) throws Exception {
@@ -264,8 +241,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
               username,
               roles.size(),
               roles,
-              fiatClientConfigurationProperties.legacyFallback,
-              e
+              fiatClientConfigurationProperties.legacyFallback
           )
           id = id.withTag("success", false).withTag("fallback", fiatClientConfigurationProperties.legacyFallback)
 
@@ -319,26 +295,4 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       }
     }
   }
-
-  // Available digests taken from org.opensaml.xml.signature.SignatureConstants (RSA signatures)
-  private enum SignatureAlgorithms {
-    SHA1(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1, SignatureConstants.ALGO_ID_DIGEST_SHA1),
-    SHA256(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256, SignatureConstants.ALGO_ID_DIGEST_SHA256),
-    SHA384(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA384, SignatureConstants.ALGO_ID_DIGEST_SHA384),
-    SHA512(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA512, SignatureConstants.ALGO_ID_DIGEST_SHA512),
-    RIPEMD160(SignatureConstants.ALGO_ID_SIGNATURE_RSA_RIPEMD160, SignatureConstants.ALGO_ID_DIGEST_RIPEMD160),
-    MD5(SignatureConstants.ALGO_ID_SIGNATURE_NOT_RECOMMENDED_RSA_MD5, SignatureConstants.ALGO_ID_DIGEST_NOT_RECOMMENDED_MD5)
-
-    String rsaSignatureMethod
-    String digestMethod
-    SignatureAlgorithms(String rsaSignatureMethod, String digestMethod) {
-      this.rsaSignatureMethod = rsaSignatureMethod
-      this.digestMethod = digestMethod
-    }
-
-    static SignatureAlgorithms fromName(String digestName) {
-      SignatureAlgorithms.find { it -> (it.name() == digestName.toUpperCase()) } as SignatureAlgorithms
-    }
-  }
-
 }

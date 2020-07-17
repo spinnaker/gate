@@ -16,41 +16,63 @@
 
 package com.netflix.spinnaker.gate.services.aws
 
+import com.netflix.hystrix.HystrixCommand
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import java.util.concurrent.Callable
+
 @CompileStatic
 @Component
 class InfrastructureService {
 
+  private static final String GROUP = "infrastructure"
+
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
 
+  private static HystrixCommand<List> command(String type, Callable<List> work) {
+    (HystrixCommand<List>)HystrixFactory.newListCommand(GROUP, type, work)
+  }
+
   List<Map> getInstanceTypes(String selectorKey = null) {
-    clouddriverServiceSelector.select().instanceTypes
+    command("instanceTypes") {
+      clouddriverServiceSelector.select().instanceTypes
+    } execute()
   }
 
   List<Map> getKeyPairs(String selectorKey = null) {
-    clouddriverServiceSelector.select().keyPairs
+    command("keyPairs") {
+      clouddriverServiceSelector.select().keyPairs
+    } execute()
   }
 
   @Deprecated
   List<Map> getSubnets(String selectorKey = null) {
-    clouddriverServiceSelector.select().getSubnets('aws')
+    command("subnets") {
+      clouddriverServiceSelector.select().getSubnets('aws')
+    } execute()
   }
 
   @Deprecated
   List<Map> getVpcs(String selectorKey = null) {
-    clouddriverServiceSelector.select().getNetworks('aws')
+    command("vpcs") {
+      clouddriverServiceSelector.select().getNetworks('aws')
+    } execute()
   }
 
   List<Map> getFunctions(String selectorKey = null, String functionName, String region, String account) {
-    clouddriverServiceSelector.select().getFunctions(functionName,region, account)
+    command("functions") {
+      clouddriverServiceSelector.select().getFunctions(functionName,region, account)
+    } execute()
   }
 
   List<Map> getApplicationFunctions(String selectorKey = null, String application) {
-    clouddriverServiceSelector.select().getApplicationFunctions(application)
+    command("functions") {
+      clouddriverServiceSelector.select().getApplicationFunctions(application)
+    } execute()
   }
 }

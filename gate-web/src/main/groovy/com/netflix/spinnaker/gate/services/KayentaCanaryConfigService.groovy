@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.KayentaService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -32,46 +33,58 @@ import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyErr
 @ConditionalOnExpression('${services.kayenta.enabled:false} and ${services.kayenta.canary-config-store:false}')
 class KayentaCanaryConfigService implements CanaryConfigService {
 
+  private static final String HYSTRIX_GROUP = "v2-canaryConfigs"
+
   @Autowired
   KayentaService kayentaService
 
   List getCanaryConfigs(String application, String configurationAccountName) {
-    try {
-      return kayentaService.getCanaryConfigs(application, configurationAccountName)
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getCanaryConfigs", {
+      try {
+        return kayentaService.getCanaryConfigs(application, configurationAccountName)
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }).execute() as List
   }
 
   Map getCanaryConfig(String id, String configurationAccountName) {
-    try {
-      return kayentaService.getCanaryConfig(id, configurationAccountName)
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    return HystrixFactory.newMapCommand(HYSTRIX_GROUP, "getCanaryConfig", {
+      try {
+        return kayentaService.getCanaryConfig(id, configurationAccountName)
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }).execute() as Map
   }
 
   Map createCanaryConfig(Map config, String configurationAccountName) {
-    try {
-      return kayentaService.createCanaryConfig(config, configurationAccountName)
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    return HystrixFactory.newMapCommand(HYSTRIX_GROUP, "createCanaryConfig", {
+      try {
+        return kayentaService.createCanaryConfig(config, configurationAccountName)
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }).execute() as Map
   }
 
   Map updateCanaryConfig(String id, Map config, String configurationAccountName) {
-    try {
-      return kayentaService.updateCanaryConfig(id, config, configurationAccountName)
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    return HystrixFactory.newMapCommand(HYSTRIX_GROUP, "updateCanaryConfig", {
+      try {
+        return kayentaService.updateCanaryConfig(id, config, configurationAccountName)
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }).execute() as Map
   }
 
   void deleteCanaryConfig(String id, String configurationAccountName) {
-    try {
-      kayentaService.deleteCanaryConfig(id, configurationAccountName)
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "deleteCanaryConfig", {
+      try {
+        kayentaService.deleteCanaryConfig(id, configurationAccountName)
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }).execute()
   }
 }

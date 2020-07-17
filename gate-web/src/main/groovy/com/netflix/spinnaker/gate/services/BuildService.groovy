@@ -18,6 +18,7 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger
 import com.netflix.spinnaker.gate.services.internal.IgorService
 import groovy.transform.CompileStatic
@@ -29,6 +30,7 @@ import retrofit.RetrofitError
 @CompileStatic
 @Component
 class BuildService {
+  private static final String GROUP = "builds"
 
   @Autowired(required = false)
   IgorService igorService
@@ -41,18 +43,22 @@ class BuildService {
     if (!igorService) {
       return []
     }
-    if (buildServiceType) {
-      return igorService.getBuildMasters(buildServiceType)
-    } else {
-      return igorService.getBuildMasters()
-    }
+    HystrixFactory.newListCommand(GROUP, "masters") { 
+      if(buildServiceType) {
+        igorService.getBuildMasters(buildServiceType)
+      } else {
+        igorService.getBuildMasters()
+      }
+    } execute()
   }
 
   List<String> getBuildMasters() {
     if (!igorService) {
       return []
     }
-    return igorService.getBuildMasters()
+    HystrixFactory.newListCommand(GROUP, "masters") {
+      igorService.getBuildMasters()
+    } execute()
   }
 
 
@@ -60,74 +66,85 @@ class BuildService {
     if (!igorService) {
       return []
     }
-    try {
-      igorService.getJobsForBuildMaster(buildMaster)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
+    HystrixFactory.newListCommand(GROUP, "jobsForBuildMaster") {
+      try {
+        igorService.getJobsForBuildMaster(buildMaster)
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
+        }
+
+        throw e
       }
-      throw e
-    }
+    } execute()
   }
 
   List<GoogleCloudBuildTrigger> getGoogleCloudBuildTriggersForAccount(String account) {
     if (!igorService) {
       return []
     }
-    try {
-      igorService.getGoogleCloudBuildTriggers(account)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        throw new GCBAccountNotFound("Account '${account}' not found")
-      }
+    HystrixFactory.newListCommand(GROUP, "triggersForGcbAccount") {
+      try {
+        igorService.getGoogleCloudBuildTriggers(account)
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new GCBAccountNotFound("Account '${account}' not found")
+        }
 
-      throw e
-    }
+        throw e
+      }
+    } execute()
   }
 
   Map getJobConfig(String buildMaster, String job) {
     if (!igorService) {
       return [:]
     }
-    try {
-      igorService.getJobConfig(buildMaster, encode(job))
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
-      }
+    HystrixFactory.newMapCommand(GROUP, "jobConfig") {
+      try {
+        igorService.getJobConfig(buildMaster, encode(job))
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
+        }
 
-      throw e
-    }
+        throw e
+      }
+    } execute()
   }
 
   List getBuilds(String buildMaster, String job) {
     if (!igorService) {
       return []
     }
-    try {
-      igorService.getBuilds(buildMaster, encode(job))
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
-      }
+    HystrixFactory.newListCommand(GROUP, "buildsForJob") {
+      try {
+        igorService.getBuilds(buildMaster, encode(job))
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
+        }
 
-      throw e
-    }
+        throw e
+      }
+    } execute()
   }
 
   Map getBuild(String buildMaster, String job, String number) {
     if (!igorService) {
       return [:]
     }
-    try {
-      igorService.getBuild(buildMaster, encode(job), number)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
-      }
+    HystrixFactory.newMapCommand(GROUP, "buildDetails") {
+      try {
+        igorService.getBuild(buildMaster, encode(job), number)
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          throw new BuildMasterNotFound("Build master '${buildMaster}' not found")
+        }
 
-      throw e
-    }
+        throw e
+      }
+    } execute()
   }
 
 }

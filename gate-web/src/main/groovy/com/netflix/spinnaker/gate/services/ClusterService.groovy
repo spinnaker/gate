@@ -16,8 +16,9 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.hystrix.exception.HystrixBadRequestException
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
-import com.netflix.spinnaker.kork.exceptions.SpinnakerException
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,6 +30,7 @@ import retrofit.RetrofitError
 @CompileStatic
 @Component
 class ClusterService {
+  private static final String GROUP = "clusters"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
@@ -37,23 +39,29 @@ class ClusterService {
   ProviderLookupService providerLookupService
 
   Map getClusters(String app, String selectorKey) {
-    clouddriverServiceSelector.select().getClusters(app)
+    HystrixFactory.newMapCommand(GROUP, "getClustersForApplication") {
+      clouddriverServiceSelector.select().getClusters(app)
+    } execute()
   }
 
   List<Map> getClustersForAccount(String app, String account, String selectorKey) {
-    clouddriverServiceSelector.select().getClustersForAccount(app, account)
+    HystrixFactory.newListCommand(GROUP, "getClustersForApplicationInAccount-${providerLookupService.providerForAccount(account)}") {
+      clouddriverServiceSelector.select().getClustersForAccount(app, account)
+    } execute()
   }
 
   Map getCluster(String app, String account, String clusterName, String selectorKey) {
-    try {
-      clouddriverServiceSelector.select().getCluster(app, account, clusterName)?.getAt(0) as Map
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
-        return [:]
-      } else {
-        throw e
+    HystrixFactory.newMapCommand(GROUP, "getCluster-${providerLookupService.providerForAccount(account)}") {
+      try {
+        clouddriverServiceSelector.select().getCluster(app, account, clusterName)?.getAt(0) as Map
+      } catch (RetrofitError e) {
+        if (e.response?.status == 404) {
+          return [:]
+        } else {
+          throw e
+        }
       }
-    }
+    } execute()
   }
 
   List<Map> getClusterServerGroups(String app, String account, String clusterName, String selectorKey) {
@@ -61,21 +69,25 @@ class ClusterService {
   }
 
   List<Map> getScalingActivities(String app, String account, String clusterName, String serverGroupName, String provider, String region, String selectorKey) {
-    clouddriverServiceSelector.select().getScalingActivities(app, account, clusterName, provider, serverGroupName, region)
+    HystrixFactory.newListCommand(GROUP, "getScalingActivitiesForCluster-${providerLookupService.providerForAccount(account)}") {
+      clouddriverServiceSelector.select().getScalingActivities(app, account, clusterName, provider, serverGroupName, region)
+    } execute()
   }
 
   Map getTargetServerGroup(String app, String account, String clusterName, String cloudProviderType, String scope, String target, Boolean onlyEnabled, Boolean validateOldest, String selectorKey) {
-    try {
-      return clouddriverServiceSelector.select().getTargetServerGroup(app, account, clusterName, cloudProviderType, scope, target, onlyEnabled, validateOldest)
-    } catch (RetrofitError re) {
-      if (re.kind == RetrofitError.Kind.HTTP && re.response?.status == 404) {
-        throw new ServerGroupNotFound("unable to find $target in $cloudProviderType/$account/$scope/$clusterName")
+    HystrixFactory.newMapCommand(GROUP, "getTargetServerGroup-${providerLookupService.providerForAccount(account)}") {
+      try {
+        return clouddriverServiceSelector.select().getTargetServerGroup(app, account, clusterName, cloudProviderType, scope, target, onlyEnabled, validateOldest)
+      } catch (RetrofitError re) {
+        if (re.kind == RetrofitError.Kind.HTTP && re.response?.status == 404) {
+          throw new ServerGroupNotFound("unable to find $target in $cloudProviderType/$account/$scope/$clusterName")
+        }
+        throw re
       }
-      throw re
-    }
+    } execute()
   }
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @InheritConstructors
-  static class ServerGroupNotFound extends SpinnakerException {}
+  static class ServerGroupNotFound extends HystrixBadRequestException {}
 }

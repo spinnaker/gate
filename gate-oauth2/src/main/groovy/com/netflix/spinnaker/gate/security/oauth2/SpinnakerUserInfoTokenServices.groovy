@@ -132,8 +132,7 @@ class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
           username,
           roles.size(),
           roles,
-          fiatClientConfigurationProperties.legacyFallback,
-          e
+          fiatClientConfigurationProperties.legacyFallback
         )
         id = id.withTag("success", false).withTag("fallback", fiatClientConfigurationProperties.legacyFallback)
 

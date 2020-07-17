@@ -17,14 +17,12 @@
 
 package com.netflix.spinnaker.gate.health
 
-import com.jakewharton.retrofit.Ok3Client
-import com.netflix.spinnaker.config.DefaultServiceEndpoint
-import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
+import com.netflix.spinnaker.config.OkHttpClientConfiguration
+import com.netflix.spinnaker.gate.config.GateConfig
 import com.netflix.spinnaker.gate.config.Service
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.HealthCheckableService
 import com.netflix.spinnaker.security.AuthenticatedRequest
-import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.health.AbstractHealthIndicator
 import org.springframework.boot.actuate.health.Health
@@ -34,6 +32,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 import retrofit.RestAdapter
 import retrofit.RetrofitError
+import retrofit.client.OkClient
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -41,7 +40,6 @@ import java.util.concurrent.atomic.AtomicReference
 import static retrofit.Endpoints.newFixedEndpoint
 
 @Component
-@Slf4j
 class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
   final Map<String, HealthCheckableService> healthCheckableServices
 
@@ -49,7 +47,7 @@ class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
   AtomicBoolean skipDownstreamServiceChecks = new AtomicBoolean(false)
 
   @Autowired
-  DownstreamServicesHealthIndicator(OkHttpClientProvider clientProvider,
+  DownstreamServicesHealthIndicator(OkHttpClientConfiguration okHttpClientConfiguration,
                                     ServiceConfiguration serviceConfiguration) {
     this(
       serviceConfiguration.services.findResults { String name, Service service ->
@@ -60,7 +58,7 @@ class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
         return [
           name, new RestAdapter.Builder()
           .setEndpoint(newFixedEndpoint(service.baseUrl))
-          .setClient(new Ok3Client(clientProvider.getClient(new DefaultServiceEndpoint(name, service.baseUrl))))
+          .setClient(new OkClient(okHttpClientConfiguration.create()))
           .build()
           .create(HealthCheckableService)
         ]
@@ -105,13 +103,11 @@ class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
         AuthenticatedRequest.allowAnonymous { service.health() }
       } catch (RetrofitError e) {
         serviceHealths[name] = "${e.message} (url: ${e.url})".toString()
-        log.error('Exception received during health check of service: {}, {}', name, serviceHealths[name])
       }
     }
 
     if (!serviceHealths) {
       // do not continue checking downstream services once successful
-      log.info('All downstream services report healthy.')
       skipDownstreamServiceChecks.set(true)
     }
 

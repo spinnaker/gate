@@ -17,6 +17,7 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component
 @CompileStatic
 @Component
 class ImageService {
+  private static final String GROUP = "images"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
@@ -33,14 +35,20 @@ class ImageService {
   ProviderLookupService providerLookupService
 
   List<Map> getForAccountAndRegion(String provider, String account, String region, String imageId, String selectorKey) {
-    clouddriverServiceSelector.select().getImageDetails(provider, account, region, imageId)
+    HystrixFactory.newListCommand(GROUP, "getImagesForAccountAndRegion-${providerLookupService.providerForAccount(account)}") {
+      clouddriverServiceSelector.select().getImageDetails(provider, account, region, imageId)
+    } execute()
   }
 
   List<Map> search(String provider, String query, String region, String account, Integer count, Map<String, Object> additionalFilters, String selectorKey) {
-    clouddriverServiceSelector.select().findImages(provider, query, region, account, count, additionalFilters)
+    HystrixFactory.newListCommand(GROUP, "searchImages-${providerLookupService.providerForAccount(account)}") {
+      clouddriverServiceSelector.select().findImages(provider, query, region, account, count, additionalFilters)
+    } execute()
   }
 
   List<String> findTags(String provider, String account, String repository, String selectorKey) {
-    clouddriverServiceSelector.select().findTags(provider, account, repository)
+    HystrixFactory.newListCommand(GROUP, "getTags-${providerLookupService.providerForAccount(account)}") {
+      clouddriverServiceSelector.select().findTags(provider, account, repository)
+    } execute()
   }
 }

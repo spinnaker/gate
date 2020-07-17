@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+
 package com.netflix.spinnaker.gate.services
 
+
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
@@ -53,11 +56,15 @@ class PipelineService {
   }
 
   void save(Map pipeline) {
-    front50Service.savePipelineConfig(pipeline)
+    HystrixFactory.newVoidCommand(GROUP, "savePipeline") {
+      front50Service.savePipelineConfig(pipeline)
+    } execute()
   }
 
   Map update(String pipelineId, Map pipeline) {
-    front50Service.updatePipeline(pipelineId, pipeline)
+    HystrixFactory.newMapCommand(GROUP, "updatePipeline") {
+      front50Service.updatePipeline(pipelineId, pipeline)
+    } execute()
   }
 
   void move(Map moveCommand) { //TODO: use update endpoint when front50 is live

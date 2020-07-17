@@ -16,28 +16,26 @@
 
 package com.netflix.spinnaker.gate
 
-import graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration
+import com.netflix.spinnaker.hystrix.spectator.HystrixSpectatorConfig
 import org.springframework.boot.actuate.autoconfigure.ldap.LdapHealthContributorAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Import
 import org.springframework.scheduling.annotation.EnableAsync
 
 @EnableAsync
 @EnableConfigurationProperties
+@Import([HystrixSpectatorConfig])
 @SpringBootApplication(
   scanBasePackages = [
     "com.netflix.spinnaker.gate",
     "com.netflix.spinnaker.config"
   ],
-  exclude = [
-    GroovyTemplateAutoConfiguration,
-    GsonAutoConfiguration,
-    LdapHealthContributorAutoConfiguration,
-    GraphQLWebsocketAutoConfiguration
-  ]
+  exclude = [GroovyTemplateAutoConfiguration, GsonAutoConfiguration,
+    LdapHealthContributorAutoConfiguration]
 )
 class Main {
 

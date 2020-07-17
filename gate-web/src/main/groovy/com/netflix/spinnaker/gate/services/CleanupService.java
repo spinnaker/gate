@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services;
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.SwabbieService;
 import java.util.Collections;
 import java.util.List;
@@ -26,48 +27,74 @@ import retrofit.RetrofitError;
 
 @Component
 public class CleanupService {
+  private static final String GROUP = "cleanup";
 
   @Autowired(required = false)
   SwabbieService swabbieService;
 
   public Map optOut(String namespace, String resourceId) {
-    try {
-      return swabbieService.optOut(namespace, resourceId, "");
-    } catch (RetrofitError e) {
-      if (e.getResponse().getStatus() == 404) {
-        return Collections.emptyMap();
-      } else {
-        throw e;
-      }
-    }
+    return (Map)
+        HystrixFactory.newMapCommand(
+                GROUP,
+                "optOut",
+                () -> {
+                  try {
+                    return swabbieService.optOut(namespace, resourceId, "");
+                  } catch (RetrofitError e) {
+                    if (e.getResponse().getStatus() == 404) {
+                      return Collections.emptyMap();
+                    } else {
+                      throw e;
+                    }
+                  }
+                })
+            .execute();
   }
 
   public Map get(String namespace, String resourceId) {
-    try {
-      return swabbieService.get(namespace, resourceId);
-    } catch (RetrofitError e) {
-      if (e.getResponse().getStatus() == 404) {
-        return Collections.emptyMap();
-      } else {
-        throw e;
-      }
-    }
+    return (Map)
+        HystrixFactory.newMapCommand(
+                GROUP,
+                "get",
+                () -> {
+                  try {
+                    return swabbieService.get(namespace, resourceId);
+                  } catch (RetrofitError e) {
+                    if (e.getResponse().getStatus() == 404) {
+                      return Collections.emptyMap();
+                    } else {
+                      throw e;
+                    }
+                  }
+                })
+            .execute();
   }
 
   public String restore(String namespace, String resourceId) {
-    try {
-      swabbieService.restore(namespace, resourceId, "");
-    } catch (RetrofitError e) {
-      return Integer.toString(e.getResponse().getStatus());
-    }
+    HystrixFactory.newStringCommand(
+            GROUP,
+            "restore",
+            () -> {
+              try {
+                swabbieService.restore(namespace, resourceId, "");
+              } catch (RetrofitError e) {
+                return Integer.toString(e.getResponse().getStatus());
+              }
+              return "200";
+            })
+        .execute();
     return "200";
   }
 
   public List getMarkedList() {
-    return swabbieService.getMarkedList(true);
+    return (List)
+        HystrixFactory.newListCommand(GROUP, "get", () -> swabbieService.getMarkedList(true))
+            .execute();
   }
 
   public List getDeletedList() {
-    return swabbieService.getDeletedList();
+    return (List)
+        HystrixFactory.newListCommand(GROUP, "get", () -> swabbieService.getDeletedList())
+            .execute();
   }
 }

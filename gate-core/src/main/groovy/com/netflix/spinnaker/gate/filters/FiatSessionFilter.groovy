@@ -76,8 +76,6 @@ class FiatSessionFilter implements Filter {
             SecurityContextHolder.clearContext()
           }
         }
-      } else {
-        log.warn("Authenticated user was not present in authenticated request. Check authentication settings.")
       }
     } else {
       if (log.isDebugEnabled()) {
@@ -105,4 +103,3 @@ class FiatSessionFilter implements Filter {
   void destroy() {
   }
 }
-

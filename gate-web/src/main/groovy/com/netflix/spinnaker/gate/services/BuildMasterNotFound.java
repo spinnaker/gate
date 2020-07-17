@@ -16,12 +16,12 @@
 
 package com.netflix.spinnaker.gate.services;
 
-import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class BuildMasterNotFound extends SpinnakerException {
+public class BuildMasterNotFound extends HystrixBadRequestException {
   public BuildMasterNotFound(String message) {
     super(message);
   }

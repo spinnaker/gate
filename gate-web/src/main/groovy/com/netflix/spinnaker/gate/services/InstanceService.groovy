@@ -20,6 +20,7 @@ package com.netflix.spinnaker.gate.services
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.frigga.Names
 import com.netflix.spinnaker.gate.config.InsightConfiguration
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component
 @CompileStatic
 @Component
 class InstanceService {
+  private static final String GROUP = "instances"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
@@ -42,24 +44,28 @@ class InstanceService {
   ObjectMapper objectMapper
 
   Map getForAccountAndRegion(String account, String region, String instanceId, String selectorKey) {
-    def service = clouddriverServiceSelector.select()
-    def accountDetails = objectMapper.convertValue(service.getAccount(account), Map)
-    def instanceDetails = service.getInstanceDetails(account, region, instanceId)
-    def instanceContext = instanceDetails.collectEntries {
-      return it.value instanceof String ? [it.key, it.value] : [it.key, ""]
-    } as Map<String, String>
-    String application
-    if (instanceContext.serverGroup) {
-      application = Names.parseName(instanceContext.serverGroup)?.app
-    }
-    def context = getContext(account, region, instanceId) + instanceContext + accountDetails + ["application": application]
-    return instanceDetails + [
-        "insightActions": insightConfiguration.instance.findResults { it.applyContext(context) }
-    ]
+    HystrixFactory.newMapCommand(GROUP, "getInstancesForAccountAndRegion-${providerLookupService.providerForAccount(account)}") {
+      def service = clouddriverServiceSelector.select()
+      def accountDetails = objectMapper.convertValue(service.getAccount(account), Map)
+      def instanceDetails = service.getInstanceDetails(account, region, instanceId)
+      def instanceContext = instanceDetails.collectEntries {
+        return it.value instanceof String ? [it.key, it.value] : [it.key, ""]
+      } as Map<String, String>
+      String application
+      if (instanceContext.serverGroup) {
+        application = Names.parseName(instanceContext.serverGroup)?.app
+      }
+      def context = getContext(account, region, instanceId) + instanceContext + accountDetails + ["application": application]
+      return instanceDetails + [
+          "insightActions": insightConfiguration.instance.findResults { it.applyContext(context) }
+      ]
+    } execute()
   }
 
   Map getConsoleOutput(String account, String region, String instanceId, String provider, String selectorKey) {
-    return clouddriverServiceSelector.select().getConsoleOutput(account, region, instanceId, provider)
+    HystrixFactory.newMapCommand(GROUP, "getConsoleOutput-${providerLookupService.providerForAccount(account)}") {
+      return clouddriverServiceSelector.select().getConsoleOutput(account, region, instanceId, provider)
+    } execute()
   }
 
   static Map<String, String> getContext(String account, String region, String instanceId) {

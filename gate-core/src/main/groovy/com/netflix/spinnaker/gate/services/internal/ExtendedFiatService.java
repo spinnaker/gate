@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.spinnaker.gate.graphql.model;
 
-/**
- * NOTICE: This is just scaffolding to allow the application to start. It should be removed once
- * real logic is implemented.
- */
-public class EmptyNode implements Node {
-  @Override
-  public String getId() {
-    return "empty";
-  }
+package com.netflix.spinnaker.gate.services.internal;
+
+import com.netflix.spinnaker.fiat.model.UserPermission;
+import java.util.List;
+import retrofit.http.GET;
+import retrofit.http.Path;
+
+public interface ExtendedFiatService {
+
+  @GET("/authorize/{userId}/serviceAccounts?expand=true")
+  List<UserPermission.View> getUserServiceAccounts(@Path("userId") String userId);
 }

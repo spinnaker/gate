@@ -17,6 +17,7 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,15 +27,20 @@ import org.springframework.web.bind.annotation.RequestParam
 @CompileStatic
 @Component
 class EntityTagsService {
+  private static final String GROUP = "entityTags"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
 
   List<Map> list(@RequestParam Map<String, Object> allParameters, String selectorKey) {
-    clouddriverServiceSelector.select().listEntityTags(allParameters)
+    HystrixFactory.newListCommand(GROUP, "listEntityTags") {
+      clouddriverServiceSelector.select().listEntityTags(allParameters)
+    } execute()
   }
 
   Map get(String id, String selectorKey) {
-    clouddriverServiceSelector.select().getEntityTags(id)
+    HystrixFactory.newMapCommand(GROUP, "getEntityTags") {
+      clouddriverServiceSelector.select().getEntityTags(id)
+    } execute()
   }
 }

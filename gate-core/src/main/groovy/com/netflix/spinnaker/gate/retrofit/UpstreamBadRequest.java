@@ -19,11 +19,11 @@ package com.netflix.spinnaker.gate.retrofit;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static retrofit.RetrofitError.Kind.HTTP;
 
-import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import java.util.Collection;
 import retrofit.RetrofitError;
 
-public class UpstreamBadRequest extends SpinnakerException {
+public class UpstreamBadRequest extends HystrixBadRequestException {
 
   private final int status;
   private final String url;
