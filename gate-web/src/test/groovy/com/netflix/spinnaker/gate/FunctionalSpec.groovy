@@ -39,6 +39,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import retrofit.RestAdapter
 import retrofit.RetrofitError
+import retrofit.RestAdapter;
 import retrofit.client.OkClient
 import retrofit.mime.TypedInput
 import spock.lang.Shared
@@ -93,6 +94,8 @@ class FunctionalSpec extends Specification {
     System.setProperty("saml.enabled", "false")
     System.setProperty('spring.session.store-type', 'NONE')
     System.setProperty("spring.main.allow-bean-definition-overriding", "true")
+    System.setProperty("spring.profiles.active", "test")
+    System.setProperty("retrofit.enabled", "false")
     def spring = new SpringApplication()
     spring.setSources([FunctionalConfiguration] as Set)
     ctx = spring.run()
@@ -233,6 +236,11 @@ class FunctionalSpec extends Specification {
     AccountLookupService accountLookupService() {
       accountLookupService
     }
+
+    @Bean
+    RestAdapter.LogLevel retrofitLogLevel() {
+      return RestAdapter.LogLevel.BASIC
+   }
 
     @Bean
     PipelineController pipelineController() {
