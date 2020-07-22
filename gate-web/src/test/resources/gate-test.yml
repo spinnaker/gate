@@ -66,4 +66,4 @@ spinnaker:
         url: https://front50.net
 
 retrofit:
-  enabled: false
+  enabled: true

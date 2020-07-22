@@ -38,6 +38,7 @@ dependencies {
 
   implementation "com.netflix.spinnaker.kork:kork-plugins"
   implementation "com.netflix.spinnaker.kork:kork-web"
+  implementation "com.netflix.spinnaker.kork:kork-retrofit"
   implementation "com.netflix.frigga:frigga"
   implementation "redis.clients:jedis"
 
@@ -71,6 +72,7 @@ dependencies {
   testImplementation "org.springframework.security:spring-security-oauth2-jose"
   testImplementation "com.unboundid:unboundid-ldapsdk"
   testImplementation "com.netflix.spinnaker.kork:kork-jedis-test"
+  testImplementation "com.netflix.spinnaker.kork:kork-retrofit"
 
   // Add each included authz provider as a runtime dependency
   gradle.includedProviderProjects.each {
@@ -98,4 +100,5 @@ test {
       }
     }
   }
+  useJUnitPlatform()
 }
