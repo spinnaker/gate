@@ -62,7 +62,7 @@ public class PostConnectionConfiguringJedisConnectionFactory extends JedisConnec
     }
 
     if (redisUri.getScheme().equals("rediss")) {
-        setUseSsl(true);
+      setUseSsl(true);
     }
   }
 
