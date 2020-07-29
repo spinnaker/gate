@@ -2,6 +2,9 @@ services:
   opsmx:
     baseUrl: http://oes-api:8085
     enabled: true
+  autopilot:
+    baseUrl: http://localhost:8090
+    enabled: true
 security:
   basic:
     enabled: true
@@ -12,6 +15,8 @@ ldap:
   enabled: true
   url: ldap://localhost:389/DC=example,DC=com
   userDnPattern:  uid={0},ou=people
+login:
+  mode: session
 google: {}
 logging:
   level:

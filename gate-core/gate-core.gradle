@@ -37,6 +37,7 @@ dependencies {
   implementation "com.github.ben-manes.caffeine:guava"
   implementation "com.netflix.hystrix:hystrix-core"
   implementation "org.apache.commons:commons-lang3"
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 }
 
 sourceSets {

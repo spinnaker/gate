@@ -220,6 +220,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
+  @ConditionalOnProperty("services.autopilot.enabled")
+  OpsmxAutopilotService opsmxAutopilotService(OkHttpClient okHttpClient) {
+    createClient "autopilot", OpsmxAutopilotService, okHttpClient
+  }
+
+  @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
                                                         OkHttpClient okHttpClient,
                                                         DynamicConfigService dynamicConfigService,
