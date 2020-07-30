@@ -51,7 +51,7 @@ class DefaultProviderLookupService implements ProviderLookupService, AccountLook
     this.clouddriverService = clouddriverService
   }
 
-  //@Scheduled(fixedDelay = 30000L)
+  @Scheduled(cron = '${scheduler.spinnaker.clouddriver:*/30 * * * * *}')
   void refreshCache() {
     try {
       def accounts = AuthenticatedRequest.allowAnonymous { clouddriverService.getAccountDetails() }

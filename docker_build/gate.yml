@@ -17,6 +17,10 @@ ldap:
   userDnPattern:  uid={0},ou=people
 login:
   mode: session
+scheduler:
+  spinnaker:
+    clouddriver: '-'
+    front50: '-'
 google: {}
 logging:
   level:

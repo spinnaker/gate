@@ -29,7 +29,27 @@ interface OpsmxAutopilotService {
   Object getAutoResponse(@Path('type') String type,
                          @Path('source') String source,
                          @Query("application") Integer id,
-                         @Query("applicationId") Integer applicationId)
+                         @Query("applicationId") Integer applicationId,
+                         @Query("serviceId") Integer serviceId,
+                         @Query("startTime") Long startTime,
+                         @Query("endTime") Long endTime,
+                         @Query("intervalMins") Float intervalMins,
+                         @Query("limit") Integer limit,
+                         @Query("sourceType") String sourceType,
+                         @Query("accountName") String accountName,
+                         @Query("templateType") String templateType,
+                         @Query("name") String name,
+                         @Query("appId") Integer appId,
+                         @Query("pipelineid") String pipelineid,
+                         @Query("applicationName") String applicationName,
+                         @Query("username") String username,
+                         @Query("templateName") String templateName,
+                         @Query("credentialType") String credentialType,
+                         @Query("id") Integer canaryId,
+                         @Query("service") Integer service,
+                         @Query("canaryId") Integer canary,
+                         @Query("clusterId") Long clusterId,
+                         @Query("version") String version)
 
   @GET("/autopilot/{type}/{source}/{source1}")
   Object getAutoResponse4(@Path('type') String type,

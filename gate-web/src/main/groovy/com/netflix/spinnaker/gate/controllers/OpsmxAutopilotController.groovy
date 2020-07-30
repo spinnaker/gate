@@ -65,8 +65,29 @@ class OpsmxAutopilotController {
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
   Object getAutoResponse(@PathVariable("type") String type, @PathVariable("source") String source,
                          @RequestParam(value = "application", required = false) Integer id,
-                         @RequestParam(value = "applicationId", required = false) Integer applicationId) {
-    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId)
+                         @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                         @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                         @RequestParam(value = "startTime", required = false) Long startTime,
+                         @RequestParam(value = "endTime", required = false) Long endTime,
+                         @RequestParam(value = "intervalMins", required = false) Float intervalMins,
+                         @RequestParam(value = "limit", required = false) Integer limit,
+                         @RequestParam(value = "sourceType", required = false) String sourceType,
+                         @RequestParam(value = "accountName", required = false)  String accountName,
+                         @RequestParam(name = "templateType",required = false) String templateType,
+                         @RequestParam(value = "name", required = false) String name,
+                         @RequestParam(name = "appId",required = false) Integer appId,
+                         @RequestParam(value = "pipelineid", required = false) String pipelineId,
+                         @RequestParam(value = "applicationName",required = false) String applicationName,
+                         @RequestParam(value = "username", required = false) String userName,
+                         @RequestParam(value = "templateName", required = false) String templateName,
+                         @RequestParam(value = "credentialType", required = false) String credentialType,
+                         @RequestParam(value = "id", required = false) Integer canaryId,
+                         @RequestParam(value = "service", required = false) Integer service,
+                         @RequestParam(value = "canaryId", required = false) Integer canary,
+                         @RequestParam(value = "clusterId", required = false) Long clusterId,
+                         @RequestParam(value = "version", required = false) String  version){
+    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType,
+      accountName, templateType, name, appId, pipelineId, applicationName, userName, templateName, credentialType, canaryId, service, canary, clusterId, version)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
