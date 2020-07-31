@@ -15,12 +15,8 @@ ldap:
   enabled: true
   url: ldap://localhost:389/DC=example,DC=com
   userDnPattern:  uid={0},ou=people
-login:
+authn:
   mode: session
-scheduler:
-  spinnaker:
-    clouddriver: '-'
-    front50: '-'
 google: {}
 logging:
   level:

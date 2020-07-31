@@ -58,7 +58,7 @@ class ApplicationService {
 
   private AtomicReference<List<Map>> allApplicationsCache = new AtomicReference<>([])
 
-  @Scheduled(cron = '${scheduler.spinnaker.front50:*/5 * * * * *}')
+  //@Scheduled(fixedDelayString = '${services.front50.applicationRefreshIntervalMs:5000}')
   void refreshApplicationsCache() {
     try {
       log.debug("Refreshing Application List")

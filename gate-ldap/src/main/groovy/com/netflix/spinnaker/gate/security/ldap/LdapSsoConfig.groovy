@@ -120,14 +120,14 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    if (loginProps == null || loginProps.mode.equalsIgnoreCase("session"))
+    if (loginProps.mode == null || loginProps.mode.equalsIgnoreCase("session"))
     {
       defaultCookieSerializer.setSameSite(null)
       http.formLogin()
       authConfig.configure(http)
       http.addFilterBefore(new BasicAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter)
     }
-    else if (loginProps !=null && loginProps.mode.equalsIgnoreCase("token")) {
+    else if (loginProps.mode !=null && loginProps.mode.equalsIgnoreCase("token")) {
       authConfig.jwtconfigure(http)
     }
 
@@ -184,7 +184,7 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Component
-  @ConfigurationProperties("login")
+  @ConfigurationProperties("authn")
   static class LoginProps {
     String mode
   }
