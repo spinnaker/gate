@@ -21,17 +21,20 @@ import static retrofit.RetrofitError.Kind.HTTP;
 
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import java.util.Collection;
+
 import retrofit.RetrofitError;
 
 public class UpstreamBadRequest extends SpinnakerException {
 
   private final int status;
   private final String url;
+  private final Object error;
 
   private UpstreamBadRequest(RetrofitError cause) {
     super(cause.getMessage(), cause);
     status = cause.getResponse().getStatus();
     url = cause.getUrl();
+    error = cause.getBody();
   }
 
   public int getStatus() {
@@ -40,6 +43,10 @@ public class UpstreamBadRequest extends SpinnakerException {
 
   public String getUrl() {
     return url;
+  }
+
+  public Object getError() {
+    return error;
   }
 
   public static Exception classifyError(RetrofitError error) {
