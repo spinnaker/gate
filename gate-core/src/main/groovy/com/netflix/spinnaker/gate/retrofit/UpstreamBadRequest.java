@@ -21,7 +21,6 @@ import static retrofit.RetrofitError.Kind.HTTP;
 
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import java.util.Collection;
-
 import retrofit.RetrofitError;
 
 public class UpstreamBadRequest extends SpinnakerException {
