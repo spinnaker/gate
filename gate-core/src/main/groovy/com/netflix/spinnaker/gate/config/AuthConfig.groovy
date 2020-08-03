@@ -38,6 +38,8 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
 import org.springframework.stereotype.Component
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.Filter
 import javax.servlet.ServletException
@@ -66,6 +68,12 @@ class AuthConfig {
 
   @Autowired
   RequestMatcherProvider requestMatcherProvider
+
+  @Autowired
+  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+
+  @Autowired
+  private JwtRequestFilter jwtRequestFilter;
 
   @Value('${security.debug:false}')
   boolean securityDebug
@@ -104,6 +112,28 @@ class AuthConfig {
       .csrf()
         .disable()
     // @formatter:on
+  }
+
+   void jwtconfigure(HttpSecurity http) throws Exception {
+    http
+      .csrf()
+      .disable()
+      .cors()
+      .disable()
+      .exceptionHandling()
+      .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+      .authorizeRequests()
+      .antMatchers("/auth/login").permitAll()
+      .antMatchers('/**/favicon.ico').permitAll()
+      .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+      .antMatchers(PermissionRevokingLogoutSuccessHandler.LOGGED_OUT_URL).permitAll()
+      .antMatchers('/plugins/deck/**').permitAll()
+      .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
+      .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
+      .antMatchers('/health').permitAll()
+      .anyRequest().authenticated()
+     http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   void configure(WebSecurity web) throws Exception {
