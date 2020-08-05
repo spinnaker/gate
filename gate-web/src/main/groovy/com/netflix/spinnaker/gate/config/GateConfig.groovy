@@ -226,6 +226,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
+  @ConditionalOnProperty("services.platform.enabled")
+  OpsmxPlatformService opsmxPlatformService(OkHttpClient okHttpClient) {
+    createClient "platform", OpsmxPlatformService, okHttpClient
+  }
+
+  @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
                                                         OkHttpClient okHttpClient,
                                                         DynamicConfigService dynamicConfigService,
