@@ -5,6 +5,9 @@ services:
   autopilot:
     baseUrl: http://localhost:8090
     enabled: true
+  platform:
+    baseUrl: http://localhost:8095
+    enabled: true
 security:
   basic:
     enabled: true
