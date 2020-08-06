@@ -21,7 +21,7 @@ import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.gate.config.Service
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.HealthCheckableService
-import com.netflix.spinnaker.kork.retrofit.RetrofitServiceProvider
+import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +45,7 @@ class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
   AtomicBoolean skipDownstreamServiceChecks = new AtomicBoolean(false)
 
   @Autowired
-  DownstreamServicesHealthIndicator(RetrofitServiceProvider serviceProvider,
+  DownstreamServicesHealthIndicator(ServiceClientProvider serviceProvider,
                                     ServiceConfiguration serviceConfiguration) {
     this(
       serviceConfiguration.services.findResults { String name, Service service ->

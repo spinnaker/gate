@@ -1,6 +1,6 @@
 package com.netflix.spinnaker.gate;
 
-import com.netflix.spinnaker.kork.retrofit.RetrofitServiceProvider;
+import com.netflix.spinnaker.kork.client.ServiceClientProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestPropertySource(properties = {"spring.config.location=classpath:gate-test.yml"})
 public class MainSpec {
 
-  @Autowired RetrofitServiceProvider retrofitServiceProvider;
+  @Autowired ServiceClientProvider serviceClientProvider;
 
   @Test
   public void startupTest() {
-    assert retrofitServiceProvider != null;
+    assert serviceClientProvider != null;
   }
 }
