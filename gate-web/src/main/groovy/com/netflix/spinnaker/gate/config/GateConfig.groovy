@@ -38,8 +38,8 @@ import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
 import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
+import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
-import com.netflix.spinnaker.kork.retrofit.RetrofitServiceProvider
 import com.netflix.spinnaker.kork.web.context.AuthenticatedRequestContextProvider
 import com.netflix.spinnaker.kork.web.context.RequestContextProvider
 import com.netflix.spinnaker.kork.web.selector.DefaultServiceSelector
@@ -83,12 +83,12 @@ import static retrofit.Endpoints.newFixedEndpoint
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
-  private final RetrofitServiceProvider retrofitServiceProvider
+  private final ServiceClientProvider serviceClientProvider
 
   @Autowired
-  GateConfig(RetrofitServiceProvider serviceClientProvider,
-            @Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
-    this.retrofitServiceProvider = serviceClientProvider
+  GateConfig(ServiceClientProvider serviceClientProvider,
+             @Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
+    this.serviceClientProvider = serviceClientProvider
     super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
   }
 
@@ -325,7 +325,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .registerModule(new JavaTimeModule())
 
-    retrofitServiceProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
+    serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
 
   }
 
