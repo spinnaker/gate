@@ -16,11 +16,9 @@
 package com.netflix.spinnaker.gate.security.basic
 
 import com.netflix.spinnaker.gate.Main
-import com.netflix.spinnaker.gate.config.GateConfig
 import com.netflix.spinnaker.gate.config.RedisTestConfig
 import com.netflix.spinnaker.gate.security.FormLoginRequestBuilder
 import com.netflix.spinnaker.gate.security.GateSystemTest
-import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import groovy.util.logging.Slf4j
@@ -30,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
@@ -45,13 +43,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @GateSystemTest
-@SpringBootTest(properties = ["fiat.enabled=false"])
-@ContextConfiguration(
-  classes = [Main, GateConfig, BasicAuthConfig, BasicTestConfig, RedisTestConfig],
-  initializers = YamlFileApplicationContextInitializer
-)
+@SpringBootTest(classes = [Main, BasicAuthConfig, BasicTestConfig, RedisTestConfig], properties = ["fiat.enabled=false"])
 @AutoConfigureMockMvc
-@TestPropertySource("/basic-auth.properties")
+@ActiveProfiles(["test", "basicauth"])
+@TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
 class BasicAuthSpec extends Specification {
 
   @Autowired

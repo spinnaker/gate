@@ -71,7 +71,6 @@ dependencies {
   testImplementation "org.springframework.security:spring-security-oauth2-jose"
   testImplementation "com.unboundid:unboundid-ldapsdk"
   testImplementation "com.netflix.spinnaker.kork:kork-jedis-test"
-  testRuntimeOnly "com.netflix.spinnaker.kork:kork-retrofit"
 
   // Add each included authz provider as a runtime dependency
   gradle.includedProviderProjects.each {

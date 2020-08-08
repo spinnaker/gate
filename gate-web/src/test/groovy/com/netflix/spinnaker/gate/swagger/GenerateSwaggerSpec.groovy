@@ -2,13 +2,14 @@ package com.netflix.spinnaker.gate.swagger
 
 import com.netflix.spinnaker.gate.Main
 import com.netflix.spinnaker.gate.security.GateSystemTest
-import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.internal.IgorService
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -21,14 +22,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Slf4j
 @GateSystemTest
-@ContextConfiguration(
-  classes = [Main],
-  initializers = YamlFileApplicationContextInitializer
-)
-@TestPropertySource(
-  // Enable Controllers we want to document in the spec here.
-  properties = [ "services.kayenta.enabled=true","services.kayenta.canary-config-store=true",
-    "services.keel.enabled=true", "spring.application.name=gate", 'services.fiat.baseUrl=https://localhost', 'services.keel.baseUrl=https://localhost' ])
+@SpringBootTest(classes = [Main])
+@AutoConfigureMockMvc
+@ActiveProfiles(["test"])
+@TestPropertySource(properties = [
+  "services.kayenta.enabled=true",
+  "services.kayenta.baseUrl=https://localhost",
+  "services.kayenta.canary-config-store=true",
+  "services.keel.enabled=true",
+  "spring.application.name=gate",
+  'services.fiat.baseUrl=https://localhost',
+  'services.keel.baseUrl=https://localhost',
+  "spring.config.location=classpath:gate-test.yml"])
 class GenerateSwaggerSpec extends Specification {
 
   @Autowired

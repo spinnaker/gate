@@ -20,11 +20,9 @@ import com.netflix.spinnaker.gate.Main
 import com.netflix.spinnaker.gate.config.RedisTestConfig
 import com.netflix.spinnaker.gate.security.FormLoginRequestBuilder
 import com.netflix.spinnaker.gate.security.GateSystemTest
-import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.security.ldap.LdapSsoConfig.LdapConfigProps
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
-import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -33,7 +31,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.security.ldap.server.UnboundIdContainer
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import spock.lang.Specification
@@ -45,15 +44,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 
-@Slf4j
+
 @GateSystemTest
-@SpringBootTest(
-    properties = ['ldap.enabled=true', 'spring.application.name=gate', 'fiat.enabled=false', 'services.fiat.baseUrl=https://localhost'])
-@ContextConfiguration(
-  classes = [LdapSsoConfig, Main, LdapTestConfig, RedisTestConfig],
-  initializers = YamlFileApplicationContextInitializer
-)
+@SpringBootTest(classes = [LdapSsoConfig, Main, LdapTestConfig, RedisTestConfig], properties = ["fiat.enabled=false"])
 @AutoConfigureMockMvc
+@ActiveProfiles(["test", "ldapauth"])
+@TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
 class LdapAuthSpec extends Specification {
 
   @Autowired

@@ -32,6 +32,10 @@ services:
 slack:
   baseUrl: "https://slack.com"
 
+integrations:
+  gremlin:
+    enabled: false
+    baseUrl: https://api.gremlin.com/v1
 ---
 
 spring:
@@ -66,4 +70,25 @@ spinnaker:
         url: https://front50.net
 
 retrofit:
+  enabled: true
+
+---
+
+spring:
+  profiles: basicauth
+  security:
+    user:
+      name: basic-user
+      password: basic-password
+
+security:
+  basicform:
+    enabled: true
+
+---
+
+spring:
+  profiles: ldapauth
+
+ldap:
   enabled: true
