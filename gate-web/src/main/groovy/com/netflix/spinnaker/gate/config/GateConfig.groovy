@@ -83,12 +83,20 @@ import static retrofit.Endpoints.newFixedEndpoint
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
-  private final ServiceClientProvider serviceClientProvider
+  private ServiceClientProvider serviceClientProvider
+
+  @Value('${server.session.timeout-in-seconds:3600}')
+  void setSessionTimeout(int maxInactiveIntervalInSeconds) {
+    super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
+  }
 
   @Autowired
-  GateConfig(ServiceClientProvider serviceClientProvider,
-             @Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
+  void setServiceClientProvider(ServiceClientProvider serviceClientProvider) {
     this.serviceClientProvider = serviceClientProvider
+  }
+
+  @Autowired
+  GateConfig(@Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
     super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
   }
 
