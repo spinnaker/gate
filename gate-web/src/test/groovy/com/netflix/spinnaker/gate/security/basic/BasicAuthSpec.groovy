@@ -15,14 +15,18 @@
  */
 package com.netflix.spinnaker.gate.security.basic
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.config.ServiceEndpoint
 import com.netflix.spinnaker.gate.Main
-import com.netflix.spinnaker.gate.config.GateConfig
 import com.netflix.spinnaker.gate.config.RedisTestConfig
 import com.netflix.spinnaker.gate.security.FormLoginRequestBuilder
 import com.netflix.spinnaker.gate.security.GateSystemTest
 import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.kork.client.ServiceClientProvider
+import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
+
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -47,10 +51,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @GateSystemTest
 @SpringBootTest(properties = ["fiat.enabled=false"])
 @ContextConfiguration(
-  classes = [Main, GateConfig, BasicAuthConfig, BasicTestConfig, RedisTestConfig],
+  classes = [Main, BasicAuthConfig, BasicTestConfig, RedisTestConfig],
   initializers = YamlFileApplicationContextInitializer
 )
 @AutoConfigureMockMvc
+@AutoConfigureServiceClientProvider
 @TestPropertySource("/basic-auth.properties")
 class BasicAuthSpec extends Specification {
 
@@ -131,6 +136,22 @@ class BasicAuthSpec extends Specification {
           ]
         }
       }
+    }
+
+    @Bean
+    @Primary
+    ServiceClientProvider serviceClientProvider() {
+     return new ServiceClientProvider() {
+       @Override
+       def <T> T getService(Class<T> type, ServiceEndpoint serviceEndpoint) {
+         return null
+       }
+
+       @Override
+       def <T> T getService(Class<T> type, ServiceEndpoint serviceEndpoint, ObjectMapper objectMapper) {
+         return null
+       }
+     }
     }
 
   }

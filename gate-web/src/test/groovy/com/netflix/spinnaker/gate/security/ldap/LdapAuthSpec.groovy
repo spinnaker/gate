@@ -24,6 +24,7 @@ import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.security.ldap.LdapSsoConfig.LdapConfigProps
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
+import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -54,6 +55,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
   initializers = YamlFileApplicationContextInitializer
 )
 @AutoConfigureMockMvc
+@AutoConfigureServiceClientProvider
 class LdapAuthSpec extends Specification {
 
   @Autowired

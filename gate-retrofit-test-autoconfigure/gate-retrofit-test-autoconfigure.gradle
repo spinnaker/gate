@@ -1,0 +1,6 @@
+description = "Spring Boot Test Retrofit Client AutoConfigure"
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-test-autoconfigure"
+    testRuntimeOnly "com.netflix.spinnaker.kork:kork-retrofit"
+}

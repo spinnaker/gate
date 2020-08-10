@@ -39,7 +39,8 @@ include "gate-api",
   "gate-saml",
   "gate-web",
   "gate-x509",
-  "gate-integrations-gremlin"
+  "gate-integrations-gremlin",
+  "gate-retrofit-test-autoconfigure"
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"

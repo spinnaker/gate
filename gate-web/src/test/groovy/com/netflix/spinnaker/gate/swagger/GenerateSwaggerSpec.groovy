@@ -4,6 +4,7 @@ import com.netflix.spinnaker.gate.Main
 import com.netflix.spinnaker.gate.security.GateSystemTest
 import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.internal.IgorService
+import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
   classes = [Main],
   initializers = YamlFileApplicationContextInitializer
 )
+@AutoConfigureServiceClientProvider
 @TestPropertySource(
   // Enable Controllers we want to document in the spec here.
   properties = [ "services.kayenta.enabled=true","services.kayenta.canary-config-store=true",

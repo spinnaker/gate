@@ -1,0 +1,2 @@
+org.springframework.boot.test.autoconfigure.jooq.AutoConfigureServiceClientProvider=\
+com.netflix.spinnaker.kork.retrofit.RetrofitServiceFactoryAutoConfiguration
