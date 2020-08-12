@@ -4,9 +4,12 @@ import com.netflix.spinnaker.gate.config.AuthenticationRequest
 import com.netflix.spinnaker.gate.config.AuthenticationResponse
 import com.netflix.spinnaker.gate.config.JwtUtil
 import com.netflix.spinnaker.gate.services.UserDataService
+import com.netflix.spinnaker.gate.util.OesRestApi
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -30,6 +33,15 @@ class TokenAuthController {
   @Autowired
   AuthenticationManager authenticationManager
 
+  @Value('${services.platform.enabled:false}')
+  boolean isPlatformEnabled;
+
+  @Value('${services.platform.baseUrl:null}')
+  String url;
+
+  @Value('${services.platform.groupPath:null}')
+  String apiPath;
+
   @ApiOperation(value = "New Login for Jwt")
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest ) {
@@ -45,9 +57,21 @@ class TokenAuthController {
 
     final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
-    final String jwt = jwtTokenUtil.generateToken(userDetails);
-
-    return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    if (isPlatformEnabled) {
+      String path = apiPath.replace("{username}",userDetails.getUsername());
+      boolean isSuccessful = OesRestApi.initiateUserGroupInPlatform(url+path);
+      if (isSuccessful) {
+        final String jwt = jwtTokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+      }
+      else {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+    else {
+      final String jwt = jwtTokenUtil.generateToken(userDetails);
+      return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
   }
 
 }

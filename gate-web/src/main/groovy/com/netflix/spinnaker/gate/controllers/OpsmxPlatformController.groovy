@@ -191,4 +191,14 @@ class OpsmxPlatformController {
     return opsmxPlatformService.updatePlatformResponse1(version, type, source, data)
   }
 
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.PUT)
+  Object updatePlatformResponse2(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2) {
+
+    return opsmxPlatformService.updatePlatformResponse2(version, type, source, source1, source2)
+  }
 }
