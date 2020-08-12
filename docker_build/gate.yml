@@ -7,7 +7,7 @@ services:
     enabled: true
   platform:
     baseUrl: http://localhost:8095
-    groupPath: /platformservice/v1/users/{username}/userGroups/importAndCache
+    userGroupApiPath: /platformservice/v1/users/{username}/userGroups/importAndCache
     enabled: true
 security:
   basic:
