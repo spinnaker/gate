@@ -106,4 +106,11 @@ interface OpsmxPlatformService {
                                 @Path('source') String source,
                                 @Body Object data)
 
+  @PUT("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object updatePlatformResponse2(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2)
+
 }
