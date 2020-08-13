@@ -53,11 +53,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @Slf4j
-@GateSystemTest
+//@GateSystemTest
 @SpringBootTest(classes = [Main, BasicAuthConfig, BasicTestConfig, RedisTestConfig], properties = ["fiat.enabled=false"])
-@ContextConfiguration(
-  initializers = YamlFileApplicationContextInitializer
-)
+@TestPropertySource(properties = ["spring.config.location=classpath:gate.yml"])
 @AutoConfigureMockMvc
 @AutoConfigureServiceClientProvider
 @TestPropertySource("/basic-auth.properties")
