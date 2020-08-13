@@ -15,8 +15,9 @@
  */
 package com.netflix.spinnaker.gate.security.basic
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.config.ServiceEndpoint
 import com.netflix.spinnaker.gate.Main
-import com.netflix.spinnaker.gate.config.GateConfig
 import com.netflix.spinnaker.gate.config.RedisTestConfig
 import com.netflix.spinnaker.gate.security.FormLoginRequestBuilder
 import com.netflix.spinnaker.gate.security.GateSystemTest
@@ -25,9 +26,13 @@ import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
-
+import graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.actuate.autoconfigure.ldap.LdapHealthContributorAutoConfiguration
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
@@ -57,10 +62,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureServiceClientProvider
 @TestPropertySource("/basic-auth.properties")
+@EnableAutoConfiguration(exclude = [
+  GroovyTemplateAutoConfiguration,
+  GsonAutoConfiguration,
+  LdapHealthContributorAutoConfiguration,
+  GraphQLWebsocketAutoConfiguration
+])
 class BasicAuthSpec extends Specification {
 
   @Autowired
   MockMvc mockMvc
+
+  @Autowired
+  ServiceClientProvider serviceClientProvider
 
   def "should do basic authentication"() {
     setup:
@@ -91,6 +105,7 @@ class BasicAuthSpec extends Specification {
 
     then:
     result.response.contentAsString.contains("foo")
+    serviceClientProvider
   }
 
   def "should return user object on correct credentials"() {
@@ -135,6 +150,22 @@ class BasicAuthSpec extends Specification {
           return [
             new ClouddriverService.AccountDetails(name: "foo")
           ]
+        }
+      }
+    }
+
+    @Bean
+    @Primary
+    ServiceClientProvider serviceClientProvider() {
+      new ServiceClientProvider() {
+        @Override
+        def <T> T getService(Class<T> type, ServiceEndpoint serviceEndpoint) {
+          return null
+        }
+
+        @Override
+        def <T> T getService(Class<T> type, ServiceEndpoint serviceEndpoint, ObjectMapper objectMapper) {
+          return null
         }
       }
     }
