@@ -36,6 +36,7 @@ import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
@@ -64,6 +65,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   GsonAutoConfiguration,
   LdapHealthContributorAutoConfiguration,
   GraphQLWebsocketAutoConfiguration
+])
+@ComponentScan(  basePackages =  [
+  "com.netflix.spinnaker.gate",
+  "com.netflix.spinnaker.config"
 ])
 class BasicAuthSpec extends Specification {
 
