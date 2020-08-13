@@ -91,8 +91,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Autowired
-  @Qualifier('serviceClientProvider')
-  void setServiceClientProvider(ServiceClientProvider serviceClientProvider) {
+  void setServiceClientProvider(@Qualifier('serviceClientProvider') ServiceClientProvider serviceClientProvider) {
     this.serviceClientProvider = serviceClientProvider
   }
 
