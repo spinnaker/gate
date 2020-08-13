@@ -55,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 //@GateSystemTest
-@SpringBootTest(classes = [Main, BasicAuthConfig, BasicTestConfig, RedisTestConfig], properties = ["fiat.enabled=false"])
+@SpringBootTest(classes = [Main,  BasicTestConfig, RedisTestConfig], properties = ["fiat.enabled=false"])
 @TestPropertySource(properties = ["spring.config.location=classpath:gate.yml"])
 @AutoConfigureMockMvc
 @AutoConfigureServiceClientProvider
