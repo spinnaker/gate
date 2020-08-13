@@ -23,6 +23,7 @@ import com.netflix.spinnaker.gate.security.GateSystemTest
 import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 
 import groovy.util.logging.Slf4j
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ContextConfiguration
@@ -119,6 +121,7 @@ class BasicAuthSpec extends Specification {
   static class BasicTestConfig {
 
     @Bean
+    @DependsOn("serviceClientProvider")
     RedisTestConfig redisTestConfig() {
       new RedisTestConfig()
     }
