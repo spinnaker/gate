@@ -25,7 +25,6 @@ import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.kork.client.ServiceClientProvider
-import com.netflix.spinnaker.kork.retrofit.RetrofitServiceFactoryAutoConfiguration
 import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration
 import groovy.util.logging.Slf4j
@@ -66,8 +65,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   GroovyTemplateAutoConfiguration,
   GsonAutoConfiguration,
   LdapHealthContributorAutoConfiguration,
-  GraphQLWebsocketAutoConfiguration,
-  RetrofitServiceFactoryAutoConfiguration
+  GraphQLWebsocketAutoConfiguration
 ])
 @ComponentScan(  basePackages =  [
   "com.netflix.spinnaker.gate",
