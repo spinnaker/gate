@@ -32,10 +32,6 @@ services:
 slack:
   baseUrl: "https://slack.com"
 
-integrations:
-  gremlin:
-    enabled: false
-    baseUrl: https://api.gremlin.com/v1
 ---
 
 spring:
