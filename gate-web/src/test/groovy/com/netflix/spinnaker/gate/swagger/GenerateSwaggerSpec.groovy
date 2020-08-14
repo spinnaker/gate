@@ -5,6 +5,8 @@ import com.netflix.spinnaker.gate.security.GateSystemTest
 import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.services.internal.IgorService
 import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
+import com.netflix.spinnaker.kork.client.ServiceClientProvider
+import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +16,7 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import org.springframework.http.MediaType
@@ -31,6 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
   // Enable Controllers we want to document in the spec here.
   properties = [ "services.kayenta.enabled=true","services.kayenta.canary-config-store=true",
     "services.keel.enabled=true", "spring.application.name=gate", 'services.fiat.baseUrl=https://localhost', 'services.keel.baseUrl=https://localhost' ])
+@Ignore
 class GenerateSwaggerSpec extends Specification {
 
   @Autowired

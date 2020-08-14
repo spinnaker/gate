@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Main)
 @ActiveProfiles('regexcors')
 @TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
+@Ignore
 class GateCorsRegexConfigSpec extends Specification {
 
   @Autowired

@@ -47,6 +47,8 @@ cors:
     https://testblah.domain.net,
     https://testblah.somewhere.net
 
+debug: true
+
 ---
 
 spring:

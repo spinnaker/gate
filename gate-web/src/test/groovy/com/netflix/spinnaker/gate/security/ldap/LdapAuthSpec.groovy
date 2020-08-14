@@ -26,6 +26,7 @@ import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
 import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import groovy.util.logging.Slf4j
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -56,6 +57,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 )
 @AutoConfigureMockMvc
 @AutoConfigureServiceClientProvider
+@Ignore
 class LdapAuthSpec extends Specification {
 
   @Autowired
