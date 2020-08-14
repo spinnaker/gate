@@ -47,8 +47,6 @@ cors:
     https://testblah.domain.net,
     https://testblah.somewhere.net
 
-debug: true
-
 ---
 
 spring:
@@ -70,27 +68,3 @@ spinnaker:
       front50:
         enabled: true
         url: https://front50.net
-
-retrofit:
-  enabled: true
-
----
-
-spring:
-  profiles: basicauth
-  security:
-    user:
-      name: basic-user
-      password: basic-password
-
-security:
-  basicform:
-    enabled: true
-
----
-
-spring:
-  profiles: ldapauth
-
-ldap:
-  enabled: true

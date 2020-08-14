@@ -1,2 +1,0 @@
-com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider=\
-com.netflix.spinnaker.kork.retrofit.RetrofitServiceFactoryAutoConfiguration

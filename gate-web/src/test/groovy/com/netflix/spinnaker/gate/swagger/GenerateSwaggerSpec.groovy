@@ -13,7 +13,6 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import org.springframework.http.MediaType
@@ -30,7 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
   // Enable Controllers we want to document in the spec here.
   properties = [ "rerofit.enabled=true","services.kayenta.enabled=true","services.kayenta.canary-config-store=true",
     "services.keel.enabled=true", "spring.application.name=gate", 'services.fiat.baseUrl=https://localhost', 'services.keel.baseUrl=https://localhost' ])
-@Ignore
 class GenerateSwaggerSpec extends Specification {
 
   @Autowired
