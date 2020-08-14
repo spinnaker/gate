@@ -24,9 +24,7 @@ import com.netflix.spinnaker.gate.security.YamlFileApplicationContextInitializer
 import com.netflix.spinnaker.gate.security.ldap.LdapSsoConfig.LdapConfigProps
 import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
-import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import groovy.util.logging.Slf4j
-import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -50,14 +48,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @Slf4j
 @GateSystemTest
 @SpringBootTest(
-    properties = ['ldap.enabled=true', 'spring.application.name=gate', 'fiat.enabled=false', 'services.fiat.baseUrl=https://localhost'])
+    properties = ['retrofit.enabled=true','ldap.enabled=true', 'spring.application.name=gate', 'fiat.enabled=false', 'services.fiat.baseUrl=https://localhost'])
 @ContextConfiguration(
   classes = [LdapSsoConfig, Main, LdapTestConfig, RedisTestConfig],
   initializers = YamlFileApplicationContextInitializer
 )
 @AutoConfigureMockMvc
-@AutoConfigureServiceClientProvider
-@Ignore
 class LdapAuthSpec extends Specification {
 
   @Autowired

@@ -17,14 +17,12 @@
 package com.netflix.spinnaker.gate.config
 
 import com.netflix.spinnaker.gate.Main
-import com.netflix.spinnaker.kork.test.autoconfigure.retrofit.AutoConfigureServiceClientProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,11 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@AutoConfigureServiceClientProvider
 @SpringBootTest(classes = Main)
 @ActiveProfiles('regexcors')
-@TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
-@Ignore
+@TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml", "retrofit.enabled=true"])
 class GateCorsRegexConfigSpec extends Specification {
 
   @Autowired
