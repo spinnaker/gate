@@ -55,11 +55,11 @@ class OpsmxAutopilotController {
   @Autowired
   OpsmxAutopilotService opsmxAutopilotService
 
-  @Autowired
-  ServiceConfiguration serviceConfiguration
-
-  @Autowired
-  OkHttpClient okHttpClient
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}", method = RequestMethod.GET)
+  Object getAutoResponse1(@PathVariable("type") String type) {
+    return opsmxAutopilotService.getAutoResponse1(type)
+  }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
@@ -78,25 +78,50 @@ class OpsmxAutopilotController {
                          @RequestParam(name = "appId",required = false) Integer appId,
                          @RequestParam(value = "pipelineid", required = false) String pipelineId,
                          @RequestParam(value = "applicationName",required = false) String applicationName,
-                         @RequestParam(value = "username", required = false) String userName,
+                         @RequestParam(value = "username", required = false) String username,
+                         @RequestParam(value = "userName", required = false) String userName,
                          @RequestParam(value = "templateName", required = false) String templateName,
                          @RequestParam(value = "credentialType", required = false) String credentialType,
                          @RequestParam(value = "id", required = false) Integer canaryId,
                          @RequestParam(value = "service", required = false) Integer service,
                          @RequestParam(value = "canaryId", required = false) Integer canary,
+                         @RequestParam(value = "canaryid", required = false) Integer canaryid,
                          @RequestParam(value = "clusterId", required = false) Long clusterId,
-                         @RequestParam(value = "version", required = false) String  version){
+                         @RequestParam(value = "version", required = false) String  version,
+                         @RequestParam(value="canaryAnalysisId", required=false) Integer canaryAnalysisId,
+                         @RequestParam(value = "metric", required = false) String metric,
+                         @RequestParam(value = "account", required = false) String account,
+                         @RequestParam(value = "metricType", required = false) String metricType,
+                         @RequestParam(value = "isBoxplotData", required = false) boolean isBoxplotData,
+                         @RequestParam(value = "metricname", required = false) String metricname,
+                         @RequestParam(value = "numofver", required = false) Integer numofver,
+                         @RequestParam(value = "serviceName", required = false) String serviceName,
+                         @RequestParam(value = "platform", required = false) String platform,
+                         @RequestParam(value = "ruleId", required = false) Integer ruleId,
+                         @RequestParam(value = "zone", required = false) String zone,
+                         @RequestParam(value = "type", required = false) String appType,
+                         @RequestParam(value = "metricTemplate", required = false) String metricTemplate,
+                         @RequestParam(value = "logTemplate", required = false) String logTemplate,
+                         @RequestParam(value = "riskanalysis_id", required = false) Integer riskanalysis_id,
+                         @RequestParam(value = "service_id", required = false) Integer service_id,
+                         @RequestParam(value = "userId", required = false) Integer userId,
+                         @RequestParam(value = "logTemplateName", required = false) String logTemplateName,
+                         @RequestParam(value = "forceDelete", required = false) boolean forceDelete,
+                         @RequestParam(value = "deleteAssociateRuns", required = false) boolean deleteAssociateRuns){
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType,
-      accountName, templateType, name, appId, pipelineId, applicationName, userName, templateName, credentialType, canaryId, service, canary, clusterId, version)
+      accountName, templateType, name, appId, pipelineId, applicationName, username, userName, templateName, credentialType, canaryId, canaryid, service, canary, clusterId, version, canaryAnalysisId,
+      metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
+      userId,logTemplateName,forceDelete,deleteAssociateRuns)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.GET)
   Object getAutoResponse4(@PathVariable("type") String type,
                          @PathVariable("source") String source,
-                         @PathVariable("source1") String source1) {
+                         @PathVariable("source1") String source1,
+                         @RequestParam(value = "Ids", required = false) String[] applicationsIds) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -121,20 +146,55 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
-  @RequestMapping(value = "/{type}/{source}", method = RequestMethod.DELETE)
-  Object deleteAutoResponse(@PathVariable("type") String type,
-                           @PathVariable("source") String source) {
+  @RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
+  Object deleteAutoResponse1(@PathVariable("type") String type) {
 
-    return opsmxAutopilotService.deleteAutoResponse(type, source)
+    return opsmxAutopilotService.deleteAutoResponse1(type)
   }
 
-  @ApiOperation(value = "Endpoint for Oes rest services")
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}", method = RequestMethod.DELETE)
+  Object deleteAutoResponse(@PathVariable("type") String type,
+                           @PathVariable("source") String source,
+                           @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                           @RequestParam(value = "pipelineid",required = false) String pipelineId,
+                           @RequestParam(value = "applicationName",required = false) String applicationName,
+                           @RequestParam(value = "accountName",required = false) String accountName,
+                           @RequestParam(value = "sourceType",required = false) String sourceType,
+                           @RequestParam(value = "credentialType",required = false) String credentialType,
+                           @RequestParam(value = "canaryId",required = false) Integer canaryId) {
+    return opsmxAutopilotService.deleteAutoResponse(type, source, applicationId, pipelineId, applicationName, accountName, sourceType, credentialType, canaryId)
+
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.DELETE)
-  Object deleteAutoResponse4(@PathVariable("type") String type,
+  Object deleteAutoResponse3(@PathVariable("type") String type,
                             @PathVariable("source") String source,
                             @PathVariable("source1") String source1) {
 
-    return opsmxAutopilotService.deleteAutoResponse4(type, source, source1)
+    return opsmxAutopilotService.deleteAutoResponse3(type, source, source1)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}", method = RequestMethod.DELETE)
+  Object deleteAutoResponse4(@PathVariable("type") String type,
+                             @PathVariable("source") String source,
+                             @PathVariable("source1") String source1,
+                             @PathVariable("source2")String source2) {
+
+    return opsmxAutopilotService.deleteAutoResponse4(type, source, source1, source2)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.DELETE)
+  Object deleteAutoResponse5(@PathVariable("type") String type,
+                             @PathVariable("source") String source,
+                             @PathVariable("source1") String source1,
+                             @PathVariable("source2") String source2,
+                             @PathVariable("source3") String source3) {
+
+    return opsmxAutopilotService.deleteAutoResponse5(type, source, source1, source2, source3)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -143,6 +203,16 @@ class OpsmxAutopilotController {
                          @RequestBody(required = false) Object data) {
 
     return opsmxAutopilotService.postAutoResponse(type,data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}", method = RequestMethod.POST)
+  Object postAutoResponse1(@PathVariable("type") String type,
+                           @PathVariable("source") String source,
+                           @RequestParam(value = "isEdit", required = false) Boolean isEdit,
+                           @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -176,6 +246,48 @@ class OpsmxAutopilotController {
                           @RequestBody(required = false) Object data) {
 
     return opsmxAutopilotService.postAutoResponse6(type, source, source1, source2, source3, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}", method = RequestMethod.PUT)
+  Object updateAutopilotResponse(@PathVariable("version") String version,
+                                @PathVariable("type") String type,
+                                @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse(version, type, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}", method = RequestMethod.PUT)
+  Object updateAutopilotResponse1(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse1(version, type, source, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
+  Object updateAutopilotResponse2(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse2(version, type, source, source1, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}", method = RequestMethod.PUT)
+  Object updatePlatformResponse3(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse3(version, type, source, source1, source2, data)
   }
 
 }
