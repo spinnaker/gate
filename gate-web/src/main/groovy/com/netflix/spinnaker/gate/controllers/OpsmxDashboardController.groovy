@@ -16,8 +16,8 @@
 
 package com.netflix.spinnaker.gate.controllers
 
-import com.netflix.spinnaker.gate.config.ServiceConfiguration
-import com.netflix.spinnaker.gate.services.internal.OpsmxPlatformService
+
+import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
@@ -25,11 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/platformservice")
+@RequestMapping("/dashboardservice")
 @RestController
 @Slf4j
-@ConditionalOnExpression('${services.platform.enabled:false}')
-class OpsmxPlatformController {
+@ConditionalOnExpression('${services.dashboard.enabled:false}')
+class OpsmxDashboardController {
 /*
  * Copyright 2020 Netflix, Inc.
  *
@@ -47,130 +47,128 @@ class OpsmxPlatformController {
  */
 
   @Autowired
-  OpsmxPlatformService opsmxPlatformService
+  OpsmxDashboardService opsmxDashboardService
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
-  Object getPlatformResponse1(@PathVariable("version") String version,
-                              @PathVariable("type") String type) {
-    return opsmxPlatformService.getPlatformResponse1(version, type)
+  Object getDashboardResponse1(@PathVariable("version") String version,
+                             @PathVariable("type") String type) {
+    return opsmxDashboardService.getDashboardResponse1(version, type)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
-  Object getPlatformResponse(@PathVariable("version") String version,
+  Object getDashboardResponse(@PathVariable("version") String version,
                          @PathVariable("type") String type,
                          @PathVariable("source") String source) {
-    return opsmxPlatformService.getPlatformResponse(version, type, source)
+    return opsmxDashboardService.getDashboardResponse(version, type, source)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.GET)
-  Object getPlatformResponse4(@PathVariable("version") String version,
+  Object getDashboardResponse4(@PathVariable("version") String version,
                           @PathVariable("type") String type,
                           @PathVariable("source") String source,
-                          @PathVariable("source1") String source1,
-                          @RequestParam(value = "permission", required = false) String permission) {
+                          @PathVariable("source1") String source1) {
 
-    return opsmxPlatformService.getPlatformResponse4(version, type, source, source1, permission)
+    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.GET)
-  Object getPlatformResponse5(@PathVariable("version") String version,
+  Object getDashboardResponse5(@PathVariable("version") String version,
                           @PathVariable("type") String type,
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
-                          @PathVariable("source2") String source2,
-                          @RequestParam(value = "permission", required = false) String permission) {
+                          @PathVariable("source2") String source2) {
 
-    return opsmxPlatformService.getPlatformResponse5(version, type, source, source1, source2, permission)
+    return opsmxDashboardService.getDashboardResponse5(version, type, source, source1, source2)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.GET)
-  Object getPlatformResponse6(@PathVariable("version") String version,
+  Object getDashboardResponse6(@PathVariable("version") String version,
                           @PathVariable("type") String type,
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
                           @PathVariable("source3") String source3) {
 
-    return opsmxPlatformService.getPlatformResponse6(version, type, source, source1, source2, source3)
+    return opsmxDashboardService.getDashboardResponse6(version, type, source, source1, source2, source3)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.DELETE)
-  Object deletePlatformResponse(@PathVariable("version") String version,
+  Object deleteDashboardResponse(@PathVariable("version") String version,
                                 @PathVariable("type") String type) {
 
-    return opsmxPlatformService.deletePlatformResponse(version, type)
+    return opsmxDashboardService.deleteDashboardResponse(version, type)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.DELETE)
-  Object deletePlatformResponse1(@PathVariable("version") String version,
+  Object deleteDashboardResponse1(@PathVariable("version") String version,
                             @PathVariable("type") String type,
                             @PathVariable("source") String source) {
 
-    return opsmxPlatformService.deletePlatformResponse1(version, type, source)
+    return opsmxDashboardService.deleteDashboardResponse1(version, type, source)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.DELETE)
-  Object deletePlatformResponse4(@PathVariable("version") String version,
+  Object deleteDashboardResponse4(@PathVariable("version") String version,
                              @PathVariable("type") String type,
                              @PathVariable("source") String source,
                              @PathVariable("source1") String source1) {
 
-    return opsmxPlatformService.deletePlatformResponse4(version, type, source, source1)
+    return opsmxDashboardService.deleteDashboardResponse4(version, type, source, source1)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.POST)
-  Object postPlatformResponse(@PathVariable("version") String version,
+  Object postDashboardResponse(@PathVariable("version") String version,
                           @PathVariable("type") String type,
                           @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.postPlatformResponse(version, type,data)
+    return opsmxDashboardService.postDashboardResponse(version, type,data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.POST)
-  Object postPlatformResponse3(@PathVariable("version") String version,
+  Object postDashboardResponse3(@PathVariable("version") String version,
                                @PathVariable("type") String type,
                                @PathVariable("source") String source,
                                @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.postPlatformResponse3(version, type, source, data)
+    return opsmxDashboardService.postDashboardResponse3(version, type, source, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.POST)
-  Object postPlatformResponse4(@PathVariable("version") String version,
+  Object postDashboardResponse4(@PathVariable("version") String version,
                            @PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @PathVariable("source1") String source1,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.postPlatformResponse4(version, type, source, source1, data)
+    return opsmxDashboardService.postDashboardResponse4(version, type, source, source1, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.POST)
-  Object postPlatformResponse5(@PathVariable("version") String version,
+  Object postDashboardResponse5(@PathVariable("version") String version,
                            @PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @PathVariable("source1") String source1,
                            @PathVariable("source2") String source2,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.postPlatformResponse5(version, type, source, source1, source2, data)
+    return opsmxDashboardService.postDashboardResponse5(version, type, source, source1, source2, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.POST)
-  Object postPlatformResponse6(@PathVariable("version") String version,
+  Object postDashboardResponse6(@PathVariable("version") String version,
                            @PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @PathVariable("source1") String source1,
@@ -178,48 +176,48 @@ class OpsmxPlatformController {
                            @PathVariable("source3") String source3,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.postPlatformResponse6(version, type, source, source1, source2, source3, data)
+    return opsmxDashboardService.postDashboardResponse6(version, type, source, source1, source2, source3, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.PUT)
-  Object updatePlatformResponse(@PathVariable("version") String version,
+  Object updateDashboardResponse(@PathVariable("version") String version,
                            @PathVariable("type") String type,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.updatePlatformResponse(version, type, data)
+    return opsmxDashboardService.updateDashboardResponse(version, type, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.PUT)
-  Object updatePlatformResponse1(@PathVariable("version") String version,
+  Object updateDashboardResponse1(@PathVariable("version") String version,
                                 @PathVariable("type") String type,
                                 @PathVariable("source") String source,
                                 @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.updatePlatformResponse1(version, type, source, data)
+    return opsmxDashboardService.updateDashboardResponse1(version, type, source, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.PUT)
-  Object updatePlatformResponse2(@PathVariable("version") String version,
+  Object updateDashboardResponse2(@PathVariable("version") String version,
                                  @PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
                                  @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.updatePlatformResponse2(version, type, source, source1, data)
+    return opsmxDashboardService.updateDashboardResponse2(version, type, source, source1, data)
   }
 
-  @ApiOperation(value = "Endpoint for platform rest services")
+  @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.PUT)
-  Object updatePlatformResponse3(@PathVariable("version") String version,
+  Object updateDashboardResponse3(@PathVariable("version") String version,
                                  @PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
                                  @PathVariable("source2") String source2,
                                  @RequestBody(required = false) Object data) {
 
-    return opsmxPlatformService.updatePlatformResponse3(version, type, source, source1, source2, data)
+    return opsmxDashboardService.updateDashboardResponse3(version, type, source, source1, source2, data)
   }
 }

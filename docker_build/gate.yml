@@ -9,6 +9,9 @@ services:
     baseUrl: http://localhost:8095
     userGroupApiPath: /platformservice/v1/users/{username}/userGroups/importAndCache
     enabled: true
+  dashboard:
+    baseUrl: http://localhost:8094
+    enabled: true
 security:
   basic:
     enabled: true

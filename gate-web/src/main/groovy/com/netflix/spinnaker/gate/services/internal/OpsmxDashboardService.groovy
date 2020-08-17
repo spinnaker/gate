@@ -19,84 +19,81 @@ package com.netflix.spinnaker.gate.services.internal
 
 import retrofit.http.*
 
-interface OpsmxPlatformService {
+interface OpsmxDashboardService {
 
+  @GET("/dashboardservice/{version}/{type}")
+  Object getDashboardResponse1(@Path('version') String version,
+                              @Path('type') String type)
 
-  @GET("/platformservice/{version}/{type}")
-  Object getPlatformResponse1(@Path('version') String version,
-                               @Path('type') String type)
-
-  @GET("/platformservice/{version}/{type}/{source}")
-  Object getPlatformResponse(@Path('version') String version,
+  @GET("/dashboardservice/{version}/{type}/{source}")
+  Object getDashboardResponse(@Path('version') String version,
                          @Path('type') String type,
                          @Path('source') String source)
 
-  @GET("/platformservice/{version}/{type}/{source}/{source1}")
-  Object getPlatformResponse4(@Path('version') String version,
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}")
+  Object getDashboardResponse4(@Path('version') String version,
+                         @Path('type') String type,
+                         @Path('source') String source,
+                         @Path('source1') String source1)
+
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object getDashboardResponse5(@Path('version') String version,
                          @Path('type') String type,
                          @Path('source') String source,
                          @Path('source1') String source1,
-                         @Query("permission") String permission)
+                         @Path('source2') String source2)
 
-  @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
-  Object getPlatformResponse5(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2,
-                         @Query("permission") String permission)
-
-  @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
-  Object getPlatformResponse6(@Path('version') String version,
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object getDashboardResponse6(@Path('version') String version,
                          @Path('type') String type,
                          @Path('source') String source,
                          @Path('source1') String source1,
                          @Path('source2') String source2,
                          @Path('source3') String source3)
 
-  @DELETE("/platformservice/{version}/{type}")
-  Object deletePlatformResponse(@Path('version') String version,
-                                @Path('type') String type)
+  @DELETE("/dashboardservice/{version}/{type}")
+  Object deleteDashboardResponse(@Path('version') String version,
+                           @Path('type') String type)
 
-  @DELETE("/platformservice/{version}/{type}/{source}")
-  Object deletePlatformResponse1(@Path('version') String version,
-                           @Path('type') String type,
-                           @Path('source') String source)
+  @DELETE("/dashboardservice/{version}/{type}/{source}")
+  Object deleteDashboardResponse1(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source)
 
-  @DELETE("/platformservice/{version}/{type}/{source}/{source1}")
-  Object deletePlatformResponse4(@Path('version') String version,
+  @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}")
+  Object deleteDashboardResponse4(@Path('version') String version,
                             @Path('type') String type,
                             @Path('source') String source,
                             @Path('source1') String source1)
 
-  @POST("/platformservice/{version}/{type}")
-  Object postPlatformResponse(@Path('version') String version,
+  @POST("/dashboardservice/{version}/{type}")
+  Object postDashboardResponse(@Path('version') String version,
                          @Path('type') String type,
                          @Body Object data)
 
-  @POST("/platformservice/{version}/{type}/{source}")
-  Object postPlatformResponse3(@Path('version') String version,
+  @POST("/dashboardservice/{version}/{type}/{source}")
+  Object postDashboardResponse3(@Path('version') String version,
                                @Path('type') String type,
                                @Path('source') String source,
                                @Body Object data)
 
-  @POST("/platformservice/{version}/{type}/{source}/{source1}")
-  Object postPlatformResponse4(@Path('version') String version,
+  @POST("/dashboardservice/{version}/{type}/{source}/{source1}")
+  Object postDashboardResponse4(@Path('version') String version,
                           @Path('type') String type,
                           @Path('source') String source,
                           @Path('source1') String source1,
                           @Body Object data)
 
-  @POST("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
-  Object postPlatformResponse5(@Path('version') String version,
+  @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object postDashboardResponse5(@Path('version') String version,
                           @Path('type') String type,
                           @Path('source') String source,
                           @Path('source1') String source1,
                           @Path('source2') String source2,
                           @Body Object data)
 
-  @POST("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
-  Object postPlatformResponse6(@Path('version') String version,
+  @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object postDashboardResponse6(@Path('version') String version,
                           @Path('type') String type,
                           @Path('source') String source,
                           @Path('source1') String source1,
@@ -104,30 +101,30 @@ interface OpsmxPlatformService {
                           @Path('source3') String source3,
                           @Body Object data)
 
-  @PUT("/platformservice/{version}/{type}")
-  Object updatePlatformResponse(@Path('version') String version,
+  @PUT("/dashboardservice/{version}/{type}")
+  Object updateDashboardResponse(@Path('version') String version,
                            @Path('type') String type,
                            @Body Object data)
 
-  @PUT("/platformservice/{version}/{type}/{source}")
-  Object updatePlatformResponse1(@Path('version') String version,
+  @PUT("/dashboardservice/{version}/{type}/{source}")
+  Object updateDashboardResponse1(@Path('version') String version,
                                 @Path('type') String type,
                                 @Path('source') String source,
                                 @Body Object data)
 
-  @PUT("/platformservice/{version}/{type}/{source}/{source1}")
-  Object updatePlatformResponse2(@Path('version') String version,
+  @PUT("/dashboardservice/{version}/{type}/{source}/{source1}")
+  Object updateDashboardResponse2(@Path('version') String version,
                                  @Path('type') String type,
                                  @Path('source') String source,
                                  @Path('source1') String source1,
                                  @Body Object data)
 
-  @PUT("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
-  Object updatePlatformResponse3(@Path('version') String version,
-                                 @Path('type') String type,
-                                 @Path('source') String source,
-                                 @Path('source1') String source1,
-                                 @Path('source2') String source2,
-                                 @Body Object data)
+  @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object updateDashboardResponse3(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Body Object data)
 
 }

@@ -232,6 +232,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
+  @ConditionalOnProperty("services.dashboard.enabled")
+  OpsmxDashboardService opsmxDashboardService(OkHttpClient okHttpClient) {
+    createClient "dashboard", OpsmxDashboardService, okHttpClient
+  }
+
+  @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
                                                         OkHttpClient okHttpClient,
                                                         DynamicConfigService dynamicConfigService,
