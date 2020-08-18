@@ -26,25 +26,25 @@ import com.netflix.spinnaker.kork.plugins.update.release.source.LatestPluginInfo
 import com.netflix.spinnaker.kork.plugins.update.release.source.SpringPluginInfoReleaseSource
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @Configuration
 @ConditionalOnProperty("spinnaker.extensibility.deck-proxy.enabled", matchIfMissing = true)
-@ComponentScan("com.netflix.spinnaker.gate.plugins.deck")
 @EnableScheduling
-open class DeckPluginConfiguration {
+class DeckPluginConfiguration {
 
   @Bean
-  open fun deckPluginCache(
+  fun deckPluginCache(
     updateManager: SpinnakerUpdateManager,
     registry: Registry,
     springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider,
     dynamicConfigService: DynamicConfigService
   ): DeckPluginCache {
-    val springPluginStatusProvider = SpringPluginStatusProvider(dynamicConfigService,
-      "spinnaker.extensibility.deck-proxy.plugins")
+    val springPluginStatusProvider = SpringPluginStatusProvider(
+      dynamicConfigService,
+      "spinnaker.extensibility.deck-proxy.plugins"
+    )
 
     val sources = listOf(
       LatestPluginInfoReleaseSource(updateManager, "deck"),
@@ -56,16 +56,14 @@ open class DeckPluginConfiguration {
       PluginBundleExtractor(springStrictPluginLoaderStatusProvider),
       springPluginStatusProvider,
       AggregatePluginInfoReleaseProvider(sources, springStrictPluginLoaderStatusProvider),
-      registry)
+      registry,
+      springStrictPluginLoaderStatusProvider
+    )
   }
 
   @Bean
-  open fun deckPluginService(
+  fun deckPluginService(
     pluginCache: DeckPluginCache,
     registry: Registry
   ): DeckPluginService = DeckPluginService(pluginCache, registry)
-
-  @Bean
-  open fun deckPluginsController(pluginService: DeckPluginService): DeckPluginsController =
-      DeckPluginsController(pluginService)
 }

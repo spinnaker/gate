@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 )
 @TestPropertySource(
   // Enable Controllers we want to document in the spec here.
-  properties = [ "services.kayenta.enabled=true","services.kayenta.canary-config-store=true",
-    "services.keel.enabled=true", "spring.application.name=gate" ])
+  properties = [ "retrofit.enabled=true","services.kayenta.enabled=true","services.kayenta.canary-config-store=true",
+    "services.keel.enabled=true", "spring.application.name=gate", 'services.fiat.baseUrl=https://localhost', 'services.keel.baseUrl=https://localhost' ])
 class GenerateSwaggerSpec extends Specification {
 
   @Autowired

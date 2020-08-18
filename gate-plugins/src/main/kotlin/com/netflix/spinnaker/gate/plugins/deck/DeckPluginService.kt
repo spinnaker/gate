@@ -59,8 +59,11 @@ class DeckPluginService(
 
     val sanitizedAssetPath = if (assetPath.startsWith("/")) assetPath.substring(1) else assetPath
 
-    val localAsset = pluginCache.getOrDownload(pluginId, pluginVersion).resolve(sanitizedAssetPath).toFile()
-    if (!localAsset.exists()) {
+    val localAsset = pluginCache.getOrDownload(pluginId, pluginVersion)?.let {
+      path ->
+      path.resolve(sanitizedAssetPath).toFile()
+    }
+    if (localAsset == null || !localAsset.exists()) {
       log.error("Unable to find requested plugin asset '$assetPath' for '$pluginId@$pluginVersion'")
       registry.counter(assetMissesId).increment()
       return null
@@ -77,22 +80,22 @@ class DeckPluginService(
 
       fun from(file: File): PluginAsset {
         return PluginAsset(
-            contentType = when {
-              file.toString().endsWith(".js") -> {
-                "application/javascript"
-              }
-              file.toString().endsWith(".css") -> {
-                "text/css"
-              }
-              file.toString().endsWith(".html") -> {
-                "text/html"
-              }
-              else -> {
-                log.warn("Unhandled file extension to content-type mapping for file `{}`, falling back to text/plain", file.toString())
-                "text/plain"
-              }
-            },
-            content = file.readText()
+          contentType = when {
+            file.toString().endsWith(".js") -> {
+              "application/javascript"
+            }
+            file.toString().endsWith(".css") -> {
+              "text/css"
+            }
+            file.toString().endsWith(".html") -> {
+              "text/html"
+            }
+            else -> {
+              log.warn("Unhandled file extension to content-type mapping for file `{}`, falling back to text/plain", file.toString())
+              "text/plain"
+            }
+          },
+          content = file.readText()
         )
       }
     }

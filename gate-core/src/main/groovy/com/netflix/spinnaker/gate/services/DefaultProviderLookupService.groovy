@@ -83,7 +83,7 @@ class DefaultProviderLookupService implements ProviderLookupService, AccountLook
       }
       accountsCache.set(accounts)
     } catch (Exception e) {
-      log.error("Unable to refresh account details cache, reason: ${e.message}")
+      log.error("Unable to refresh account details cache", e)
     }
   }
 

@@ -17,7 +17,10 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.config.DefaultServiceEndpoint
+import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
+import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import okhttp3.MediaType
@@ -34,19 +37,34 @@ import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import retrofit.Endpoint
+import retrofit.RetrofitError
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import static retrofit.RetrofitError.Kind.HTTP
 
 @CompileStatic
 @Component
 @Slf4j
 class NotificationService {
-  @Autowired(required = false)
-  Front50Service front50Service
 
-  @Autowired
-  OkHttpClient okHttpClient
+  private Front50Service front50Service
+  private EchoService echoService
 
-  @Autowired
-  ServiceConfiguration serviceConfiguration
+  private OkHttpClient okHttpClient
+  private Endpoint echoEndpoint
+
+  NotificationService(@Autowired(required = false) Front50Service front50Service,
+                      @Autowired OkHttpClientProvider okHttpClientProvider,
+                      @Autowired ServiceConfiguration serviceConfiguration,
+                      @Autowired(required = false) EchoService echoService) {
+    this.front50Service = front50Service
+    this.echoService = echoService
+    // We use the "raw" OkHttpClient here instead of EchoService because retrofit messes up with the encoding
+    // of the body for the x-www-form-urlencoded content type, which is what Slack uses. This allows us to pass
+    // the original body unmodified along to echo.
+    this.echoEndpoint = serviceConfiguration.getServiceEndpoint("echo")
+    this.okHttpClient =  okHttpClientProvider.getClient(new DefaultServiceEndpoint("echo", echoEndpoint.url))
+  }
 
   Map getNotificationConfigs(String type, String app) {
     front50Service.getNotificationConfigs(type, app)
@@ -60,6 +78,10 @@ class NotificationService {
     front50Service.deleteNotificationConfig(type, app)
   }
 
+  List getNotificationTypeMetadata() {
+    echoService.getNotificationTypeMetadata()
+  }
+
   ResponseEntity<String> processNotificationCallback(String source, RequestEntity<String> request) {
     log.debug("Processing notification callback: ${request.getMethod()} ${request.getUrl()}, ${request.getHeaders()}")
     String contentType = request.getHeaders().getFirst("Content-Type")?.toLowerCase()
@@ -70,28 +92,34 @@ class NotificationService {
 
     final MediaType mediaType = MediaType.parse(contentType)
 
-    // We use the "raw" OkHttpClient here instead of EchoService because retrofit messes up with the encoding
-    // of the body for the x-www-form-urlencoded content type, which is what Slack uses. This allows us to pass
-    // the original body unmodified along to echo.
-    Endpoint echoEndpoint = serviceConfiguration.getServiceEndpoint("echo")
 
+    log.debug("Building echo request with URL ${echoEndpoint.url + request.url.path}, Content-Type: $contentType")
     Request.Builder builder = new Request.Builder()
       .url(echoEndpoint.url + request.url.path)
       .post(RequestBody.create(mediaType, request.body))
 
     request.getHeaders().each { String name, List values ->
       values.each { value ->
+        log.debug("Relaying request header $name: $value")
         builder.addHeader(name, value.toString())
       }
     }
 
     Request echoRequest = builder.build();
-    Response response = okHttpClient.newCall(echoRequest).execute()
-
-    // convert retrofit response to Spring format
-    String body = response.body().contentLength() > 0 ? response.body().string() : null
-    HttpHeaders headers = new HttpHeaders()
-    headers.putAll(response.headers().toMultimap())
-    return new ResponseEntity(body, headers, HttpStatus.valueOf(response.code()))
+    try {
+      Response response = okHttpClient.newCall(echoRequest).execute()
+      // convert retrofit response to Spring format
+      String body = response.body().contentLength() > 0 ? response.body().string() : null
+      HttpHeaders headers = new HttpHeaders()
+      headers.putAll(response.headers().toMultimap())
+      return new ResponseEntity(body, headers, HttpStatus.valueOf(response.code()))
+    } catch (RetrofitError error) {
+      log.error("Error proxying notification callback to echo: $error")
+      if (error.getKind() == HTTP) {
+        throw error
+      } else {
+        return new ResponseEntity(INTERNAL_SERVER_ERROR)
+      }
+    }
   }
 }
