@@ -8,6 +8,7 @@ import com.netflix.spinnaker.gate.services.UserDataService
 import com.netflix.spinnaker.gate.util.OesRestApi
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
+import org.apache.tomcat.websocket.AuthenticationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
 @Slf4j
-@ConditionalOnExpression('${ldap.enabled:false}')
+@ConditionalOnExpression('${ldap.enabled:false} or ${file.enabled:false}')
 @RestController
 @RequestMapping("/auth")
 class TokenAuthController {
@@ -33,35 +34,47 @@ class TokenAuthController {
   @Autowired
   UserDataService userDetailsService
 
-  @Autowired
+  @Autowired(required=false)
   AuthenticationManager authenticationManager
 
   @Value('${services.platform.enabled:false}')
   boolean isPlatformEnabled;
 
+  @Value('${file.enabled:false}')
+  boolean isFileEnabled;
+
+  @Value('${file.url:null}')
+  String fileApiPath;
+
   @Value('${services.platform.baseUrl:null}')
   String url;
 
   @Value('${services.platform.userGroupApiPath:null}')
-  String apiPath;
+  String groupApiPath;
+
 
   @ApiOperation(value = "New Login for Jwt")
   @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
   public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest ) {
 
-    try {
-      authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
-      );
+    if (isFileEnabled && isPlatformEnabled){
+      if(!OesRestApi.initiateFileLoginInPlatform(url+fileApiPath, authenticationRequest)) throw new AuthenticationException("File Login Failed");
     }
-    catch (BadCredentialsException e) {
-      throw new Exception("Incorrect username or password", e);
+    else {
+      try {
+        authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
+        );
+      }
+      catch (BadCredentialsException e) {
+        throw new Exception("Incorrect username or password", e);
+      }
     }
 
     final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
     if (isPlatformEnabled) {
-      String path = apiPath.replace("{username}",userDetails.getUsername());
+      String path = groupApiPath.replace("{username}",userDetails.getUsername());
       boolean isSuccessful = OesRestApi.initiateUserGroupInPlatform(url+path);
       if (isSuccessful) {
         final String jwt = jwtTokenUtil.generateToken(userDetails);
