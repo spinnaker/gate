@@ -7,7 +7,7 @@ services:
     enabled: true
   platform:
     baseUrl: http://localhost:8095
-    userGroupApiPath: /platformservice/v1/users/{username}/userGroups/importAndCache
+    userGroupApiPath: /platformservice/v1/users/{username}/usergroups/importAndCache
     enabled: true
   dashboard:
     baseUrl: http://localhost:8094
@@ -22,6 +22,9 @@ ldap:
   enabled: true
   url: ldap://localhost:389/DC=example,DC=com
   userDnPattern:  uid={0},ou=people
+file:
+  enabled: false
+  url: /platformservice/v1/users/authenticate
 authn:
   mode: session
 google: {}
