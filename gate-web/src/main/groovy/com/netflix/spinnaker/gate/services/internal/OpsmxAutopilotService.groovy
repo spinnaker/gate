@@ -46,7 +46,7 @@ interface OpsmxAutopilotService {
                          @Query("userName") String userName,
                          @Query("templateName") String templateName,
                          @Query("credentialType") String credentialType,
-                         @Query("id") Integer canaryId,
+                         @Query("id") Integer Id,
                          @Query("service") Integer service,
                          @Query("canaryId") Integer canary,
                          @Query("canaryid") Integer canaryid,
@@ -56,7 +56,7 @@ interface OpsmxAutopilotService {
                          @Query("metric") String metric,
                          @Query("account") String account,
                          @Query("metricType") String metricType,
-                         @Query("isBoxplotData") boolean isBoxplotData,
+                         @Query("isBoxplotData") Boolean isBoxplotData,
                          @Query("metricname") String metricname,
                          @Query("numofver") Integer numofver,
                          @Query("serviceName") String serviceName,
@@ -70,8 +70,8 @@ interface OpsmxAutopilotService {
                          @Query("service_id") Integer service_id,
                          @Query("userId") Integer userId,
                          @Query("logTemplateName") String logTemplateName,
-                         @Query("forceDelete") boolean forceDelete,
-                         @Query("deleteAssociateRuns") boolean deleteAssociateRuns)
+                         @Query("forceDelete") Boolean forceDelete,
+                         @Query("deleteAssociateRuns") Boolean deleteAssociateRuns)
 
   @GET("/autopilot/{type}")
   Object getAutoResponse1(@Path('type') String type)
