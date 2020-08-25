@@ -92,7 +92,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "metric", required = false) String metric,
                          @RequestParam(value = "account", required = false) String account,
                          @RequestParam(value = "metricType", required = false) String metricType,
-                         @RequestParam(value = "isBoxplotData", required = false) boolean isBoxplotData,
+                         @RequestParam(value = "isBoxplotData", required = false) Boolean isBoxplotData,
                          @RequestParam(value = "metricname", required = false) String metricname,
                          @RequestParam(value = "numofver", required = false) Integer numofver,
                          @RequestParam(value = "serviceName", required = false) String serviceName,
@@ -106,10 +106,10 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "service_id", required = false) Integer service_id,
                          @RequestParam(value = "userId", required = false) Integer userId,
                          @RequestParam(value = "logTemplateName", required = false) String logTemplateName,
-                         @RequestParam(value = "forceDelete", required = false) boolean forceDelete,
-                         @RequestParam(value = "deleteAssociateRuns", required = false) boolean deleteAssociateRuns){
+                         @RequestParam(value = "forceDelete", required = false) Boolean forceDelete,
+                         @RequestParam(value = "deleteAssociateRuns", required = false) Boolean deleteAssociateRuns){
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType,
-      accountName, templateType, name, appId, pipelineId, applicationName, username, userName, templateName, credentialType, canaryId, canaryid, service, canary, clusterId, version, canaryAnalysisId,
+      accountName, templateType, name, appId, pipelineId, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
       userId,logTemplateName,forceDelete,deleteAssociateRuns)
   }
