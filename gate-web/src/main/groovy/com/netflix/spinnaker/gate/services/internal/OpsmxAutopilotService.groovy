@@ -71,7 +71,10 @@ interface OpsmxAutopilotService {
                          @Query("userId") Integer userId,
                          @Query("logTemplateName") String logTemplateName,
                          @Query("forceDelete") Boolean forceDelete,
-                         @Query("deleteAssociateRuns") Boolean deleteAssociateRuns)
+                         @Query("deleteAssociateRuns") Boolean deleteAssociateRuns,
+                         @Query("event") String event,
+                         @Query("serviceList") List<String> serviceList,
+                         @Query("pipelineId") String pipelineId)
 
   @GET("/autopilot/{type}")
   Object getAutoResponse1(@Path('type') String type)
@@ -107,7 +110,10 @@ interface OpsmxAutopilotService {
                            @Query("accountName") String accountName,
                            @Query("sourceType") String sourceType,
                            @Query("credentialType") String credentialType,
-                           @Query("canaryId") Integer canaryId)
+                           @Query("canaryId") Integer canaryId,
+                           @Query("forceDelete") Boolean forceDelete,
+                           @Query("deleteAssociateRuns") Boolean deleteAssociateRuns,
+                           @Query("templateName") String templateName)
 
   @DELETE("/autopilot/{type}/{source}/{source1}")
   Object deleteAutoResponse3(@Path('type') String type,
@@ -135,6 +141,11 @@ interface OpsmxAutopilotService {
   Object postAutoResponse1(@Path('type') String type,
                            @Path('source') String source,
                            @Query("isEdit") Boolean pipelineid,
+                           @Query('userName') String userName,
+                           @Query('userId') Integer userId,
+                           @Query('canaryId') Integer canaryId,
+                           @Query('logTemplateName') String logTemplateName,
+                           @Query('serviceId') Integer serviceId,
                            @Body Object data)
 
   @POST("/autopilot/{type}/{source}/{source1}")
