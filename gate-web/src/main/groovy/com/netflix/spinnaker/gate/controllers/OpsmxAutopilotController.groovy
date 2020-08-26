@@ -76,7 +76,7 @@ class OpsmxAutopilotController {
                          @RequestParam(name = "templateType",required = false) String templateType,
                          @RequestParam(value = "name", required = false) String name,
                          @RequestParam(name = "appId",required = false) Integer appId,
-                         @RequestParam(value = "pipelineid", required = false) String pipelineId,
+                         @RequestParam(value = "pipelineid", required = false) String pipelineid,
                          @RequestParam(value = "applicationName",required = false) String applicationName,
                          @RequestParam(value = "username", required = false) String username,
                          @RequestParam(value = "userName", required = false) String userName,
@@ -107,11 +107,14 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "userId", required = false) Integer userId,
                          @RequestParam(value = "logTemplateName", required = false) String logTemplateName,
                          @RequestParam(value = "forceDelete", required = false) Boolean forceDelete,
-                         @RequestParam(value = "deleteAssociateRuns", required = false) Boolean deleteAssociateRuns){
+                         @RequestParam(value = "deleteAssociateRuns", required = false) Boolean deleteAssociateRuns,
+                         @RequestParam(value = "event", required = false) String event,
+                         @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
+                         @RequestParam(value = "pipelineId", required = false) String pipelineId){
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType,
-      accountName, templateType, name, appId, pipelineId, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
+      accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
-      userId,logTemplateName,forceDelete,deleteAssociateRuns)
+      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -162,8 +165,12 @@ class OpsmxAutopilotController {
                            @RequestParam(value = "accountName",required = false) String accountName,
                            @RequestParam(value = "sourceType",required = false) String sourceType,
                            @RequestParam(value = "credentialType",required = false) String credentialType,
-                           @RequestParam(value = "canaryId",required = false) Integer canaryId) {
-    return opsmxAutopilotService.deleteAutoResponse(type, source, applicationId, pipelineId, applicationName, accountName, sourceType, credentialType, canaryId)
+                           @RequestParam(value = "canaryId",required = false) Integer canaryId,
+                           @RequestParam(value = "forceDelete",required = false) Boolean forceDelete,
+                           @RequestParam(value = "deleteAssociateRuns",required = false) Boolean deleteAssociateRuns,
+                           @RequestParam(value = "templateName",required = false) String templateName) {
+    return opsmxAutopilotService.deleteAutoResponse(type, source, applicationId, pipelineId, applicationName, accountName, sourceType, credentialType, canaryId,
+      forceDelete, deleteAssociateRuns, templateName)
 
   }
 
@@ -210,9 +217,14 @@ class OpsmxAutopilotController {
   Object postAutoResponse1(@PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @RequestParam(value = "isEdit", required = false) Boolean isEdit,
+                           @RequestParam(value = "userName", required=false) String userName,
+                           @RequestParam(value = "userId", required=false) Integer userId,
+                           @RequestParam(value = "canaryId", required=false) Integer canaryId,
+                           @RequestParam(value = "logTemplateName", required=false) String logTemplateName,
+                           @RequestParam(value ="serviceId", required = false) Integer serviceId,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, data)
+    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, userName, userId, canaryId, logTemplateName, serviceId, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
