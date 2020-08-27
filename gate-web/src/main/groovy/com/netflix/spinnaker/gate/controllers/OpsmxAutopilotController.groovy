@@ -122,9 +122,10 @@ class OpsmxAutopilotController {
   Object getAutoResponse4(@PathVariable("type") String type,
                          @PathVariable("source") String source,
                          @PathVariable("source1") String source1,
-                         @RequestParam(value = "Ids", required = false) String[] applicationsIds) {
+                         @RequestParam(value = "Ids", required = false) String[] applicationsIds,
+                         @RequestParam(value = "datasourceType", required = false) String datasourceType) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")

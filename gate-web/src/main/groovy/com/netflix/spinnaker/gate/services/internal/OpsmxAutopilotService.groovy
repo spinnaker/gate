@@ -83,7 +83,8 @@ interface OpsmxAutopilotService {
   Object getAutoResponse4(@Path('type') String type,
                          @Path('source') String source,
                          @Path('source1') String source1,
-                         @Query("Ids") String[] applicationsIds)
+                         @Query("Ids") String[] applicationsIds,
+                         @Query("datasourceType") String datasourceType)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
