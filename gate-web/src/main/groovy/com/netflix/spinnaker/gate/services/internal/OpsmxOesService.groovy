@@ -27,7 +27,10 @@ interface OpsmxOesService {
                         @Query("isLatest") boolean isLatest,
                         @Query("applicationName") String applicationName,
                         @Query("chartId") Integer chartId,
-                        @Query("imageSource") String imageSource)
+                        @Query("imageSource") String imageSource,
+                        @Query("accountName") String accountName,
+                        @Query("startTime") String startTime,
+                        @Query("endTime") String endTime)
 
   @GET("/oes/{type}/{source}/{source1}")
   Object getOesResponse4(@Path('type') String type,
@@ -49,7 +52,8 @@ interface OpsmxOesService {
 
   @DELETE("/oes/{type}/{source}")
   Object deleteOesResponse(@Path('type') String type,
-                           @Path('source') String source)
+                           @Path('source') String source,
+                           @Query("accountName") String accountName)
 
   @DELETE("/oes/{type}/{source}/{source1}")
   Object deleteOesResponse4(@Path('type') String type,

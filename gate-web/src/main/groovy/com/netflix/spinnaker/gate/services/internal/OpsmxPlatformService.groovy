@@ -44,7 +44,8 @@ interface OpsmxPlatformService {
                          @Path('source') String source,
                          @Path('source1') String source1,
                          @Path('source2') String source2,
-                         @Query("permission") String permission)
+                         @Query("permission") String permission,
+                         @Query("resourceType") String resourceType)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getPlatformResponse6(@Path('version') String version,

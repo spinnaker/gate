@@ -68,10 +68,13 @@ class OpsmxOesController {
                         @RequestParam(value = "isLatest", required = false) boolean isLatest,
                         @RequestParam(value = "applicationName", required = false) String applicationName,
                         @RequestParam(value = "chartId", required = false) Integer chartId,
-                        @RequestParam(value = "imageSource", required = false) String imageSource) {
+                        @RequestParam(value = "imageSource", required = false) String imageSource,
+                        @RequestParam(value = "accountName", required = false) String accountName,
+                        @RequestParam(value = "startTime", required = false) String startTime,
+                        @RequestParam(value = "endTime", required = false) String endTime) {
 
     return opsmxOesService.getOesResponse(type, source, isTreeView, isLatest,
-            applicationName, chartId, imageSource)
+            applicationName, chartId, imageSource, accountName, startTime, endTime)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
@@ -107,9 +110,10 @@ class OpsmxOesController {
   @ApiOperation(value = "Endpoint for Oes rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.DELETE)
   Object deleteOesResponse(@PathVariable("type") String type,
-                           @PathVariable("source") String source) {
+                           @PathVariable("source") String source,
+                           @RequestParam(value = "accountName", required = false) String accountName) {
 
-    return opsmxOesService.deleteOesResponse(type, source)
+    return opsmxOesService.deleteOesResponse(type, source, accountName)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
