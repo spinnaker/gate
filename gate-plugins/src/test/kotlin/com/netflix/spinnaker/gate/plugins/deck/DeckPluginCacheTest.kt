@@ -101,7 +101,7 @@ class DeckPluginCacheTest : JUnit5Minutests {
     val pluginInfoReleaseProvider: PluginInfoReleaseProvider = mockk(relaxed = true)
     val registry: Registry = NoopRegistry()
     val springStrictPluginLoaderStatusProvider: SpringStrictPluginLoaderStatusProvider = mockk(relaxed = true)
-    var subject = DeckPluginCache(updateManager, pluginBundleExtractor, pluginStatusProvider, pluginInfoReleaseProvider, registry, springStrictPluginLoaderStatusProvider, null)
+    val subject = DeckPluginCache(updateManager, pluginBundleExtractor, pluginStatusProvider, pluginInfoReleaseProvider, registry, springStrictPluginLoaderStatusProvider, null)
 
     init {
       val plugins = listOf(
