@@ -45,7 +45,8 @@ class PluginInfoController(
   @ApiOperation(value = "Persist plugin metadata information")
   @RequestMapping(
     method = [RequestMethod.POST, RequestMethod.PUT],
-    consumes = [MediaType.APPLICATION_JSON_VALUE])
+    consumes = [MediaType.APPLICATION_JSON_VALUE]
+  )
   @ResponseStatus(value = HttpStatus.ACCEPTED)
   fun persistPluginInfo(@RequestBody pluginInfo: SpinnakerPluginInfo): Map<String, Any> {
     return pluginService.upsertPluginInfo(pluginInfo)
@@ -56,7 +57,8 @@ class PluginInfoController(
   @RequestMapping(
     value = ["/{id:.+}"],
     method = [RequestMethod.DELETE],
-    consumes = [MediaType.APPLICATION_JSON_VALUE])
+    consumes = [MediaType.APPLICATION_JSON_VALUE]
+  )
   @ResponseStatus(value = HttpStatus.ACCEPTED)
   fun deletePluginInfo(@PathVariable id: String): Map<String, Any> {
     return pluginService.deletePluginInfo(id)
@@ -64,7 +66,7 @@ class PluginInfoController(
 
   @ApiOperation(value = "Get all plugin info objects")
   @RequestMapping(method = [RequestMethod.GET])
-  fun getAllPluginInfo(@RequestParam(value = "service", required = false) service: String?): List<Map<*, *>> {
+  fun getAllPluginInfo(@RequestParam(value = "service", required = false) service: String?): List<*> {
     return front50Service.getPluginInfo(service)
   }
 
