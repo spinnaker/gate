@@ -35,7 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 class DeckPluginConfiguration {
 
-  @Value("\${spinnaker.extensibility.deck-proxy.path:#{null}}")
+  @Value("\${spinnaker.extensibility.deck-proxy.plugins-path:#{null}}")
   private val pluginsCacheDirectory: String? = null
 
   @Bean
