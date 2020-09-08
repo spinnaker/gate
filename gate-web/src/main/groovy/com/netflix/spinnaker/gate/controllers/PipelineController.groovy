@@ -41,6 +41,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import retrofit.RetrofitError
 
+import javax.servlet.http.HttpServletResponse
+
 import static net.logstash.logback.argument.StructuredArguments.value
 
 @Slf4j
@@ -103,10 +105,14 @@ class PipelineController {
   }
 
   @ApiOperation(value = "Retrieve a pipeline execution")
-  @GetMapping("{id}")
-  Map getPipeline(@PathVariable("id") String id) {
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+  void getPipeline(HttpServletResponse response, @PathVariable("id") String id) {
     try {
-      pipelineService.getPipeline(id)
+      def pipeline = pipelineService.getPipeline(id)
+      def asJsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pipeline)
+
+      response.addHeader("Content-Type", "application/json; charset=utf-8")
+      response.getOutputStream().write(asJsonString.getBytes("UTF-8"))
     } catch (RetrofitError e) {
       if (e.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
