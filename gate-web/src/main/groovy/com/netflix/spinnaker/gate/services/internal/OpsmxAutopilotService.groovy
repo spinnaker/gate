@@ -125,14 +125,14 @@ interface OpsmxAutopilotService {
   Object deleteAutoResponse4(@Path('type') String type,
                              @Path('source') String source,
                              @Path('source1') String source1,
-                             @Path('source1') String source2)
+                             @Path('source2') String source2)
 
   @DELETE("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object deleteAutoResponse5(@Path('type') String type,
                              @Path('source') String source,
                              @Path('source1') String source1,
-                             @Path('source1') String source2,
-                             @Path('source1') String source3)
+                             @Path('source2') String source2,
+                             @Path('source3') String source3)
 
   @POST("/autopilot/{type}")
   Object postAutoResponse(@Path('type') String type,
