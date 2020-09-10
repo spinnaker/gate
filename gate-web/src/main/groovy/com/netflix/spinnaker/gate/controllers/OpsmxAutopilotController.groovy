@@ -72,6 +72,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "intervalMins", required = false) Float intervalMins,
                          @RequestParam(value = "limit", required = false) Integer limit,
                          @RequestParam(value = "sourceType", required = false) String sourceType,
+                         @RequestParam(value = "datasourceType", required = false) String datasourceType,
                          @RequestParam(value = "accountName", required = false)  String accountName,
                          @RequestParam(name = "templateType",required = false) String templateType,
                          @RequestParam(value = "name", required = false) String name,
@@ -111,7 +112,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "event", required = false) String event,
                          @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
                          @RequestParam(value = "pipelineId", required = false) String pipelineId){
-    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType,
+    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
       userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId)

@@ -36,6 +36,7 @@ interface OpsmxAutopilotService {
                          @Query("intervalMins") Float intervalMins,
                          @Query("limit") Integer limit,
                          @Query("sourceType") String sourceType,
+                         @Query("datasourceType") String datasourceType,
                          @Query("accountName") String accountName,
                          @Query("templateType") String templateType,
                          @Query("name") String name,
