@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
+import java.util.Optional
 
 @Configuration
 @ConditionalOnProperty("spinnaker.extensibility.deck-proxy.enabled", matchIfMissing = true)
@@ -62,7 +63,7 @@ class DeckPluginConfiguration {
       AggregatePluginInfoReleaseProvider(sources, springStrictPluginLoaderStatusProvider),
       registry,
       springStrictPluginLoaderStatusProvider,
-      pluginsCacheDirectory
+      Optional.ofNullable(pluginsCacheDirectory)
     )
   }
 
