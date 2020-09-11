@@ -33,10 +33,14 @@ slack:
 
 spinnaker:
   extensibility:
+    framework:
+      version: v2
     plugins-root-path: build/plugins
     plugins:
       com.netflix.gate.enabled.plugin:
         enabled: true
+        api-extension.config:
+          id: test
       com.netflix.gate.disabled.plugin:
         enabled: false
       com.netflix.gate.version.not.supported.plugin:
