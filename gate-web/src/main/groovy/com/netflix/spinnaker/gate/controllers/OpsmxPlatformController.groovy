@@ -70,9 +70,9 @@ class OpsmxPlatformController {
                           @PathVariable("type") String type,
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
-                          @RequestParam(value = "permission", required = false) String permission) {
+                          @RequestParam(value = "permissionId", required = false) String permissionId) {
 
-    return opsmxPlatformService.getPlatformResponse4(version, type, source, source1, permission)
+    return opsmxPlatformService.getPlatformResponse4(version, type, source, source1, permissionId)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
@@ -82,10 +82,10 @@ class OpsmxPlatformController {
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
-                          @RequestParam(value = "permission", required = false) String permission,
+                          @RequestParam(value = "permissionId", required = false) String permissionId,
                           @RequestParam(value = "resourceType", required = false) String resourceType) {
 
-    return opsmxPlatformService.getPlatformResponse5(version, type, source, source1, source2, permission, resourceType)
+    return opsmxPlatformService.getPlatformResponse5(version, type, source, source1, source2, permissionId, resourceType)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
