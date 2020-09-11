@@ -17,16 +17,21 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
 import com.netflix.spectator.api.Registry
+import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.gate.api.extension.ProxyConfigProvider
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
-import com.squareup.okhttp.Request
-import com.squareup.okhttp.RequestBody
-import com.squareup.okhttp.internal.http.HttpMethod
+import com.netflix.spinnaker.security.AuthenticatedRequest
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.internal.http.HttpMethod
 import java.net.SocketException
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -40,38 +45,44 @@ import org.springframework.web.bind.annotation.RequestMethod.PUT
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.HandlerMapping
-import javax.annotation.PostConstruct
 
 @RestController
 @RequestMapping(value = ["/proxies"])
-public class ProxyController(
+class ProxyController(
   val objectMapper: ObjectMapper,
   val registry: Registry,
-  val proxyConfigProviders: List<ProxyConfigProvider>
+  val okHttpClientProvider: OkHttpClientProvider,
+  val proxyConfigProvidersObjectProvider: ObjectProvider<List<ProxyConfigProvider>>
 ) {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val proxies = mutableListOf<Proxy>()
+  /**
+   * A single entry cache containing the set of initialized proxies.
+   *
+   * Extension point implementations are not guaranteed to be available at initialization time,
+   * so a [CacheBuilder] is used to ensure we only perform initialization once.
+   */
+  private val proxiesCache = CacheBuilder.newBuilder().maximumSize(1).build(
+    CacheLoader.from { _: String? ->
+      val proxyConfigProviders = proxyConfigProvidersObjectProvider.ifAvailable
 
-  val proxyInvocationsId = registry.createId("proxy.invocations")
-
-  @PostConstruct
-  fun postConstruct() {
-    proxyConfigProviders.forEach {
-      it.proxyConfigs.forEach { proxyConfig ->
-        try {
-          val proxy = Proxy(proxyConfig)
-
-          // initialize the `okHttpClient` for each proxy
-          proxy.init()
-
-          proxies.add(proxy)
-        } catch (e: Exception) {
-          log.error("Failed to initialize proxy (id: ${proxyConfig.id})", e)
+      val proxiesById = mutableMapOf<String, Proxy>()
+      proxyConfigProviders?.forEach {
+        it.proxyConfigs.forEach { proxyConfig ->
+          try {
+            proxiesById.put(proxyConfig.id, Proxy(proxyConfig).init(okHttpClientProvider))
+          } catch (e: Exception) {
+            log.error("Failed to initialize proxy (id: ${proxyConfig.id})", e)
+          }
         }
       }
+
+      log.info("Initialized ${proxiesById.size} proxies (${proxiesById.keys.joinToString()})")
+      return@from proxiesById
     }
-  }
+  )
+
+  val proxyInvocationsId = registry.createId("proxy.invocations")
 
   @RequestMapping(value = ["/{proxy}/**"], method = [DELETE, GET, POST, PUT])
   fun any(
@@ -79,12 +90,14 @@ public class ProxyController(
     @RequestParam requestParams: Map<String, String>,
     httpServletRequest: HttpServletRequest
   ): ResponseEntity<Any> {
-    return request(proxyId, requestParams, httpServletRequest)
+    return AuthenticatedRequest.allowAnonymous {
+      return@allowAnonymous request(proxyId, requestParams, httpServletRequest)
+    }
   }
 
   @RequestMapping(method = [GET])
   fun list() : List<SimpleProxyConfig> {
-    return proxies.map { SimpleProxyConfig(
+    return proxies().map { SimpleProxyConfig(
       it.config.id,
       it.config.uri
     ) }
@@ -95,7 +108,7 @@ public class ProxyController(
     requestParams: Map<String, String>,
     request: HttpServletRequest
   ): ResponseEntity<Any> {
-    val proxy = proxies
+    val proxy = proxies()
       .find { it.config.id.equals(proxyId, true) }
       ?: throw InvalidRequestException("No proxy config found with id '$proxyId'")
     val proxyConfig = proxy.config
@@ -105,7 +118,7 @@ public class ProxyController(
       .toString()
       .substringAfter("/proxies/$proxyId")
 
-    val proxiedUrlBuilder = Request.Builder().url(proxyConfig.uri + proxyPath).build().httpUrl().newBuilder()
+    val proxiedUrlBuilder = Request.Builder().url(proxyConfig.uri + proxyPath).build().url().newBuilder()
     for ((key, value) in requestParams) {
       proxiedUrlBuilder.addQueryParameter(key, value)
     }
@@ -120,7 +133,7 @@ public class ProxyController(
 
       val body = if (HttpMethod.permitsRequestBody(method) && request.contentType != null) {
         RequestBody.create(
-          com.squareup.okhttp.MediaType.parse(request.contentType),
+          okhttp3.MediaType.parse(request.contentType),
           request.reader.lines().collect(Collectors.joining(System.lineSeparator()))
         )
       } else {
@@ -131,8 +144,8 @@ public class ProxyController(
         Request.Builder().url(proxiedUrl).method(method, body).build()
       ).execute()
       statusCode = response.code()
-      contentType = response.header("Content-Type")
-      responseBody = response.body().string()
+      contentType = response.header("Content-Type") ?: contentType
+      responseBody = response.body()?.string() ?: ""
     } catch (e: SocketException) {
       log.error("Exception processing proxy request", e)
       statusCode = HttpStatus.GATEWAY_TIMEOUT.value()
@@ -172,6 +185,8 @@ public class ProxyController(
 
     return ResponseEntity(responseObj, httpHeaders, status)
   }
+
+  private fun proxies() = proxiesCache.get("all").values
 
   data class SimpleProxyConfig(val id: String, val uri: String)
 }
