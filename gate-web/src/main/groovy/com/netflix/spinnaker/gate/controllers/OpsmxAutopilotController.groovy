@@ -264,44 +264,65 @@ class OpsmxAutopilotController {
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.PUT)
-  Object updateAutopilotResponse(@PathVariable("version") String version,
-                                @PathVariable("type") String type,
+  Object updateAutopilotResponse(@PathVariable("type") String type,
                                 @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.updateAutopilotResponse(version, type, data)
+    return opsmxAutopilotService.updateAutopilotResponse(type, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.PUT)
-  Object updateAutopilotResponse1(@PathVariable("version") String version,
-                                 @PathVariable("type") String type,
+  Object updateAutopilotResponse1(@PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.updateAutopilotResponse1(version, type, source, data)
+    return opsmxAutopilotService.updateAutopilotResponse1(type, source, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
-  Object updateAutopilotResponse2(@PathVariable("version") String version,
-                                 @PathVariable("type") String type,
+  Object updateAutopilotResponse2(@PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
                                  @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.updateAutopilotResponse2(version, type, source, source1, data)
+    return opsmxAutopilotService.updateAutopilotResponse2(type, source, source1, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}/{source1}/{source2}", method = RequestMethod.PUT)
-  Object updatePlatformResponse3(@PathVariable("version") String version,
-                                 @PathVariable("type") String type,
+  Object updatePlatformResponse3(@PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
                                  @PathVariable("source2") String source2,
                                  @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.updateAutopilotResponse3(version, type, source, source1, source2, data)
+    return opsmxAutopilotService.updateAutopilotResponse3(type, source, source1, source2, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.PUT)
+  Object updatePlatformResponse3(@PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse4(type, source, source1, source2, source3, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.PUT)
+  Object updatePlatformResponse3(@PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @PathVariable("source4") String source4,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse5(type, source, source1, source2, source3, source4, data)
   }
 
 }
