@@ -172,29 +172,42 @@ interface OpsmxAutopilotService {
                           @Body Object data)
 
   @PUT("/autopilot/{type}")
-  Object updateAutopilotResponse(@Path('version') String version,
-                                 @Path('type') String type,
+  Object updateAutopilotResponse(@Path('type') String type,
                                  @Body Object data)
 
   @PUT("/autopilot/{type}/{source}")
-  Object updateAutopilotResponse1(@Path('version') String version,
-                                  @Path('type') String type,
+  Object updateAutopilotResponse1(@Path('type') String type,
                                   @Path('source') String source,
                                   @Body Object data)
 
   @PUT("/autopilot/{type}/{source}/{source1}")
-  Object updateAutopilotResponse2(@Path('version') String version,
-                                  @Path('type') String type,
+  Object updateAutopilotResponse2(@Path('type') String type,
                                   @Path('source') String source,
                                   @Path('source1') String source1,
                                   @Body Object data)
 
   @PUT("/autopilot/{type}/{source}/{source1}/{source2}")
-  Object updateAutopilotResponse3(@Path('version') String version,
-                                  @Path('type') String type,
+  Object updateAutopilotResponse3(@Path('type') String type,
                                   @Path('source') String source,
                                   @Path('source1') String source1,
                                   @Path('source2') String source2,
+                                  @Body Object data)
+
+  @PUT("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
+  Object updateAutopilotResponse4(@Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Body Object data)
+
+  @PUT("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object updateAutopilotResponse5(@Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4,
                                   @Body Object data)
 
 }
