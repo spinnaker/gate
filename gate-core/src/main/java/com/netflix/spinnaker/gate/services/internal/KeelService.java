@@ -44,6 +44,10 @@ public interface KeelService {
   @GET("/resources/{name}")
   Resource getResource(@Path("name") String name);
 
+  @GET("/resources/{name}")
+  @Headers("Accept: application/x-yaml")
+  Resource getResourceYaml(@Path("name") String name);
+
   @GET("/resources/{name}/status")
   String getResourceStatus(@Path("name") String name);
 
@@ -58,6 +62,10 @@ public interface KeelService {
 
   @GET("/delivery-configs/{name}")
   DeliveryConfig getManifest(@Path("name") String name);
+
+  @GET("/delivery-configs/{name}")
+  @Headers("Accept: application/x-yaml")
+  DeliveryConfig getManifestYaml(@Path("name") String name);
 
   @GET("/delivery-configs/{name}/artifacts")
   List<Map<String, Object>> getManifestArtifacts(@Path("name") String name);
@@ -74,6 +82,9 @@ public interface KeelService {
 
   @POST("/delivery-configs/diff")
   List<Map> diffManifest(@Body DeliveryConfig manifest);
+
+  @GET("/delivery-configs/schema")
+  Map<String, Object> schema();
 
   @POST("/delivery-configs/validate")
   @Headers("Accept: application/json")
@@ -144,9 +155,6 @@ public interface KeelService {
       @Path("targetEnvironment") String targetEnvironment,
       @Path("reference") String reference,
       @Path("version") String version);
-
-  @GET("/v3/api-docs")
-  Map<String, Object> getApiDocs();
 
   @GET("/installedPlugins")
   List<SpinnakerPluginDescriptor> getInstalledPlugins();

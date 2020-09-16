@@ -85,6 +85,12 @@ public class ManagedController {
     return keelService.getResource(resourceId);
   }
 
+  @ApiOperation(value = "Get a resource", response = Resource.class)
+  @GetMapping(path = "/resources/{resourceId}.yml", produces = APPLICATION_YAML_VALUE)
+  Resource getResourceYaml(@PathVariable("resourceId") String resourceId) {
+    return keelService.getResourceYaml(resourceId);
+  }
+
   @ApiOperation(value = "Get status of a resource", response = Map.class)
   @GetMapping(path = "/resources/{resourceId}/status")
   Map getResourceStatus(@PathVariable("resourceId") String resourceId) {
@@ -147,6 +153,12 @@ public class ManagedController {
     return keelService.getManifest(name);
   }
 
+  @ApiOperation(value = "Get a delivery config manifest", response = DeliveryConfig.class)
+  @GetMapping(path = "/delivery-configs/{name}.yml", produces = APPLICATION_YAML_VALUE)
+  DeliveryConfig getManifestYaml(@PathVariable("name") String name) {
+    return keelService.getManifestYaml(name);
+  }
+
   @ApiOperation(
       value = "Get the status of each version of each artifact in each environment",
       response = List.class)
@@ -205,6 +217,14 @@ public class ManagedController {
       produces = {APPLICATION_JSON_VALUE})
   List<Map> diffManifest(@RequestBody DeliveryConfig manifest) {
     return keelService.diffManifest(manifest);
+  }
+
+  @ApiOperation(value = "Ad-hoc validate and diff a config manifest", response = Map.class)
+  @GetMapping(
+      path = "/delivery-configs/schema",
+      produces = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE})
+  Map<String, Object> schema() {
+    return keelService.schema();
   }
 
   @ApiOperation(
@@ -301,10 +321,5 @@ public class ManagedController {
       @PathVariable("reference") String reference,
       @PathVariable("version") String version) {
     keelService.deleteVeto(application, targetEnvironment, reference, version);
-  }
-
-  @GetMapping(path = "/api-docs")
-  Map<String, Object> getApiDocs() {
-    return keelService.getApiDocs();
   }
 }
