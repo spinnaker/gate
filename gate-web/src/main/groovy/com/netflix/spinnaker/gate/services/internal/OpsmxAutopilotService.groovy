@@ -100,6 +100,14 @@ interface OpsmxAutopilotService {
                          @Path('source2') String source2,
                          @Path('source3') String source3)
 
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object getAutoResponse7(@Path('type') String type,
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Path('source4') String source4)
+
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
 
