@@ -37,6 +37,7 @@ interface OpsmxAutopilotService {
                          @Query("limit") Integer limit,
                          @Query("sourceType") String sourceType,
                          @Query("datasourceType") String datasourceType,
+                         @Query("time") String time,
                          @Query("accountName") String accountName,
                          @Query("templateType") String templateType,
                          @Query("name") String name,
@@ -106,7 +107,8 @@ interface OpsmxAutopilotService {
                           @Path('source1') String source1,
                           @Path('source2') String source2,
                           @Path('source3') String source3,
-                          @Path('source4') String source4)
+                          @Path('source4') String source4,
+                          @Query("time") String time)
 
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
