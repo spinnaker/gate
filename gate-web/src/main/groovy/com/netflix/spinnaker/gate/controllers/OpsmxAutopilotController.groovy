@@ -73,6 +73,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "limit", required = false) Integer limit,
                          @RequestParam(value = "sourceType", required = false) String sourceType,
                          @RequestParam(value = "datasourceType", required = false) String datasourceType,
+                         @RequestParam(value = "time", required = false) String time,
                          @RequestParam(value = "accountName", required = false)  String accountName,
                          @RequestParam(name = "templateType",required = false) String templateType,
                          @RequestParam(value = "name", required = false) String name,
