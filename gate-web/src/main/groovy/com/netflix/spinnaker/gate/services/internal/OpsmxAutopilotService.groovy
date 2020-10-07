@@ -37,7 +37,6 @@ interface OpsmxAutopilotService {
                          @Query("limit") Integer limit,
                          @Query("sourceType") String sourceType,
                          @Query("datasourceType") String datasourceType,
-                         @Query("time") String time,
                          @Query("accountName") String accountName,
                          @Query("templateType") String templateType,
                          @Query("name") String name,
