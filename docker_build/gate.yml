@@ -12,6 +12,9 @@ services:
   dashboard:
     baseUrl: http://localhost:8094
     enabled: true
+  visibility:
+    baseUrl: http://localhost:8096
+    enabled: true
 security:
   basic:
     enabled: true
