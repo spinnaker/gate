@@ -57,14 +57,6 @@ class OpsmxVisibilityController {
     return opsmxVisibilityService.getVisibilityResponse1(version, type, serviceId)
   }
 
-//  @ApiOperation(value = "Endpoint for visibility rest services")
-//  @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
-//  Object getVisibilityResponse2(@PathVariable("version") String version,
-//                                @PathVariable("type") String type,
-//                                @RequestParam(value = "serviceId", required = false) Integer serviceId) {
-//    return opsmxVisibilityService.getVisibilityResponse2(version, type, serviceId)
- // }
-
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
   Object getVisibilityResponse(@PathVariable("version") String version,
@@ -108,6 +100,33 @@ class OpsmxVisibilityController {
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.GET)
+  Object getVisibilityResponse7(@PathVariable("version") String version,
+                                @PathVariable("type") String type,
+                                @PathVariable("source") String source,
+                                @PathVariable("source1") String source1,
+                                @PathVariable("source2") String source2,
+                                @PathVariable("source3") String source3,
+                                @PathVariable("source4") String source4) {
+
+    return opsmxVisibilityService.getVisibilityResponse7(version, type, source, source1, source2, source3, source4)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.GET)
+  Object getVisibilityResponse8(@PathVariable("version") String version,
+                                @PathVariable("type") String type,
+                                @PathVariable("source") String source,
+                                @PathVariable("source1") String source1,
+                                @PathVariable("source2") String source2,
+                                @PathVariable("source3") String source3,
+                                @PathVariable("source4") String source4,
+                                @PathVariable("source5") String source5) {
+
+    return opsmxVisibilityService.getVisibilityResponse8(version, type, source, source1, source2, source3, source4, source5)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.DELETE)
   Object deleteVisibilityResponse(@PathVariable("version") String version,
                                 @PathVariable("type") String type) {
@@ -132,6 +151,29 @@ class OpsmxVisibilityController {
                                  @PathVariable("source1") String source1) {
 
     return opsmxVisibilityService.deleteVisibilityResponse4(version, type, source, source1)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.DELETE)
+  Object deleteVisibilityResponse5(@PathVariable("version") String version,
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @PathVariable("source2") String source2) {
+
+    return opsmxVisibilityService.deleteVisibilityResponse5(version, type, source, source1, source2)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.DELETE)
+  Object deleteVisibilityResponse6(@PathVariable("version") String version,
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @PathVariable("source2") String source2,
+                                   @PathVariable("source3") String source3) {
+
+    return opsmxVisibilityService.deleteVisibilityResponse6(version, type, source, source1, source2, source3)
   }
 
   @ApiOperation(value = "Endpoint for platform visibility services")
@@ -190,6 +232,35 @@ class OpsmxVisibilityController {
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.POST)
+  Object postVisibilityResponse7(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @PathVariable("source4") String source4,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.postVisibilityResponse7(version, type, source, source1, source2, source3, source4, data)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.POST)
+  Object postVisibilityResponse8(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @PathVariable("source4") String source4,
+                                 @PathVariable("source5") String source5,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.postVisibilityResponse8(version, type, source, source1, source2, source3, source4, source5, data)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.PUT)
   Object updateVisibilityResponse(@PathVariable("version") String version,
                                 @PathVariable("type") String type,
@@ -229,5 +300,47 @@ class OpsmxVisibilityController {
                                  @RequestBody(required = false) Object data) {
 
     return opsmxVisibilityService.updateVisibilityResponse3(version, type, source, source1, source2, data)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.PUT)
+  Object updateVisibilityResponse4(@PathVariable("version") String version,
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @PathVariable("source2") String source2,
+                                   @PathVariable("source3") String source3,
+                                   @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.updateVisibilityResponse4(version, type, source, source1, source2, source3, data)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.PUT)
+  Object updateVisibilityResponse5(@PathVariable("version") String version,
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @PathVariable("source2") String source2,
+                                   @PathVariable("source3") String source3,
+                                   @PathVariable("source4") String source4,
+                                   @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.updateVisibilityResponse5(version, type, source, source1, source2, source3, source4, data)
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.PUT)
+  Object updateVisibilityResponse6(@PathVariable("version") String version,
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @PathVariable("source2") String source2,
+                                   @PathVariable("source3") String source3,
+                                   @PathVariable("source4") String source4,
+                                   @PathVariable("source5") String source5,
+                                   @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.updateVisibilityResponse5(version, type, source, source1, source2, source3, source4, source5, data)
   }
 }

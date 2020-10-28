@@ -51,6 +51,25 @@ interface OpsmxDashboardService {
                          @Path('source2') String source2,
                          @Path('source3') String source3)
 
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object getDashboardResponse7(@Path('version') String version,
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Path('source3') String source3,
+                               @Path('source4') String source4)
+
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object getDashboardResponse8(@Path('version') String version,
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Path('source3') String source3,
+                               @Path('source4') String source4,
+                               @Path('source5') String source5)
+
   @DELETE("/dashboardservice/{version}/{type}")
   Object deleteDashboardResponse(@Path('version') String version,
                            @Path('type') String type)
@@ -65,6 +84,40 @@ interface OpsmxDashboardService {
                             @Path('type') String type,
                             @Path('source') String source,
                             @Path('source1') String source1)
+
+  @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object deleteDashboardResponse5(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2)
+
+  @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object deleteDashboardResponse6(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3)
+
+  @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object deleteDashboardResponse7(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4)
+
+  @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object deleteDashboardResponse8(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4,
+                                  @Path('source5') String source5)
 
   @POST("/dashboardservice/{version}/{type}")
   Object postDashboardResponse(@Path('version') String version,
@@ -101,6 +154,27 @@ interface OpsmxDashboardService {
                           @Path('source3') String source3,
                           @Body Object data)
 
+  @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object postDashboardResponse7(@Path('version') String version,
+                                @Path('type') String type,
+                                @Path('source') String source,
+                                @Path('source1') String source1,
+                                @Path('source2') String source2,
+                                @Path('source3') String source3,
+                                @Path('source4') String source4,
+                                @Body Object data)
+
+  @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object postDashboardResponse8(@Path('version') String version,
+                                @Path('type') String type,
+                                @Path('source') String source,
+                                @Path('source1') String source1,
+                                @Path('source2') String source2,
+                                @Path('source3') String source3,
+                                @Path('source4') String source4,
+                                @Path('source5') String source5,
+                                @Body Object data)
+
   @PUT("/dashboardservice/{version}/{type}")
   Object updateDashboardResponse(@Path('version') String version,
                            @Path('type') String type,
@@ -125,6 +199,36 @@ interface OpsmxDashboardService {
                                   @Path('source') String source,
                                   @Path('source1') String source1,
                                   @Path('source2') String source2,
+                                  @Body Object data)
+
+  @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object updateDashboardResponse4(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Body Object data)
+
+  @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object updateDashboardResponse5(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4,
+                                  @Body Object data)
+
+  @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object updateDashboardResponse6(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4,
+                                  @Path('source5') String source5,
                                   @Body Object data)
 
 }

@@ -24,13 +24,8 @@ interface OpsmxVisibilityService {
 
   @GET("/visibilityservice/{version}/{type}")
   Object getVisibilityResponse1(@Path('version') String version,
-                              @Path('type') String type,
+                                @Path('type') String type,
                                 @Query("serviceId") Integer serviceId)
-
-//  @GET("/visibilityservice/{version}/{type}")
-//  Object getVisibilityResponse2(@Path('version') String version,
-//                                @Path('type') String type,
-//                                @Query("serviceId") Integer serviceId)
 
   @GET("/visibilityservice/{version}/{type}/{source}")
   Object getVisibilityResponse(@Path('version') String version,
@@ -59,6 +54,25 @@ interface OpsmxVisibilityService {
                               @Path('source2') String source2,
                               @Path('source3') String source3)
 
+  @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object getVisibilityResponse7(@Path('version') String version,
+                                @Path('type') String type,
+                                @Path('source') String source,
+                                @Path('source1') String source1,
+                                @Path('source2') String source2,
+                                @Path('source3') String source3,
+                                @Path('source4') String source4)
+
+  @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object getVisibilityResponse8(@Path('version') String version,
+                                @Path('type') String type,
+                                @Path('source') String source,
+                                @Path('source1') String source1,
+                                @Path('source2') String source2,
+                                @Path('source3') String source3,
+                                @Path('source4') String source4,
+                                @Path('source5') String source5)
+
   @DELETE("/visibilityservice/{version}/{type}")
   Object deleteVisibilityResponse(@Path('version') String version,
                                 @Path('type') String type)
@@ -73,6 +87,21 @@ interface OpsmxVisibilityService {
                                  @Path('type') String type,
                                  @Path('source') String source,
                                  @Path('source1') String source1)
+
+  @DELETE("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object deleteVisibilityResponse5(@Path('version') String version,
+                                   @Path('type') String type,
+                                   @Path('source') String source,
+                                   @Path('source1') String source1,
+                                   @Path('source2') String source2)
+
+  @DELETE("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object deleteVisibilityResponse6(@Path('version') String version,
+                                   @Path('type') String type,
+                                   @Path('source') String source,
+                                   @Path('source1') String source1,
+                                   @Path('source2') String source2,
+                                   @Path('source3') String source3)
 
   @POST("/visibilityservice/{version}/{type}")
   Object postVisibilityResponse(@Path('version') String version,
@@ -109,6 +138,27 @@ interface OpsmxVisibilityService {
                                @Path('source3') String source3,
                                @Body Object data)
 
+  @POST("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object postVisibilityResponse7(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Path('source3') String source3,
+                                 @Path('source4') String source4,
+                                 @Body Object data)
+
+  @POST("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object postVisibilityResponse8(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Path('source3') String source3,
+                                 @Path('source4') String source4,
+                                 @Path('source5') String source5,
+                                 @Body Object data)
+
   @PUT("/visibilityservice/{version}/{type}")
   Object updateVisibilityResponse(@Path('version') String version,
                                 @Path('type') String type,
@@ -134,5 +184,35 @@ interface OpsmxVisibilityService {
                                  @Path('source1') String source1,
                                  @Path('source2') String source2,
                                  @Body Object data)
+
+  @PUT("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
+  Object updateVisibilityResponse4(@Path('version') String version,
+                                   @Path('type') String type,
+                                   @Path('source') String source,
+                                   @Path('source1') String source1,
+                                   @Path('source2') String source2,
+                                   @Path('source3') String source3,
+                                   @Body Object data)
+
+  @PUT("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object updateVisibilityResponse5(@Path('version') String version,
+                                   @Path('type') String type,
+                                   @Path('source') String source,
+                                   @Path('source1') String source1,
+                                   @Path('source2') String source2,
+                                   @Path('source3') String source3,
+                                   @Path('source4') String source4,
+                                   @Body Object data)
+
+  @PUT("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object updateVisibilityResponse6(@Path('version') String version,
+                                   @Path('type') String type,
+                                   @Path('source') String source,
+                                   @Path('source1') String source1,
+                                   @Path('source2') String source2,
+                                   @Path('source3') String source3,
+                                   @Path('source4') String source4,
+                                   @Path('source5') String source5,
+                                   @Body Object data)
 
 }
