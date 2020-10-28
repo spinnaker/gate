@@ -238,6 +238,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
+  @ConditionalOnProperty("services.visibility.enabled")
+  OpsmxVisibilityService opsmxVisibilityService(OkHttpClient okHttpClient) {
+    createClient "visibility", OpsmxVisibilityService, okHttpClient
+  }
+
+  @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
                                                         OkHttpClient okHttpClient,
                                                         DynamicConfigService dynamicConfigService,
