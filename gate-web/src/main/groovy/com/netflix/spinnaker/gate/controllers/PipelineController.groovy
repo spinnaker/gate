@@ -96,6 +96,43 @@ class PipelineController {
     }
   }
 
+  @CompileDynamic
+  @ApiOperation(value = "Save an array of pipeline definition")
+  @PostMapping('/bulksave')
+  Map bulksavePipeline(
+    @RequestBody List<Map> pipelineList,
+    @RequestParam(value = "staleCheck", required = false, defaultValue = "false")
+      Boolean staleCheck) {
+
+    def retData = []
+    def operation = [
+      description: "bulk save pipeline",
+      application: "bulk save application",
+      job        : [
+        [
+          type      : "savePipeline",
+          pipeline  : (String) Base64.encoder.encodeToString(objectMapper.writeValueAsString(pipelineList).getBytes("UTF-8")),
+          user      : AuthenticatedRequest.spinnakerUser.orElse("anonymous"),
+          staleCheck: staleCheck,
+          bulksave  : true
+        ]
+      ]
+    ]
+
+    def result = taskService.bulkCreateAndWaitForCompletion(operation)
+    String resultStatus = result.get("status")
+
+    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
+      String exception = result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
+      throw new PipelineException(
+        exception ?: "Pipeline bulk save operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})"
+      )
+    } else {
+      retData = result.variables.find { it.key == "bulksave"}?.value
+    }
+    return retData
+  }
+
   @ApiOperation(value = "Rename a pipeline definition")
   @PostMapping('move')
   void renamePipeline(@RequestBody Map renameCommand) {

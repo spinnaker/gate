@@ -119,12 +119,63 @@ public class TaskService {
     return task;
   }
 
+  public Map bulkCreateAndWaitForCompletion(Map body, int maxPolls, int intervalMs) {
+    log.info("Bulk Creating and waiting for completion: " + body);
+
+    if (body.containsKey("application")) {
+      AuthenticatedRequest.setApplication(body.get("application").toString());
+    }
+
+    Map createResult = create(body);
+    if (createResult.get("ref") == null) {
+      log.warn("No ref field found in create result, returning entire result: " + createResult);
+      return createResult;
+    }
+
+    String taskId = ((String) createResult.get("ref")).split("/")[2];
+    log.info("Create succeeded; polling task for completion: " + taskId);
+
+    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>(1);
+    map.put("id", taskId);
+    Map task = map;
+    for (int i = 0; i < maxPolls; i++) {
+      try {
+        Thread.sleep(intervalMs);
+      } catch (InterruptedException ignored) {
+      }
+
+      task = getTask(taskId);
+      if (new ArrayList<>(Arrays.asList("SUCCEEDED", "TERMINAL"))
+          .contains((String) task.get("status"))) {
+        List<Map<String, String>> bulksaveTasks = (List<Map<String, String>>) task.get("steps");
+        long count = 0;
+        if (bulksaveTasks != null && !bulksaveTasks.isEmpty()) {
+          count =
+              bulksaveTasks.stream()
+                  .filter(
+                      hashmap ->
+                          ("SUCCEEDED".equals((String) hashmap.get("status"))
+                              || "TERMINAL".equals((String) hashmap.get("status"))))
+                  .count();
+        }
+        if (count == 2) {
+          return task;
+        }
+      }
+    }
+    return task;
+  }
+
   public Map createAndWaitForCompletion(Map body, int maxPolls) {
     return createAndWaitForCompletion(body, maxPolls, 1000);
   }
 
   public Map createAndWaitForCompletion(Map body) {
     return createAndWaitForCompletion(body, 32, 1000);
+  }
+
+  public Map bulkCreateAndWaitForCompletion(Map body) {
+    return bulkCreateAndWaitForCompletion(body, 300, 1000);
   }
 
   /** @deprecated This pipeline operation does not belong here. */
