@@ -91,6 +91,7 @@ class AuthConfig {
         .antMatchers(PermissionRevokingLogoutSuccessHandler.LOGGED_OUT_URL).permitAll()
         .antMatchers('/auth/user').permitAll()
         .antMatchers(HttpMethod.POST,'/autopilot/registerCanary').permitAll()
+        .antMatchers(HttpMethod.GET,'/autopilot/canaries/**').permitAll()
         .antMatchers(HttpMethod.GET,'/autopilot/mgmt/**').permitAll()
         .antMatchers('/plugins/deck/**').permitAll()
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
