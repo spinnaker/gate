@@ -111,11 +111,12 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "deleteAssociateRuns", required = false) Boolean deleteAssociateRuns,
                          @RequestParam(value = "event", required = false) String event,
                          @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
-                         @RequestParam(value = "pipelineId", required = false) String pipelineId){
+                         @RequestParam(value = "pipelineId", required = false) String pipelineId,
+                         @RequestParam(value = "referer", required = false) String referer){
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
-      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId)
+      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
