@@ -39,6 +39,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.util.UriComponents
+import org.springframework.web.util.UriComponentsBuilder
 import retrofit.RetrofitError
 
 import static net.logstash.logback.argument.StructuredArguments.value
@@ -60,6 +62,10 @@ class PipelineController {
   @Autowired
   ObjectMapper objectMapper
 
+  private static final Collection<String> TASK_COMPLETION_STATUSES =
+    Collections.unmodifiableList(
+      Arrays.asList("CANCELED", "SUCCEEDED", "STOPPED", "SKIPPED", "TERMINAL", "FAILED_CONTINUE"))
+
   @ApiOperation(value = "Delete a pipeline definition")
   @DeleteMapping("/{application}/{pipelineName:.+}")
   void deletePipeline(@PathVariable String application, @PathVariable String pipelineName) {
@@ -69,10 +75,10 @@ class PipelineController {
   @CompileDynamic
   @ApiOperation(value = "Save a pipeline definition")
   @PostMapping('')
-  void savePipeline(
+  ResponseEntity<Void> savePipeline(
     @RequestBody Map pipeline,
     @RequestParam(value = "staleCheck", required = false, defaultValue = "false")
-      Boolean staleCheck) {
+      Boolean staleCheck, UriComponentsBuilder uriComponentsBuilder) {
     def operation = [
       description: (String) "Save pipeline '${pipeline.get("name") ?: "Unknown"}'",
       application: pipeline.get('application'),
@@ -86,14 +92,32 @@ class PipelineController {
       ]
     ]
     def result = taskService.createAndWaitForCompletion(operation)
+    return processTaskResponse(result, uriComponentsBuilder)
+  }
+
+  @CompileDynamic
+  private ResponseEntity<Void> processTaskResponse(Map<String, Object> result, UriComponentsBuilder uriComponentsBuilder) {
     String resultStatus = result.get("status")
 
-    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
-      String exception = result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
+    // Send 400 bad request
+    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus) && resultStatus in TASK_COMPLETION_STATUSES) {
+      Map variables = result.get("variables") ? (Map)result.get("variables") : [:]
+      Map exceptionDetails = (variables.find { it.key == "exception" }?.value as Map)?.get('details') as Map
+      String exception = (exceptionDetails?.get('errors') as List)?.getAt(0)
       throw new PipelineException(
         exception ?: "Pipeline save operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})"
       )
     }
+
+    //Send 200 if Succeeds
+    if ("SUCCEEDED".equalsIgnoreCase(resultStatus)) {
+      return ResponseEntity.ok().build()
+    }
+
+    //Task is not complete so send 202(accepted) and let api client poll the task status URL.
+    UriComponents uriComponents = uriComponentsBuilder.path("/tasks/{id}").buildAndExpand(result.get('id'))
+    URI location = uriComponents.toUri();
+    return ResponseEntity.accepted().location(location).build()
   }
 
   @ApiOperation(value = "Rename a pipeline definition")
@@ -117,7 +141,7 @@ class PipelineController {
   @CompileDynamic
   @ApiOperation(value = "Update a pipeline definition", response = HashMap.class)
   @PutMapping("{id}")
-  Map updatePipeline(@PathVariable("id") String id, @RequestBody Map pipeline) {
+  ResponseEntity<?> updatePipeline(@PathVariable("id") String id, @RequestBody Map pipeline, UriComponentsBuilder uriComponentsBuilder) {
     def operation = [
       description: (String) "Update pipeline '${pipeline.get("name") ?: 'Unknown'}'",
       application: (String) pipeline.get('application'),
@@ -131,18 +155,16 @@ class PipelineController {
     ]
 
     def result = taskService.createAndWaitForCompletion(operation)
-    String resultStatus = result.get("status")
+    ResponseEntity responseEntity = processTaskResponse(result, uriComponentsBuilder)
 
-    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
-      String exception = result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
-      throw new PipelineException(
-        exception ?: "Pipeline save operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})"
-      )
+    if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+      Map body = front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), true)?.find {
+        id == (String) it.get("id")
+      }
+      return ResponseEntity.ok(body)
     }
 
-    return front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), true)?.find {
-      id == (String) it.get("id")
-    }
+    return responseEntity
   }
 
   @ApiOperation(value = "Cancel a pipeline execution")
@@ -346,4 +368,5 @@ class PipelineController {
       super(message)
     }
   }
+
 }

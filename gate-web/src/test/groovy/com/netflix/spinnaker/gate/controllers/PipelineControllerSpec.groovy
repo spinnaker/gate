@@ -27,29 +27,76 @@ import retrofit.RetrofitError
 import retrofit.client.Response
 import retrofit.converter.JacksonConverter
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 
 class PipelineControllerSpec extends Specification {
 
-  def "should update a pipeline"() {
+  private Map pipeline = [
+    id: "id",
+    name: "test pipeline",
+    stages: [],
+    triggers: [],
+    limitConcurrent: true,
+    parallel: true,
+    index: 4,
+    application: "application"
+  ]
+
+  @Unroll
+  def "should create a pipeline and return status #result for task status #taskStatus"() {
     given:
     def taskSerivce = Mock(TaskService)
     def front50Service = Mock(Front50Service)
     MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new PipelineController(objectMapper: new ObjectMapper(), taskService: taskSerivce, front50Service: front50Service)).build()
 
-    and:
-    def pipeline = [
-      id: "id",
-      name: "test pipeline",
-      stages: [],
-      triggers: [],
-      limitConcurrent: true,
-      parallel: true,
-      index: 4,
-      application: "application"
-    ]
+    when:
+    def response = mockMvc.perform(
+      post("/pipelines/").contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(pipeline))
+    ).andReturn().response
+
+    then:
+    response.status == result
+    1 * taskSerivce.createAndWaitForCompletion([
+      description: "Save pipeline 'test pipeline'" as String,
+      application: 'application',
+      job: [
+        [
+          type: 'savePipeline',
+          pipeline: Base64.encoder.encodeToString(new ObjectMapper().writeValueAsString(pipeline).bytes),
+          user: 'anonymous',
+          'staleCheck': false
+        ]
+      ]
+    ]) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+    if (result == 200) { // check for empty response body.
+      assert response.getContentAsString().length() == 0
+    }
+    if (result == 202) { // check location header exists.
+      assert response.getHeader('Location').equalsIgnoreCase('http://localhost/tasks/task-id')
+    }
+    0 * _
+
+    where:
+    taskStatus      ||   result
+    'SUCCEEDED'     ||   200
+    'BUFFERED'      ||   202
+    'TERMINAL'      ||   400
+    'SKIPPED'       ||   400
+    'STOPPED'       ||   400
+    'CANCELED'      ||   400
+
+  }
+
+  @Unroll
+  def "should update a pipeline and return status #result for task status #taskStatus"() {
+    given:
+    def taskSerivce = Mock(TaskService)
+    def front50Service = Mock(Front50Service)
+    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new PipelineController(objectMapper: new ObjectMapper(), taskService: taskSerivce, front50Service: front50Service)).build()
 
     when:
     def response = mockMvc.perform(
@@ -58,28 +105,38 @@ class PipelineControllerSpec extends Specification {
     ).andReturn().response
 
     then:
-    response.status == 200
+    response.status == result
     1 * taskSerivce.createAndWaitForCompletion([
       description: "Update pipeline 'test pipeline'" as String,
       application: 'application',
       job: [
         [
           type: 'updatePipeline',
-          pipeline: Base64.encoder.encodeToString(new ObjectMapper().writeValueAsString([
-            id: 'id',
-            name: 'test pipeline',
-            stages: [],
-            triggers: [],
-            limitConcurrent: true,
-            parallel: true,
-            index: 4,
-            application: 'application'
-          ]).bytes),
+          pipeline: Base64.encoder.encodeToString(new ObjectMapper().writeValueAsString(pipeline).bytes),
           user: 'anonymous'
         ]
       ]
-    ]) >> { [id: 'task-id', application: 'application', status: 'SUCCEEDED'] }
-    1 * front50Service.getPipelineConfigsForApplication('application', true) >> []
+    ]) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+    if (result == 200) {
+      1 * front50Service.getPipelineConfigsForApplication('application', true) >> [['id': 'id']]
+    }
+    if (result == 200) { // check body exists.
+      assert response.getContentAsString().equalsIgnoreCase('{"id":"id"}')
+    }
+    if (result == 202) { // check location header exists.
+      assert response.getHeader('Location').equalsIgnoreCase('http://localhost/tasks/task-id')
+    }
+    0 * _
+
+    where:
+    taskStatus      ||   result
+    'SUCCEEDED'     ||   200
+    'BUFFERED'      ||   202
+    'TERMINAL'      ||   400
+    'SKIPPED'       ||   400
+    'STOPPED'       ||   400
+    'CANCELED'      ||   400
+
   }
 
   def "should propagate pipeline template errors"() {
