@@ -60,6 +60,19 @@ interface OpsmxOesService {
                             @Path('source') String source,
                             @Path('source1') String source1)
 
+  @DELETE("/oes/{type}/{source}/{source1}/{source2}")
+  Object deleteOesResponse5(@Path('type') String type,
+                            @Path('source') String source,
+                            @Path('source1') String source1,
+                            @Path('source2') String source2)
+
+  @DELETE("/oes/{type}/{source}/{source1}/{source2}/{source3}")
+  Object deleteOesResponse6(@Path('type') String type,
+                            @Path('source') String source,
+                            @Path('source1') String source1,
+                            @Path('source2') String source2,
+                            @Path('source3') String source3)
+
   @POST("/oes/{type}/{source}")
   Object postOesResponse(@Path('type') String type,
                          @Path('source') String source,
@@ -97,5 +110,20 @@ interface OpsmxOesService {
   Object updateOesResponse4(@Path('type') String type,
                             @Path('source') String source,
                             @Path('source1') String source1,
+                            @Body Object data)
+
+  @PUT("/oes/{type}/{source}/{source1}/{source2}")
+  Object updateOesResponse5(@Path('type') String type,
+                            @Path('source') String source,
+                            @Path('source1') String source1,
+                            @Path('source2') String source2,
+                            @Body Object data)
+
+  @PUT("/oes/{type}/{source}/{source1}/{source2}/{source3}")
+  Object updateOesResponse6(@Path('type') String type,
+                            @Path('source') String source,
+                            @Path('source1') String source1,
+                            @Path('source2') String source2,
+                            @Path('source3') String source3,
                             @Body Object data)
 }
