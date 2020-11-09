@@ -125,6 +125,27 @@ class OpsmxOesController {
     return opsmxOesService.deleteOesResponse4(type, source, source1)
   }
 
+  @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.DELETE)
+  Object deleteOesResponse5(@PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2) {
+
+    return opsmxOesService.deleteOesResponse5(type, source, source1, source2)
+  }
+
+  @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.DELETE)
+  Object deleteOesResponse6(@PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @PathVariable("source3") String source3) {
+
+    return opsmxOesService.deleteOesResponse6(type, source, source1, source2, source3)
+  }
+
   @ApiOperation(value = "Add or Update dynamic account configured in Spinnaker", response = String.class)
   @RequestMapping(value = "/addOrUpdateDynamicAccount", method = RequestMethod.POST)
   String addOrUpdateAccount(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
@@ -194,6 +215,31 @@ class OpsmxOesController {
 
     return opsmxOesService.updateOesResponse4(type, source, source1, data)
   }
+
+  @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
+  Object updateOesResponse5(@PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @RequestBody Object data) {
+
+    return opsmxOesService.updateOesResponse5(type, source, source1, source2, data)
+  }
+
+  @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
+  Object updateOesResponse6(@PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @PathVariable("source3") String source3,
+                            @RequestBody Object data) {
+
+    return opsmxOesService.updateOesResponse6(type, source, source1, source2, source3, data)
+  }
+
+
 
   private String addOrUpdateDynamicAccount(byte[] bytes, String filename, String data) {
 
