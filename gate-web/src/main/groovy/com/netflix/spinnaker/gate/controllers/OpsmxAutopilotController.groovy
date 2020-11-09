@@ -221,6 +221,18 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.DELETE)
+  Object deleteAutoResponse6(@PathVariable("type") String type,
+                             @PathVariable("source") String source,
+                             @PathVariable("source1") String source1,
+                             @PathVariable("source2") String source2,
+                             @PathVariable("source3") String source3,
+                             @PathVariable("source4") String source4) {
+
+    return opsmxAutopilotService.deleteAutoResponse6(type, source, source1, source2, source3, source4)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.POST)
   Object postAutoResponse(@PathVariable("type") String type,
                          @RequestBody(required = false) Object data) {
@@ -259,9 +271,10 @@ class OpsmxAutopilotController {
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
+                           @RequestParam(value = "isEdit", required = false) Boolean isEdit,
                           @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.postAutoResponse5(type, source, source1, source2, data)
+    return opsmxAutopilotService.postAutoResponse5(type, source, source1, source2, isEdit, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -337,6 +350,20 @@ class OpsmxAutopilotController {
                                  @RequestBody(required = false) Object data) {
 
     return opsmxAutopilotService.updateAutopilotResponse5(type, source, source1, source2, source3, source4, data)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.PUT)
+  Object updatePlatformResponse4(@PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @PathVariable("source4") String source4,
+                                 @PathVariable("source5") String source5,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxAutopilotService.updateAutopilotResponse6(type, source, source1, source2, source3, source4, source5, data)
   }
 
 }

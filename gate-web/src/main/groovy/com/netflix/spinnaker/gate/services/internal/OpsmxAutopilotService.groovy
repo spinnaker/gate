@@ -145,6 +145,14 @@ interface OpsmxAutopilotService {
                              @Path('source2') String source2,
                              @Path('source3') String source3)
 
+  @DELETE("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object deleteAutoResponse6(@Path('type') String type,
+                             @Path('source') String source,
+                             @Path('source1') String source1,
+                             @Path('source2') String source2,
+                             @Path('source3') String source3,
+                             @Path('source4') String source4)
+
   @POST("/autopilot/{type}")
   Object postAutoResponse(@Path('type') String type,
                          @Body Object data)
@@ -171,6 +179,7 @@ interface OpsmxAutopilotService {
                           @Path('source') String source,
                           @Path('source1') String source1,
                           @Path('source2') String source2,
+                           @Query("isEdit") Boolean isEdit,
                           @Body Object data)
 
   @POST("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
@@ -218,6 +227,16 @@ interface OpsmxAutopilotService {
                                   @Path('source2') String source2,
                                   @Path('source3') String source3,
                                   @Path('source4') String source4,
+                                  @Body Object data)
+
+  @PUT("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object updateAutopilotResponse6(@Path('type') String type,
+                                  @Path('source') String source,
+                                  @Path('source1') String source1,
+                                  @Path('source2') String source2,
+                                  @Path('source3') String source3,
+                                  @Path('source4') String source4,
+                                  @Path('source5') String source5,
                                   @Body Object data)
 
 }
