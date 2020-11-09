@@ -126,7 +126,7 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
-  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}", method = RequestMethod.DELETE)
   Object deleteOesResponse5(@PathVariable("type") String type,
                             @PathVariable("source") String source,
                             @PathVariable("source1") String source1,
@@ -136,7 +136,7 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
-  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.DELETE)
   Object deleteOesResponse6(@PathVariable("type") String type,
                             @PathVariable("source") String source,
                             @PathVariable("source1") String source1,
@@ -217,7 +217,7 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
-  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}", method = RequestMethod.PUT)
   Object updateOesResponse5(@PathVariable("type") String type,
                             @PathVariable("source") String source,
                             @PathVariable("source1") String source1,
@@ -228,7 +228,7 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
-  @RequestMapping(value = "/{type}/{source}/{source1}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.PUT)
   Object updateOesResponse6(@PathVariable("type") String type,
                             @PathVariable("source") String source,
                             @PathVariable("source1") String source1,
