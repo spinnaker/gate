@@ -188,6 +188,7 @@ interface OpsmxAutopilotService {
                           @Path('source1') String source1,
                           @Path('source2') String source2,
                           @Path('source3') String source3,
+                           @Query("isEdit") Boolean isEdit,
                           @Body Object data)
 
   @PUT("/autopilot/{type}")

@@ -284,9 +284,10 @@ class OpsmxAutopilotController {
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
                           @PathVariable("source3") String source3,
+                           @RequestParam(value = "isEdit", required = false) Boolean isEdit,
                           @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.postAutoResponse6(type, source, source1, source2, source3, data)
+    return opsmxAutopilotService.postAutoResponse6(type, source, source1, source2, source3, isEdit, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
