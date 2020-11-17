@@ -18,26 +18,26 @@
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.RawResourceService;
-import groovy.transform.CompileStatic;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@CompileStatic
 @RestController
 public class RawResourceController {
+  private final RawResourceService rawResourceService;
 
-  @Autowired RawResourceService rawResourceService;
+  @Autowired
+  public RawResourceController(RawResourceService rawResourceService) {
+    this.rawResourceService = rawResourceService;
+  }
 
   @ApiOperation(
       value = "Retrieve a list of raw resources for a given application",
       response = List.class)
   @RequestMapping(value = "/applications/{application}/rawResources", method = RequestMethod.GET)
-  List<Map> getApplicationRawResources(
-      @PathVariable String application,
-      @RequestHeader(value = "X-RateLimit-App", required = false) String sourceApp) {
-    return rawResourceService.getApplicationRawResources(application, sourceApp);
+  List<Map<String, Object>> getApplicationRawResources(@PathVariable String application) {
+    return rawResourceService.getApplicationRawResources(application);
   }
 }

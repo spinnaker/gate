@@ -18,19 +18,21 @@
 package com.netflix.spinnaker.gate.services;
 
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector;
-import groovy.transform.CompileStatic;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@CompileStatic
 @Component
 public class RawResourceService {
+  private final ClouddriverServiceSelector clouddriverServiceSelector;
 
-  @Autowired private ClouddriverServiceSelector clouddriverServiceSelector;
+  @Autowired
+  public RawResourceService(ClouddriverServiceSelector clouddriverServiceSelector) {
+    this.clouddriverServiceSelector = clouddriverServiceSelector;
+  }
 
-  public List<Map> getApplicationRawResources(String appName, String selectorKey) {
+  public List<Map<String, Object>> getApplicationRawResources(String appName) {
     return clouddriverServiceSelector.select().getApplicationRawResources(appName);
   }
 }

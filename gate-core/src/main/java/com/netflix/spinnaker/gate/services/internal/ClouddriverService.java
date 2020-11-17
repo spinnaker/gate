@@ -102,7 +102,7 @@ public interface ClouddriverService {
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}/rawResources")
-  List<Map> getApplicationRawResources(@Path("name") String appName);
+  List<Map<String, Object>> getApplicationRawResources(@Path("name") String appName);
 
   @Headers("Accept: application/json")
   @GET("/applications/{name}/serverGroups")
