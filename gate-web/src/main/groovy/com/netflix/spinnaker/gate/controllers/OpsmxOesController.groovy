@@ -147,7 +147,7 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Add or Update dynamic account configured in Spinnaker", response = String.class)
-  @RequestMapping(value = "/addOrUpdateDynamicAccount", method = RequestMethod.POST)
+  @RequestMapping(value = "/accountsConfig/addOrUpdateDynamicAccount", method = RequestMethod.POST)
   String addOrUpdateAccount(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
     String filename = files ? files.getOriginalFilename() : ''
     return addOrUpdateDynamicAccount(files.bytes, filename, postData.get("postData"))
