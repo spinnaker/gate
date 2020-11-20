@@ -86,6 +86,11 @@ class AuthConfig {
     http
       .requestMatcher(requestMatcherProvider.requestMatcher())
       .authorizeRequests()
+        .antMatchers("/resources/**").permitAll()
+        .antMatchers("/images/**").permitAll()
+        .antMatchers("/js/**").permitAll()
+        .antMatchers("/fonts/**").permitAll()
+        .antMatchers("/css/**").permitAll()
         .antMatchers('/**/favicon.ico').permitAll()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .antMatchers(PermissionRevokingLogoutSuccessHandler.LOGGED_OUT_URL).permitAll()
@@ -109,9 +114,7 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    http.formLogin()
-        .loginPage("/login")
-        .permitAll()
+    http.formLogin().loginPage("/login").permitAll()
 
     http.logout()
         .logoutUrl("/auth/logout")
