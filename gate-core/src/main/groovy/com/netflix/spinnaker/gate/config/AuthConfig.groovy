@@ -33,13 +33,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
 import org.springframework.stereotype.Component
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.Filter
 import javax.servlet.ServletException
@@ -98,7 +98,9 @@ class AuthConfig {
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
         .antMatchers('/health').permitAll()
+        .antMatchers('/hello*').permitAll()
         .antMatchers('/**').authenticated()
+
     if (fiatSessionFilterEnabled) {
       Filter fiatSessionFilter = new FiatSessionFilter(
         fiatSessionFilterEnabled,
@@ -107,6 +109,10 @@ class AuthConfig {
 
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
+
+    http.formLogin()
+        .loginPage("/login")
+        .permitAll()
 
     http.logout()
         .logoutUrl("/auth/logout")
