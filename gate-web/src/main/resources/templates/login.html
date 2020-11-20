@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>OES Login - Please sign in</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet"
+        crossorigin="anonymous" />
+</head>
+
+<body>
+<div class="container">
+  <div class="border-box">
+    <div class="align-center">
+      <img class="d-inline-block align-middle mr-2" id="myimgnew" src='https://www.opsmx.com/images/logo.png' width="120">
+    </div>
+    <form class="form-signin signin-form" th:action="@{/login}" method="post">
+      <h2 class="form-signin-heading signin-title">Sign In</h2>
+      <div th:if="${param.error}" class="d-inline-block align-middle mr-2 error-message">
+        Invalid username and password.
+      </div>
+      <div th:if="${param.logout}" class="d-inline-block align-middle mr-2 info-message">
+        You have been logged out.
+      </div>
+      <p>
+        <label for="username" class="sr-only">username</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="username" required autofocus>
+      </p>
+      <p>
+        <label for="password" class="sr-only">password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="password" required>
+      </p>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">sign in</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .align-center {
+      margin: auto;
+      width: 50%;
+      padding: 2%;
+      text-align: center;
+  }
+
+  .error-message {
+      margin: auto;
+      color: red;
+      padding: 3%;
+      text-align: center;
+   }
+
+  .info-message {
+    margin: auto;
+    color: #469494;
+    padding: 3%;
+    text-align: center;
+   }
+
+   .signin-form {
+
+   }
+
+   .signin-title {
+    text-align: center;
+    font-size: 28px;
+    padding: 3% 0;
+   }
+
+   .border-box {
+      border: 1px solid #bfbbbb;
+      border-radius: 10px;
+      width: 35%;
+      padding: 3% 0;
+      background: #fbfbfb;
+      margin: auto;
+   }
+</style>
+</body>
+
+</html>
