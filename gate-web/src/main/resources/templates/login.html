@@ -1,45 +1,94 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
+  <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <title>OES Login - Please sign in</title>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-  <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet"
-        crossorigin="anonymous" />
-</head>
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
 
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- google fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700|Roboto:300,400,500,700&display=swap" rel="stylesheet">
+
+  <!-- awsomefonts -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+  <title>OES - Login</title>
+</head>
 <body>
-<div class="container">
-  <div class="border-box">
-    <div class="align-center">
-      <img class="d-inline-block align-middle mr-2" id="myimgnew" src='https://www.opsmx.com/images/logo.png' width="120">
+<div id="wrapper">
+  <div class="login-reg">
+    <div class="login-reg-header">
+      <img src="images/logo.png" alt="">
     </div>
-    <form class="form-signin signin-form" th:action="@{/login}" method="post">
-      <h2 class="form-signin-heading signin-title">Sign In</h2>
-      <div th:if="${param.error}" class="d-inline-block align-middle mr-2 error-message">
-        Invalid username and password.
+    <!-- /.login-reg-header -->
+
+    <div class="login-reg-body">
+      <div class="container login-reg-container">
+        <div class="card">
+          <div class="card-body">
+            <div class="lrcb-inner">
+              <div class="login-reg-icon text-center">
+                <img src="images/login-icon.png" class="img-fluid" alt="login" />
+              </div>
+              <!-- /.login-reg-icon -->
+              <h3>Login to your account</h3>
+              <form th:action="@{/login}" method="post">
+                <div th:if="${param.error}" class="d-inline-block align-middle mr-2 error-message">
+                  Invalid username and password.
+                </div>
+                <div class="form-group mb-3">
+                  <label>User Name</label>
+                  <input type="text" id="username" name="username" class="form-control" placeholder="Username" autofocus required/>
+                </div>
+                <!-- /.form-group -->
+                <div class="form-group mb-3">
+                  <label>Password</label>
+                  <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" />
+                </div>
+                <!-- /.form-group -->
+                <!--<div class="form-group d-flex align-items-center justify-content-between mb-3">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="rememberCheck" checked>
+                    <label class="custom-control-label" for="rememberCheck">Remember Me</label>
+                  </div>
+                  <a href="#" class="text-primary text-decoration-none">Forgot Password?</a>
+                </div>
+                -->
+                <!-- /.form-group -->
+                <div class="form-group mb-3">
+                  <button type="submit" class="btn btn-primary btn-block">Log In</button>
+                </div>
+                <!-- /.form-group -->
+                <!--<hr />
+                <div class="mt-2 text-center text-muted">
+                  Don't have an account? <a href="#" class="text-primary">Sign Up</a>
+                </div>
+                -->
+              </form>
+            </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
       </div>
-      <div th:if="${param.logout}" class="d-inline-block align-middle mr-2 info-message">
-        You have been logged out.
-      </div>
-      <p>
-        <label for="username" class="sr-only">username</label>
-        <input type="text" id="username" name="username" class="form-control" placeholder="username" required autofocus>
-      </p>
-      <p>
-        <label for="password" class="sr-only">password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="password" required>
-      </p>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">sign in</button>
-    </form>
+      <!-- /.login-reg-container -->
+    </div>
+    <!-- /.login-reg-body -->
   </div>
+  <!-- /.login-reg -->
 </div>
+<!-- /#wrapper -->
+
+<!-- Optional JavaScript -->
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+
 
 <style>
   .align-center {
@@ -48,7 +97,6 @@
       padding: 2%;
       text-align: center;
   }
-
   .error-message {
       margin: auto;
       color: red;
@@ -56,32 +104,7 @@
       text-align: center;
    }
 
-  .info-message {
-    margin: auto;
-    color: #469494;
-    padding: 3%;
-    text-align: center;
-   }
-
-   .signin-form {
-
-   }
-
-   .signin-title {
-    text-align: center;
-    font-size: 28px;
-    padding: 3% 0;
-   }
-
-   .border-box {
-      border: 1px solid #bfbbbb;
-      border-radius: 10px;
-      width: 35%;
-      padding: 3% 0;
-      background: #fbfbfb;
-      margin: auto;
-   }
 </style>
-</body>
 
+</body>
 </html>
