@@ -98,7 +98,6 @@ class AuthConfig {
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
         .antMatchers('/health').permitAll()
-        .antMatchers('/hello*').permitAll()
         .antMatchers('/**').authenticated()
 
     if (fiatSessionFilterEnabled) {
