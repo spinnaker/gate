@@ -96,6 +96,7 @@ swagger:
     - .*projects.*
     - .*functions.*
     - .*managed.*
+    - .*oes.*
 
 integrations:
   gremlin:

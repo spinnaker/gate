@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Netflix, Inc.
+ * Copyright 2020 OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,17 @@ import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
+import okio.Buffer
+import okio.BufferedSink
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+
+import okio.Okio
+import okio.Source
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
@@ -35,21 +42,6 @@ import org.springframework.web.multipart.MultipartFile
 @Slf4j
 @ConditionalOnExpression('${services.opsmx.enabled:false}')
 class OpsmxOesController {
-/*
- * Copyright 2020 Netflix, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
   @Autowired
   OpsmxOesService opsmxOesService
@@ -146,11 +138,11 @@ class OpsmxOesController {
     return opsmxOesService.deleteOesResponse6(type, source, source1, source2, source3)
   }
 
-  @ApiOperation(value = "Add or Update dynamic account configured in Spinnaker", response = String.class)
+  @ApiOperation(value = "Add or Update dynamic account configured in Spinnaker", response = String.class )
   @RequestMapping(value = "/accountsConfig/addOrUpdateDynamicAccount", method = RequestMethod.POST)
   String addOrUpdateAccount(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
-    String filename = files ? files.getOriginalFilename() : ''
-    return addOrUpdateDynamicAccount(files.bytes, filename, postData.get("postData"))
+	String filename = files ? files.getOriginalFilename() : ''
+	return addOrUpdateDynamicAccount(files, postData.get("postData"), )
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
@@ -239,27 +231,64 @@ class OpsmxOesController {
     return opsmxOesService.updateOesResponse6(type, source, source1, source2, source3, data)
   }
 
+  private String addOrUpdateDynamicAccount(MultipartFile files, String data) {
+	  
+	  Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+	  Map headersMap = new HashMap()
+	  authenticationHeaders.each { key, val ->
+		  if(val.isPresent())
+		   headersMap.putAt(key,val.get())
+		  else
+		   headersMap.putAt(key,"")
+	  }
+	  AuthenticatedRequest.propagate {
+		  def request = new Request.Builder()
+			.url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/addOrUpdateDynamicAccount")
+			.headers(Headers.of(headersMap))
+			.post(uploadFileOkHttp(data,files))
+			.build()
+			
+		  def response = okHttpClient.newCall(request).execute()
+		  return response.body()?.string() ?: "Unknown reason: " + response.code()
+		}.call() as String			
+  }
+  
+  private okhttp3.RequestBody uploadFileOkHttp(String data, MultipartFile multiPartfile) throws IOException {
+	  
+	  String fileName = multiPartfile.getOriginalFilename();
+	  MultipartBody.Builder builder = new MultipartBody.Builder();
+	  builder.setType(MultipartBody.FORM);
+	  builder.addFormDataPart("files", fileName, new okhttp3.RequestBody() {
+		  @Override
+		  public MediaType contentType() {
+			  return MediaType.parse("application/octet-stream");
+		  }
+		  
+		  @Override
+		  public void writeTo(BufferedSink sink) throws IOException {
+			  try {
+				  Source source = Okio.source(multiPartfile.getInputStream());
+				  Buffer buf = new Buffer();
 
+				  long totalRead = 0;
+				  long totalSize = multiPartfile.getSize();
+				  long remaining = totalSize;
 
-  private String addOrUpdateDynamicAccount(byte[] bytes, String filename, String data) {
+				  for (long readCount; (readCount = source.read(buf, 32000)) != -1;) {
 
-    AuthenticatedRequest.propagate {
-      def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("opsmx").url +
-          "/oes/accountsConfig/addOrUpdateDynamicAccount")
-        .post(new MultipartBody.Builder()
-          .addFormDataPart(
-            "files",
-            filename,
-            RequestBody.create(MediaType.parse("application/octet-stream"), bytes))
-          .addFormDataPart(
-            "postData",
-            null,
-            RequestBody.create(MediaType.parse("text/plain"), data))
-          .build())
-        .build()
-      def response = okHttpClient.newCall(request).execute()
-      return response.body()?.string() ?: "Unknown reason: " + response.code()
-    }.call() as String
+					  totalRead += readCount;
+					  remaining -= readCount;
+
+					  sink.write(buf, readCount);
+					  sink.flush();
+
+				  }
+			  } catch (Exception e) {
+				  e.printStackTrace();
+			  }
+		  }
+	  });
+	  builder.addFormDataPart("postData", null, okhttp3.RequestBody.create(MediaType.parse("text/plain"), data));
+	  return builder.build();
   }
 }
