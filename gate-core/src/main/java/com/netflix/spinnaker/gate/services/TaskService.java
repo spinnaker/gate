@@ -177,7 +177,7 @@ public class TaskService {
   }
 
   public Map bulkCreateAndWaitForCompletion(Map body) {
-    return bulkCreateAndWaitForCompletion(body, 120, 1000);
+    return bulkCreateAndWaitForCompletion(body, 300, 1000);
   }
 
   /** @deprecated This pipeline operation does not belong here. */
