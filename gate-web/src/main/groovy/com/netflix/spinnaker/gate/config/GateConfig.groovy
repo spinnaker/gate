@@ -88,7 +88,7 @@ import static retrofit.Endpoints.newFixedEndpoint
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
-  @Value('${server.session.timeout-in-seconds:3600}')
+  @Value('${server.session.timeout-in-seconds:300}')
   void setSessionTimeout(int maxInactiveIntervalInSeconds) {
     super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
   }
