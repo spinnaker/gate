@@ -39,3 +39,7 @@ logging:
 
 redis:
   connection: redis://spin-redis:6379
+
+server:
+  session:
+    timeout-in-seconds: 7200
