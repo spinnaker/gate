@@ -338,6 +338,10 @@ public interface ClouddriverService {
   @GET("/ecs/secrets")
   List<Map> getAllEcsSecrets();
 
+  @GET("/ecs/ecsDescribeClusters/{account}/{region}")
+  List<Map> getAllEcsClustersDescription(
+      @Path(value = "account") String account, @Path(value = "region") String region);
+
   @GET("/ecs/serviceDiscoveryRegistries")
   List<Map> getAllEcsServiceDiscoveryRegistries();
 

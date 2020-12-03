@@ -33,4 +33,8 @@ class EcsClusterService {
   List getAllEcsClusters() {
     clouddriver.getAllEcsClusters()
   }
+
+  List getAllEcsClustersDescription(String account, String region) {
+    clouddriver.getAllEcsClustersDescription(account, region)
+  }
 }
