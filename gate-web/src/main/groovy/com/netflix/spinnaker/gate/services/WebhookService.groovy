@@ -22,6 +22,8 @@ import com.netflix.spinnaker.security.AuthenticatedRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import java.util.concurrent.Callable
+
 @Component
 class WebhookService {
 
@@ -37,7 +39,8 @@ class WebhookService {
       event = new HashMap()
     }
 
-    return AuthenticatedRequest.allowAnonymous( {
+
+    return callEndpoint( {
       echoService.webhooks(type, source, event)
     })
   }
@@ -48,14 +51,21 @@ class WebhookService {
       event = new HashMap()
     }
 
-    return AuthenticatedRequest.allowAnonymous({
+    return callEndpoint({
       echoService.webhooks(type, source, event, gitHubSignature, bitBucketEventType)
     })
   }
 
   List preconfiguredWebhooks() {
-    return AuthenticatedRequest.allowAnonymous({
+    return callEndpoint({
       orcaServiceSelector.select().preconfiguredWebhooks()
     })
   }
+
+  private static <V> V callEndpoint(Callable<V> closure) {
+    return AuthenticatedRequest.getSpinnakerUser()
+      .map({ user -> closure.call() })
+      .orElse(AuthenticatedRequest.allowAnonymous(closure))
+  }
+
 }
