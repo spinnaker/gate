@@ -50,28 +50,37 @@ class PipelineControllerSpec extends Specification {
     given:
     def taskSerivce = Mock(TaskService)
     def front50Service = Mock(Front50Service)
+    Map inputMap = [
+      description: "Save pipeline 'test pipeline'" as String,
+      application: 'application',
+      job        : [
+        [
+          type        : 'savePipeline',
+          pipeline    : Base64.encoder.encodeToString(new ObjectMapper().writeValueAsString(pipeline).bytes),
+          user        : 'anonymous',
+          'staleCheck': false
+        ]
+      ]
+    ]
     MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new PipelineController(objectMapper: new ObjectMapper(), taskService: taskSerivce, front50Service: front50Service)).build()
 
     when:
     def response = mockMvc.perform(
-      post("/pipelines/").contentType(MediaType.APPLICATION_JSON)
+      post("/pipelines/").contentType(MediaType.APPLICATION_JSON).param('waitForCompletion', waitForCompletion.toString())
         .content(new ObjectMapper().writeValueAsString(pipeline))
     ).andReturn().response
 
     then:
     response.status == result
-    1 * taskSerivce.createAndWaitForCompletion([
-      description: "Save pipeline 'test pipeline'" as String,
-      application: 'application',
-      job: [
-        [
-          type: 'savePipeline',
-          pipeline: Base64.encoder.encodeToString(new ObjectMapper().writeValueAsString(pipeline).bytes),
-          user: 'anonymous',
-          'staleCheck': false
-        ]
-      ]
-    ]) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+
+    if (waitForCompletion) {
+      1 * taskSerivce.createAndWaitForCompletion(inputMap) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+    }
+
+    if (!waitForCompletion) {
+      1 * taskSerivce.create(inputMap) >> { ['ref': "/pipelines/task-id"] }
+    }
+
     if (result == 200) { // check for empty response body.
       assert response.getContentAsString().length() == 0
     }
@@ -81,14 +90,14 @@ class PipelineControllerSpec extends Specification {
     0 * _
 
     where:
-    taskStatus      ||   result
-    'SUCCEEDED'     ||   200
-    'BUFFERED'      ||   202
-    'TERMINAL'      ||   400
-    'SKIPPED'       ||   400
-    'STOPPED'       ||   400
-    'CANCELED'      ||   400
-
+    taskStatus      | waitForCompletion ||   result
+    'SUCCEEDED'     | true              ||   200
+    'BUFFERED'      | true              ||   400
+    'TERMINAL'      | true              ||   400
+    'SKIPPED'       | true              ||   400
+    'STOPPED'       | true              ||   400
+    'CANCELED'      | true              ||   400
+    'ASYNC'         | false             ||   202
   }
 
   @Unroll
@@ -96,17 +105,7 @@ class PipelineControllerSpec extends Specification {
     given:
     def taskSerivce = Mock(TaskService)
     def front50Service = Mock(Front50Service)
-    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new PipelineController(objectMapper: new ObjectMapper(), taskService: taskSerivce, front50Service: front50Service)).build()
-
-    when:
-    def response = mockMvc.perform(
-      put("/pipelines/${pipeline.id}").contentType(MediaType.APPLICATION_JSON)
-        .content(new ObjectMapper().writeValueAsString(pipeline))
-    ).andReturn().response
-
-    then:
-    response.status == result
-    1 * taskSerivce.createAndWaitForCompletion([
+    def inputMap = [
       description: "Update pipeline 'test pipeline'" as String,
       application: 'application',
       job: [
@@ -116,7 +115,25 @@ class PipelineControllerSpec extends Specification {
           user: 'anonymous'
         ]
       ]
-    ]) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+    ]
+    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new PipelineController(objectMapper: new ObjectMapper(), taskService: taskSerivce, front50Service: front50Service)).build()
+
+    when:
+    def response = mockMvc.perform(
+      put("/pipelines/${pipeline.id}").contentType(MediaType.APPLICATION_JSON).param('waitForCompletion', waitForCompletion.toString())
+        .content(new ObjectMapper().writeValueAsString(pipeline))
+    ).andReturn().response
+
+    then:
+    response.status == result
+
+    if (waitForCompletion) {
+      1 * taskSerivce.createAndWaitForCompletion(inputMap) >> { [id: 'task-id', application: 'application', status: taskStatus] }
+    }
+
+    if (!waitForCompletion) {
+      1 * taskSerivce.create(inputMap) >> { ['ref': "/pipelines/task-id"] }
+    }
     if (result == 200) {
       1 * front50Service.getPipelineConfigsForApplication('application', true) >> [['id': 'id']]
     }
@@ -129,13 +146,14 @@ class PipelineControllerSpec extends Specification {
     0 * _
 
     where:
-    taskStatus      ||   result
-    'SUCCEEDED'     ||   200
-    'BUFFERED'      ||   202
-    'TERMINAL'      ||   400
-    'SKIPPED'       ||   400
-    'STOPPED'       ||   400
-    'CANCELED'      ||   400
+    taskStatus      | waitForCompletion ||   result
+    'SUCCEEDED'     | true              ||   200
+    'BUFFERED'      | true              ||   400
+    'TERMINAL'      | true              ||   400
+    'SKIPPED'       | true              ||   400
+    'STOPPED'       | true              ||   400
+    'CANCELED'      | true              ||   400
+    'ASYNC'         | false             ||   202
 
   }
 

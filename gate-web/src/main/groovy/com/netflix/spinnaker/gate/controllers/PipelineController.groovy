@@ -78,7 +78,8 @@ class PipelineController {
   ResponseEntity<Void> savePipeline(
     @RequestBody Map pipeline,
     @RequestParam(value = "staleCheck", required = false, defaultValue = "false")
-      Boolean staleCheck, UriComponentsBuilder uriComponentsBuilder) {
+      Boolean staleCheck, @RequestParam(value = "waitForCompletion", required = false, defaultValue = "true") Boolean waitForCompletion,
+    UriComponentsBuilder uriComponentsBuilder) {
     def operation = [
       description: (String) "Save pipeline '${pipeline.get("name") ?: "Unknown"}'",
       application: pipeline.get('application'),
@@ -91,16 +92,32 @@ class PipelineController {
         ]
       ]
     ]
-    def result = taskService.createAndWaitForCompletion(operation)
-    return processTaskResponse(result, uriComponentsBuilder)
+    def result = waitForCompletion ? taskService.createAndWaitForCompletion(operation) : taskService.create(operation)
+    return processTaskResponse(result, waitForCompletion, uriComponentsBuilder)
   }
 
   @CompileDynamic
-  private ResponseEntity<Void> processTaskResponse(Map<String, Object> result, UriComponentsBuilder uriComponentsBuilder) {
-    String resultStatus = result.get("status")
+  private ResponseEntity<Void> processTaskResponse(Map<String, Object> result,
+                                                   Boolean waitForCompletion,
+                                                   UriComponentsBuilder uriComponentsBuilder) {
 
+    if (!waitForCompletion) {
+      if (result.get("ref") == null) {
+        log.warn("No ref field found in result")
+        return ResponseEntity.accepted().build()
+      }
+
+      String taskId = ((String) result.get("ref")).split("/")[2]
+      //Let api client poll the task status URL.
+      UriComponents uriComponents = uriComponentsBuilder.path("/tasks/{id}").buildAndExpand(taskId)
+      URI location = uriComponents.toUri();
+      return ResponseEntity.accepted().location(location).build()
+    }
+
+    // Process status of the operation and send response accordingly.
+    String resultStatus = result.get("status")
     // Send 400 bad request
-    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus) && resultStatus in TASK_COMPLETION_STATUSES) {
+    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
       Map variables = result.get("variables") ? (Map)result.get("variables") : [:]
       Map exceptionDetails = (variables.find { it.key == "exception" }?.value as Map)?.get('details') as Map
       String exception = (exceptionDetails?.get('errors') as List)?.getAt(0)
@@ -110,14 +127,8 @@ class PipelineController {
     }
 
     //Send 200 if Succeeds
-    if ("SUCCEEDED".equalsIgnoreCase(resultStatus)) {
-      return ResponseEntity.ok().build()
-    }
+    return ResponseEntity.ok().build()
 
-    //Task is not complete so send 202(accepted) and let api client poll the task status URL.
-    UriComponents uriComponents = uriComponentsBuilder.path("/tasks/{id}").buildAndExpand(result.get('id'))
-    URI location = uriComponents.toUri();
-    return ResponseEntity.accepted().location(location).build()
   }
 
   @ApiOperation(value = "Rename a pipeline definition")
@@ -141,7 +152,7 @@ class PipelineController {
   @CompileDynamic
   @ApiOperation(value = "Update a pipeline definition", response = HashMap.class)
   @PutMapping("{id}")
-  ResponseEntity<?> updatePipeline(@PathVariable("id") String id, @RequestBody Map pipeline, UriComponentsBuilder uriComponentsBuilder) {
+  ResponseEntity<?> updatePipeline(@PathVariable("id") String id, @RequestBody Map pipeline,  @RequestParam(value = "waitForCompletion", required = false, defaultValue = "true") Boolean waitForCompletion, UriComponentsBuilder uriComponentsBuilder) {
     def operation = [
       description: (String) "Update pipeline '${pipeline.get("name") ?: 'Unknown'}'",
       application: (String) pipeline.get('application'),
@@ -154,8 +165,8 @@ class PipelineController {
       ]
     ]
 
-    def result = taskService.createAndWaitForCompletion(operation)
-    ResponseEntity responseEntity = processTaskResponse(result, uriComponentsBuilder)
+    def result = waitForCompletion ? taskService.createAndWaitForCompletion(operation) : taskService.create(operation)
+    ResponseEntity responseEntity = processTaskResponse(result, waitForCompletion, uriComponentsBuilder)
 
     if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
       Map body = front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), true)?.find {
