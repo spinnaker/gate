@@ -62,10 +62,6 @@ class PipelineController {
   @Autowired
   ObjectMapper objectMapper
 
-  private static final Collection<String> TASK_COMPLETION_STATUSES =
-    Collections.unmodifiableList(
-      Arrays.asList("CANCELED", "SUCCEEDED", "STOPPED", "SKIPPED", "TERMINAL", "FAILED_CONTINUE"))
-
   @ApiOperation(value = "Delete a pipeline definition")
   @DeleteMapping("/{application}/{pipelineName:.+}")
   void deletePipeline(@PathVariable String application, @PathVariable String pipelineName) {
