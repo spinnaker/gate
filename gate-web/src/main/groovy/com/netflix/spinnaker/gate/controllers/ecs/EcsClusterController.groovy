@@ -36,8 +36,8 @@ class EcsClusterController {
   }
 
   @ApiOperation(value = "Retrieve a list Ecs Cluster Description WRT account and region")
-  @RequestMapping(value = "/ecs/ecsDescribeClusters/{account}/{region}", method = RequestMethod.GET)
-  List getAllEcsClustersDescription(@PathVariable String account, @PathVariable String region) {
-    ecsClusterService.getAllEcsClustersDescription(account, region)
+  @RequestMapping(value = "/ecs/getEcsClusterDescriptions/{account}/{region}", method = RequestMethod.GET)
+  List getEcsClusterDescriptions(@PathVariable String account, @PathVariable String region) {
+    ecsClusterService.getEcsClusterDescriptions(account, region)
   }
 }
