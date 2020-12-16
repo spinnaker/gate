@@ -22,7 +22,7 @@ providers, use the `includeProviders` flag:
 To start the JVM in debug mode, set the Java system property `DEBUG=true`:
 
 ```
-./gradlew -DDEBUG=true
+./gradlew -DDEBUG=true 
 ```
 
 The JVM will then listen for a debugger to be attached on port 8184.  The JVM will _not_ wait for
