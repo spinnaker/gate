@@ -24,7 +24,9 @@ interface OpsmxPlatformService {
 
   @GET("/platformservice/{version}/{type}")
   Object getPlatformResponse1(@Path('version') String version,
-                               @Path('type') String type)
+                               @Path('type') String type,
+                              @Query("datasourceType") String datasourceType,
+                              @Query("accountName") String accountName)
 
   @GET("/platformservice/{version}/{type}/{source}")
   Object getPlatformResponse(@Path('version') String version,
