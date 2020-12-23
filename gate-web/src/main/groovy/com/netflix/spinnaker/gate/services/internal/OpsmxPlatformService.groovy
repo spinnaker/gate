@@ -31,7 +31,8 @@ interface OpsmxPlatformService {
   @GET("/platformservice/{version}/{type}/{source}")
   Object getPlatformResponse(@Path('version') String version,
                          @Path('type') String type,
-                         @Path('source') String source)
+                         @Path('source') String source,
+                             @Query("source1") String source1)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}")
   Object getPlatformResponse4(@Path('version') String version,
