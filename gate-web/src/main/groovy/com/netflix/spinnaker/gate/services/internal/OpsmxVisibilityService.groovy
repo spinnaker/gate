@@ -30,7 +30,8 @@ interface OpsmxVisibilityService {
   @GET("/visibilityservice/{version}/{type}/{source}")
   Object getVisibilityResponse(@Path('version') String version,
                              @Path('type') String type,
-                             @Path('source') String source)
+                             @Path('source') String source,
+                               @Query("source1") String source1)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,
@@ -86,7 +87,8 @@ interface OpsmxVisibilityService {
   Object deleteVisibilityResponse4(@Path('version') String version,
                                  @Path('type') String type,
                                  @Path('source') String source,
-                                 @Path('source1') String source1)
+                                 @Path('source1') String source1,
+                                   @Query("source2") String source2)
 
   @DELETE("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
   Object deleteVisibilityResponse5(@Path('version') String version,

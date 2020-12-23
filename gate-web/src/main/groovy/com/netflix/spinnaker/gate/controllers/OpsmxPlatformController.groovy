@@ -52,16 +52,19 @@ class OpsmxPlatformController {
   @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getPlatformResponse1(@PathVariable("version") String version,
-                              @PathVariable("type") String type) {
-    return opsmxPlatformService.getPlatformResponse1(version, type)
+                              @PathVariable("type") String type,
+                              @RequestParam(value = "datasourceType", required = false) String datasourceType,
+                              @RequestParam(value = "accountName", required = false) String accountName) {
+    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
   Object getPlatformResponse(@PathVariable("version") String version,
                          @PathVariable("type") String type,
-                         @PathVariable("source") String source) {
-    return opsmxPlatformService.getPlatformResponse(version, type, source)
+                         @PathVariable("source") String source,
+                             @RequestParam(value = "source1", required = false) String source1) {
+    return opsmxPlatformService.getPlatformResponse(version, type, source, source1)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
