@@ -60,7 +60,8 @@ interface OpsmxPlatformService {
 
   @DELETE("/platformservice/{version}/{type}")
   Object deletePlatformResponse(@Path('version') String version,
-                                @Path('type') String type)
+                                @Path('type') String type,
+                                @Query("accountName") String accountName)
 
   @DELETE("/platformservice/{version}/{type}/{source}")
   Object deletePlatformResponse1(@Path('version') String version,

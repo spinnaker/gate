@@ -106,9 +106,9 @@ class OpsmxPlatformController {
   @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.DELETE)
   Object deletePlatformResponse(@PathVariable("version") String version,
-                                @PathVariable("type") String type) {
-
-    return opsmxPlatformService.deletePlatformResponse(version, type)
+                                @PathVariable("type") String type,
+                                @RequestParam(value = "accountName", required = false) String accountName) {
+    return opsmxPlatformService.deletePlatformResponse(version, type, accountName)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
