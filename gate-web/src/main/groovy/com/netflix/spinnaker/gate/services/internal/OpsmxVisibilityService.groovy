@@ -88,7 +88,7 @@ interface OpsmxVisibilityService {
                                  @Path('type') String type,
                                  @Path('source') String source,
                                  @Path('source1') String source1,
-                                   @Query("source2") String source2)
+                                   @Query("datasourceName") String datasourceName)
 
   @DELETE("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
   Object deleteVisibilityResponse5(@Path('version') String version,
