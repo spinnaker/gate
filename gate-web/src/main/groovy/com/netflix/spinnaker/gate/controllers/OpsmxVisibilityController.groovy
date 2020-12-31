@@ -150,8 +150,8 @@ class OpsmxVisibilityController {
                                  @PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
-                                   @RequestParam(value = "source2", required = false) String source2) {
-    return opsmxVisibilityService.deleteVisibilityResponse4(version, type, source, source1, source2)
+                                   @RequestParam(value = "datasourceName", required = false) String datasourceName) {
+    return opsmxVisibilityService.deleteVisibilityResponse4(version, type, source, source1, datasourceName)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
