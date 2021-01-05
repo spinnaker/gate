@@ -28,6 +28,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -63,7 +65,7 @@ class OpsmxAutopilotController {
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
-  Object getAutoResponse(@PathVariable("type") String type, @PathVariable("source") String source,
+  @ResponseBody Object getAutoResponse(@PathVariable("type") String type, @PathVariable("source") String source,
                          @RequestParam(value = "application", required = false) Integer id,
                          @RequestParam(value = "applicationId", required = false) Integer applicationId,
                          @RequestParam(value = "serviceId", required = false) Integer serviceId,
@@ -113,10 +115,20 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer){
-    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
+
+
+    okhttp3.ResponseBody response = opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
       userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer)
+
+    if (response.contentType().type().equalsIgnoreCase("application/zip")){
+      HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Type", response.contentType().type())
+      return ResponseEntity.ok().headers(headers).body(response.bytes())
+    } else {
+      return response.string()
+    }
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
