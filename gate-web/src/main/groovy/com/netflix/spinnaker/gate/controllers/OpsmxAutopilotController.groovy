@@ -117,6 +117,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "referer", required = false) String referer){
 
 
+    log.info("**************************************** Invoking Autopilot API ***************************************************")
     okhttp3.ResponseBody response = opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
