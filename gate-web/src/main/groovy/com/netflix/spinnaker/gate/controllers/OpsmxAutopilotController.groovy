@@ -122,11 +122,15 @@ class OpsmxAutopilotController {
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
       userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer)
 
+
+    log.info("******************************* Response content type ************************************ : {}", response.contentType().type())
     if (response.contentType().type().equalsIgnoreCase("application/zip")){
+      log.info("***************************** Inside if condition *******************************")
       HttpHeaders headers = new HttpHeaders();
       headers.add("Content-Type", response.contentType().type())
       return ResponseEntity.ok().headers(headers).body(response.bytes())
     } else {
+      log.info("***************************** Inside else condition *******************************")
       return response.string()
     }
   }
