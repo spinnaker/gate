@@ -16,13 +16,6 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
-import okhttp3.ResponseBody
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
-import retrofit.Callback
 import retrofit.client.Response
 import retrofit.http.*
 
