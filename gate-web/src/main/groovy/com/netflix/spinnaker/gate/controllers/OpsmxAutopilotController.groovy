@@ -69,8 +69,9 @@ class OpsmxAutopilotController {
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @GetMapping(value = "/canaries/debugLogsData", produces = "application/zip")
   @ResponseBody Object downloadDebugData(@RequestParam(value = "id", required = false) Integer canaryId){
-    Callback<okhttp3.ResponseBody> response = opsmxAutopilotService.downloadDebugData(canaryId)
-    return response.asType(Byte[].class)
+    log.info("*************** Download debug data API invoked ***********************************")
+    return opsmxAutopilotService.downloadDebugData(canaryId)
+    //return response.asType(Byte[].class)
     //return IOUtils.toByteArray(body.getBody().in())
   }
 

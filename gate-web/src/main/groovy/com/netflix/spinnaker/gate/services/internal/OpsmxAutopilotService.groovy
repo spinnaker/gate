@@ -28,7 +28,7 @@ import retrofit.http.*
 interface OpsmxAutopilotService {
 
   @GET("/autopilot/canaries/debugLogsData")
-  Callback<ResponseBody> downloadDebugData(@Query("id") Integer canaryId)
+  byte[] downloadDebugData(@Query("id") Integer canaryId)
 
   @GET("/autopilot/{type}/{source}")
   Object getAutoResponse(@Path('type') String type,
