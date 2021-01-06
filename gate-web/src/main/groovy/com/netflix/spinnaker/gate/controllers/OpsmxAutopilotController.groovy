@@ -72,7 +72,7 @@ class OpsmxAutopilotController {
     log.info("*************** Download debug data API invoked ***********************************")
     Response response = opsmxAutopilotService.downloadDebugData(canaryId)
     log.info("Response received status : {} and reason : {}", response.getStatus(), response.getReason())
-    byte [] zipFile = IOUtils.toByteArray(body.getBody().in())
+    byte [] zipFile = IOUtils.toByteArray(response.getBody().in())
     return zipFile
     //return response.asType(Byte[].class)
     //return IOUtils.toByteArray(body.getBody().in())
