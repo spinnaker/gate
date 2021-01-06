@@ -26,10 +26,12 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import retrofit.client.Response
 
 @RequestMapping("/autopilot")
 @RestController
@@ -59,6 +61,22 @@ class OpsmxAutopilotController {
   @RequestMapping(value = "/{type}", method = RequestMethod.GET)
   Object getAutoResponse1(@PathVariable("type") String type) {
     return opsmxAutopilotService.getAutoResponse1(type)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @GetMapping(value = "/canaries/debugLogsData", produces = "application/zip")
+  @ResponseBody Object downloadDebugData(@RequestParam(value = "id", required = false) Integer canaryId){
+    Response response = opsmxAutopilotService.downloadDebugData(canaryId)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte [] zipFile = IOUtils.toByteArray(inputStream)
+      return zipFile
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -113,6 +131,7 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer){
+
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
