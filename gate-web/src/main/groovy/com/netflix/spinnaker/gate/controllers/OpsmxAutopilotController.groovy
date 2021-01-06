@@ -26,12 +26,15 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import retrofit.Callback
+import retrofit.client.Response
 
 @RequestMapping("/autopilot")
 @RestController
@@ -64,8 +67,16 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @GetMapping(value = "/canaries/debugLogsData", produces = "application/zip")
+  @ResponseBody Object downloadDebugData(@RequestParam(value = "id", required = false) Integer canaryId){
+    Callback<okhttp3.ResponseBody> response = opsmxAutopilotService.downloadDebugData(canaryId)
+    return response.asType(Byte[].class)
+    //return IOUtils.toByteArray(body.getBody().in())
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
-  @ResponseBody Object getAutoResponse(@PathVariable("type") String type, @PathVariable("source") String source,
+  Object getAutoResponse(@PathVariable("type") String type, @PathVariable("source") String source,
                          @RequestParam(value = "application", required = false) Integer id,
                          @RequestParam(value = "applicationId", required = false) Integer applicationId,
                          @RequestParam(value = "serviceId", required = false) Integer serviceId,
@@ -116,24 +127,10 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer){
 
-
-    log.info("**************************************** Invoking Autopilot API ***************************************************")
-    okhttp3.ResponseBody response = opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
+    return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
       userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer)
-
-
-    log.info("******************************* Response content type ************************************ : {}", response.contentType().type())
-    if (response.contentType().type().equalsIgnoreCase("application/zip")){
-      log.info("***************************** Inside if condition *******************************")
-      HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Type", response.contentType().type())
-      return ResponseEntity.ok().headers(headers).body(response.bytes())
-    } else {
-      log.info("***************************** Inside else condition *******************************")
-      return response.string()
-    }
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
