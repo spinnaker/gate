@@ -70,7 +70,10 @@ class OpsmxAutopilotController {
   @GetMapping(value = "/canaries/debugLogsData", produces = "application/zip")
   @ResponseBody Object downloadDebugData(@RequestParam(value = "id", required = false) Integer canaryId){
     log.info("*************** Download debug data API invoked ***********************************")
-    return opsmxAutopilotService.downloadDebugData(canaryId)
+    Response response = opsmxAutopilotService.downloadDebugData(canaryId)
+    log.info("Response received status : {} and reason : {}", response.getStatus(), response.getReason())
+    byte [] zipFile = IOUtils.toByteArray(body.getBody().in())
+    return zipFile
     //return response.asType(Byte[].class)
     //return IOUtils.toByteArray(body.getBody().in())
   }

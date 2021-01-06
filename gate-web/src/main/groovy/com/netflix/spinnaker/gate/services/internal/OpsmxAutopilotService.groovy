@@ -23,12 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import retrofit.Callback
+import retrofit.client.Response
 import retrofit.http.*
 
 interface OpsmxAutopilotService {
 
   @GET("/autopilot/canaries/debugLogsData")
-  byte[] downloadDebugData(@Query("id") Integer canaryId)
+  Response downloadDebugData(@Query("id") Integer canaryId)
 
   @GET("/autopilot/{type}/{source}")
   Object getAutoResponse(@Path('type') String type,
