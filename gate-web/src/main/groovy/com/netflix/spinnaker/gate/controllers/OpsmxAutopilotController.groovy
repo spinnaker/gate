@@ -29,9 +29,13 @@ import okhttp3.Request
 import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import retrofit.client.Response
+
+import java.util.stream.Collectors
 
 @RequestMapping("/autopilot")
 @RestController
@@ -70,7 +74,10 @@ class OpsmxAutopilotController {
     InputStream inputStream = response.getBody().in()
     try {
       byte [] zipFile = IOUtils.toByteArray(inputStream)
-      return zipFile
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(zipFile)
+      
     } finally{
       if (inputStream!=null){
         inputStream.close()
