@@ -20,8 +20,10 @@ import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.util.stream.Collectors
 
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
@@ -321,6 +323,24 @@ class OpsmxOesController {
 	  });
 	  builder.addFormDataPart("postData", null, okhttp3.RequestBody.create(MediaType.parse("text/plain"), data));
 	  return builder.build();
+  }
+  
+  @ApiOperation(value = "download the manifest file")
+  @GetMapping(value = "/accountsConfig/cloudProviders/manifestfile/{agentName}", produces = "application/octet-stream")
+  @ResponseBody Object getDownloadManifestFile(@PathVariable("agentName") String agentName){
+	  
+	Response response = opsmxOesService.manifestDownloadFile(agentName)
+	InputStream inputStream = response.getBody().in()
+	try {
+	  byte [] manifestFile = IOUtils.toByteArray(inputStream)
+	  HttpHeaders headers = new HttpHeaders()
+	  headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+	  return ResponseEntity.ok().headers(headers).body(manifestFile)
+	} finally{
+	  if (inputStream!=null){
+		inputStream.close()
+	  }
+	}
   }
 
 }

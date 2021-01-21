@@ -16,9 +16,13 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import retrofit.client.Response
 import retrofit.http.*
 
 interface OpsmxOesService {
+	
+   @GET("/oes/accountsConfig/cloudProviders/manifestfile/{agentName}")
+   Response manifestDownloadFile(@Path('agentName') String agentName)
 
   @GET("/oes/{type}/{source}")
   Object getOesResponse(@Path('type') String type,
