@@ -16,26 +16,31 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import org.apache.commons.io.IOUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.util.stream.Collectors
+
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
 import com.netflix.spinnaker.security.AuthenticatedRequest
+
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import okio.Buffer
-import okio.BufferedSink
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-
+import okio.Buffer
+import okio.BufferedSink
 import okio.Okio
 import okio.Source
-
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
+import retrofit.client.Response
 
 @RequestMapping("/oes")
 @RestController
@@ -142,7 +147,7 @@ class OpsmxOesController {
   @RequestMapping(value = "/accountsConfig/addOrUpdateDynamicAccount", method = RequestMethod.POST)
   String addOrUpdateAccount(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
 	String filename = files ? files.getOriginalFilename() : ''
-	return addOrUpdateDynamicAccount(files, postData.get("postData"), )
+	return addOrUpdateDynamicAccount(files, postData.get("postData"))
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
@@ -231,8 +236,36 @@ class OpsmxOesController {
     return opsmxOesService.updateOesResponse6(type, source, source1, source2, source3, data)
   }
 
+  @ApiOperation(value = "Add or Update dynamic account configured in Spinnaker", response = String.class )
+  @RequestMapping(value = "/accountsConfig/cloudProviders/addOrUpdateDynamicAccount", method = RequestMethod.POST)
+  String addOrUpdateCloudProver(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
+    String filename = files ? files.getOriginalFilename() : ''
+    return addOrUpdateCloudProverAccount(files, postData.get("postData"))
+  }
+
+  private String addOrUpdateCloudProverAccount(MultipartFile files, String data) {
+    Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+    Map headersMap = new HashMap()
+    authenticationHeaders.each { key, val ->
+      if(val.isPresent())
+        headersMap.putAt(key,val.get())
+      else
+        headersMap.putAt(key,"")
+    }
+    AuthenticatedRequest.propagate {
+      def request = new Request.Builder()
+        .url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/cloudProviders/addOrUpdateDynamicAccount")
+        .headers(Headers.of(headersMap))
+        .post(uploadFileOkHttp(data,files))
+        .build()
+
+      def response = okHttpClient.newCall(request).execute()
+      return response.body()?.string() ?: "Unknown reason: " + response.code()
+    }.call() as String
+  }
+
   private String addOrUpdateDynamicAccount(MultipartFile files, String data) {
-	  
+
 	  Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
 	  Map headersMap = new HashMap()
 	  authenticationHeaders.each { key, val ->
@@ -247,14 +280,14 @@ class OpsmxOesController {
 			.headers(Headers.of(headersMap))
 			.post(uploadFileOkHttp(data,files))
 			.build()
-			
+
 		  def response = okHttpClient.newCall(request).execute()
 		  return response.body()?.string() ?: "Unknown reason: " + response.code()
-		}.call() as String			
+		}.call() as String
   }
-  
+
   private okhttp3.RequestBody uploadFileOkHttp(String data, MultipartFile multiPartfile) throws IOException {
-	  
+
 	  String fileName = multiPartfile.getOriginalFilename();
 	  MultipartBody.Builder builder = new MultipartBody.Builder();
 	  builder.setType(MultipartBody.FORM);
@@ -263,7 +296,7 @@ class OpsmxOesController {
 		  public MediaType contentType() {
 			  return MediaType.parse("application/octet-stream");
 		  }
-		  
+
 		  @Override
 		  public void writeTo(BufferedSink sink) throws IOException {
 			  try {
@@ -291,4 +324,23 @@ class OpsmxOesController {
 	  builder.addFormDataPart("postData", null, okhttp3.RequestBody.create(MediaType.parse("text/plain"), data));
 	  return builder.build();
   }
+  
+  @ApiOperation(value = "download the manifest file")
+  @GetMapping(value = "/accountsConfig/cloudProviders/manifestfile/{agentName}", produces = "application/octet-stream")
+  @ResponseBody Object getDownloadManifestFile(@PathVariable("agentName") String agentName){
+	  
+	Response response = opsmxOesService.manifestDownloadFile(agentName)
+	InputStream inputStream = response.getBody().in()
+	try {
+	  byte [] manifestFile = IOUtils.toByteArray(inputStream)
+	  HttpHeaders headers = new HttpHeaders()
+	  headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+	  return ResponseEntity.ok().headers(headers).body(manifestFile)
+	} finally{
+	  if (inputStream!=null){
+		inputStream.close()
+	  }
+	}
+  }
+
 }
