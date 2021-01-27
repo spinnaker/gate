@@ -16,11 +16,12 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import io.swagger.models.auth.In
 import retrofit.client.Response
 import retrofit.http.*
 
 interface OpsmxOesService {
-	
+
    @GET("/oes/accountsConfig/cloudProviders/manifestfile/{agentName}")
    Response manifestDownloadFile(@Path('agentName') String agentName)
 
@@ -52,7 +53,8 @@ interface OpsmxOesService {
                          @Path('source') String source,
                          @Path('source1') String source1,
                          @Path('source2') String source2,
-                         @Path('source3') String source3)
+                         @Path('source3') String source3,
+                         @Query("noOfDays") Integer noOfDays)
 
   @DELETE("/oes/{type}/{source}")
   Object deleteOesResponse(@Path('type') String type,

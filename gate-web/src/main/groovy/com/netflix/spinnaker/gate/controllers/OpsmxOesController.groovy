@@ -99,9 +99,10 @@ class OpsmxOesController {
                          @PathVariable("source") String source,
                          @PathVariable("source1") String source1,
                          @PathVariable("source2") String source2,
-                         @PathVariable("source3") String source3) {
+                         @PathVariable("source3") String source3,
+                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxOesService.getOesResponse6(type, source, source1, source2, source3)
+    return opsmxOesService.getOesResponse6(type, source, source1, source2, source3, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
@@ -324,11 +325,11 @@ class OpsmxOesController {
 	  builder.addFormDataPart("postData", null, okhttp3.RequestBody.create(MediaType.parse("text/plain"), data));
 	  return builder.build();
   }
-  
+
   @ApiOperation(value = "download the manifest file")
   @GetMapping(value = "/accountsConfig/cloudProviders/manifestfile/{agentName}", produces = "application/octet-stream")
   @ResponseBody Object getDownloadManifestFile(@PathVariable("agentName") String agentName){
-	  
+
 	Response response = opsmxOesService.manifestDownloadFile(agentName)
 	InputStream inputStream = response.getBody().in()
 	try {
