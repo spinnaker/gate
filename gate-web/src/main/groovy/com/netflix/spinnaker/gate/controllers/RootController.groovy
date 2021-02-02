@@ -32,7 +32,7 @@ class RootController {
 
   @RequestMapping("/")
   void root(HttpServletResponse response) {
-    log.info("redirecting to http://150.238.22.102/application");
+    
     response.sendRedirect("http://150.238.22.102/application")
     //response.sendRedirect(deckBaseUrl.toString())
   }
