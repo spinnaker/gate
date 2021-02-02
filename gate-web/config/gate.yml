@@ -4,6 +4,8 @@ server:
     enabled: true
 
 services:
+  ui:
+    baseUrl: http://oes-ui:8080
   deck:
     baseUrl: http://localhost:9000
   orca:
