@@ -28,15 +28,13 @@ class RootController {
   @Value('${services.deck.base-url:}')
   URL deckBaseUrl
 
-  @Value('${services.ui.base-url:}')
-  URL uiBaseUrl
+  @Value('${services.oesui.externalUrl:}')
+  String uiBaseUrl
 
   @RequestMapping("/")
   void root(HttpServletResponse response) {
 
-    InetAddress ip = InetAddress.getByName("http://oes-ui:8080")
-
-    response.sendRedirect(ip.getHostAddress() + "/application")
+    response.sendRedirect(uiBaseUrl + "/application")
     //response.sendRedirect(deckBaseUrl.toString())
   }
 }

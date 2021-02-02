@@ -15,6 +15,8 @@ services:
   visibility:
     baseUrl: http://localhost:8096
     enabled: true
+  oesui:
+    externalUrl: http://150.238.22.102
 security:
   basic:
     enabled: true
