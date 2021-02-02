@@ -30,7 +30,7 @@ class RootController {
   @Value('${services.deck.base-url:}')
   URL deckBaseUrl
 
-  @Value('${services.oesui.externalUrl:}')
+  @Value('${services.oesui.external-url:}')
   String uiBaseUrl
 
   @RequestMapping("/")
