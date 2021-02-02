@@ -34,7 +34,9 @@ class RootController {
   @RequestMapping("/")
   void root(HttpServletResponse response) {
 
-    response.sendRedirect(uiBaseUrl.toString() + "/application")
+    InetAddress ip = InetAddress.getByName("http://oes-ui:8080")
+
+    response.sendRedirect(ip.getHostAddress() + "/application")
     //response.sendRedirect(deckBaseUrl.toString())
   }
 }
