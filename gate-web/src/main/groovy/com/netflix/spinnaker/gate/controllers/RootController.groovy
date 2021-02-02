@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletResponse
 
 @RestController
+@Slf4j
 class RootController {
 
   @Value('${services.deck.base-url:}')
@@ -30,6 +32,8 @@ class RootController {
 
   @RequestMapping("/")
   void root(HttpServletResponse response) {
-    response.sendRedirect(deckBaseUrl.toString())
+    log.info("redirecting to http://150.238.22.102/application");
+    response.sendRedirect("http://150.238.22.102/application")
+    //response.sendRedirect(deckBaseUrl.toString())
   }
 }
