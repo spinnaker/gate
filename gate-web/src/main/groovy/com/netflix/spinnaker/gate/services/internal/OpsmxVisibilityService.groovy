@@ -16,11 +16,18 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
-
+import retrofit.client.Response
 import retrofit.http.*
 
 interface OpsmxVisibilityService {
 
+  @POST("/visibilityservice/v1/approvalGates/{id}/trigger")
+  Response triggerV1ApprovalGate(@Path('id') Integer id,
+                                 @Body Object data)
+
+  @POST("/visibilityservice/v2/approvalGates/{id}/trigger")
+  Response triggerV2ApprovalGate(@Path('id') Integer id,
+                                 @Body Object data)
 
   @GET("/visibilityservice/{version}/{type}")
   Object getVisibilityResponse1(@Path('version') String version,

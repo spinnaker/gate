@@ -23,7 +23,10 @@ import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import retrofit.client.Response
 
 @RequestMapping("/visibilityservice")
 @RestController
@@ -48,6 +51,47 @@ class OpsmxVisibilityController {
 
   @Autowired
   OpsmxVisibilityService opsmxVisibilityService
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/v1/approvalGates/{id}/trigger", method = RequestMethod.POST)
+  @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
+                                             @RequestBody(required = false) Object data) {
+    Response response = opsmxVisibilityService.triggerV1ApprovalGate(id, data)
+    InputStream inputStream = response.getBody().in()
+    try {
+      HttpHeaders headers = new HttpHeaders()
+      response.getHeaders().forEach({ header ->
+        headers.add(header.getName(), header.getValue())
+      })
+      String responseBody = new String(IOUtils.toByteArray(inputStream))
+      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+  }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
+  @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
+                                             @RequestBody(required = false) Object data) {
+
+    Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
+    InputStream inputStream = response.getBody().in()
+    try {
+      HttpHeaders headers = new HttpHeaders()
+      response.getHeaders().forEach({ header ->
+        headers.add(header.getName(), header.getValue())
+      })
+      String responseBody = new String(IOUtils.toByteArray(inputStream))
+      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+  }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
