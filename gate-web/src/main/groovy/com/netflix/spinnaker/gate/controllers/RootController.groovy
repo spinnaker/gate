@@ -27,16 +27,12 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 class RootController {
 
-  @Value('${services.deck.base-url:}')
-  URL deckBaseUrl
-
-  @Value('${services.oesui.external-url:}')
+  @Value('${services.oesui.externalUrl:}')
   String uiBaseUrl
 
   @RequestMapping("/")
   void root(HttpServletResponse response) {
     log.info("uiBaseUrl : {}", uiBaseUrl)
     response.sendRedirect(uiBaseUrl + "/application")
-    //response.sendRedirect(deckBaseUrl.toString())
   }
 }
