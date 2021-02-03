@@ -59,15 +59,20 @@ class OpsmxVisibilityController {
   @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
                                              @RequestBody(required = false) Object data) {
     Response response = opsmxVisibilityService.triggerV1ApprovalGate(id, data)
-    InputStream inputStream = response.getBody().in()
+    InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
       response.getHeaders().forEach({ header ->
         headers.add(header.getName(), header.getValue())
       })
+      if (response.getBody()!=null){
+        inputStream = response.getBody().in()
+      } else {
+        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
+      }
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      if (responseBody == null){
-        responseBody = new String()
+      if (responseBody == null || (responseBody!=null && responseBody.trim().isEmpty())){
+        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
       }
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
@@ -83,15 +88,20 @@ class OpsmxVisibilityController {
                                              @RequestBody(required = false) Object data) {
 
     Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
-    InputStream inputStream = response.getBody().in()
+    InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
       response.getHeaders().forEach({ header ->
         headers.add(header.getName(), header.getValue())
       })
+      if (response.getBody()!=null){
+        inputStream = response.getBody().in()
+      } else {
+        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
+      }
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      if (responseBody == null){
-        responseBody = new String()
+      if (responseBody == null || (responseBody!=null && responseBody.trim().isEmpty())){
+        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
       }
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
