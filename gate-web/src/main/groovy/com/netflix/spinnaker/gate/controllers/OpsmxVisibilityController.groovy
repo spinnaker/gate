@@ -27,6 +27,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import retrofit.client.Response
+import org.apache.commons.io.IOUtils
 
 @RequestMapping("/visibilityservice")
 @RestController
