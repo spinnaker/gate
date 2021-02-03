@@ -66,6 +66,9 @@ class OpsmxVisibilityController {
         headers.add(header.getName(), header.getValue())
       })
       String responseBody = new String(IOUtils.toByteArray(inputStream))
+      if (responseBody == null){
+        responseBody = new String()
+      }
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
@@ -87,6 +90,9 @@ class OpsmxVisibilityController {
         headers.add(header.getName(), header.getValue())
       })
       String responseBody = new String(IOUtils.toByteArray(inputStream))
+      if (responseBody == null){
+        responseBody = new String()
+      }
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
