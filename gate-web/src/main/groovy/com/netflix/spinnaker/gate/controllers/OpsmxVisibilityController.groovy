@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.google.gson.Gson
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
@@ -87,7 +88,7 @@ class OpsmxVisibilityController {
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
   @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
-                                             @RequestBody(required = false) Object data) {
+                                             @RequestBody(required = false) Object data) throws Exception {
 
     Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
     InputStream inputStream = null
@@ -107,8 +108,10 @@ class OpsmxVisibilityController {
       //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
        // return new ResponseEntity<String>(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
       //return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
-      //return ResponseEntity.accepted().headers(headers).body(responseBody)
-      return responseBody
+      Gson gson = new Gson()
+      String responsePayload = gson.toJson(responseBody, String.class)
+      return ResponseEntity.ok().headers(headers).body(responsePayload)
+
     }catch(Exception e){
       log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
     }
