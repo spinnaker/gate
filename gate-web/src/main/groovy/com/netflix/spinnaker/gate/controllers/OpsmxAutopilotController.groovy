@@ -17,6 +17,8 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
+import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
+import com.netflix.spinnaker.gate.model.RegisterCanaryResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxAutopilotService
 import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
 import com.netflix.spinnaker.security.AuthenticatedRequest
@@ -30,6 +32,7 @@ import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -77,7 +80,7 @@ class OpsmxAutopilotController {
       HttpHeaders headers = new HttpHeaders()
       headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
       return ResponseEntity.ok().headers(headers).body(zipFile)
-      
+
     } finally{
       if (inputStream!=null){
         inputStream.close()
@@ -85,6 +88,51 @@ class OpsmxAutopilotController {
     }
 
   }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/api/v1/registerCanary", method = RequestMethod.POST)
+  @ResponseBody Object triggerV1RegisterCanary(@RequestBody(required = false) Object data) throws Exception {
+
+    Response response = opsmxAutopilotService.triggerV1RegisterCanary(data)
+    InputStream inputStream = null
+
+    try {
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      inputStream = response.getBody().in()
+      String responseBody = new String(IOUtils.toByteArray(inputStream))
+      RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
+      return new ResponseEntity(registerCanaryResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
+
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/api/v2/registerCanary", method = RequestMethod.POST)
+  @ResponseBody Object triggerV2RegisterCanary(@RequestBody(required = false) Object data) throws Exception {
+
+    Response response = opsmxAutopilotService.triggerV2RegisterCanary(data)
+    InputStream inputStream = null
+
+    try {
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      inputStream = response.getBody().in()
+      String responseBody = new String(IOUtils.toByteArray(inputStream))
+      RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
+      return new ResponseEntity(registerCanaryResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
+
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+  }
+
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
