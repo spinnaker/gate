@@ -100,13 +100,17 @@ class OpsmxVisibilityController {
       String length = Long.toString(response.body.length())
       Integer byteCount = Integer.parseInt(length)
       String responseBody = ByteString.read(inputStream, byteCount).utf8()
+      log.info("response body :::::::::::::::::::::::::::::::::::::::::::::::::::   "+ responseBody)
 
       //inputStream = response.getBody().in()
       //String responseBody = new String(IOUtils.toByteArray(inputStream))
       //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
 
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
-    } finally{
+    }catch(Exception e){
+      log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
+    }
+    finally{
       if (inputStream!=null){
         inputStream.close()
       }
