@@ -59,6 +59,8 @@ class OpsmxVisibilityController {
   @Autowired
   OpsmxVisibilityService opsmxVisibilityService
 
+  Gson gson = new Gson()
+
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/v1/approvalGates/{id}/trigger", method = RequestMethod.POST)
   @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
@@ -94,12 +96,14 @@ class OpsmxVisibilityController {
 
     Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
     InputStream inputStream = null
+
     try {
       HttpHeaders headers = new HttpHeaders()
       headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
       inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
+      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
 
     } finally{
       if (inputStream!=null){
