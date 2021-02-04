@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.google.gson.Gson
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.model.RegisterCanaryResponseModel
@@ -63,6 +64,8 @@ class OpsmxAutopilotController {
 
   @Autowired
   OpsmxAutopilotService opsmxAutopilotService
+
+  Gson gson = new Gson()
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.GET)
