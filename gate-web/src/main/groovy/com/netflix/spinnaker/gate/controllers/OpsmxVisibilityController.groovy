@@ -16,11 +16,12 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.google.gson.Gson
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
+import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.*
 import retrofit.client.Response
 import org.apache.commons.io.IOUtils
 import org.springframework.http.HttpStatus
+
+import java.util.stream.Collectors
 
 @RequestMapping("/visibilityservice")
 @RestController
@@ -54,19 +57,21 @@ class OpsmxVisibilityController {
   @Autowired
   OpsmxVisibilityService opsmxVisibilityService
 
+  Gson gson = new Gson()
+
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/v1/approvalGates/{id}/trigger", method = RequestMethod.POST)
   @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
                                              @RequestBody(required = false) Object data) {
     Response response = opsmxVisibilityService.triggerV1ApprovalGate(id, data)
-    InputStream inputStream = response.getBody().in()
+    InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
-      response.getHeaders().forEach({ header ->
-        headers.add(header.getName(), header.getValue())
-      })
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
+      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
         inputStream.close()
@@ -77,17 +82,19 @@ class OpsmxVisibilityController {
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
   @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
-                                             @RequestBody(required = false) Object data) {
+                                             @RequestBody(required = false) Object data) throws Exception {
 
     Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
-    InputStream inputStream = response.getBody().in()
+    InputStream inputStream = null
+
     try {
       HttpHeaders headers = new HttpHeaders()
-      response.getHeaders().forEach({ header ->
-        headers.add(header.getName(), header.getValue())
-      })
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
+      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
+
     } finally{
       if (inputStream!=null){
         inputStream.close()
