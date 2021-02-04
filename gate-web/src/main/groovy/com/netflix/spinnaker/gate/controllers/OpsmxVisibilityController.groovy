@@ -22,6 +22,7 @@ import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
+import okio.ByteString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
@@ -95,20 +96,15 @@ class OpsmxVisibilityController {
       response.getHeaders().forEach({ header ->
         headers.add(header.getName(), header.getValue())
       })
-
       inputStream = response.getBody().in()
-      //BufferedReader br = null
-      StringBuilder sb = new StringBuilder()
-      String line
-      BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))
-      while ((line = br.readLine()) != null) {
-        sb.append(line)
-        sb.append('\n')
-      }
+      String length = Long.toString(response.body.length())
+      Integer byteCount = Integer.parseInt(length)
+      String responseBody = ByteString.read(inputStream, byteCount).utf8()
+
       //inputStream = response.getBody().in()
       //String responseBody = new String(IOUtils.toByteArray(inputStream))
       //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
-      String responseBody = sb.toString()
+
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
