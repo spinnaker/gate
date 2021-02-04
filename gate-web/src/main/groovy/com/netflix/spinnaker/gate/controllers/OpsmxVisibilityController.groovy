@@ -33,6 +33,8 @@ import retrofit.client.Response
 import org.apache.commons.io.IOUtils
 import org.springframework.http.HttpStatus
 
+import java.util.stream.Collectors
+
 @RequestMapping("/visibilityservice")
 @RestController
 @Slf4j
@@ -94,9 +96,10 @@ class OpsmxVisibilityController {
     InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
-      response.getHeaders().forEach({ header ->
-        headers.add(header.getName(), header.getValue())
-      })
+//      response.getHeaders().forEach({ header ->
+//        headers.add(header.getName(), header.getValue())
+//      })
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
       inputStream = response.getBody().in()
       String length = Long.toString(response.body.length())
       Integer byteCount = Integer.parseInt(length)
