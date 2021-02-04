@@ -96,29 +96,12 @@ class OpsmxVisibilityController {
     InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
-//      response.getHeaders().forEach({ header ->
-//        headers.add(header.getName(), header.getValue())
-//      })
       headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
       inputStream = response.getBody().in()
-      String length = Long.toString(response.body.length())
-      Integer byteCount = Integer.parseInt(length)
-      String responseBody = ByteString.read(inputStream, byteCount).utf8()
-      log.info("response body :::::::::::::::::::::::::::::::::::::::::::::::::::   "+ responseBody)
+      String responseBody = new String(IOUtils.toByteArray(inputStream))
+      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
 
-      //inputStream = response.getBody().in()
-      //String responseBody = new String(IOUtils.toByteArray(inputStream))
-      //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
-       // return new ResponseEntity<String>(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
-      //return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
-      Gson gson = new Gson()
-      String responsePayload = gson.toJson(responseBody)
-      return new ResponseEntity<String>(responsePayload, headers, HttpStatus.valueOf(response.getStatus()))
-
-    }catch(Exception e){
-      log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
-    }
-    finally{
+    } finally{
       if (inputStream!=null){
         inputStream.close()
       }
