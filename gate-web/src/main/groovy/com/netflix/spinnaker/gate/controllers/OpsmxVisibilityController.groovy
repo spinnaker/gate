@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
+import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
@@ -94,15 +95,10 @@ class OpsmxVisibilityController {
       response.getHeaders().forEach({ header ->
         headers.add(header.getName(), header.getValue())
       })
-      if (response.getBody()!=null){
-        inputStream = response.getBody().in()
-      } else {
-        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
-      }
-      String responseBody = new String(IOUtils.toByteArray(inputStream))
-      if (responseBody == null || (responseBody!=null && responseBody.trim().isEmpty())){
-        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
-      }
+
+      //inputStream = response.getBody().in()
+      //String responseBody = new String(IOUtils.toByteArray(inputStream))
+      ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
