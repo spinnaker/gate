@@ -22,8 +22,6 @@ import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import okhttp3.OkHttpClient
-import okio.ByteString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
@@ -69,19 +67,11 @@ class OpsmxVisibilityController {
     InputStream inputStream = null
     try {
       HttpHeaders headers = new HttpHeaders()
-      response.getHeaders().forEach({ header ->
-        headers.add(header.getName(), header.getValue())
-      })
-      if (response.getBody()!=null){
-        inputStream = response.getBody().in()
-      } else {
-        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
-      }
+      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      if (responseBody == null || (responseBody!=null && responseBody.trim().isEmpty())){
-        return new ResponseEntity(headers, HttpStatus.valueOf(response.getStatus()))
-      }
-      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
+      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
     } finally{
       if (inputStream!=null){
         inputStream.close()
