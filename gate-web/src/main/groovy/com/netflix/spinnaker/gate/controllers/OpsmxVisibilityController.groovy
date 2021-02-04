@@ -86,7 +86,7 @@ class OpsmxVisibilityController {
 
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
-  @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
+  ResponseEntity<String> triggerV2ApprovalGate(@PathVariable("id") Integer id,
                                              @RequestBody(required = false) Object data) {
 
     Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
@@ -105,8 +105,8 @@ class OpsmxVisibilityController {
       //inputStream = response.getBody().in()
       //String responseBody = new String(IOUtils.toByteArray(inputStream))
       //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
-
-      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+        return new ResponseEntity<String>(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
+      //return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
     }catch(Exception e){
       log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
     }
