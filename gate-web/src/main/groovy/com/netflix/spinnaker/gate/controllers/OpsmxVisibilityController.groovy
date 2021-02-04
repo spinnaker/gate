@@ -112,8 +112,8 @@ class OpsmxVisibilityController {
        // return new ResponseEntity<String>(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
       //return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
       Gson gson = new Gson()
-      String responsePayload = gson.toJson(responseBody, String.class)
-      return ResponseEntity.ok().headers(headers).body(responsePayload)
+      String responsePayload = gson.toJson(responseBody)
+      return new ResponseEntity<String>(responsePayload, headers, HttpStatus.valueOf(response.getStatus()))
 
     }catch(Exception e){
       log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
