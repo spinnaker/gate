@@ -107,7 +107,8 @@ class OpsmxVisibilityController {
       //ApprovalGateTriggerResponseModel responseBody = response.getBody().asType(ApprovalGateTriggerResponseModel.class)
        // return new ResponseEntity<String>(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
       //return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
-      return ResponseEntity.accepted().headers(headers).body(responseBody)
+      //return ResponseEntity.accepted().headers(headers).body(responseBody)
+      return responseBody
     }catch(Exception e){
       log.error("Exception occured while invoking the trigger API ::::::::::::::::::::::::::::: "+ e)
     }
