@@ -333,7 +333,7 @@ public class ManagedController {
   }
 
   @PostMapping(
-      path = "/notifications/callbacks/{source}/v2",
+      path = "/notifications/callbacks/{source}",
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<String> processNotificationCallback(
