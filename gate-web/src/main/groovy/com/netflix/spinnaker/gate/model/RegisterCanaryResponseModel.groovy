@@ -19,4 +19,12 @@ package com.netflix.spinnaker.gate.model
 class RegisterCanaryResponseModel {
 
   private Integer canaryId;
+
+  Integer getCanaryId() {
+    return canaryId
+  }
+
+  void setCanaryId(Integer canaryId) {
+    this.canaryId = canaryId
+  }
 }
