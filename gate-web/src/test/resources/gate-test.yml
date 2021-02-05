@@ -29,7 +29,7 @@ services:
 
   swabbie.enabled: false
 
-  keel.enabled: false
+  keel.baseUrl: "http://localhost:8087"
 
 slack:
   baseUrl: "https://slack.com"

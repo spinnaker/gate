@@ -95,7 +95,7 @@ class NotificationService {
    * @param service
    * @return
    */
-  ResponseEntity<String> processNotificationCallback(String source, RequestEntity<String> request, String service) {
+  ResponseEntity<String> processNotificationCallback(String source, RequestEntity<String> request, String service = "echo") {
     Endpoint endpointToUse = echoEndpoint
     OkHttpClient clientToUse = echoOkHttpClient
     String path = request.url.path
