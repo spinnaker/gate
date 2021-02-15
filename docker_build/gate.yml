@@ -40,8 +40,8 @@ saml:
   keyStoreAliasName: saml
   metadataUrl: /opt/spinnaker/saml/metadata.xml
   redirectProtocol: https
-  redirectHostname: developer.engineering.opsmx.com
-  redirectBasePath: /applications
+  redirectHostname: oes-gate:8084
+  redirectBasePath: /
   issuerId: spind
 google: {}
 logging:

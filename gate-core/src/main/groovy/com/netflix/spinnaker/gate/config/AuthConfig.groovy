@@ -81,6 +81,9 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
+  @Value('${saml.enabled:false}')
+  boolean samlEnabled
+
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http
@@ -122,7 +125,9 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    //http.formLogin().loginPage("/login").permitAll()
+    if (!samlEnabled){
+      http.formLogin().loginPage("/login").permitAll()
+    }
 
     http.logout()
         .logoutUrl("/auth/logout")
