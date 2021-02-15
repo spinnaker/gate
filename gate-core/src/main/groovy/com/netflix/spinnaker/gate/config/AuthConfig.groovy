@@ -122,7 +122,7 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    http.formLogin().loginPage("/login").permitAll()
+    //http.formLogin().loginPage("/login").permitAll()
 
     http.logout()
         .logoutUrl("/auth/logout")

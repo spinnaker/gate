@@ -35,10 +35,10 @@ authn:
 
 saml:
   enabled: true
-  keyStore: /opt/spinnaker/config/saml.jks
+  keyStore: /opt/spinnaker/saml/saml.jks
   keyStorePassword: changeit
   keyStoreAliasName: saml
-  metadataUrl: https://sso.jumpcloud.com/saml2/saml21
+  metadataUrl: /opt/spinnaker/saml/metadata.xml
   redirectProtocol: https
   redirectHostname: developer.engineering.opsmx.com
   redirectBasePath: /applications
