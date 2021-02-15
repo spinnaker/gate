@@ -168,7 +168,6 @@ class AuthConfig {
       .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
       .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
       .antMatchers('/health').permitAll()
-      .antMatchers("/saml/SSO").permitAll()
       .anyRequest().authenticated()
      http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
   }
