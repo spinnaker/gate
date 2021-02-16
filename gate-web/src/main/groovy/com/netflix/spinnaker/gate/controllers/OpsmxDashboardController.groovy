@@ -67,11 +67,14 @@ class OpsmxDashboardController {
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.GET)
   Object getDashboardResponse4(@PathVariable("version") String version,
-                          @PathVariable("type") String type,
-                          @PathVariable("source") String source,
-                          @PathVariable("source1") String source1) {
+                               @PathVariable("type") String type,
+                               @PathVariable("source") String source,
+                               @PathVariable("source1") String source1,
+                               @RequestParam(value = "index", required = false) Integer index,
+                               @RequestParam(value = "limit", required = false) Integer limit,
+                               @RequestParam(value = "sort", required = false) String sort) {
 
-    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1)
+    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1, index, limit, sort)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
