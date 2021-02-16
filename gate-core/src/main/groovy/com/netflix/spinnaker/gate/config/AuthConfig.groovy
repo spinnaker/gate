@@ -81,8 +81,8 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
-  @Value('${saml.enabled:false}')
-  boolean samlEnabled
+  @Value('${ldap.enabled:false}')
+  boolean ldapEnabled
 
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
@@ -113,7 +113,6 @@ class AuthConfig {
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
         .antMatchers('/health').permitAll()
-        .antMatchers("/saml/SSO").permitAll()
         .antMatchers('/**').authenticated()
 
     if (fiatSessionFilterEnabled) {
@@ -125,7 +124,7 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    if (!samlEnabled){
+    if (ldapEnabled){
       http.formLogin().loginPage("/login").permitAll()
     }
 
