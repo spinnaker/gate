@@ -32,9 +32,14 @@ interface OpsmxDashboardService {
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}")
   Object getDashboardResponse4(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1)
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Query("index") Integer index,
+                               @Query("limit") Integer limit,
+                               @Query("sort") String sort,
+                               @Query("order") String order,
+                               @Query("search") String search)
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getDashboardResponse5(@Path('version') String version,
