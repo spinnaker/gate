@@ -35,10 +35,10 @@ interface OpsmxDashboardService {
                                @Path('type') String type,
                                @Path('source') String source,
                                @Path('source1') String source1,
-                               @Query("index") Integer index,
-                               @Query("limit") Integer limit,
-                               @Query("sort") String sort,
-                               @Query("order") String order,
+                               @Query("pageNo") Integer pageNo,
+                               @Query("pageLimit") Integer pageLimit,
+                               @Query("sortBy") String sortBy,
+                               @Query("sortOrder") String sortOrder,
                                @Query("search") String search)
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
