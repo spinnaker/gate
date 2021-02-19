@@ -70,13 +70,13 @@ class OpsmxDashboardController {
                                @PathVariable("type") String type,
                                @PathVariable("source") String source,
                                @PathVariable("source1") String source1,
-                               @RequestParam(value = "index", required = false) Integer index,
-                               @RequestParam(value = "limit", required = false) Integer limit,
-                               @RequestParam(value = "sort", required = false) String sort,
-                               @RequestParam(value = "order", required = false) String order,
+                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                               @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                               @RequestParam(value = "sortBy", required = false) String sortBy,
+                               @RequestParam(value = "sortOrder", required = false) String sortOrder,
                                @RequestParam(value = "search", required = false) String search) {
 
-    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1, index, limit, sort, order, search)
+    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1, pageNo, pageLimit, sortBy, sortOrder, search)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
