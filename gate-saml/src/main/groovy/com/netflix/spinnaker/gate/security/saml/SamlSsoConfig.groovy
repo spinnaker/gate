@@ -208,6 +208,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
       RetrySupport retrySupport = new RetrySupport()
 
+
+
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
         def assertion = credential.authenticationAssertion
@@ -280,6 +282,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       static Map<String, List<String>> extractAttributes(Assertion assertion) {
         def attributes = [:]
         assertion.attributeStatements*.attributes.flatten().each { Attribute attribute ->
+          log.info("attribute in extractAttributes  : {}", attribute)
           def name = attribute.name
           def values = attribute.attributeValues.findResults {
             switch (it) {
