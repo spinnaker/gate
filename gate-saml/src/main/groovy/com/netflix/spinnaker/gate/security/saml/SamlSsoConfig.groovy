@@ -234,10 +234,10 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
             permissionService.loginWithRoles(username, roles)
           }, 5, 2000, false)
 
-          log.debug("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
+          log.info("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
           id = id.withTag("success", true).withTag("fallback", "none")
         } catch (Exception e) {
-          log.debug(
+          log.error(
               "Unsuccessful SAML authentication (user: {}, roleCount: {}, roles: {}, legacyFallback: {})",
               username,
               roles.size(),
