@@ -266,6 +266,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       Set<String> extractRoles(String email,
                                Map<String, List<String>> attributes,
                                UserAttributeMapping userAttributeMapping) {
+        log.info("extracting roles : {}", attributes[userAttributeMapping.roles])
         def assertionRoles = attributes[userAttributeMapping.roles].collect { String roles ->
           def commonNames = roles.split(userAttributeMapping.rolesDelimiter)
           commonNames.collect {
