@@ -213,11 +213,24 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
         log.info("credential attributes : {}", credential.attributes)
+
         def assertion = credential.authenticationAssertion
         def attributes = extractAttributes(assertion)
         def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
 
         def subjectNameId = assertion.getSubject().nameID.value
+        log.info(" statements : {}", assertion.getStatements())
+        log.info("Subjects : {}", assertion.getSubject())
+        log.info("Advice : {}", assertion.getAdvice())
+        log.info("Attribute statements : {}", assertion.getAttributeStatements())
+        log.info("AuthnStatements : {}", assertion.getAuthnStatements())
+        log.info("AuthzDecisionStatements : {}", assertion.getAuthzDecisionStatements())
+        log.info("Conditions : {}", assertion.getConditions())
+        log.info("ID : {}", assertion.getID())
+        log.info("IssueInstant : {}", assertion.getIssueInstant())
+        log.info("Issuer : {}", assertion.getIssuer())
+        log.info("Version : {}", assertion.getVersion())
+        
         def email = attributes[userAttributeMapping.email]?.get(0) ?: subjectNameId
         String username = attributes[userAttributeMapping.username]?.get(0) ?: subjectNameId
         def roles = extractRoles(email, attributes, userAttributeMapping)
