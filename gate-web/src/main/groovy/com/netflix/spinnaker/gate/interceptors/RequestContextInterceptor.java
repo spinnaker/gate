@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.interceptors;
 
-import com.netflix.spinnaker.kork.common.Header;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +40,6 @@ public class RequestContextInterceptor extends HandlerInterceptorAdapter {
     if (orchestrationMatch.matcher(requestURI).matches()) {
       AuthenticatedRequest.setExecutionType("orchestration");
     }
-    String userRole = Header.makeCustomHeader("user-role");
-    AuthenticatedRequest.set(userRole, "spin-users");
 
     return true;
   }
