@@ -219,18 +219,12 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
 
         def subjectNameId = assertion.getSubject().nameID.value
-        log.info(" statements : {}", assertion.getStatements())
-        log.info("Subjects : {}", assertion.getSubject())
-        log.info("Advice : {}", assertion.getAdvice())
-        log.info("Attribute statements : {}", assertion.getAttributeStatements())
-        log.info("AuthnStatements : {}", assertion.getAuthnStatements())
-        log.info("AuthzDecisionStatements : {}", assertion.getAuthzDecisionStatements())
-        log.info("Conditions : {}", assertion.getConditions())
-        log.info("ID : {}", assertion.getID())
-        log.info("IssueInstant : {}", assertion.getIssueInstant())
-        log.info("Issuer : {}", assertion.getIssuer())
-        log.info("Version : {}", assertion.getVersion())
         
+        log.info("groups : {}", credential.getAttributeAsStringArray("groups"))
+        log.info("Groups : {}", credential.getAttributeAsStringArray("Groups"))
+        log.info("UserGroups : {}", credential.getAttributeAsStringArray("UserGroups"))
+        log.info("usergroups : {}", credential.getAttributeAsStringArray("usergroups"))
+
         def email = attributes[userAttributeMapping.email]?.get(0) ?: subjectNameId
         String username = attributes[userAttributeMapping.username]?.get(0) ?: subjectNameId
         def roles = extractRoles(email, attributes, userAttributeMapping)
