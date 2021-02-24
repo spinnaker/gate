@@ -22,7 +22,9 @@ import com.netflix.spinnaker.gate.config.AuthConfig
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
+import com.netflix.spinnaker.kork.common.Header
 import com.netflix.spinnaker.kork.core.RetrySupport
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.opensaml.saml2.core.Assertion
@@ -237,6 +239,8 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           }, 5, 2000, false)
 
           log.info("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
+          String userRole = Header.makeCustomHeader("user-role");
+          AuthenticatedRequest.set(userRole, roles.toString().replace("[", "").replace("]", ""));
           id = id.withTag("success", true).withTag("fallback", "none")
         } catch (Exception e) {
           log.error(
