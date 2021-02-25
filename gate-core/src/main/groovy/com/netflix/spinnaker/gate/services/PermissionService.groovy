@@ -127,7 +127,7 @@ class PermissionService {
         log.error("Exception occured while login with roles : {}", e)
         throw classifyError(e)
       } catch(Exception e1){
-        log.error("Exception occured while login with roles : {}", e)
+        log.error("Exception occured while login with roles : {}", e1)
       }
     }
 
