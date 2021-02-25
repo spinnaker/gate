@@ -122,7 +122,7 @@ class PermissionService {
         JsonObject body = new JsonObject()
         String groups = gson.toJson(roles, Collection.class)
         body.addProperty("groups", groups)
-        oesAuthorizationService.importAndCacheUserGroups(roles)
+        oesAuthorizationService.importAndCacheUserGroups(roles, userId)
       } catch(Exception e1){
         log.error("Exception occured while login with roles : {}", e1)
       }
