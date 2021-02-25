@@ -22,9 +22,7 @@ import com.netflix.spinnaker.gate.config.AuthConfig
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
-import com.netflix.spinnaker.kork.common.Header
 import com.netflix.spinnaker.kork.core.RetrySupport
-import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import org.opensaml.saml2.core.Assertion
@@ -214,7 +212,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
-
         def assertion = credential.authenticationAssertion
         def attributes = extractAttributes(assertion)
         def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
@@ -238,12 +235,10 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
             permissionService.loginWithRoles(username, roles)
           }, 5, 2000, false)
 
-          log.info("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
-          String userRole = Header.makeCustomHeader("user-role");
-          AuthenticatedRequest.set(userRole, roles.toString().replace("[", "").replace("]", ""));
+          log.debug("Successful SAML authentication (user: {}, roleCount: {}, roles: {})", username, roles.size(), roles)
           id = id.withTag("success", true).withTag("fallback", "none")
         } catch (Exception e) {
-          log.error(
+          log.debug(
               "Unsuccessful SAML authentication (user: {}, roleCount: {}, roles: {}, legacyFallback: {})",
               username,
               roles.size(),
@@ -272,7 +267,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       Set<String> extractRoles(String email,
                                Map<String, List<String>> attributes,
                                UserAttributeMapping userAttributeMapping) {
-        log.info("extracting roles : {}", attributes)
         def assertionRoles = attributes[userAttributeMapping.roles].collect { String roles ->
           def commonNames = roles.split(userAttributeMapping.rolesDelimiter)
           commonNames.collect {
@@ -286,7 +280,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
       static Map<String, List<String>> extractAttributes(Assertion assertion) {
         def attributes = [:]
         assertion.attributeStatements*.attributes.flatten().each { Attribute attribute ->
-          log.info("attribute in extractAttributes  : {}", attribute)
           def name = attribute.name
           def values = attribute.attributeValues.findResults {
             switch (it) {
