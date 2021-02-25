@@ -17,7 +17,10 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.google.gson.JsonObject
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -25,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody
 @FeignClient(name = "OES", url = '${services.platform.baseUrl}')
 interface OesAuthorizationService {
 
-  @PutMapping("/platformservice/v2/usergroups/importAndCache")
-  Object importAndCacheUserGroups(@RequestBody Object data)
+  @PutMapping(value = "/platformservice/v2/usergroups/importAndCache", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody JsonObject data)
 
 }

@@ -117,17 +117,19 @@ class PermissionService {
         }
       }.execute()
     }
-//    if (isOesAuthorizationServiceEnabled){
-//      try {
-//        JsonObject body = new JsonObject()
-//        String groups = gson.toJson(roles)
-//        body.addProperty("groups", groups)
-//        oesAuthorizationService.importAndCacheUserGroups(body)
-//      } catch(RetrofitError e){
-//        log.error("Exception occured while login with roles : {}", e)
-//        throw classifyError(e)
-//      }
-//    }
+    if (isOesAuthorizationServiceEnabled){
+      try {
+        JsonObject body = new JsonObject()
+        String groups = gson.toJson(roles, Collection.class)
+        body.addProperty("groups", groups)
+        oesAuthorizationService.importAndCacheUserGroups(body)
+      } catch(RetrofitError e){
+        log.error("Exception occured while login with roles : {}", e)
+        throw classifyError(e)
+      } catch(Exception e1){
+        log.error("Exception occured while login with roles : {}", e)
+      }
+    }
 
   }
 
