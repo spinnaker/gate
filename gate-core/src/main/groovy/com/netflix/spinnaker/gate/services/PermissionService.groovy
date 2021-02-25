@@ -16,7 +16,9 @@
 
 package com.netflix.spinnaker.gate.services
 
-
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
@@ -34,6 +36,7 @@ import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import retrofit.RetrofitError
@@ -67,6 +70,14 @@ class PermissionService {
 
   @Autowired
   FiatStatus fiatStatus
+
+  @Value('${services.platform.enabled}')
+  boolean isOesAuthorizationServiceEnabled
+
+  @Autowired
+  OesAuthorizationService oesAuthorizationService
+
+  Gson gson = new Gson()
 
   boolean isEnabled() {
     return fiatStatus.isEnabled()
@@ -104,6 +115,18 @@ class PermissionService {
         }
       }.execute()
     }
+    if (isOesAuthorizationServiceEnabled){
+      try {
+        JsonObject body = new JsonObject()
+        String groups = gson.toJson(roles)
+        body.addProperty("groups", groups)
+        oesAuthorizationService.importAndCacheUserGroups(body)
+      } catch(RetrofitError e){
+        log.error("Exception occured while login with roles : {}", e)
+        throw classifyError(e)
+      }
+    }
+
   }
 
   void logout(String userId) {
