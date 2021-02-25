@@ -23,6 +23,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import java.util.Collection
 
 
@@ -30,6 +31,6 @@ import java.util.Collection
 interface OesAuthorizationService {
 
   @PutMapping(value = "/platformservice/v2/usergroups/importAndCache", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody Collection<String> data)
+  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody Collection<String> data, @RequestHeader(value = "x-spinnaker-user") String userName)
 
 }
