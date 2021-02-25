@@ -17,12 +17,15 @@
 
 package com.netflix.spinnaker.gate.services
 
-import retrofit.http.Body
-import retrofit.http.PUT
+import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 
+
+@FeignClient(name = "OES", url = '${services.platform.baseUrl}')
 interface OesAuthorizationService {
 
-  @PUT("/platformservice/v2/usergroups/importAndCache")
-  Object importAndCacheUserGroups(@Body Object data)
+  @PutMapping("/platformservice/v2/usergroups/importAndCache")
+  Object importAndCacheUserGroups(@RequestBody Object data)
 
 }

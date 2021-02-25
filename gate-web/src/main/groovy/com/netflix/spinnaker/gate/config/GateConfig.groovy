@@ -38,7 +38,6 @@ import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
 import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
-import com.netflix.spinnaker.gate.services.OesAuthorizationService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.context.AuthenticatedRequestContextProvider
@@ -230,12 +229,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty("services.platform.enabled")
   OpsmxPlatformService opsmxPlatformService(OkHttpClient okHttpClient) {
     createClient "platform", OpsmxPlatformService, okHttpClient
-  }
-
-  @Bean
-  @ConditionalOnProperty("services.platform.enabled")
-  OesAuthorizationService oesAuthorizationService(OkHttpClient okHttpClient) {
-    createClient "oesAuthorizationService", OesAuthorizationService, okHttpClient
   }
 
   @Bean

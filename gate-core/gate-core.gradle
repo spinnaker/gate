@@ -38,6 +38,8 @@ dependencies {
   implementation "com.netflix.hystrix:hystrix-core"
   implementation "org.apache.commons:commons-lang3"
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.4.RELEASE'
+
 }
 
 sourceSets {
