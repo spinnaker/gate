@@ -23,12 +23,13 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import java.util.Collection
 
 
 @FeignClient(name = "OES", url = '${services.platform.baseUrl}')
 interface OesAuthorizationService {
 
   @PutMapping(value = "/platformservice/v2/usergroups/importAndCache", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody JsonObject data)
+  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody Collection<String> data)
 
 }
