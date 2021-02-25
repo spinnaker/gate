@@ -37,6 +37,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import retrofit.RetrofitError
@@ -48,6 +49,7 @@ import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyErr
 
 @Slf4j
 @Component
+@EnableFeignClients
 class PermissionService {
 
   static final String HYSTRIX_GROUP = "permission"
