@@ -29,6 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody
 interface OesAuthorizationService {
 
   @PutMapping(value = "/platformservice/v2/usergroups/importAndCache", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody JsonObject data)
+  ResponseEntity<Object> importAndCacheUserGroups(@RequestBody Collection<String> data)
 
 }
