@@ -17,7 +17,6 @@
 
 package com.netflix.spinnaker.gate.services
 
-import com.google.gson.JsonObject
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
