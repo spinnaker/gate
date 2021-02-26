@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services
 
-import com.google.gson.JsonParser
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
