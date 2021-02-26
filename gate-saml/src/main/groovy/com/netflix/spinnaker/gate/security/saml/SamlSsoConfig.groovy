@@ -208,8 +208,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
 
       RetrySupport retrySupport = new RetrySupport()
 
-
-
       @Override
       User loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
         def assertion = credential.authenticationAssertion

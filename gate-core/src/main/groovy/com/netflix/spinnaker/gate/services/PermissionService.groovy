@@ -15,10 +15,6 @@
  */
 
 package com.netflix.spinnaker.gate.services
-
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
@@ -73,19 +69,11 @@ class PermissionService {
   @Autowired
   FiatStatus fiatStatus
 
-  @Value('${services.platform.enabled}')
-  boolean isOesAuthorizationServiceEnabled
-
-  @Autowired
-  OesAuthorizationService oesAuthorizationService
-
-  Gson gson = new Gson()
-
   boolean isEnabled() {
     return fiatStatus.isEnabled()
   }
 
-  private FiatService getFiatServiceForLogin() {
+  FiatService getFiatServiceForLogin() {
     return fiatLoginService.orElse(fiatService);
   }
 
@@ -117,17 +105,6 @@ class PermissionService {
         }
       }.execute()
     }
-    if (isOesAuthorizationServiceEnabled){
-      try {
-        JsonObject body = new JsonObject()
-        String groups = gson.toJson(roles, Collection.class)
-        body.addProperty("groups", groups)
-        oesAuthorizationService.importAndCacheUserGroups(roles, userId)
-      } catch(Exception e1){
-        log.error("Exception occured while login with roles : {}", e1)
-      }
-    }
-
   }
 
   void logout(String userId) {
