@@ -213,7 +213,6 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
         def assertion = credential.authenticationAssertion
         def attributes = extractAttributes(assertion)
         def userAttributeMapping = samlSecurityConfigProperties.userAttributeMapping
-        
         def subjectNameId = assertion.getSubject().nameID.value
         def email = attributes[userAttributeMapping.email]?.get(0) ?: subjectNameId
         String username = attributes[userAttributeMapping.username]?.get(0) ?: subjectNameId
