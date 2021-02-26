@@ -69,17 +69,11 @@ class PermissionService {
   @Autowired
   FiatStatus fiatStatus
 
-  @Value('${services.platform.enabled}')
-  boolean isOesAuthorizationServiceEnabled
-
-  @Autowired
-  OesAuthorizationService oesAuthorizationService
-
   boolean isEnabled() {
     return fiatStatus.isEnabled()
   }
 
-  private FiatService getFiatServiceForLogin() {
+  FiatService getFiatServiceForLogin() {
     return fiatLoginService.orElse(fiatService);
   }
 
@@ -111,14 +105,6 @@ class PermissionService {
         }
       }.execute()
     }
-    if (isOesAuthorizationServiceEnabled){
-      try {
-        oesAuthorizationService.cacheUserGroups(roles, userId)
-      } catch(Exception e1){
-        log.error("Exception occured while login with roles : {}", e1)
-      }
-    }
-
   }
 
   void logout(String userId) {
