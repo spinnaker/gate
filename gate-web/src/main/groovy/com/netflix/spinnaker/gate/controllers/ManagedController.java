@@ -8,13 +8,16 @@ import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
+import com.netflix.spinnaker.gate.model.manageddelivery.OverrideVerificationRequest;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
+import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.gate.services.NotificationService;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
 import groovy.util.logging.Slf4j;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
@@ -36,10 +39,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit.RetrofitError;
+import retrofit.client.Header;
+import retrofit.client.Response;
 
 @RequestMapping("/managed")
 @RestController
@@ -346,6 +352,27 @@ public class ManagedController {
     keelService.markGood(application, veto);
   }
 
+  @ApiOperation(value = "Override the status of a verification")
+  @PostMapping(path = "/{application}/environment/{environment}/verifications/{verificationId}")
+  void overrideVerification(
+      @PathVariable("application") String application,
+      @PathVariable("environment") String environment,
+      @PathVariable("verificationId") String verificationId,
+      @RequestBody OverrideVerificationRequest payload) {
+    keelService.overrideVerification(application, environment, verificationId, payload);
+  }
+
+  @ApiOperation(value = "Retry a verification")
+  @PostMapping(
+      path = "/{application}/environment/{environment}/verifications/{verificationId}/retry")
+  void retryVerification(
+      @PathVariable("application") String application,
+      @PathVariable("environment") String environment,
+      @PathVariable("verificationId") String verificationId,
+      @RequestBody RetryVerificationRequest payload) {
+    keelService.retryVerification(application, environment, verificationId, payload);
+  }
+
   @PostMapping(
       path = "/notifications/callbacks/{source}",
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
@@ -353,5 +380,27 @@ public class ManagedController {
   ResponseEntity<String> processNotificationCallback(
       @PathVariable String source, RequestEntity<String> request) {
     return notificationService.processNotificationCallback(source, request, "keel");
+  }
+
+  @ApiOperation(value = "Get a report of application onboarding")
+  @GetMapping(path = "/reports/onboarding")
+  ResponseEntity<byte[]> getOnboardingReport(
+      @RequestHeader(value = "Accept", defaultValue = "text/html") String accept,
+      @RequestParam Map<String, String> params)
+      throws IOException {
+    Response keelResponse = keelService.getOnboardingReport(accept, params);
+
+    ResponseEntity response =
+        ResponseEntity.status(keelResponse.getStatus())
+            .header(
+                "Content-Type",
+                keelResponse.getHeaders().stream()
+                    .filter(header -> header.getName().equalsIgnoreCase("Content-Type"))
+                    .findFirst()
+                    .orElse(new Header("Content-Type", accept))
+                    .getValue())
+            .body(keelResponse.getBody().in().readAllBytes());
+
+    return response;
   }
 }
