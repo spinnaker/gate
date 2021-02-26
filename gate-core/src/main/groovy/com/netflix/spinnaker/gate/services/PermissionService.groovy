@@ -113,7 +113,7 @@ class PermissionService {
     }
     if (isOesAuthorizationServiceEnabled){
       try {
-        oesAuthorizationService.importAndCacheUserGroups(roles, userId)
+        oesAuthorizationService.cacheUserGroups(roles, userId)
       } catch(Exception e1){
         log.error("Exception occured while login with roles : {}", e1)
       }
