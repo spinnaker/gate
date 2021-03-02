@@ -202,9 +202,15 @@ class OpsmxAutopilotController {
                          @PathVariable("source") String source,
                          @PathVariable("source1") String source1,
                          @RequestParam(value = "Ids", required = false) String[] applicationsIds,
-                         @RequestParam(value = "datasourceType", required = false) String datasourceType) {
+                         @RequestParam(value = "datasourceType", required = false) String datasourceType,
+                          @RequestParam(value = "canaryId", required = false) Integer canaryId,
+                          @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                          @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                          @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                          @RequestParam(value = "sortBy", required = false) String sortBy,
+                          @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")

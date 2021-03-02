@@ -88,10 +88,16 @@ interface OpsmxAutopilotService {
 
   @GET("/autopilot/{type}/{source}/{source1}")
   Object getAutoResponse4(@Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Query("Ids") String[] applicationsIds,
-                         @Query("datasourceType") String datasourceType)
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Query("Ids") String[] applicationsIds,
+                          @Query("datasourceType") String datasourceType,
+                          @Query("canaryId") Integer canaryId,
+                          @Query("serviceId") Integer serviceId,
+                          @Query("pageNo") Integer pageNo,
+                          @Query("pageLimit") Integer pageLimit,
+                          @Query("sortBy") String sortBy,
+                          @Query("sortOrder") String sortOrder)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
