@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
-import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.*
 
