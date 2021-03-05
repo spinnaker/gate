@@ -167,18 +167,16 @@ public interface KeelService {
   @POST("/application/{application}/mark/good")
   Response markGood(@Path("application") String application, @Body EnvironmentArtifactVeto veto);
 
-  @POST("/application/{application}/environment/{environment}/verifications/{verificationId}")
+  @POST("/application/{application}/environment/{environment}/verifications")
   Response overrideVerification(
       @Path("application") String application,
       @Path("environment") String environment,
-      @Path("verificationId") String verificationId,
       @Body OverrideVerificationRequest payload);
 
-  @POST("/application/{application}/environment/{environment}/verifications/{verificationId}/retry")
+  @POST("/application/{application}/environment/{environment}/verifications/retry")
   Response retryVerification(
       @Path("application") String application,
       @Path("environment") String environment,
-      @Path("verificationId") String verificationId,
       @Body RetryVerificationRequest payload);
 
   @GET("/installedPlugins")
@@ -187,6 +185,10 @@ public interface KeelService {
   @GET("/reports/onboarding")
   Response getOnboardingReport(
       @Header("Accept") String accept, @QueryMap Map<String, String> params);
+
+  @GET("/reports/adoption")
+  @Headers("Accept: text/html")
+  Response getAdoptionReport(@QueryMap Map<String, String> params);
 
   @GET("/environments/{application}")
   List<Map<String, Object>> getEnvironments(@Path("application") String application);

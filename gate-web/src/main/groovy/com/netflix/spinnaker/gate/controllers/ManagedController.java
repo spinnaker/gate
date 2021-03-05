@@ -353,24 +353,22 @@ public class ManagedController {
   }
 
   @ApiOperation(value = "Override the status of a verification")
-  @PostMapping(path = "/{application}/environment/{environment}/verifications/{verificationId}")
+  @PostMapping(path = "/{application}/environment/{environment}/verifications")
   void overrideVerification(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
-      @PathVariable("verificationId") String verificationId,
       @RequestBody OverrideVerificationRequest payload) {
-    keelService.overrideVerification(application, environment, verificationId, payload);
+    keelService.overrideVerification(application, environment, payload);
   }
 
   @ApiOperation(value = "Retry a verification")
-  @PostMapping(
-      path = "/{application}/environment/{environment}/verifications/{verificationId}/retry")
+  @PostMapping(path = "/{application}/environment/{environment}/verifications/retry")
   void retryVerification(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @PathVariable("verificationId") String verificationId,
       @RequestBody RetryVerificationRequest payload) {
-    keelService.retryVerification(application, environment, verificationId, payload);
+    keelService.retryVerification(application, environment, payload);
   }
 
   @PostMapping(
@@ -402,6 +400,16 @@ public class ManagedController {
             .body(keelResponse.getBody().in().readAllBytes());
 
     return response;
+  }
+
+  @ApiOperation(value = "Get a report of Managed Delivery adoption")
+  @GetMapping(path = "/reports/adoption", produces = "text/html")
+  ResponseEntity<byte[]> getAdoptionReport(@RequestParam Map<String, String> params)
+      throws IOException {
+    Response keelResponse = keelService.getAdoptionReport(params);
+    return ResponseEntity.status(keelResponse.getStatus())
+        .header("Content-Type", "text/html")
+        .body(keelResponse.getBody().in().readAllBytes());
   }
 
   @ApiOperation(value = "Get current environment details")
