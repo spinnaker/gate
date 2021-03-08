@@ -93,10 +93,10 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
-  @RequestMapping(value = "/api/v1/registerCanary", method = RequestMethod.POST)
-  @ResponseBody Object triggerV1RegisterCanary(@RequestBody(required = false) Object data) throws Exception {
+  @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
+  Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data) throws Exception {
 
-    Response response = opsmxAutopilotService.triggerV1RegisterCanary(data)
+    Response response = opsmxAutopilotService.triggerRegisterCanary(version, data)
     InputStream inputStream = null
 
     try {
@@ -104,30 +104,8 @@ class OpsmxAutopilotController {
       headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
       inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
-      return new ResponseEntity(registerCanaryResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
-
-    } finally{
-      if (inputStream!=null){
-        inputStream.close()
-      }
-    }
-  }
-
-  @ApiOperation(value = "Endpoint for autopilot rest services")
-  @RequestMapping(value = "/api/v2/registerCanary", method = RequestMethod.POST)
-  @ResponseBody Object triggerV2RegisterCanary(@RequestBody(required = false) Object data) throws Exception {
-
-    Response response = opsmxAutopilotService.triggerV2RegisterCanary(data)
-    InputStream inputStream = null
-
-    try {
-      HttpHeaders headers = new HttpHeaders()
-      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
-      inputStream = response.getBody().in()
-      String responseBody = new String(IOUtils.toByteArray(inputStream))
-      RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
-      return new ResponseEntity(registerCanaryResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
+      //RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
+      return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
 
     } finally{
       if (inputStream!=null){
