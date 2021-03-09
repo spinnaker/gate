@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.model.RegisterCanaryResponseModel
@@ -37,6 +38,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import retrofit.client.Header
 import retrofit.client.Response
 
 import java.util.stream.Collectors
@@ -101,10 +103,20 @@ class OpsmxAutopilotController {
 
     try {
       HttpHeaders headers = new HttpHeaders()
-      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
+      List<Header> locationHeaders = response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList())
+      if (locationHeaders!=null && !locationHeaders.isEmpty()){
+        headers.add("Location", locationHeaders.get(0).value)
+      }
+
       inputStream = response.getBody().in()
       String responseBody = new String(IOUtils.toByteArray(inputStream))
-      //RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
+      try {
+        RegisterCanaryResponseModel registerCanaryResponseModel = gson.fromJson(responseBody, RegisterCanaryResponseModel.class)
+        return new ResponseEntity(registerCanaryResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
+      }catch(JsonSyntaxException jse){
+        log.error("JSON parsing failed and hence passing the String value : {}", jse.getMessage())
+      }
+
       return new ResponseEntity(responseBody, headers, HttpStatus.valueOf(response.getStatus()))
 
     } finally{
