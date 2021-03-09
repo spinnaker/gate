@@ -24,11 +24,8 @@ interface OpsmxAutopilotService {
   @GET("/autopilot/canaries/debugLogsData")
   Response downloadDebugData(@Query("id") Integer canaryId)
 
-  @POST("/autopilot/api/v1/registerCanary")
-  Response triggerV1RegisterCanary(@Body Object data)
-
-  @POST("/autopilot/api/v2/registerCanary")
-  Response triggerV2RegisterCanary(@Body Object data)
+  @POST("/autopilot/api/{version}/registerCanary")
+  Response triggerRegisterCanary(@Path('version') String version, @Body Object data)
 
   @GET("/autopilot/{type}/{source}")
   Object getAutoResponse(@Path('type') String type,
