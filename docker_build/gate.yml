@@ -25,8 +25,12 @@ cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
   enabled: true
-  url: ldap://localhost:389/DC=example,DC=com
-  userDnPattern:  uid={0},ou=people
+  url: ldap://oes-ldap:389
+  userDnPattern:  uid={0},ou=users,dc=example,dc=org
+  managerDn: uid=admin,ou=users,,dc=example,dc=org
+  managerPassword: opsmx@123
+  groupSearchBase: ou=groups,dc=example,dc=org
+  groupSearchFilter: member={0}
 file:
   enabled: false
   url: /platformservice/v1/users/authenticate
