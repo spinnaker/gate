@@ -40,7 +40,7 @@ security:
 cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
-  enabled: true
+  enabled: false
   url: ldap://localhost:3389
   userDnPattern:  uid={0},ou=users,dc=example,dc=org
   managerDn: cn=admin,dc=example,dc=org
