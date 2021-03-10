@@ -106,7 +106,9 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
             .rolePrefix("")
             .groupSearchBase(ldapConfigProps.groupSearchBase)
             .userDetailsContextMapper(ldapUserContextMapper)
-
+    if (ldapConfigProps.groupSearchFilter) {
+      ldapConfigurer.groupSearchFilter(ldapConfigProps.groupSearchFilter)
+    }
     if (ldapConfigProps.userDnPattern) {
       ldapConfigurer.userDnPatterns(ldapConfigProps.userDnPattern)
     }
@@ -180,6 +182,7 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
     String managerDn
     String managerPassword
     String groupSearchBase
+    String groupSearchFilter
 
     String userDnPattern
     String userSearchBase

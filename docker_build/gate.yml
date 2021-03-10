@@ -25,10 +25,10 @@ cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
   enabled: true
-  url: ldap://oes-ldap:389
+  url: ldap://localhost:3389
   userDnPattern:  uid={0},ou=users,dc=example,dc=org
-  managerDn: uid=admin,ou=users,,dc=example,dc=org
-  managerPassword: opsmx@123
+  managerDn: cn=admin,dc=example,dc=org
+  managerPassword: opsmxadmin123
   groupSearchBase: ou=groups,dc=example,dc=org
   groupSearchFilter: member={0}
 file:
