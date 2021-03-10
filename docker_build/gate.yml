@@ -21,6 +21,22 @@ security:
   basic:
     enabled: true
   user: {}
+  oauth2:
+    enabled: true
+    client:
+      clientId: 27fd1553830aa359c4b6
+      clientSecret: 220d79cb979f239620a4ffa435395a9659941b32
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      scope: user:email
+    resource:
+      userInfoUri: https://api.github.com/user
+    userInfoMapping:
+      email: email
+      firstName: ''
+      lastName: name
+      username: login
+    provider: GITHUB
 cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
