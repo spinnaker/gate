@@ -16,20 +16,23 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 import javax.servlet.http.HttpServletResponse
 
+@Slf4j
 @RestController
 class RootController {
 
-  @Value('${services.deck.base-url:}')
-  URL deckBaseUrl
+  @Value('${services.oesui.externalUrl:}')
+  String uiBaseUrl
 
   @RequestMapping("/")
   void root(HttpServletResponse response) {
-    response.sendRedirect(deckBaseUrl.toString())
+    log.info("uiBaseUrl : {}", uiBaseUrl)
+    response.sendRedirect(uiBaseUrl + "/application")
   }
 }

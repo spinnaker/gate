@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 import retrofit.RetrofitError
@@ -57,6 +58,8 @@ public class GateWebConfig implements WebMvcConfigurer {
 
   @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
+
+
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
@@ -121,5 +124,9 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Override
   void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer.favorPathExtension(false)
+  }
+
+  public void addViewControllers(ViewControllerRegistry registry) {
+    registry.addViewController("/login").setViewName("login")
   }
 }

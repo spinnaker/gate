@@ -76,6 +76,7 @@ class PagerDutyController {
   @Scheduled(fixedDelay = 300000L)
   void refreshPagerDuty() {
     try {
+      log.info("Refreshing PagerDuty service list")
       List<Map> services = fetchAllServices()
       log.info("Fetched {} PagerDuty services", services?.size())
       pagerDutyServicesCache.set(services)
@@ -88,6 +89,7 @@ class PagerDutyController {
     }
 
     try {
+      log.info("Refreshing PagerDuty oncall list")
       List<Map> onCalls = fetchAllOnCalls()
       log.info("Fetched {} PagerDuty onCall", onCalls?.size())
       pagerDutyOnCallCache.set(onCalls)

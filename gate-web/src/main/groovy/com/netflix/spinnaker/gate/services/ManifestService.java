@@ -16,8 +16,9 @@
 
 package com.netflix.spinnaker.gate.services;
 
+import com.netflix.hystrix.exception.HystrixBadRequestException;
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
-import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,29 +28,41 @@ import retrofit.RetrofitError;
 
 @Component
 public class ManifestService {
+  private static final String GROUP = "manifests";
 
+  private final ProviderLookupService providerLookupService;
   private final ClouddriverService clouddriverService;
 
   @Autowired
-  public ManifestService(ClouddriverService clouddriverService) {
+  public ManifestService(
+      ClouddriverService clouddriverService, ProviderLookupService providerLookupService) {
     this.clouddriverService = clouddriverService;
+    this.providerLookupService = providerLookupService;
   }
 
   public Map getManifest(String account, String location, String name) {
-    try {
-      return clouddriverService.getManifest(account, location, name);
-    } catch (RetrofitError re) {
-      if (re.getKind() == RetrofitError.Kind.HTTP
-          && re.getResponse() != null
-          && re.getResponse().getStatus() == 404) {
-        throw new ManifestNotFound("Unable to find " + name + " in " + account + "/" + location);
-      }
-      throw re;
-    }
+    return (Map)
+        HystrixFactory.newMapCommand(
+                GROUP,
+                "getManifest-" + providerLookupService.providerForAccount(account),
+                () -> {
+                  try {
+                    return clouddriverService.getManifest(account, location, name);
+                  } catch (RetrofitError re) {
+                    if (re.getKind() == RetrofitError.Kind.HTTP
+                        && re.getResponse() != null
+                        && re.getResponse().getStatus() == 404) {
+                      throw new ManifestNotFound(
+                          "Unable to find " + name + " in " + account + "/" + location);
+                    }
+                    throw re;
+                  }
+                })
+            .execute();
   }
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  static class ManifestNotFound extends SpinnakerException {
+  static class ManifestNotFound extends HystrixBadRequestException {
     ManifestNotFound(String message) {
       super(message);
     }

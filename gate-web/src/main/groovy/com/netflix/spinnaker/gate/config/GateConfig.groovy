@@ -72,7 +72,7 @@ import org.springframework.web.client.RestTemplate
 import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
 
-import javax.servlet.*
+import javax.servlet.Filter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -208,6 +208,36 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Bean
   ClouddriverService clouddriverService() {
     createClient "clouddriver", ClouddriverService
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.opsmx.enabled")
+  OpsmxOesService opsmxOesService() {
+    createClient "opsmx", OpsmxOesService
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.autopilot.enabled")
+  OpsmxAutopilotService opsmxAutopilotService() {
+    createClient "autopilot", OpsmxAutopilotService
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.platform.enabled")
+  OpsmxPlatformService opsmxPlatformService() {
+    createClient "platform", OpsmxPlatformService
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.dashboard.enabled")
+  OpsmxDashboardService opsmxDashboardService() {
+    createClient "dashboard", OpsmxDashboardService
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.visibility.enabled")
+  OpsmxVisibilityService opsmxVisibilityService() {
+    createClient "visibility", OpsmxVisibilityService
   }
 
   @Bean

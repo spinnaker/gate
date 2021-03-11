@@ -23,6 +23,7 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.gate.security.SpinnakerUser
+import com.netflix.spinnaker.gate.services.commands.HystrixFactory
 import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService
 import com.netflix.spinnaker.kork.core.RetrySupport
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException
@@ -45,6 +46,8 @@ import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyErr
 @Slf4j
 @Component
 class PermissionService {
+
+  static final String HYSTRIX_GROUP = "permission"
 
   @Autowired
   FiatService fiatService
@@ -75,48 +78,56 @@ class PermissionService {
 
   void login(String userId) {
     if (fiatStatus.isEnabled()) {
-      try {
-        AuthenticatedRequest.allowAnonymous({
-          fiatServiceForLogin.loginUser(userId, "")
-          permissionEvaluator.invalidatePermission(userId)
-        })
-      } catch (RetrofitError e) {
-        throw classifyError(e)
-      }
+      HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "login") {
+        try {
+          AuthenticatedRequest.allowAnonymous({
+            fiatServiceForLogin.loginUser(userId, "")
+            permissionEvaluator.invalidatePermission(userId)
+          })
+        } catch (RetrofitError e) {
+          throw classifyError(e)
+        }
+      }.execute()
     }
   }
 
   void loginWithRoles(String userId, Collection<String> roles) {
     if (fiatStatus.isEnabled()) {
-      try {
-        AuthenticatedRequest.allowAnonymous({
-          fiatServiceForLogin.loginWithRoles(userId, roles)
-          permissionEvaluator.invalidatePermission(userId)
-        })
-      } catch (RetrofitError e) {
-        throw classifyError(e)
-      }
+      HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "loginWithRoles") {
+        try {
+          AuthenticatedRequest.allowAnonymous({
+            fiatServiceForLogin.loginWithRoles(userId, roles)
+            permissionEvaluator.invalidatePermission(userId)
+          })
+        } catch (RetrofitError e) {
+          throw classifyError(e)
+        }
+      }.execute()
     }
   }
 
   void logout(String userId) {
     if (fiatStatus.isEnabled()) {
-      try {
-        fiatServiceForLogin.logoutUser(userId)
-        permissionEvaluator.invalidatePermission(userId)
-      } catch (RetrofitError e) {
-        throw classifyError(e)
-      }
+      HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "logout") {
+        try {
+          fiatServiceForLogin.logoutUser(userId)
+          permissionEvaluator.invalidatePermission(userId)
+        } catch (RetrofitError e) {
+          throw classifyError(e)
+        }
+      }.execute()
     }
   }
 
   void sync() {
     if (fiatStatus.isEnabled()) {
-      try {
-        fiatServiceForLogin.sync(Collections.emptyList())
-      } catch (RetrofitError e) {
-        throw classifyError(e)
-      }
+      HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "sync") {
+        try {
+          fiatServiceForLogin.sync(Collections.emptyList())
+        } catch (RetrofitError e) {
+          throw classifyError(e)
+        }
+      }.execute()
     }
   }
 
@@ -124,11 +135,13 @@ class PermissionService {
     if (!fiatStatus.isEnabled()) {
       return []
     }
-    try {
-      return permissionEvaluator.getPermission(userId)?.roles ?: []
-    } catch (RetrofitError e) {
-      throw classifyError(e)
-    }
+    return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getRoles") {
+      try {
+        return permissionEvaluator.getPermission(userId)?.roles ?: []
+      } catch (RetrofitError e) {
+        throw classifyError(e)
+      }
+    }.execute() as Set<Role>
   }
 
   //VisibleForTesting
@@ -187,12 +200,14 @@ class PermissionService {
       return []
     }
 
-    try {
-      UserPermission.View view = permissionEvaluator.getPermission(user.username)
-      return view.getServiceAccounts().collect { it.name }
-    } catch (RetrofitError re) {
-      throw classifyError(re)
-    }
+    return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getServiceAccounts") {
+      try {
+        UserPermission.View view = permissionEvaluator.getPermission(user.username)
+        return view.getServiceAccounts().collect { it.name }
+      } catch (RetrofitError re) {
+        throw classifyError(re)
+      }
+    }.execute() as List<String>
   }
 
   boolean isAdmin(String userId) {

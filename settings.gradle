@@ -22,8 +22,6 @@
   }
 }
 
-enableFeaturePreview("VERSION_ORDERING_V2")
-
 rootProject.name = "gate"
 
 include "gate-api",
@@ -40,7 +38,8 @@ include "gate-api",
   "gate-saml",
   "gate-web",
   "gate-x509",
-  "gate-integrations-gremlin"
+  "gate-integrations-gremlin",
+  "gate-file"
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"
@@ -54,3 +53,4 @@ rootProject.children.each {
 }
 
 gradle.ext.includedProviderProjects = includeProviders.split(',').collect{ ':gate-' + it.toLowerCase() }
+include 'gate-file'

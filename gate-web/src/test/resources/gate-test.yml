@@ -9,11 +9,7 @@ services:
 
   echo.enabled: false
 
-  echo.baseUrl: "http://echo"
-
   fiat.enabled: false
-
-  fiat.baseUrl: "http://localhost:8082"
 
   front50.baseUrl: "http://localhost:8080"
 
@@ -62,7 +58,3 @@ spring:
 spinnaker:
   extensions:
     applicationName: spinnakerpluginstest
-    repositories:
-      front50:
-        enabled: true
-        url: https://front50.net

@@ -51,7 +51,7 @@ class DefaultProviderLookupService implements ProviderLookupService, AccountLook
     this.clouddriverService = clouddriverService
   }
 
-  @Scheduled(fixedDelay = 30000L)
+  //@Scheduled(fixedDelay = 30000L)
   void refreshCache() {
     try {
       def accounts = AuthenticatedRequest.allowAnonymous { clouddriverService.getAccountDetails() }
@@ -83,7 +83,7 @@ class DefaultProviderLookupService implements ProviderLookupService, AccountLook
       }
       accountsCache.set(accounts)
     } catch (Exception e) {
-      log.error("Unable to refresh account details cache", e)
+      log.error("Unable to refresh account details cache, reason: ${e.message}")
     }
   }
 
