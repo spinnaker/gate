@@ -24,8 +24,8 @@ security:
   oauth2:
     enabled: true
     client:
-      clientId: 27fd1553830aa359c4b6
-      clientSecret: 220d79cb979f239620a4ffa435395a9659941b32
+      clientId: # client ID
+      clientSecret: # client secret
       accessTokenUri: https://github.com/login/oauth/access_token
       userAuthorizationUri: https://github.com/login/oauth/authorize
       scope: user:email
@@ -76,3 +76,7 @@ redis:
 server:
   session:
     timeout-in-seconds: 7200
+  tomcat:
+    protocolHeader: X-Forwarded-Proto
+    remoteIpHeader: X-Forwarded-For
+    internalProxies: .*
