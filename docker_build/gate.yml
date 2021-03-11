@@ -19,10 +19,10 @@ services:
     externalUrl: http://150.238.22.102
 security:
   basic:
-    enabled: true
+    enabled: false
   user: {}
   oauth2:
-    enabled: true
+    enabled: false
     client:
       clientId: # client ID
       clientSecret: # client secret
@@ -40,7 +40,7 @@ security:
 cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
-  enabled: false
+  enabled: true
   url: ldap://localhost:3389
   userDnPattern:  uid={0},ou=users,dc=example,dc=org
   managerDn: cn=admin,dc=example,dc=org
