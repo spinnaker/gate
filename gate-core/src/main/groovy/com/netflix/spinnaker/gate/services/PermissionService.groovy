@@ -15,8 +15,6 @@
  */
 
 package com.netflix.spinnaker.gate.services
-
-
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
@@ -34,6 +32,8 @@ import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import retrofit.RetrofitError
@@ -45,6 +45,7 @@ import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyErr
 
 @Slf4j
 @Component
+@EnableFeignClients
 class PermissionService {
 
   static final String HYSTRIX_GROUP = "permission"
@@ -72,7 +73,7 @@ class PermissionService {
     return fiatStatus.isEnabled()
   }
 
-  private FiatService getFiatServiceForLogin() {
+  FiatService getFiatServiceForLogin() {
     return fiatLoginService.orElse(fiatService);
   }
 

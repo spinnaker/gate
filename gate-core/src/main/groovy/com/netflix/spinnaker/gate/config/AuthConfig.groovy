@@ -81,6 +81,9 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
+  @Value('${ldap.enabled:false}')
+  boolean ldapEnabled
+
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http
@@ -123,7 +126,9 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    http.formLogin().loginPage("/login").permitAll()
+    if (ldapEnabled){
+      http.formLogin().loginPage("/login").permitAll()
+    }
 
     http.logout()
         .logoutUrl("/auth/logout")
