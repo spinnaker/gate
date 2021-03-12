@@ -79,7 +79,8 @@ interface OpsmxAutopilotService {
                          @Query("serviceList") List<String> serviceList,
                          @Query("pipelineId") String pipelineId,
                          @Query("referer") String referer,
-                         @Query("testCaseId") Integer testCaseId)
+                         @Query("testCaseId") Integer testCaseId,
+                         @Query("verificationType") String verificationType)
 
   @GET("/autopilot/{type}")
   Object getAutoResponse1(@Path('type') String type)
