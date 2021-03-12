@@ -58,6 +58,14 @@ class OpsmxOesController {
   OkHttpClient okHttpClient
 
   @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{source}", method = RequestMethod.POST)
+  Object postOesResponse(@PathVariable("source") String source,
+                         @RequestBody(required = false) Object data) {
+
+    return opsmxOesService.postOesResponse(source, data)
+  }
+
+  @ApiOperation(value = "Endpoint for Oes rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.GET)
   Object getOesResponse(@PathVariable("type") String type,
                         @PathVariable("source") String source,
