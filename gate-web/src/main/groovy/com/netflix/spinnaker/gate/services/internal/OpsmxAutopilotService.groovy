@@ -97,7 +97,8 @@ interface OpsmxAutopilotService {
                           @Query("pageLimit") Integer pageLimit,
                           @Query("sortBy") String sortBy,
                           @Query("sortOrder") String sortOrder,
-                          @Query("applicationId") Integer applicationId)
+                          @Query("applicationId") Integer applicationId,
+                          @Query("noOfDays") Integer noOfDays)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
