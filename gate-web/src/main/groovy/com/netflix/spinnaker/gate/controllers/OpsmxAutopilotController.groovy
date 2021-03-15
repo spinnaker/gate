@@ -201,9 +201,10 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                           @RequestParam(value = "sortBy", required = false) String sortBy,
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                          @RequestParam(value = "applicationId", required = false) Integer applicationId) {
+                          @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
