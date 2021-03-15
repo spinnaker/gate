@@ -322,14 +322,15 @@ class OpsmxAutopilotController {
   Object postAutoResponse1(@PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @RequestParam(value = "isEdit", required = false) Boolean isEdit,
-                           @RequestParam(value = "userName", required=false) String userName,
-                           @RequestParam(value = "userId", required=false) Integer userId,
-                           @RequestParam(value = "canaryId", required=false) Integer canaryId,
-                           @RequestParam(value = "logTemplateName", required=false) String logTemplateName,
-                           @RequestParam(value ="serviceId", required = false) Integer serviceId,
+                           @RequestParam(value = "userName", required = false) String userName,
+                           @RequestParam(value = "userId", required = false) Integer userId,
+                           @RequestParam(value = "canaryId", required = false) Integer canaryId,
+                           @RequestParam(value = "logTemplateName", required = false) String logTemplateName,
+                           @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                           @RequestParam(value = "testCaseId", required = false) Integer testCaseId,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, userName, userId, canaryId, logTemplateName, serviceId, data)
+    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, userName, userId, canaryId, logTemplateName, serviceId, testCaseId, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
