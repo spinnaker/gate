@@ -178,6 +178,7 @@ interface OpsmxAutopilotService {
                            @Query('canaryId') Integer canaryId,
                            @Query('logTemplateName') String logTemplateName,
                            @Query('serviceId') Integer serviceId,
+                           @Query('testCaseId') Integer testCaseId,
                            @Body Object data)
 
   @POST("/autopilot/{type}/{source}/{source1}")
