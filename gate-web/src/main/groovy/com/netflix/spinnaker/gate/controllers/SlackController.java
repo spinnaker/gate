@@ -90,10 +90,10 @@ public class SlackController {
       String nextCursor = cursor;
       response =
           retrySupport.retry(
-             () -> slackService.getChannels(slackConfigProperties.getToken(), nextCursor),
-             4,
-             Duration.ofSeconds(30),
-             true);
+              () -> slackService.getChannels(slackConfigProperties.getToken(), nextCursor),
+              4,
+              Duration.ofSeconds(30),
+              true);
       cursor = response.response_metadata.next_cursor;
       channels.addAll(response.channels);
     }
