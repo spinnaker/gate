@@ -22,7 +22,6 @@ import com.netflix.spinnaker.gate.services.SlackService;
 import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.swagger.annotations.ApiOperation;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +88,12 @@ public class SlackController {
     String cursor = response.response_metadata.next_cursor;
     while (cursor != null & cursor.length() > 0) {
       String nextCursor = cursor;
-      response = retrySupport.retry(() -> slackService.getChannels(slackConfigProperties.getToken(), nextCursor), 4, Duration.ofSeconds(30), true);
+      response =
+          retrySupport.retry(
+             () -> slackService.getChannels(slackConfigProperties.getToken(), nextCursor),
+             4,
+             Duration.ofSeconds(30),
+             true);
       cursor = response.response_metadata.next_cursor;
       channels.addAll(response.channels);
     }
