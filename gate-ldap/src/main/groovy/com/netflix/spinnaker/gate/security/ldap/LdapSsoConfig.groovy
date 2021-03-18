@@ -21,6 +21,7 @@ import com.netflix.spinnaker.gate.security.AllowedAccountsSupport
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -47,6 +48,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.session.web.http.DefaultCookieSerializer
 import org.springframework.stereotype.Component
 
+@Slf4j
 @ConditionalOnExpression('${ldap.enabled:false}')
 @Configuration
 @SpinnakerAuthConfig
@@ -104,7 +106,9 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
             .rolePrefix("")
             .groupSearchBase(ldapConfigProps.groupSearchBase)
             .userDetailsContextMapper(ldapUserContextMapper)
-
+    if (ldapConfigProps.groupSearchFilter) {
+      ldapConfigurer.groupSearchFilter(ldapConfigProps.groupSearchFilter)
+    }
     if (ldapConfigProps.userDnPattern) {
       ldapConfigurer.userDnPatterns(ldapConfigProps.userDnPattern)
     }
@@ -164,6 +168,7 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static Set<String> sanitizeRoles(Collection<? extends GrantedAuthority> authorities) {
+      log.info("sanitize roles : {}", authorities)
       authorities.findResults {
         StringUtils.removeStartIgnoreCase(it.authority, "ROLE_")?.toLowerCase()
       }
@@ -177,6 +182,7 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
     String managerDn
     String managerPassword
     String groupSearchBase
+    String groupSearchFilter
 
     String userDnPattern
     String userSearchBase

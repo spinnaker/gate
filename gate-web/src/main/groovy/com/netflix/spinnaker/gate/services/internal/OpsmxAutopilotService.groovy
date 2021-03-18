@@ -79,7 +79,8 @@ interface OpsmxAutopilotService {
                          @Query("serviceList") List<String> serviceList,
                          @Query("pipelineId") String pipelineId,
                          @Query("referer") String referer,
-                         @Query("testCaseId") Integer testCaseId)
+                         @Query("testCaseId") Integer testCaseId,
+                         @Query("verificationType") String verificationType)
 
   @GET("/autopilot/{type}")
   Object getAutoResponse1(@Path('type') String type)
@@ -96,7 +97,8 @@ interface OpsmxAutopilotService {
                           @Query("pageLimit") Integer pageLimit,
                           @Query("sortBy") String sortBy,
                           @Query("sortOrder") String sortOrder,
-                          @Query("applicationId") Integer applicationId)
+                          @Query("applicationId") Integer applicationId,
+                          @Query("noOfDays") Integer noOfDays)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
@@ -176,6 +178,7 @@ interface OpsmxAutopilotService {
                            @Query('canaryId') Integer canaryId,
                            @Query('logTemplateName') String logTemplateName,
                            @Query('serviceId') Integer serviceId,
+                           @Query('testCaseId') Integer testCaseId,
                            @Body Object data)
 
   @POST("/autopilot/{type}/{source}/{source1}")

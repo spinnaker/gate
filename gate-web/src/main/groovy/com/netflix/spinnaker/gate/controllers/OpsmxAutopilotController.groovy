@@ -179,12 +179,13 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "serviceList", required = false) List<String>  serviceList,
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer,
-                         @RequestParam(value = "testCaseId", required = false) Integer testCaseId){
+                         @RequestParam(value = "testCaseId", required = false) Integer testCaseId,
+                         @RequestParam(value = "verificationType", required = false) String verificationType){
 
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
-      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId)
+      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId, verificationType)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -200,9 +201,10 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                           @RequestParam(value = "sortBy", required = false) String sortBy,
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                          @RequestParam(value = "applicationId", required = false) Integer applicationId) {
+                          @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -320,14 +322,15 @@ class OpsmxAutopilotController {
   Object postAutoResponse1(@PathVariable("type") String type,
                            @PathVariable("source") String source,
                            @RequestParam(value = "isEdit", required = false) Boolean isEdit,
-                           @RequestParam(value = "userName", required=false) String userName,
-                           @RequestParam(value = "userId", required=false) Integer userId,
-                           @RequestParam(value = "canaryId", required=false) Integer canaryId,
-                           @RequestParam(value = "logTemplateName", required=false) String logTemplateName,
-                           @RequestParam(value ="serviceId", required = false) Integer serviceId,
+                           @RequestParam(value = "userName", required = false) String userName,
+                           @RequestParam(value = "userId", required = false) Integer userId,
+                           @RequestParam(value = "canaryId", required = false) Integer canaryId,
+                           @RequestParam(value = "logTemplateName", required = false) String logTemplateName,
+                           @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                           @RequestParam(value = "testCaseId", required = false) Integer testCaseId,
                            @RequestBody(required = false) Object data) {
 
-    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, userName, userId, canaryId, logTemplateName, serviceId, data)
+    return opsmxAutopilotService.postAutoResponse1(type, source, isEdit, userName, userId, canaryId, logTemplateName, serviceId, testCaseId, data)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
