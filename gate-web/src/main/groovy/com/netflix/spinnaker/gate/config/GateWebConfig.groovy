@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.config
 
 import com.netflix.spectator.api.Registry
+import com.netflix.spinnaker.gate.config.controllers.PipelineControllerConfigProperties
 import com.netflix.spinnaker.gate.filters.ContentCachingFilter
 import com.netflix.spinnaker.gate.interceptors.RequestContextInterceptor
 import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptor
@@ -47,7 +48,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Configuration
 @ComponentScan
-@EnableConfigurationProperties(ResponseHeaderInterceptorConfigurationProperties.class)
+@EnableConfigurationProperties([ResponseHeaderInterceptorConfigurationProperties.class, PipelineControllerConfigProperties.class])
 public class GateWebConfig implements WebMvcConfigurer {
   @Autowired
   Registry registry
