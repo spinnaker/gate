@@ -24,6 +24,13 @@ interface OpsmxAutopilotService {
   @GET("/autopilot/canaries/debugLogsData")
   Response downloadDebugData(@Query("id") Integer canaryId)
 
+  @GET("/autopilot/canaries/clusterCompleteLog")
+  Response downloadClusterInfo(@Query("canaryId") Integer canaryId,
+                               @Query("serviceId") Integer serviceId,
+                               @Query("clusterId") Integer clusterId,
+                               @Query("version") String version,
+                               @Query("testCaseId") Integer testCaseId)
+
   @POST("/autopilot/api/{version}/registerCanary")
   Response triggerRegisterCanary(@Path('version') String version, @Body Object data)
 
