@@ -63,4 +63,42 @@ class AuthConfigTest extends Specification {
       .collect(Collectors.toList())
     filtered.size() == 0
   }
+
+  @SuppressWarnings("GroovyAccessibility")
+  def "test webhooks can be configured to be authenticated"() {
+    given:
+    def requestMatcher = AnyRequestMatcher.INSTANCE
+    def mockRequestMatcherProvider = Mock(RequestMatcherProvider) {
+      requestMatcher() >> requestMatcher
+    }
+    def authConfig = new AuthConfig(
+      permissionRevokingLogoutSuccessHandler: Mock(AuthConfig.PermissionRevokingLogoutSuccessHandler),
+      securityProperties: Mock(SecurityProperties),
+      configProps: Mock(FiatClientConfigurationProperties),
+      fiatStatus: Mock(FiatStatus),
+      permissionEvaluator: Mock(FiatPermissionEvaluator),
+      requestMatcherProvider: mockRequestMatcherProvider,
+      securityDebug: false,
+      fiatSessionFilterEnabled: false,
+      webhookRequireAuthEnabled: true,
+    )
+    def httpSecurity = new HttpSecurity(
+      Mock(ObjectPostProcessor),
+      Mock(AuthenticationManagerBuilder),
+      new HashMap<Class<?, Object>>()
+    )
+
+    when:
+    authConfig.configure(httpSecurity)
+
+    then:
+    def filtered = httpSecurity.authorizeRequests().getUrlMappings()
+      .stream()
+      .filter({ it -> it.requestMatcher.getPattern() == "/webhooks/**" })
+      .filter( { it ->
+        it.configAttrs.stream().any( {att -> att.getAttribute() == "authenticated"})
+      })
+      .collect(Collectors.toList())
+    filtered.size() == 1
+  }
 }

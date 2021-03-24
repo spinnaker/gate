@@ -73,6 +73,9 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
+  @Value('${security.webhook-require-auth.enabled:false}')
+  boolean webhookRequireAuthEnabled
+
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http
@@ -95,6 +98,10 @@ class AuthConfig {
         permissionEvaluator)
 
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
+    }
+
+    if (webhookRequireAuthEnabled) {
+      http.authorizeRequests().antMatchers(HttpMethod.POST, '/webhooks/**').authenticated()
     }
 
     http.logout()
