@@ -80,7 +80,7 @@ class AuthConfigTest extends Specification {
       requestMatcherProvider: mockRequestMatcherProvider,
       securityDebug: false,
       fiatSessionFilterEnabled: false,
-      webhookRequireAuthEnabled: true,
+      webhookDefaultAuthEnabled: true,
     )
     def httpSecurity = new HttpSecurity(
       Mock(ObjectPostProcessor),
