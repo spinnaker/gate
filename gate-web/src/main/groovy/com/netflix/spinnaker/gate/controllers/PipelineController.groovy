@@ -177,6 +177,12 @@ class PipelineController {
     pipelineService.restartPipelineStage(id, stageId, context)
   }
 
+  @ApiOperation(value = "Ignore the failure of a stage", response = HashMap.class)
+  @PutMapping("/{id}/stages/{stageId}/ignoreFailure")
+  Map ignoreStageFailure(@PathVariable("id") String id, @PathVariable("stageId") String stageId, @RequestBody Map context) {
+    pipelineService.ignorePipelineStageFailure(id, stageId, context)
+  }
+
   @ApiOperation(value = "Delete a pipeline execution", response = HashMap.class)
   @DeleteMapping("{id}")
   Map deletePipeline(@PathVariable("id") String id) {

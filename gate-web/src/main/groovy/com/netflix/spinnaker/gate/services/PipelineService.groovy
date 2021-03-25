@@ -153,6 +153,11 @@ class PipelineService {
     orcaServiceSelector.select().restartPipelineStage(executionId, stageId, context)
   }
 
+  Map ignorePipelineStageFailure(String executionId, String stageId, Map context) {
+    setApplicationForExecution(executionId)
+    orcaServiceSelector.select().ignorePipelineStageFailure(executionId, stageId, context)
+  }
+
   Map evaluateExpressionForExecution(String executionId, String pipelineExpression) {
     orcaServiceSelector.select().evaluateExpressionForExecution(executionId, pipelineExpression)
   }
