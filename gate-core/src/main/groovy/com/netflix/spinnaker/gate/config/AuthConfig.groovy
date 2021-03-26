@@ -73,7 +73,7 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
-  @Value('${security.webhooks.default-auth.enabled:false}')
+  @Value('${security.webhooks.default-auth-enabled:false}')
   boolean webhookDefaultAuthEnabled
 
   void configure(HttpSecurity http) throws Exception {
