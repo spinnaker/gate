@@ -95,6 +95,30 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @GetMapping(value = "/canaries/clusterCompleteLog", produces = "application/zip")
+  @ResponseBody Object downloadClusterInfo(@RequestParam(value = "canaryId", required = false) Integer canaryId,
+                                           @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                                           @RequestParam(value = "clusterId", required = false) Integer clusterId,
+                                           @RequestParam(value = "version", required = false) String version,
+                                           @RequestParam(value = "testCaseId", required = false) Integer testCaseId){
+
+    Response response = opsmxAutopilotService.downloadClusterInfo(canaryId, serviceId, clusterId, version, testCaseId)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte [] zipFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(zipFile)
+
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
   Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data) throws Exception {
 
