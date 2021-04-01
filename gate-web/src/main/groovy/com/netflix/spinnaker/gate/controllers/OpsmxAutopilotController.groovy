@@ -204,12 +204,13 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer,
                          @RequestParam(value = "testCaseId", required = false) Integer testCaseId,
-                         @RequestParam(value = "verificationType", required = false) String verificationType){
+                         @RequestParam(value = "verificationType", required = false) String verificationType,
+                         @RequestParam(value = "patternId", required = false) String patternId){
 
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
-      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId, verificationType)
+      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId, verificationType, patternId)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
