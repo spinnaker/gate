@@ -16,12 +16,11 @@
 
 package com.netflix.spinnaker.gate
 
-import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spinnaker.gate.config.Service
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.ApplicationService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+
 import spock.lang.Specification
 import spock.lang.Unroll
 

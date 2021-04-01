@@ -16,10 +16,9 @@
 
 package com.netflix.spinnaker.gate.services
 
-import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
+
 import com.netflix.spinnaker.fiat.shared.FiatStatus
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
+
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll

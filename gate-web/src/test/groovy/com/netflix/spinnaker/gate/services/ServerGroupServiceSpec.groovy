@@ -19,7 +19,7 @@ package com.netflix.spinnaker.gate.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.gate.config.InsightConfiguration
-import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import spock.lang.Specification
 

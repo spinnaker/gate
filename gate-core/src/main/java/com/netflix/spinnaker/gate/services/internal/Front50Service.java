@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.services.internal;
 
 import com.netflix.spinnaker.fiat.model.resources.ServiceAccount;
+import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
 import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
@@ -142,4 +143,7 @@ public interface Front50Service {
 
   @GET("/pluginInfo")
   public abstract List<Map> getPluginInfo(@Query("service") String service);
+
+  @GET("/installedPlugins")
+  List<SpinnakerPluginDescriptor> getInstalledPlugins();
 }

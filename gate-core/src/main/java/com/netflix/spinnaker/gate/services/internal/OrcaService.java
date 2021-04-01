@@ -1,5 +1,6 @@
 package com.netflix.spinnaker.gate.services.internal;
 
+import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
 import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
@@ -169,4 +170,7 @@ public interface OrcaService {
 
   @GET("/capabilities/expressions")
   public abstract Map getExpressionCapabilities();
+
+  @GET("/installedPlugins")
+  List<SpinnakerPluginDescriptor> getInstalledPlugins();
 }

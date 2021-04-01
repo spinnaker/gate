@@ -18,7 +18,7 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.services.BuildService
-import com.netflix.spinnaker.gate.services.internal.IgorService
+
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import groovy.json.JsonSlurper
 import org.springframework.http.MediaType
