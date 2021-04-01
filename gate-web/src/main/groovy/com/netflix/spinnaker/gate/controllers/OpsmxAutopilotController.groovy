@@ -119,6 +119,28 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @GetMapping(value = "/canaries/patternCompleteLog", produces = "application/zip")
+  @ResponseBody Object downloadPatternCompleteLog(@RequestParam(value = "canaryId", required = false) Integer canaryId,
+                                                  @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                                                  @RequestParam(value = "patternId", required = false) Integer patternId){
+
+    Response response = opsmxAutopilotService.downloadPatternCompleteLog(canaryId, serviceId, patternId)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte [] zipFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(zipFile)
+
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
   Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data) throws Exception {
 
