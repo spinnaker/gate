@@ -43,10 +43,14 @@ interface OpsmxDashboardService {
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getDashboardResponse5(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2)
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Query("pageNo") Integer pageNo,
+                               @Query("pageLimit") Integer pageLimit,
+                               @Query("sortBy") String sortBy,
+                               @Query("sortOrder") String sortOrder)
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getDashboardResponse6(@Path('version') String version,
@@ -63,7 +67,11 @@ interface OpsmxDashboardService {
                                @Path('source1') String source1,
                                @Path('source2') String source2,
                                @Path('source3') String source3,
-                               @Path('source4') String source4)
+                               @Path('source4') String source4,
+                               @Query("pageNo") Integer pageNo,
+                               @Query("pageLimit") Integer pageLimit,
+                               @Query("sortBy") String sortBy,
+                               @Query("sortOrder") String sortOrder)
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
   Object getDashboardResponse8(@Path('version') String version,
