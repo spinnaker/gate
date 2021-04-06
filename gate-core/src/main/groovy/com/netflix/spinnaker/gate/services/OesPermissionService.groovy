@@ -25,7 +25,6 @@ class OesPermissionService extends PermissionService{
   @Override
   void loginWithRoles(String userId, Collection<String> roles) {
     if (fiatStatus.isEnabled()) {
-      HystrixFactory.newVoidCommand(HYSTRIX_GROUP, "loginWithRoles") {
         try {
           AuthenticatedRequest.allowAnonymous({
             fiatServiceForLogin.loginWithRoles(userId, roles)
@@ -34,7 +33,6 @@ class OesPermissionService extends PermissionService{
         } catch (RetrofitError e) {
           throw classifyError(e)
         }
-      }.execute()
     }
     if (isOesAuthorizationServiceEnabled){
       try {
