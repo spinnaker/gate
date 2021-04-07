@@ -27,7 +27,7 @@ interface OpsmxAutopilotService {
   @GET("/autopilot/canaries/patternCompleteLog")
   Response downloadPatternCompleteLog(@Query("canaryId") Integer canaryId,
                                @Query("serviceId") Integer serviceId,
-                               @Query("patternId") Integer patternId)
+                               @Query("patternId") String patternId)
 
   @GET("/autopilot/canaries/clusterCompleteLog")
   Response downloadClusterInfo(@Query("canaryId") Integer canaryId,
