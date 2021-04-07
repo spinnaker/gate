@@ -122,7 +122,7 @@ class OpsmxAutopilotController {
   @GetMapping(value = "/canaries/patternCompleteLog", produces = "application/zip")
   @ResponseBody Object downloadPatternCompleteLog(@RequestParam(value = "canaryId", required = false) Integer canaryId,
                                                   @RequestParam(value = "serviceId", required = false) Integer serviceId,
-                                                  @RequestParam(value = "patternId", required = false) Integer patternId){
+                                                  @RequestParam(value = "patternId", required = false) String patternId){
 
     Response response = opsmxAutopilotService.downloadPatternCompleteLog(canaryId, serviceId, patternId)
     InputStream inputStream = response.getBody().in()
