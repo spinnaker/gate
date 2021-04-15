@@ -21,13 +21,10 @@ import retrofit.http.*
 
 interface OpsmxVisibilityService {
 
-  @POST("/visibilityservice/v1/approvalGates/{id}/trigger")
-  Response triggerV1ApprovalGate(@Path('id') Integer id,
-                                 @Body Object data)
-
-  @POST("/visibilityservice/v2/approvalGates/{id}/trigger")
-  Response triggerV2ApprovalGate(@Path('id') Integer id,
-                                 @Body Object data)
+  @POST("/visibilityservice/{version}/approvalGates/{id}/trigger")
+  Response triggerApprovalGate(@Path('version') String version,
+                               @Path('id') Integer id,
+                               @Body Object data)
 
   @GET("/visibilityservice/{version}/{type}")
   Object getVisibilityResponse1(@Path('version') String version,

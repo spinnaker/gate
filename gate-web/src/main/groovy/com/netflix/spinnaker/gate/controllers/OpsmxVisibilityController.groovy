@@ -60,31 +60,12 @@ class OpsmxVisibilityController {
   Gson gson = new Gson()
 
   @ApiOperation(value = "Endpoint for visibility rest services")
-  @RequestMapping(value = "/v1/approvalGates/{id}/trigger", method = RequestMethod.POST)
-  @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
-                                             @RequestBody(required = false) Object data) {
-    Response response = opsmxVisibilityService.triggerV1ApprovalGate(id, data)
-    InputStream inputStream = null
-    try {
-      HttpHeaders headers = new HttpHeaders()
-      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
-      inputStream = response.getBody().in()
-      String responseBody = new String(IOUtils.toByteArray(inputStream))
-      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
-      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
-    } finally{
-      if (inputStream!=null){
-        inputStream.close()
-      }
-    }
-  }
-
-  @ApiOperation(value = "Endpoint for visibility rest services")
-  @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
-  @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
+  @RequestMapping(value = "/{version}/approvalGates/{id}/trigger", method = RequestMethod.POST)
+  @ResponseBody Object triggerApprovalGate(@PathVariable("version") String version,
+                                           @PathVariable("id") Integer id,
                                              @RequestBody(required = false) Object data) throws Exception {
 
-    Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
+    Response response = opsmxVisibilityService.triggerApprovalGate(version, id, data)
     InputStream inputStream = null
 
     try {
