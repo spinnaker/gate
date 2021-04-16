@@ -290,6 +290,36 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.GET)
+  Object getAutoResponse8(@PathVariable("type") String type,
+                          @PathVariable("source") String source,
+                          @PathVariable("source1") String source1,
+                          @PathVariable("source2") String source2,
+                          @PathVariable("source3") String source3,
+                          @PathVariable("source4") String source4,
+                          @PathVariable("source5") String source5,
+                          @RequestParam(value = "imageId", required = false) String imageId) {
+
+    return opsmxAutopilotService.getAutoResponse8(type, source, source1, source2, source3, source4, source5, imageId)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}/{source8}", method = RequestMethod.GET)
+  Object getAutoResponse9(@PathVariable("type") String type,
+                          @PathVariable("source") String source,
+                          @PathVariable("source1") String source1,
+                          @PathVariable("source2") String source2,
+                          @PathVariable("source3") String source3,
+                          @PathVariable("source4") String source4,
+                          @PathVariable("source5") String source5,
+                          @PathVariable("source6") String source6,
+                          @PathVariable("source7") String source7,
+                          @PathVariable("source8") String source8,
+                          @RequestParam(value = "imageId", required = false) String imageId) {
+    return opsmxAutopilotService.getAutoResponse9(type, source, source1, source2, source3, source4, source5, source6, source7, source8, imageId)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
   Object deleteAutoResponse1(@PathVariable("type") String type) {
 

@@ -136,6 +136,29 @@ interface OpsmxAutopilotService {
                           @Path('source4') String source4,
                           @Query("time") String time)
 
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object getAutoResponse8(@Path('type') String type,
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Path('source4') String source4,
+                          @Path('source5') String source5,
+                          @Query("imageId") String imageId)
+
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}/{source8}")
+  Object getAutoResponse9(@Path('type') String type,
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Path('source4') String source4,
+                          @Path('source5') String source5,
+                          @Path('source6') String source6,
+                          @Path('source7') String source7,
+                          @Path('source8') String source8,
+                          @Query("imageId") String imageId)
+
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
 
