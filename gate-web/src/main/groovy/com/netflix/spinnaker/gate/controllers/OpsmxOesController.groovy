@@ -114,6 +114,19 @@ class OpsmxOesController {
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.GET)
+  Object getOesResponse7(@PathVariable("type") String type,
+                         @PathVariable("source") String source,
+                         @PathVariable("source1") String source1,
+                         @PathVariable("source2") String source2,
+                         @PathVariable("source3") String source3,
+                         @PathVariable("source4") String source4,
+                         @RequestParam(value = "imageId", required = false) String imageId) {
+
+    return opsmxOesService.getOesResponse7(type, source, source1, source2, source3, source4, imageId)
+  }
+
+  @ApiOperation(value = "Endpoint for Oes rest services")
   @RequestMapping(value = "/{type}/{source}", method = RequestMethod.DELETE)
   Object deleteOesResponse(@PathVariable("type") String type,
                            @PathVariable("source") String source,
