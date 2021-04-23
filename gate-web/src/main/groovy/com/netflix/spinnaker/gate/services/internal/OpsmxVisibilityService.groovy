@@ -30,7 +30,8 @@ interface OpsmxVisibilityService {
   Object getVisibilityResponse1(@Path('version') String version,
                                 @Path('type') String type,
                                 @Query("serviceId") Integer serviceId,
-                                @Query("images") String images)
+                                @Query("images") String images,
+                                @Query("executionId") String executionId)
 
   @GET("/visibilityservice/{version}/{type}/{source}")
   Object getVisibilityResponse(@Path('version') String version,
