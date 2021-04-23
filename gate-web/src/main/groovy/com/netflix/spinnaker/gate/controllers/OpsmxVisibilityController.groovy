@@ -88,8 +88,9 @@ class OpsmxVisibilityController {
   Object getVisibilityResponse1(@PathVariable("version") String version,
                                 @PathVariable("type") String type,
                                 @RequestParam(value = "serviceId", required = false) Integer serviceId,
-                                @RequestParam(value = "images", required = false) String images) {
-    return opsmxVisibilityService.getVisibilityResponse1(version, type, serviceId, images)
+                                @RequestParam(value = "images", required = false) String images,
+                                @RequestParam(value = "executionId", required = false) String executionId) {
+    return opsmxVisibilityService.getVisibilityResponse1(version, type, serviceId, images, executionId)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
