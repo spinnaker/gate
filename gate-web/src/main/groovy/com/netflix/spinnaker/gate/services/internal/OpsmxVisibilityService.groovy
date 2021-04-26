@@ -45,7 +45,8 @@ interface OpsmxVisibilityService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Query("status") String status,
-                                @Query("images") String images)
+                                @Query("images") String images,
+                                @Query("executionId") String executionId)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getVisibilityResponse5(@Path('version') String version,
