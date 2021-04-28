@@ -98,8 +98,9 @@ class OpsmxVisibilityController {
   Object getVisibilityResponse(@PathVariable("version") String version,
                                @PathVariable("type") String type,
                                @PathVariable("source") String source,
-                               @RequestParam(value = "source1", required = false) String source1) {
-    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1)
+                               @RequestParam(value = "source1", required = false) String source1,
+                               @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances) {
+    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -121,9 +122,10 @@ class OpsmxVisibilityController {
                               @PathVariable("type") String type,
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
-                              @PathVariable("source2") String source2) {
+                              @PathVariable("source2") String source2,
+                                @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances) {
 
-    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2)
+    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2, approvalgateinstances)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
