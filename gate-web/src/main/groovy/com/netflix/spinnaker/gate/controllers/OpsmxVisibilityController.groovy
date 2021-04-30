@@ -99,8 +99,9 @@ class OpsmxVisibilityController {
                                @PathVariable("type") String type,
                                @PathVariable("source") String source,
                                @RequestParam(value = "source1", required = false) String source1,
-                               @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances) {
-    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances)
+                               @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances,
+                               @RequestParam(value = "approvalGateInstanceIds", required = false) List<Integer> approvalGateInstanceIds) {
+    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
