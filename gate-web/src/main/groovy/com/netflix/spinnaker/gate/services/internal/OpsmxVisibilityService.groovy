@@ -38,7 +38,8 @@ interface OpsmxVisibilityService {
                              @Path('type') String type,
                              @Path('source') String source,
                                @Query("source1") String source1,
-                               @Query("approvalGateInstances") List<Integer> approvalgateinstances)
+                               @Query("approvalGateInstances") List<Integer> approvalgateinstances,
+                               @Query("approvalGateInstanceIds") List<Integer> approvalGateInstanceIds)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,
