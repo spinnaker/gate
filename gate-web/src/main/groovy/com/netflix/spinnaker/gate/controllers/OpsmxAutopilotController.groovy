@@ -299,9 +299,11 @@ class OpsmxAutopilotController {
                           @PathVariable("source3") String source3,
                           @PathVariable("source4") String source4,
                           @PathVariable("source5") String source5,
-                          @RequestParam(value = "imageId", required = false) String imageId) {
+                          @RequestParam(value = "imageId", required = false) String imageId,
+                          @RequestParam(value = "canaryIds", required = false) String canaryIds,
+                          @RequestParam(value = "gateIds", required = false) String gateIds) {
 
-    return opsmxAutopilotService.getAutoResponse8(type, source, source1, source2, source3, source4, source5, imageId)
+    return opsmxAutopilotService.getAutoResponse8(type, source, source1, source2, source3, source4, source5, imageId, canaryIds, gateIds)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")

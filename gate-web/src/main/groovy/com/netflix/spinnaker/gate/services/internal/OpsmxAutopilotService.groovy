@@ -145,7 +145,9 @@ interface OpsmxAutopilotService {
                           @Path('source3') String source3,
                           @Path('source4') String source4,
                           @Path('source5') String source5,
-                          @Query("imageId") String imageId)
+                          @Query("imageId") String imageId,
+                          @Query("canaryIds") String canaryIds,
+                          @Query("gateIds") String gateIds)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}/{source8}")
   Object getAutoResponse9(@Path('type') String type,
