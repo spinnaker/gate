@@ -1,5 +1,13 @@
 FROM registry.access.redhat.com/ubi8/ubi:latest
 MAINTAINER OpsMx
+
+# Disable old version and uninstalling 
+RUN dnf module disable nginx php -y
+RUN dnf remove nginx* -y
+
+####### Copy nginx configuration #########
+COPY /docker_build/nginx.repo /etc/yum.repos.d/nginx.repo
+
 # Add user opsmx and create logs and spinnaker config directory
 RUN adduser opsmx \
     && usermod -aG wheel opsmx \
@@ -7,11 +15,14 @@ RUN adduser opsmx \
     && mkdir -p /opt/spinnaker/config
 
 # Install procps(ps)
-RUN yum install -y procps
+RUN yum install -y procps nginx net-tools
 # Install java 8
 RUN yum install -y java-1.8.0-openjdk.x86_64
 # Install ping
 RUN yum install -y iputils
+
+RUN yum -y update
+
 #######Gate Dependencies#########
 ENV WORK_DIR=/opsmx/workdir
 ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
