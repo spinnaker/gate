@@ -39,7 +39,8 @@ interface OpsmxDashboardService {
                                @Query("pageLimit") Integer pageLimit,
                                @Query("sortBy") String sortBy,
                                @Query("sortOrder") String sortOrder,
-                               @Query("search") String search)
+                               @Query("search") String search,
+                               @Query("noOfDays") Integer noOfDays)
 
   @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getDashboardResponse5(@Path('version') String version,
