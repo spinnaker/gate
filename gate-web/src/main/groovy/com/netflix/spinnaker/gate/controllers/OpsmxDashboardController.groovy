@@ -102,9 +102,10 @@ class OpsmxDashboardController {
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
-                          @PathVariable("source3") String source3) {
+                          @PathVariable("source3") String source3,
+                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxDashboardService.getDashboardResponse6(version, type, source, source1, source2, source3)
+    return opsmxDashboardService.getDashboardResponse6(version, type, source, source1, source2, source3, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
