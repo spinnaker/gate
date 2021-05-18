@@ -70,7 +70,8 @@ interface OpsmxOesService {
                          @Path('source2') String source2,
                          @Path('source3') String source3,
                          @Path('source4') String source4,
-                         @Query("imageId") String imageId)
+                         @Query("imageId") String imageId,
+                         @Query("executionId") String executionId)
 
   @DELETE("/oes/{type}/{source}")
   Object deleteOesResponse(@Path('type') String type,
