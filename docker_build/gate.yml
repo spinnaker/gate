@@ -26,25 +26,25 @@ security:
     client:
       clientId: # client ID
       clientSecret: # client secret
-      accessTokenUri: https://github.com/login/oauth/access_token
-      userAuthorizationUri: https://github.com/login/oauth/authorize
+      accessTokenUri: ${oauth2.accessTokenUri}
+      userAuthorizationUri: ${oauth2.userAuthorizationUri}
       scope: user:email
     resource:
-      userInfoUri: https://api.github.com/user
+      userInfoUri: ${oauth2.userInfoUri}
     userInfoMapping:
       email: email
       firstName: ''
       lastName: name
-      username: login
-    provider: GITHUB
+      username: ${oauth2.userInfoMapping.username}
+    provider: ${oauth2.provider}
 cors:
   allowed-origins-pattern: ^https?://(?:localhost|137.117.94.95)(?::[1-9]\d*)?/?
 ldap:
   enabled: true
-  url: ldap://localhost:3389
+  url: ${ldap.url}
   userDnPattern:  uid={0},ou=users,dc=example,dc=org
   managerDn: cn=admin,dc=example,dc=org
-  managerPassword: opsmxadmin123
+  managerPassword: ${ldap.password}
   groupSearchBase: ou=groups,dc=example,dc=org
   groupSearchFilter: member={0}
 file:
@@ -56,13 +56,13 @@ authn:
 saml:
   enabled: false
   keyStore: /opt/spinnaker/saml/saml.jks
-  keyStorePassword: changeit
+  keyStorePassword: ${saml.keyStorePassword}
   keyStoreAliasName: saml
   metadataUrl: /opt/spinnaker/saml/metadata.xml
   redirectProtocol: https
-  redirectHostname: oes-gate:8084
+  redirectHostname: ${saml.redirectHostname}
   redirectBasePath: /
-  issuerId: spind
+  issuerId: ${saml.issuerId}
 google: {}
 logging:
   level:

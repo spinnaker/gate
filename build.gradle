@@ -33,6 +33,8 @@ allprojects {
       compileOnly "org.projectlombok:lombok"
       annotationProcessor "org.projectlombok:lombok"
       testAnnotationProcessor "org.projectlombok:lombok"
+      compile("org.springframework.cloud:spring-cloud-starter-vault-config")
+
 
       implementation "org.codehaus.groovy:groovy-all"
       implementation "net.logstash.logback:logstash-logback-encoder"
