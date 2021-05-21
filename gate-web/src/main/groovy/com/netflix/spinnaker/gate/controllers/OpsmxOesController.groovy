@@ -122,9 +122,9 @@ class OpsmxOesController {
                          @PathVariable("source3") String source3,
                          @PathVariable("source4") String source4,
                          @RequestParam(value = "imageId", required = false) String imageId,
-                         @RequestParam(value = "executionId", required = false) String executionId) {
-
-    return opsmxOesService.getOesResponse7(type, source, source1, source2, source3, source4, imageId, executionId)
+                         @RequestParam(value = "executionId", required = false) String executionId,
+                         @RequestParam(value = "gateIds", required = false) String gateIds) {
+    return opsmxOesService.getOesResponse7(type, source, source1, source2, source3, source4, imageId, executionId, gateIds)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
