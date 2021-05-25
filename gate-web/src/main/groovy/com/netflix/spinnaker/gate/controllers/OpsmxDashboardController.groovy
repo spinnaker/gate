@@ -74,20 +74,25 @@ class OpsmxDashboardController {
                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                                @RequestParam(value = "sortBy", required = false) String sortBy,
                                @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                               @RequestParam(value = "search", required = false) String search) {
+                               @RequestParam(value = "search", required = false) String search,
+                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1, pageNo, pageLimit, sortBy, sortOrder, search)
+    return opsmxDashboardService.getDashboardResponse4(version, type, source, source1, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.GET)
   Object getDashboardResponse5(@PathVariable("version") String version,
-                          @PathVariable("type") String type,
-                          @PathVariable("source") String source,
-                          @PathVariable("source1") String source1,
-                          @PathVariable("source2") String source2) {
+                               @PathVariable("type") String type,
+                               @PathVariable("source") String source,
+                               @PathVariable("source1") String source1,
+                               @PathVariable("source2") String source2,
+                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                               @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                               @RequestParam(value = "sortBy", required = false) String sortBy,
+                               @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
-    return opsmxDashboardService.getDashboardResponse5(version, type, source, source1, source2)
+    return opsmxDashboardService.getDashboardResponse5(version, type, source, source1, source2, pageNo, pageLimit, sortBy, sortOrder)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
@@ -97,9 +102,10 @@ class OpsmxDashboardController {
                           @PathVariable("source") String source,
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
-                          @PathVariable("source3") String source3) {
+                          @PathVariable("source3") String source3,
+                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxDashboardService.getDashboardResponse6(version, type, source, source1, source2, source3)
+    return opsmxDashboardService.getDashboardResponse6(version, type, source, source1, source2, source3, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
@@ -110,9 +116,13 @@ class OpsmxDashboardController {
                                @PathVariable("source1") String source1,
                                @PathVariable("source2") String source2,
                                @PathVariable("source3") String source3,
-                               @PathVariable("source4") String source4) {
+                               @PathVariable("source4") String source4,
+                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                               @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                               @RequestParam(value = "sortBy", required = false) String sortBy,
+                               @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
-    return opsmxDashboardService.getDashboardResponse7(version, type, source, source1, source2, source3, source4)
+    return opsmxDashboardService.getDashboardResponse7(version, type, source, source1, source2, source3, source4, pageNo, pageLimit, sortBy, sortOrder)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")

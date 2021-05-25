@@ -21,38 +21,42 @@ import retrofit.http.*
 
 interface OpsmxVisibilityService {
 
-  @POST("/visibilityservice/v1/approvalGates/{id}/trigger")
-  Response triggerV1ApprovalGate(@Path('id') Integer id,
-                                 @Body Object data)
-
-  @POST("/visibilityservice/v2/approvalGates/{id}/trigger")
-  Response triggerV2ApprovalGate(@Path('id') Integer id,
-                                 @Body Object data)
+  @POST("/visibilityservice/{version}/approvalGates/{id}/trigger")
+  Response triggerApprovalGate(@Path('version') String version,
+                               @Path('id') Integer id,
+                               @Body Object data)
 
   @GET("/visibilityservice/{version}/{type}")
   Object getVisibilityResponse1(@Path('version') String version,
                                 @Path('type') String type,
-                                @Query("serviceId") Integer serviceId)
+                                @Query("serviceId") Integer serviceId,
+                                @Query("images") String images,
+                                @Query("executionId") String executionId)
 
   @GET("/visibilityservice/{version}/{type}/{source}")
   Object getVisibilityResponse(@Path('version') String version,
                              @Path('type') String type,
                              @Path('source') String source,
-                               @Query("source1") String source1)
+                               @Query("source1") String source1,
+                               @Query("approvalGateInstances") List<Integer> approvalgateinstances,
+                               @Query("approvalGateInstanceIds") List<Integer> approvalGateInstanceIds)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,
                               @Path('type') String type,
                               @Path('source') String source,
                               @Path('source1') String source1,
-                              @Query("status") String status)
+                              @Query("status") String status,
+                                @Query("images") String images,
+                                @Query("executionId") String executionId)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getVisibilityResponse5(@Path('version') String version,
                               @Path('type') String type,
                               @Path('source') String source,
                               @Path('source1') String source1,
-                              @Path('source2') String source2)
+                              @Path('source2') String source2,
+                                @Query("approvalGateInstances") List<Integer> approvalgateinstances)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getVisibilityResponse6(@Path('version') String version,

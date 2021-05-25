@@ -25,6 +25,9 @@ interface OpsmxOesService {
    @GET("/oes/accountsConfig/cloudProviders/manifestfile/{agentName}")
    Response manifestDownloadFile(@Path('agentName') String agentName)
 
+  @GET("/oes/accountsConfig/agents/{agentName}/manifest")
+  Response agentManifestDownloadFile(@Path('agentName') String agentName)
+
   @POST("/oes/{source}")
   Object postOesResponse(@Path('source') String source,
                          @Body Object data)
@@ -59,6 +62,17 @@ interface OpsmxOesService {
                          @Path('source2') String source2,
                          @Path('source3') String source3,
                          @Query("noOfDays") Integer noOfDays)
+
+  @GET("/oes/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
+  Object getOesResponse7(@Path('type') String type,
+                         @Path('source') String source,
+                         @Path('source1') String source1,
+                         @Path('source2') String source2,
+                         @Path('source3') String source3,
+                         @Path('source4') String source4,
+                         @Query("imageId") String imageId,
+                         @Query("executionId") String executionId,
+                         @Query("gateIds") String gateIds)
 
   @DELETE("/oes/{type}/{source}")
   Object deleteOesResponse(@Path('type') String type,

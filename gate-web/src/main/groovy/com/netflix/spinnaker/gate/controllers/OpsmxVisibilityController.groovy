@@ -60,31 +60,12 @@ class OpsmxVisibilityController {
   Gson gson = new Gson()
 
   @ApiOperation(value = "Endpoint for visibility rest services")
-  @RequestMapping(value = "/v1/approvalGates/{id}/trigger", method = RequestMethod.POST)
-  @ResponseBody Object triggerV1ApprovalGate(@PathVariable("id") Integer id,
-                                             @RequestBody(required = false) Object data) {
-    Response response = opsmxVisibilityService.triggerV1ApprovalGate(id, data)
-    InputStream inputStream = null
-    try {
-      HttpHeaders headers = new HttpHeaders()
-      headers.add("Location", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Location") }).collect(Collectors.toList()).get(0).value)
-      inputStream = response.getBody().in()
-      String responseBody = new String(IOUtils.toByteArray(inputStream))
-      ApprovalGateTriggerResponseModel approvalGateTriggerResponseModel = gson.fromJson(responseBody, ApprovalGateTriggerResponseModel.class)
-      return new ResponseEntity(approvalGateTriggerResponseModel, headers, HttpStatus.valueOf(response.getStatus()))
-    } finally{
-      if (inputStream!=null){
-        inputStream.close()
-      }
-    }
-  }
-
-  @ApiOperation(value = "Endpoint for visibility rest services")
-  @RequestMapping(value = "/v2/approvalGates/{id}/trigger", method = RequestMethod.POST)
-  @ResponseBody Object triggerV2ApprovalGate(@PathVariable("id") Integer id,
+  @RequestMapping(value = "/{version}/approvalGates/{id}/trigger", method = RequestMethod.POST)
+  @ResponseBody Object triggerApprovalGate(@PathVariable("version") String version,
+                                           @PathVariable("id") Integer id,
                                              @RequestBody(required = false) Object data) throws Exception {
 
-    Response response = opsmxVisibilityService.triggerV2ApprovalGate(id, data)
+    Response response = opsmxVisibilityService.triggerApprovalGate(version, id, data)
     InputStream inputStream = null
 
     try {
@@ -106,8 +87,10 @@ class OpsmxVisibilityController {
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getVisibilityResponse1(@PathVariable("version") String version,
                                 @PathVariable("type") String type,
-                                @RequestParam(value = "serviceId", required = false) Integer serviceId) {
-    return opsmxVisibilityService.getVisibilityResponse1(version, type, serviceId)
+                                @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                                @RequestParam(value = "images", required = false) String images,
+                                @RequestParam(value = "executionId", required = false) String executionId) {
+    return opsmxVisibilityService.getVisibilityResponse1(version, type, serviceId, images, executionId)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -115,8 +98,10 @@ class OpsmxVisibilityController {
   Object getVisibilityResponse(@PathVariable("version") String version,
                                @PathVariable("type") String type,
                                @PathVariable("source") String source,
-                               @RequestParam(value = "source1", required = false) String source1) {
-    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1)
+                               @RequestParam(value = "source1", required = false) String source1,
+                               @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances,
+                               @RequestParam(value = "approvalGateInstanceIds", required = false) List<Integer> approvalGateInstanceIds) {
+    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -125,9 +110,11 @@ class OpsmxVisibilityController {
                               @PathVariable("type") String type,
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
-                              @RequestParam(value = "status", required = false) String status) {
+                              @RequestParam(value = "status", required = false) String status,
+                                @RequestParam(value = "images", required = false) String images,
+                                @RequestParam(value = "executionId", required = false) String executionId) {
 
-    return opsmxVisibilityService.getVisibilityResponse4(version, type, source, source1, status)
+    return opsmxVisibilityService.getVisibilityResponse4(version, type, source, source1, status, images, executionId)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -136,9 +123,10 @@ class OpsmxVisibilityController {
                               @PathVariable("type") String type,
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
-                              @PathVariable("source2") String source2) {
+                              @PathVariable("source2") String source2,
+                                @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances) {
 
-    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2)
+    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2, approvalgateinstances)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")

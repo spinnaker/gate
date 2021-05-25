@@ -24,6 +24,11 @@ interface OpsmxAutopilotService {
   @GET("/autopilot/canaries/debugLogsData")
   Response downloadDebugData(@Query("id") Integer canaryId)
 
+  @GET("/autopilot/canaries/patternCompleteLog")
+  Response downloadPatternCompleteLog(@Query("canaryId") Integer canaryId,
+                               @Query("serviceId") Integer serviceId,
+                               @Query("patternId") String patternId)
+
   @GET("/autopilot/canaries/clusterCompleteLog")
   Response downloadClusterInfo(@Query("canaryId") Integer canaryId,
                                @Query("serviceId") Integer serviceId,
@@ -87,7 +92,8 @@ interface OpsmxAutopilotService {
                          @Query("pipelineId") String pipelineId,
                          @Query("referer") String referer,
                          @Query("testCaseId") Integer testCaseId,
-                         @Query("verificationType") String verificationType)
+                         @Query("verificationType") String verificationType,
+                         @Query("patternId") String patternId)
 
   @GET("/autopilot/{type}")
   Object getAutoResponse1(@Path('type') String type)
@@ -105,7 +111,9 @@ interface OpsmxAutopilotService {
                           @Query("sortBy") String sortBy,
                           @Query("sortOrder") String sortOrder,
                           @Query("applicationId") Integer applicationId,
-                          @Query("noOfDays") Integer noOfDays)
+                          @Query("noOfDays") Integer noOfDays,
+                          @Query("patternId") String patternId,
+                          @Query("search") String search)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
@@ -128,6 +136,31 @@ interface OpsmxAutopilotService {
                           @Path('source3') String source3,
                           @Path('source4') String source4,
                           @Query("time") String time)
+
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
+  Object getAutoResponse8(@Path('type') String type,
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Path('source4') String source4,
+                          @Path('source5') String source5,
+                          @Query("imageId") String imageId,
+                          @Query("canaryIds") String canaryIds,
+                          @Query("gateIds") String gateIds)
+
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}/{source8}")
+  Object getAutoResponse9(@Path('type') String type,
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Path('source4') String source4,
+                          @Path('source5') String source5,
+                          @Path('source6') String source6,
+                          @Path('source7') String source7,
+                          @Path('source8') String source8,
+                          @Query("imageId") String imageId)
 
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)

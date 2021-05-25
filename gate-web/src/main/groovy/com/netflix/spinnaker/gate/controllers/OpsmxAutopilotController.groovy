@@ -119,6 +119,28 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @GetMapping(value = "/canaries/patternCompleteLog", produces = "application/zip")
+  @ResponseBody Object downloadPatternCompleteLog(@RequestParam(value = "canaryId", required = false) Integer canaryId,
+                                                  @RequestParam(value = "serviceId", required = false) Integer serviceId,
+                                                  @RequestParam(value = "patternId", required = false) String patternId){
+
+    Response response = opsmxAutopilotService.downloadPatternCompleteLog(canaryId, serviceId, patternId)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte [] zipFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(zipFile)
+
+    } finally{
+      if (inputStream!=null){
+        inputStream.close()
+      }
+    }
+
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
   Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data) throws Exception {
 
@@ -204,12 +226,13 @@ class OpsmxAutopilotController {
                          @RequestParam(value = "pipelineId", required = false) String pipelineId,
                          @RequestParam(value = "referer", required = false) String referer,
                          @RequestParam(value = "testCaseId", required = false) Integer testCaseId,
-                         @RequestParam(value = "verificationType", required = false) String verificationType){
+                         @RequestParam(value = "verificationType", required = false) String verificationType,
+                         @RequestParam(value = "patternId", required = false) String patternId){
 
     return opsmxAutopilotService.getAutoResponse(type, source, id, applicationId, serviceId, startTime, endTime, intervalMins, limit, sourceType, datasourceType,
       accountName, templateType, name, appId, pipelineid, applicationName, username, userName, templateName, credentialType, canaryId, service, canary, canaryid, clusterId, version, canaryAnalysisId,
       metric,account,metricType,isBoxplotData,metricname,numofver,serviceName,platform,ruleId,zone,appType,metricTemplate,logTemplate,riskanalysis_id,service_id,
-      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId, verificationType)
+      userId,logTemplateName,forceDelete,deleteAssociateRuns, event, serviceList, pipelineId, referer, testCaseId, verificationType, patternId)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -226,9 +249,11 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "sortBy", required = false) String sortBy,
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
                           @RequestParam(value = "applicationId", required = false) Integer applicationId,
-                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                          @RequestParam(value = "patternId", required = false) String patternId,
+                          @RequestParam(value = "search", required = false) String search) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
@@ -263,6 +288,38 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "time", required = false) String time) {
 
     return opsmxAutopilotService.getAutoResponse7(type, source, source1, source2, source3, source4, time)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.GET)
+  Object getAutoResponse8(@PathVariable("type") String type,
+                          @PathVariable("source") String source,
+                          @PathVariable("source1") String source1,
+                          @PathVariable("source2") String source2,
+                          @PathVariable("source3") String source3,
+                          @PathVariable("source4") String source4,
+                          @PathVariable("source5") String source5,
+                          @RequestParam(value = "imageId", required = false) String imageId,
+                          @RequestParam(value = "canaryIds", required = false) String canaryIds,
+                          @RequestParam(value = "gateIds", required = false) String gateIds) {
+
+    return opsmxAutopilotService.getAutoResponse8(type, source, source1, source2, source3, source4, source5, imageId, canaryIds, gateIds)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}/{source8}", method = RequestMethod.GET)
+  Object getAutoResponse9(@PathVariable("type") String type,
+                          @PathVariable("source") String source,
+                          @PathVariable("source1") String source1,
+                          @PathVariable("source2") String source2,
+                          @PathVariable("source3") String source3,
+                          @PathVariable("source4") String source4,
+                          @PathVariable("source5") String source5,
+                          @PathVariable("source6") String source6,
+                          @PathVariable("source7") String source7,
+                          @PathVariable("source8") String source8,
+                          @RequestParam(value = "imageId", required = false) String imageId) {
+    return opsmxAutopilotService.getAutoResponse9(type, source, source1, source2, source3, source4, source5, source6, source7, source8, imageId)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
