@@ -25,7 +25,7 @@ RUN yum -y update
 
 #######Gate Dependencies#########
 ENV WORK_DIR=/opsmx/workdir
-ENV JAVA_HOME=/usr/lib/jvm/jre-1.11.0-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 COPY /docker_build/run.sh /usr/local/bin/run.sh
 RUN  chmod +x /usr/local/bin/run.sh
 COPY /docker_build/gate.yml /opt/spinnaker/config/
