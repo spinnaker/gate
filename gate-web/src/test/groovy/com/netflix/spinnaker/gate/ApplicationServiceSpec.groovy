@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate
 
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spinnaker.gate.config.Service
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.ApplicationService
