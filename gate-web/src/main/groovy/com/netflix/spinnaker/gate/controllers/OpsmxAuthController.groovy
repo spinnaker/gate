@@ -49,13 +49,13 @@ class OpsmxAuthController {
       return false
     }
 
-    log.info([
-      "validateDeckRedirect(${to})",
-      "toUrl(host: ${toURL.host}, port: ${toURL.port})",
-      "deckBaseUrl(host: ${deckBaseUrl.host}, port: ${deckBaseUrl.port})",
-      "redirectHostPattern(${redirectHostPattern?.pattern()})"
-    ].join(" - ")
-    )
+//    log.info([
+//      "validateDeckRedirect(${to})",
+//      "toUrl(host: ${toURL.host}, port: ${toURL.port})",
+//      "deckBaseUrl(host: ${deckBaseUrl.host}, port: ${deckBaseUrl.port})",
+//      "redirectHostPattern(${redirectHostPattern?.pattern()})"
+//    ].join(" - ")
+//    )
     return true
   }
 }
