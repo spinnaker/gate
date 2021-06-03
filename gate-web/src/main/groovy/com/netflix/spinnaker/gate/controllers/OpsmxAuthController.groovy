@@ -34,7 +34,7 @@ class OpsmxAuthController {
   @ApiOperation(value = "Redirect to Deck")
   @RequestMapping(value = "/redirectauto", method = RequestMethod.GET)
   void redirectAuto(HttpServletResponse response, @RequestParam String to) {
-
+    log.info("to url : {}", to)
     validAutoRedirect(to) ?
       response.sendRedirect(to) :
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Requested redirect address not recognized.")
@@ -49,7 +49,7 @@ class OpsmxAuthController {
       return false
     }
 
-    log.debug([
+    log.info([
       "validateDeckRedirect(${to})",
       "toUrl(host: ${toURL.host}, port: ${toURL.port})",
       "deckBaseUrl(host: ${deckBaseUrl.host}, port: ${deckBaseUrl.port})",

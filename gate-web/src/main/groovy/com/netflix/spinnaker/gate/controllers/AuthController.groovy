@@ -120,6 +120,7 @@ class AuthController {
   @ApiOperation(value = "Redirect to Deck")
   @RequestMapping(value = "/redirect", method = RequestMethod.GET)
   void redirect(HttpServletResponse response, @RequestParam String to) {
+    log.info("to url : {}", to)
     validDeckRedirect(to) ?
         response.sendRedirect(to) :
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Requested redirect address not recognized.")
@@ -134,7 +135,7 @@ class AuthController {
       return false
     }
 
-    log.debug([
+    log.info([
       "validateDeckRedirect(${to})",
       "toUrl(host: ${toURL.host}, port: ${toURL.port})",
       "deckBaseUrl(host: ${deckBaseUrl.host}, port: ${deckBaseUrl.port})",
