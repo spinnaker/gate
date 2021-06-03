@@ -219,6 +219,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
+  @ConditionalOnProperty("services.clouddriver.enabled")
   ClouddriverService clouddriverService(OkHttpClient okHttpClient) {
     createClient "clouddriver", ClouddriverService, okHttpClient
   }
