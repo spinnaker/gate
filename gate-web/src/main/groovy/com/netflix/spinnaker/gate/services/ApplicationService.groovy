@@ -25,6 +25,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import retrofit.RetrofitError
@@ -56,7 +57,7 @@ class ApplicationService {
 
   private AtomicReference<List<Map>> allApplicationsCache = new AtomicReference<>([])
 
-  //@Scheduled(fixedDelayString = '${services.front50.applicationRefreshIntervalMs:5000}')
+  @Scheduled(fixedDelayString = '${services.front50.applicationRefreshIntervalMs:5000}')
   void refreshApplicationsCache() {
     try {
       log.debug("Refreshing Application List")
