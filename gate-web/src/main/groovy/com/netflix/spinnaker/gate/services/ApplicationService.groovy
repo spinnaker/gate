@@ -93,6 +93,7 @@ class ApplicationService {
   }
 
   List<Map> getAllApplications() {
+    log.info("get All applications : {}", allApplicationsCache.get())
     return allApplicationsCache.get()
   }
 

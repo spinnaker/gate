@@ -67,6 +67,7 @@ class ApplicationController {
     @RequestParam(value = "account", required = false) String account,
     @ApiParam(name = "owner", required = false, value = "filters results to only include applications owned by the specified email")
     @RequestParam(value = "owner", required = false) String owner) {
+    log.info("get All applications : {}", applicationService.getAllApplications())
     return applicationService.getAllApplications()
       .findAll {
         if (!account) {
