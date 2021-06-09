@@ -19,7 +19,7 @@ package com.netflix.spinnaker.gate.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.gate.services.BuildService
 import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger
-import com.netflix.spinnaker.gate.services.internal.IgorService
+
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse

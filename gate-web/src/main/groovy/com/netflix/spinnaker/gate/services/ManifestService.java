@@ -27,6 +27,7 @@ import retrofit.RetrofitError;
 
 @Component
 public class ManifestService {
+  private static final String GROUP = "manifests";
 
   private final ClouddriverService clouddriverService;
 

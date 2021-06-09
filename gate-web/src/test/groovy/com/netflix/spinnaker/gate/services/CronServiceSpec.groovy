@@ -18,7 +18,7 @@ package com.netflix.spinnaker.gate.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
-import com.netflix.spinnaker.gate.services.internal.EchoService
+
 import retrofit.RetrofitError
 import retrofit.client.Response
 import retrofit.converter.GsonConverter

@@ -33,8 +33,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
 import org.springframework.stereotype.Component
@@ -67,11 +69,21 @@ class AuthConfig {
   @Autowired
   RequestMatcherProvider requestMatcherProvider
 
+  @Autowired
+  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+
+  @Autowired
+  private JwtRequestFilter jwtRequestFilter;
+
   @Value('${security.debug:false}')
   boolean securityDebug
 
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
+
+
+  @Value('${ldap.enabled:false}')
+  boolean ldapEnabled
 
   @Value('${security.webhooks.default-auth-enabled:false}')
   boolean webhookDefaultAuthEnabled
@@ -81,16 +93,36 @@ class AuthConfig {
     http
       .requestMatcher(requestMatcherProvider.requestMatcher())
       .authorizeRequests()
+        .antMatchers("/resources/**").permitAll()
+        .antMatchers("/images/**").permitAll()
+        .antMatchers("/js/**").permitAll()
+        .antMatchers("/fonts/**").permitAll()
+        .antMatchers("/css/**").permitAll()
         .antMatchers('/**/favicon.ico').permitAll()
         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .antMatchers(PermissionRevokingLogoutSuccessHandler.LOGGED_OUT_URL).permitAll()
         .antMatchers('/auth/user').permitAll()
+        .antMatchers(HttpMethod.POST,'/autopilot/registerCanary').permitAll()
+        .antMatchers(HttpMethod.GET,'/autopilot/api/v2/autopilot/canaries/{id}').permitAll()
+        .antMatchers(HttpMethod.GET,'/autopilot/api/v1/autopilot/canaries/{id}').permitAll()
+        .antMatchers(HttpMethod.POST,'/autopilot/api/v1/registerCanary').permitAll()
+        .antMatchers(HttpMethod.POST,'/autopilot/api/v2/registerCanary').permitAll()
+        .antMatchers(HttpMethod.POST,'/autopilot/api/v3/registerCanary').permitAll()
+        .antMatchers(HttpMethod.GET,'/autopilot/canaries/{id}').permitAll()
+        .antMatchers(HttpMethod.POST,'/visibilityservice/v1/approvalGates/{id}/trigger').permitAll()
+        .antMatchers(HttpMethod.POST,'/visibilityservice/v2/approvalGates/{id}/trigger').permitAll()
+        .antMatchers(HttpMethod.POST,'/visibilityservice/v4/approvalGates/{id}/trigger').permitAll()
+        .antMatchers(HttpMethod.GET,'/visibilityservice/v2/approvalGateInstances/{id}/status').permitAll()
+        .antMatchers(HttpMethod.GET,'/visibilityservice/v1/approvalGateInstances/{id}/status').permitAll()
+        .antMatchers(HttpMethod.POST,'/oes/echo').permitAll()
+        .antMatchers(HttpMethod.GET,'/autopilot/mgmt/**').permitAll()
         .antMatchers('/plugins/deck/**').permitAll()
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/managed/notifications/callbacks/**').permitAll()
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
+
     if (fiatSessionFilterEnabled) {
       Filter fiatSessionFilter = new FiatSessionFilter(
         fiatSessionFilterEnabled,
@@ -98,6 +130,11 @@ class AuthConfig {
         permissionEvaluator)
 
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
+    }
+
+
+    if (ldapEnabled) {
+      http.formLogin().loginPage("/login").permitAll()
     }
 
     if (webhookDefaultAuthEnabled) {
@@ -112,6 +149,42 @@ class AuthConfig {
       .csrf()
         .disable()
     // @formatter:on
+  }
+
+   void jwtconfigure(HttpSecurity http) throws Exception {
+    http
+      .csrf()
+      .disable()
+      .cors()
+      .disable()
+      .exceptionHandling()
+      .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+      .authorizeRequests()
+      .antMatchers("/auth/login").permitAll()
+      .antMatchers(HttpMethod.POST,'/autopilot/registerCanary').permitAll()
+      .antMatchers(HttpMethod.POST,'/autopilot/api/v1/registerCanary').permitAll()
+      .antMatchers(HttpMethod.POST,'/autopilot/api/v2/registerCanary').permitAll()
+      .antMatchers(HttpMethod.POST,'/autopilot/api/v3/registerCanary').permitAll()
+      .antMatchers(HttpMethod.GET,'/autopilot/canaries/{id}').permitAll()
+      .antMatchers(HttpMethod.GET,'/autopilot/api/v2/autopilot/canaries/{id}').permitAll()
+      .antMatchers(HttpMethod.GET,'/autopilot/api/v1/autopilot/canaries/{id}').permitAll()
+      .antMatchers(HttpMethod.POST,'/visibilityservice/v1/approvalGates/{id}/trigger').permitAll()
+      .antMatchers(HttpMethod.POST,'/visibilityservice/v2/approvalGates/{id}/trigger').permitAll()
+      .antMatchers(HttpMethod.POST,'/visibilityservice/v4/approvalGates/{id}/trigger').permitAll()
+      .antMatchers(HttpMethod.GET,'/visibilityservice/v2/approvalGateInstances/{id}/status').permitAll()
+      .antMatchers(HttpMethod.GET,'/visibilityservice/v1/approvalGateInstances/{id}/status').permitAll()
+      .antMatchers(HttpMethod.POST,'/oes/echo').permitAll()
+      .antMatchers(HttpMethod.GET,'/autopilot/mgmt/**').permitAll()
+      .antMatchers('/**/favicon.ico').permitAll()
+      .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+      .antMatchers(PermissionRevokingLogoutSuccessHandler.LOGGED_OUT_URL).permitAll()
+      .antMatchers('/plugins/deck/**').permitAll()
+      .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
+      .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
+      .antMatchers('/health').permitAll()
+      .anyRequest().authenticated()
+     http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   void configure(WebSecurity web) throws Exception {

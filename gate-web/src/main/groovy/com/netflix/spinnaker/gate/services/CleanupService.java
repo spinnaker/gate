@@ -26,6 +26,7 @@ import retrofit.RetrofitError;
 
 @Component
 public class CleanupService {
+  private static final String GROUP = "cleanup";
 
   @Autowired(required = false)
   SwabbieService swabbieService;

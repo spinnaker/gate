@@ -21,10 +21,11 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-
 @CompileStatic
 @Component
 class NetworkService {
+
+  private static final String GROUP = "networks"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector

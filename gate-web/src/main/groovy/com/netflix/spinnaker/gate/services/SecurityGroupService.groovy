@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component
 @CompileStatic
 @Component
 class SecurityGroupService {
+  private static final String GROUP = "security"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector

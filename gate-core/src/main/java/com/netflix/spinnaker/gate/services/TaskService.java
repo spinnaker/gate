@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class TaskService {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final String GROUP = "tasks";
 
   private OrcaServiceSelector orcaServiceSelector;
   private ClouddriverServiceSelector clouddriverServiceSelector;
@@ -85,7 +86,7 @@ public class TaskService {
   }
 
   public Map createAndWaitForCompletion(Map body, int maxPolls, int intervalMs) {
-    log.info("Creating and waiting for completion: " + body);
+    log.info("Creating and waiting for completion: " + String.valueOf(body));
 
     if (body.containsKey("application")) {
       AuthenticatedRequest.setApplication(body.get("application").toString());
@@ -93,7 +94,9 @@ public class TaskService {
 
     Map createResult = create(body);
     if (createResult.get("ref") == null) {
-      log.warn("No ref field found in create result, returning entire result: " + createResult);
+      log.warn(
+          "No ref field found in create result, returning entire result: "
+              + String.valueOf(createResult));
       return createResult;
     }
 
@@ -110,7 +113,7 @@ public class TaskService {
       }
 
       task = getTask(taskId);
-      if (new ArrayList<>(Arrays.asList("SUCCEEDED", "TERMINAL"))
+      if (new ArrayList<String>(Arrays.asList("SUCCEEDED", "TERMINAL"))
           .contains((String) task.get("status"))) {
         return task;
       }

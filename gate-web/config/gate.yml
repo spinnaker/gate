@@ -99,7 +99,7 @@ swagger:
     - .*projects.*
     - .*functions.*
     - .*managed.*
-    - .*plugins.*
+    - .*oes.*
 
 integrations:
   gremlin:

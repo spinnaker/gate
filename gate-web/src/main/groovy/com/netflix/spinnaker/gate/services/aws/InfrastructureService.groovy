@@ -21,9 +21,13 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import java.util.concurrent.Callable
+
 @CompileStatic
 @Component
 class InfrastructureService {
+
+  private static final String GROUP = "infrastructure"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector

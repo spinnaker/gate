@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.jakewharton.retrofit.Ok3Client
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
@@ -38,6 +40,7 @@ import com.netflix.spinnaker.gate.filters.RequestSheddingFilter
 import com.netflix.spinnaker.gate.filters.ResetAuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
+import com.netflix.spinnaker.gate.retrofit.Slf4jRetrofitLogger
 import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.client.ServiceClientProvider
@@ -51,6 +54,7 @@ import com.netflix.spinnaker.okhttp.OkHttp3MetricsInterceptor
 import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -67,12 +71,16 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
 import org.springframework.session.data.redis.config.ConfigureRedisAction
 import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
+import org.springframework.stereotype.Component
 import org.springframework.util.CollectionUtils
 import org.springframework.web.client.RestTemplate
 import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
-
+import retrofit.RequestInterceptor
+import retrofit.RestAdapter
+import retrofit.converter.JacksonConverter
 import javax.servlet.*
+import javax.servlet.Filter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -91,6 +99,11 @@ class GateConfig extends RedisHttpSessionConfiguration {
   void setSessionTimeout(int maxInactiveIntervalInSeconds) {
     super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
   }
+
+  @Value('${retrofit.logLevel:BASIC}')
+  String retrofitLogLevel
+  @Autowired
+  RequestInterceptor spinnakerRequestInterceptor
 
   @Autowired
   void setServiceClientProvider(ServiceClientProvider serviceClientProvider) {
@@ -175,50 +188,88 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  OrcaServiceSelector orcaServiceSelector(RequestContextProvider contextProvider) {
-    return new OrcaServiceSelector(createClientSelector("orca", OrcaService), contextProvider)
+  OrcaServiceSelector orcaServiceSelector(OkHttpClient okHttpClient, RequestContextProvider contextProvider) {
+    return new OrcaServiceSelector(createClientSelector("orca", OrcaService, okHttpClient), contextProvider)
   }
 
   @Bean
   @Primary
-  FiatService fiatService() {
+  FiatService fiatService(OkHttpClient okHttpClient) {
     // always create the fiat service even if 'services.fiat.enabled' is 'false' (it can be enabled dynamically)
-    createClient "fiat", FiatService, null, true
+    createClient "fiat", FiatService, okHttpClient, null, true
   }
 
   @Bean
-  ExtendedFiatService extendedFiatService() {
+  ExtendedFiatService extendedFiatService(OkHttpClient okHttpClient) {
     // always create the fiat service even if 'services.fiat.enabled' is 'false' (it can be enabled dynamically)
-    createClient "fiat", ExtendedFiatService,  null, true
+    createClient "fiat", ExtendedFiatService, okHttpClient, null, true
   }
 
   @Bean
   @ConditionalOnProperty("services.fiat.config.dynamic-endpoints.login")
-  FiatService fiatLoginService() {
+  FiatService fiatLoginService(OkHttpClient okHttpClient) {
     // always create the fiat service even if 'services.fiat.enabled' is 'false' (it can be enabled dynamically)
-    createClient "fiat", FiatService,  "login", true
+    createClient "fiat", FiatService, okHttpClient, "login", true
   }
 
 
   @Bean
-  Front50Service front50Service() {
-    createClient "front50", Front50Service
+  Front50Service front50Service(OkHttpClient okHttpClient) {
+    createClient "front50", Front50Service, okHttpClient
   }
 
   @Bean
-  ClouddriverService clouddriverService() {
-    createClient "clouddriver", ClouddriverService
+  ClouddriverService clouddriverService(OkHttpClient okHttpClient) {
+    createClient "clouddriver", ClouddriverService, okHttpClient
+  }
+
+    @Bean
+    @ConditionalOnProperty("services.keel.enabled")
+    KeelService keelService(OkHttpClient okHttpClient) {
+      createClient "keel", KeelService, okHttpClient
+    }
+
+  @Bean
+  @ConditionalOnProperty("services.opsmx.enabled")
+  OpsmxOesService opsmxOesService(OkHttpClient okHttpClient) {
+    createClient "opsmx", OpsmxOesService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.autopilot.enabled")
+  OpsmxAutopilotService opsmxAutopilotService(OkHttpClient okHttpClient) {
+    createClient "autopilot", OpsmxAutopilotService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.platform.enabled")
+  OpsmxPlatformService opsmxPlatformService(OkHttpClient okHttpClient) {
+    createClient "platform", OpsmxPlatformService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.dashboard.enabled")
+  OpsmxDashboardService opsmxDashboardService(OkHttpClient okHttpClient) {
+    createClient "dashboard", OpsmxDashboardService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.visibility.enabled")
+  OpsmxVisibilityService opsmxVisibilityService(OkHttpClient okHttpClient) {
+    createClient "visibility", OpsmxVisibilityService, okHttpClient
   }
 
   @Bean
   @ConditionalOnProperty("services.keel.enabled")
-  KeelService keelService(OkHttpClientProvider clientProvider) {
-    createClient "keel", KeelService
+  KeelService keelService(OkHttpClientProvider clientProvider, OkHttpClient okHttpClient) {
+    createClient "keel", KeelService, okHttpClient
   }
 
   @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
+                                                        OkHttpClient okHttpClient,
                                                         DynamicConfigService dynamicConfigService,
+                                                        DynamicRoutingConfigProperties properties,
                                                         RequestContextProvider contextProvider
   ) {
     if (serviceConfiguration.getService("clouddriver").getConfig().containsKey("dynamicEndpoints")) {
@@ -241,7 +292,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
       List<ServiceSelector> selectors = []
       endpoints.each { sourceApp, url ->
-        def service = buildService("clouddriver",  ClouddriverService, newFixedEndpoint(url))
+        def service = buildService(okHttpClient,  ClouddriverService, newFixedEndpoint(url))
         selectors << new ByUserOriginSelector(service, 2, ['origin': (Object) sourceApp])
       }
 
@@ -249,22 +300,22 @@ class GateConfig extends RedisHttpSessionConfiguration {
         new SelectableService(selectors + defaultSelector), dynamicConfigService, contextProvider)
     }
 
-    SelectableService selectableService = createClientSelector("clouddriver", ClouddriverService)
+    SelectableService selectableService = createClientSelector("clouddriver", ClouddriverService, okHttpClient)
     return new ClouddriverServiceSelector(selectableService, dynamicConfigService, contextProvider)
   }
 
   //---- semi-optional components:
   @Bean
   @ConditionalOnProperty('services.rosco.enabled')
-  RoscoService roscoService() {
-    createClient "rosco", RoscoService
+  RoscoService roscoService(OkHttpClient okHttpClient) {
+    createClient "rosco", RoscoService, okHttpClient
   }
 
   @Bean
   @ConditionalOnProperty('services.rosco.enabled')
-  RoscoServiceSelector roscoServiceSelector(RoscoService defaultService) {
+  RoscoServiceSelector roscoServiceSelector(OkHttpClient okHttpClient, RoscoService defaultService) {
     return new RoscoServiceSelector(
-      createClientSelector("rosco", RoscoService),
+      createClientSelector("rosco", RoscoService, okHttpClient),
       defaultService
     )
   }
@@ -272,31 +323,32 @@ class GateConfig extends RedisHttpSessionConfiguration {
   //---- optional backend components:
   @Bean
   @ConditionalOnProperty('services.echo.enabled')
-  EchoService echoService() {
-    createClient "echo", EchoService
+  EchoService echoService(OkHttpClient okHttpClient) {
+    createClient "echo", EchoService, okHttpClient
   }
 
   @Bean
   @ConditionalOnProperty('services.igor.enabled')
-  IgorService igorService() {
-    createClient "igor", IgorService
+  IgorService igorService(OkHttpClient okHttpClient) {
+    createClient "igor", IgorService, okHttpClient
   }
 
   @Bean
   @ConditionalOnProperty('services.mine.enabled')
-  MineService mineService() {
-    createClient "mine", MineService
+  MineService mineService(OkHttpClient okHttpClient) {
+    createClient "mine", MineService, okHttpClient
   }
 
-  @Bean
-  @ConditionalOnProperty("services.keel.enabled")
-  KeelService keelService() {
-    createClient "keel", KeelService
-  }
+//  @Bean
+//  @ConditionalOnProperty("services.keel.enabled")
+//  KeelService keelService(OkHttpClient okHttpClient) {
+//    createClient "keel", KeelService, okHttpClient
+//  }
 
   @Bean
   @ConditionalOnProperty('services.kayenta.enabled')
-  KayentaService kayentaService(OkHttpClientConfigurationProperties props,
+  KayentaService kayentaService(OkHttpClient defaultClient,
+                                OkHttpClientConfigurationProperties props,
                                 OkHttp3MetricsInterceptor interceptor,
                                 @Value('${services.kayenta.externalhttps:false}') boolean kayentaExternalHttps) {
     if (kayentaExternalHttps) {
@@ -304,20 +356,21 @@ class GateConfig extends RedisHttpSessionConfiguration {
       noSslCustomizationProps.keyStore = null
       noSslCustomizationProps.trustStore = null
       def okHttpClient = new OkHttp3ClientConfiguration(noSslCustomizationProps, interceptor).create().build()
-      createClient "kayenta", KayentaService
+      createClient "kayenta", KayentaService, okHttpClient
     } else {
-      createClient "kayenta", KayentaService
+      createClient "kayenta", KayentaService, defaultClient
     }
   }
 
   @Bean
   @ConditionalOnProperty('services.swabbie.enabled')
-  SwabbieService swabbieService() {
-    createClient("swabbie", SwabbieService)
+  SwabbieService swabbieService(OkHttpClient okHttpClient) {
+    createClient("swabbie", SwabbieService, okHttpClient)
   }
 
   private <T> T createClient(String serviceName,
                              Class<T> type,
+                             OkHttpClient okHttpClient,
                              String dynamicName = null,
                              boolean forceEnabled = false) {
     Service service = serviceConfiguration.getService(serviceName)
@@ -331,21 +384,30 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
     Endpoint endpoint = serviceConfiguration.getServiceEndpoint(serviceName, dynamicName)
 
-    buildService(serviceName, type, endpoint)
+    buildService(okHttpClient, type, endpoint)
   }
 
-  private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
+  private <T> T buildService(OkHttpClient client, Class<T> type, Endpoint endpoint) {
     // New role providers break deserialization if this is not enabled.
     ObjectMapper objectMapper = new ObjectMapper()
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .registerModule(new JavaTimeModule())
 
-    serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
+    //serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
+    new RestAdapter.Builder()
+      .setRequestInterceptor(spinnakerRequestInterceptor)
+      .setEndpoint(endpoint)
+      .setClient(new Ok3Client(client))
+      .setConverter(new JacksonConverter(objectMapper))
+      .setLogLevel(RestAdapter.LogLevel.valueOf(retrofitLogLevel))
+      .setLog(new Slf4jRetrofitLogger(type))
+      .build()
+      .create(type)
 
   }
 
-  private <T> SelectableService createClientSelector(String serviceName, Class<T> type) {
+  private <T> SelectableService createClientSelector(String serviceName, Class<T> type, OkHttpClient okHttpClient) {
     Service service = serviceConfiguration.getService(serviceName)
     if (CollectionUtils.isEmpty(service?.getBaseUrls())) {
       throw new IllegalArgumentException("Unknown service ${serviceName} requested of type ${type}")
@@ -355,7 +417,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       service.getBaseUrls().collect {
         def selector = new DefaultServiceSelector(
           buildService(
-            serviceName,
+            okHttpClient,
             type,
             newFixedEndpoint(it.baseUrl)),
           it.priority,
@@ -446,4 +508,15 @@ class GateConfig extends RedisHttpSessionConfiguration {
                                                   FiatClientConfigurationProperties fiatClientConfigurationProperties) {
     return new FiatPermissionEvaluator(registry, fiatService, fiatClientConfigurationProperties, fiatStatus)
   }
+    @Component
+    static class HystrixFilter implements Filter {
+      @Override
+      void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+        HystrixRequestContext.initializeContext()
+        chain.doFilter(request, response)
+      }
+      void init(FilterConfig filterConfig) throws ServletException {}
+      void destroy() {}
+    }
 }

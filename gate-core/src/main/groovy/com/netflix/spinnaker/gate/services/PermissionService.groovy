@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services
 
-
 import com.netflix.spinnaker.fiat.model.UserPermission
 import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
@@ -33,6 +32,8 @@ import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import retrofit.RetrofitError
@@ -44,7 +45,10 @@ import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyErr
 
 @Slf4j
 @Component
+@EnableFeignClients
 class PermissionService {
+
+  static final String HYSTRIX_GROUP = "permission"
 
   @Autowired
   FiatService fiatService
@@ -69,7 +73,7 @@ class PermissionService {
     return fiatStatus.isEnabled()
   }
 
-  private FiatService getFiatServiceForLogin() {
+  FiatService getFiatServiceForLogin() {
     return fiatLoginService.orElse(fiatService);
   }
 
@@ -132,7 +136,8 @@ class PermissionService {
   }
 
   //VisibleForTesting
-  @PackageScope List<UserPermission.View> lookupServiceAccounts(String userId) {
+  @PackageScope
+  List<UserPermission.View> lookupServiceAccounts(String userId) {
     try {
       return extendedFiatService.getUserServiceAccounts(userId)
     } catch (RetrofitError re) {
@@ -187,12 +192,14 @@ class PermissionService {
       return []
     }
 
-    try {
-      UserPermission.View view = permissionEvaluator.getPermission(user.username)
-      return view.getServiceAccounts().collect { it.name }
-    } catch (RetrofitError re) {
-      throw classifyError(re)
-    }
+    return HystrixFactory.newListCommand(HYSTRIX_GROUP, "getServiceAccounts") {
+      try {
+        UserPermission.View view = permissionEvaluator.getPermission(user.username)
+        return view.getServiceAccounts().collect { it.name }
+      } catch (RetrofitError re) {
+        throw classifyError(re)
+      }
+    }.execute() as List<String>
   }
 
   boolean isAdmin(String userId) {

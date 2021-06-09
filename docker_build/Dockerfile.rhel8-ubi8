@@ -1,0 +1,42 @@
+FROM registry.access.redhat.com/ubi8/ubi:latest
+MAINTAINER OpsMx
+
+# Disable old version and uninstalling 
+RUN dnf module disable nginx php -y
+RUN dnf remove nginx* -y
+
+####### Copy nginx configuration #########
+COPY /docker_build/nginx.repo /etc/yum.repos.d/nginx.repo
+
+# Add user opsmx and create logs and spinnaker config directory
+RUN adduser opsmx \
+    && usermod -aG wheel opsmx \
+    && mkdir -p /opsmx/workdir/logs \
+    && mkdir -p /opt/spinnaker/config
+
+# Install procps(ps)
+RUN yum install -y procps nginx net-tools
+# Install java 11 
+RUN yum -y install java-11-openjdk-headless.x86_64
+# Install ping
+RUN yum install -y iputils
+
+RUN yum -y update
+
+#######Gate Dependencies#########
+ENV WORK_DIR=/opsmx/workdir
+ENV JAVA_HOME=/usr/lib/jvm/jre-11-openjdk
+COPY /docker_build/run.sh /usr/local/bin/run.sh
+RUN  chmod +x /usr/local/bin/run.sh
+COPY /docker_build/gate.yml /opt/spinnaker/config/
+COPY /docker_build/startup.sh /opsmx/workdir/
+RUN  chmod +x /opsmx/workdir/startup.sh
+
+# === Copy Gate Build Files ===
+COPY /gate-web/build/install/gate  /opsmx/workdir/gate
+RUN chown -R opsmx:root ${WORK_DIR}/* /opt/* && chmod 777 /opt/* ${WORK_DIR}/*
+
+# === Start Gate Service ===
+USER opsmx
+WORKDIR ${WORK_DIR}
+CMD ["run.sh"]

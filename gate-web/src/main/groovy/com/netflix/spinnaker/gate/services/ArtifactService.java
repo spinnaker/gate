@@ -32,6 +32,7 @@ import retrofit.client.Response;
 @CompileStatic
 @Component
 public class ArtifactService {
+  private static final String GROUP = "artifacts";
 
   private ClouddriverServiceSelector clouddriverServiceSelector;
   private Optional<IgorService> igorService;

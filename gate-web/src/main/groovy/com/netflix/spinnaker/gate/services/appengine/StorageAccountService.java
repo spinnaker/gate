@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Deprecated
 public class StorageAccountService {
 
+  private static final String GROUP = "storageAccount";
+
   @Autowired private ClouddriverServiceSelector clouddriverServiceSelector;
 
   public List<String> getAppengineStorageAccounts(String selectorKey) {

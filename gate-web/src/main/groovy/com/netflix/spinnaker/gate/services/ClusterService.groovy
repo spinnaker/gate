@@ -29,6 +29,7 @@ import retrofit.RetrofitError
 @CompileStatic
 @Component
 class ClusterService {
+  private static final String GROUP = "clusters"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component
 @CompileStatic
 @Component
 class InstanceService {
+  private static final String GROUP = "instances"
 
   @Autowired
   ClouddriverServiceSelector clouddriverServiceSelector
@@ -54,7 +55,7 @@ class InstanceService {
     }
     def context = getContext(account, region, instanceId) + instanceContext + accountDetails + ["application": application]
     return instanceDetails + [
-        "insightActions": insightConfiguration.instance.findResults { it.applyContext(context) }
+      "insightActions": insightConfiguration.instance.findResults { it.applyContext(context) }
     ]
   }
 

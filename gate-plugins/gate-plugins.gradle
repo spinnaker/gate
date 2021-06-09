@@ -22,10 +22,21 @@ dependencies {
   implementation project(":gate-core")
 
   implementation "com.google.guava:guava"
+  //OES-GATE changes start
+  //implementation "com.netflix.spinnaker.fiat:fiat-core:$fiatVersion"
+  //implementation "com.netflix.spinnaker.fiat:fiat-api:$fiatVersion"
+
+  //implementation "com.netflix.spinnaker.kork:kork-plugins"
+  //implementation "com.netflix.spinnaker.kork:kork-swagger"
+  //implementation "com.netflix.spinnaker.kork:kork-web"
+  //OES-GATE changes end
+
+  //Spinnaker changes start
   implementation "io.spinnaker.fiat:fiat-core:$fiatVersion"
   implementation "io.spinnaker.fiat:fiat-api:$fiatVersion"
   implementation "io.spinnaker.kork:kork-plugins"
   implementation "io.spinnaker.kork:kork-web"
+  //Spinnaker changes end
 
   implementation "io.swagger:swagger-annotations"
 

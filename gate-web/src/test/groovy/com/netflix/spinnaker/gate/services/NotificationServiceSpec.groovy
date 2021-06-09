@@ -19,7 +19,7 @@ package com.netflix.spinnaker.gate.services
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
-import com.netflix.spinnaker.gate.services.internal.EchoService
+
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import okhttp3.Call
 import okhttp3.MediaType

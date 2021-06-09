@@ -16,13 +16,11 @@
 
 package com.netflix.spinnaker.gate.controllers
 
-import com.netflix.spinnaker.gate.services.internal.EchoService
+
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import com.netflix.spinnaker.gate.services.WebhookService
 import com.squareup.okhttp.mockwebserver.MockWebServer
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.util.NestedServletException
@@ -30,7 +28,6 @@ import retrofit.RestAdapter
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import retrofit.client.OkClient
-import retrofit.http.*
 import spock.lang.Specification
 
 class WebhooksControllerSpec extends Specification {

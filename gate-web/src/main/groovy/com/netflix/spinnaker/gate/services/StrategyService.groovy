@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.gate.services.internal.Front50Service
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component
 @Component
 @Slf4j
 class StrategyService {
+  private static final String GROUP = "strategies"
 
   @Autowired(required = false)
   Front50Service front50Service
