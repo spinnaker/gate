@@ -21,19 +21,31 @@ dependencies {
   api "org.springframework.boot:spring-boot-starter-thymeleaf"
   api "com.squareup.retrofit:retrofit"
 
+  //Spinnaker GATE change start
+  implementation "io.spinnaker.kork:kork-plugins"
+  //Spinnaker GATE change end
+
   implementation "com.jakewharton.retrofit:retrofit1-okhttp3-client:1.1.0"
   implementation "com.squareup.retrofit:converter-jackson"
   implementation "com.squareup.okhttp:okhttp"
   implementation "com.squareup.okhttp:okhttp-urlconnection"
   implementation "com.squareup.okhttp:okhttp-apache"
 
-  implementation "com.netflix.spinnaker.fiat:fiat-api:$fiatVersion"
-  implementation "com.netflix.spinnaker.fiat:fiat-core:$fiatVersion"
+  implementation "io.spinnaker.fiat:fiat-api:$fiatVersion"
+  implementation "io.spinnaker.fiat:fiat-core:$fiatVersion"
 
-  implementation "com.netflix.spinnaker.kork:kork-plugins"
-  implementation "com.netflix.spinnaker.kork:kork-core"
-  implementation "com.netflix.spinnaker.kork:kork-web"
-  implementation "com.netflix.spinnaker.kork:kork-security"
+  //OES-GATE changes start
+  //implementation "com.netflix.spinnaker.kork:kork-core"
+  //implementation "com.netflix.spinnaker.kork:kork-web"
+  //implementation "com.netflix.spinnaker.kork:kork-security"
+  //OES-GATE changes end
+
+  //Spinnaker GATE changes start
+  implementation "io.spinnaker.kork:kork-core"
+  implementation "io.spinnaker.kork:kork-web"
+  implementation "io.spinnaker.kork:kork-security"
+  //Spinnaker GATE changes end
+
   implementation "com.netflix.spectator:spectator-api"
   implementation "com.github.ben-manes.caffeine:guava"
   implementation "org.apache.commons:commons-lang3"

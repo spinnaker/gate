@@ -81,8 +81,12 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
+
   @Value('${ldap.enabled:false}')
   boolean ldapEnabled
+
+  @Value('${security.webhooks.default-auth-enabled:false}')
+  boolean webhookDefaultAuthEnabled
 
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
@@ -128,8 +132,13 @@ class AuthConfig {
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
     }
 
-    if (ldapEnabled){
+
+    if (ldapEnabled) {
       http.formLogin().loginPage("/login").permitAll()
+    }
+
+    if (webhookDefaultAuthEnabled) {
+      http.authorizeRequests().antMatchers(HttpMethod.POST, '/webhooks/**').authenticated()
     }
 
     http.logout()
