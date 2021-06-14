@@ -91,7 +91,7 @@ class PipelineController {
         if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
           String exception = "delete pipeline exception"//result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
           throw new PipelineException(
-            exception ?: "Pipeline delete operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})"
+            "Pipeline delete failed"
           )
         }
 
