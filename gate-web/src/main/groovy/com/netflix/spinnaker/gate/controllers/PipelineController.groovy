@@ -65,13 +65,11 @@ class PipelineController {
   @ApiOperation(value = "Delete a pipeline definition")
   @DeleteMapping("/{application}/{pipelineName:.+}")
   void deletePipeline(@PathVariable String application, @PathVariable String pipelineName) {
-    //pipelineService.deleteForApplication(application, pipelineName)
     List<Map> pipelineConfigs = front50Service.getPipelineConfigsForApplication(application, true)
     if (pipelineConfigs!=null && !pipelineConfigs.isEmpty()){
       Optional<Map> filterResult = pipelineConfigs.stream().filter({ pipeline -> ((String) pipeline.get("name")) != null && ((String) pipeline.get("name")).trim().equalsIgnoreCase(pipelineName) }).findFirst()
       if (filterResult.isPresent()){
         Map pipeline = filterResult.get()
-
 
         def operation = [
           description: (String) "Delete pipeline '${pipeline.get("name") ?: 'Unknown'}'",
@@ -94,9 +92,6 @@ class PipelineController {
             "Pipeline delete failed"
           )
         }
-
-
-
       }
     }
   }
