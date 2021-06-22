@@ -62,6 +62,7 @@ class PipelineController {
   @Autowired
   ObjectMapper objectMapper
 
+  @CompileDynamic
   @ApiOperation(value = "Delete a pipeline definition")
   @DeleteMapping("/{application}/{pipelineName:.+}")
   void deletePipeline(@PathVariable String application, @PathVariable String pipelineName) {
@@ -87,9 +88,9 @@ class PipelineController {
         String resultStatus = result.get("status")
 
         if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
-          String exception = "delete pipeline exception"//result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
+          String exception = result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
           throw new PipelineException(
-            "Pipeline delete failed"
+            exception ?: "Pipeline delete operation did not succeed: ${result.get("id", "unknown task id")} (status: ${resultStatus})"
           )
         }
       }
