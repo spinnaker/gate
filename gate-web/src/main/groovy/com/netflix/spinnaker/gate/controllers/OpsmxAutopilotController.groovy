@@ -251,9 +251,10 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "applicationId", required = false) Integer applicationId,
                           @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
                           @RequestParam(value = "patternId", required = false) String patternId,
-                          @RequestParam(value = "search", required = false) String search) {
+                          @RequestParam(value = "search", required = false) String search,
+                          @RequestParam(value = "verificationType", required = false) String verificationType) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search)
+    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search,verificationType)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
