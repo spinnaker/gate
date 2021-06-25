@@ -104,6 +104,19 @@ class OpsmxPlatformController {
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.GET)
+  Object getPlatformResponse7(@PathVariable("version") String version,
+                              @PathVariable("type") String type,
+                              @PathVariable("source") String source,
+                              @PathVariable("source1") String source1,
+                              @PathVariable("source2") String source2,
+                              @PathVariable("source3") String source3,
+                              @PathVariable("source4") String source4) {
+
+    return opsmxPlatformService.getPlatformResponse7(version, type, source, source1, source2, source3, source4)
+  }
+
+  @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.DELETE)
   Object deletePlatformResponse(@PathVariable("version") String version,
                                 @PathVariable("type") String type,
@@ -225,5 +238,19 @@ class OpsmxPlatformController {
                                  @RequestBody(required = false) Object data) {
 
     return opsmxPlatformService.updatePlatformResponse3(version, type, source, source1, source2, data)
+  }
+
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.PUT)
+  Object updatePlatformResponse4(@PathVariable("version") String version,
+                              @PathVariable("type") String type,
+                              @PathVariable("source") String source,
+                              @PathVariable("source1") String source1,
+                              @PathVariable("source2") String source2,
+                              @PathVariable("source3") String source3,
+                              @PathVariable("source4") String source4,
+                                 @RequestBody(required = false) Object data) {
+
+    return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, data)
   }
 }
