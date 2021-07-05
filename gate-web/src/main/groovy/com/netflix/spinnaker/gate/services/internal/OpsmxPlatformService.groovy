@@ -36,10 +36,11 @@ interface OpsmxPlatformService {
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}")
   Object getPlatformResponse4(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Query("permissionId") String permissionId)
+                              @Path('type') String type,
+                              @Path('source') String source,
+                              @Path('source1') String source1,
+                              @Query("datasourceType") String datasourceType,
+                              @Query("permissionId") String permissionId)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getPlatformResponse5(@Path('version') String version,

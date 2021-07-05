@@ -61,6 +61,7 @@ interface OpsmxOesService {
                          @Path('source1') String source1,
                          @Path('source2') String source2,
                          @Path('source3') String source3,
+                         @Query("permissionId") String permissionId,
                          @Query("noOfDays") Integer noOfDays)
 
   @GET("/oes/{type}/{source}/{source1}/{source2}/{source3}/{source4}")

@@ -108,9 +108,10 @@ class OpsmxOesController {
                          @PathVariable("source1") String source1,
                          @PathVariable("source2") String source2,
                          @PathVariable("source3") String source3,
+                         @RequestParam(value = "permissionId", required = false) String permissionId,
                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxOesService.getOesResponse6(type, source, source1, source2, source3, noOfDays)
+    return opsmxOesService.getOesResponse6(type, source, source1, source2, source3,permissionId,noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
@@ -278,7 +279,7 @@ class OpsmxOesController {
     String filename = files ? files.getOriginalFilename() : ''
     return addOrUpdateSpinnakerCloudProverAccount(files, postData.get("postData"))
   }
-  
+
   @ApiOperation(value = "Add or Update V1 Spinnaker x509")
   @RequestMapping(value = "/accountsConfig/v1/spinnakerX509", method = RequestMethod.POST)
   Object addOrUpdateSpinnakerSetupV1(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
@@ -326,7 +327,7 @@ class OpsmxOesController {
       return response.body()?.string() ?: "Unknown reason: " + response.code()
     }.call() as Object
   }
-  
+
   private Object addOrUpdateSpinnakerV1(MultipartFile files, String data) {
 	  Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
 	  Map headersMap = new HashMap()
@@ -342,7 +343,7 @@ class OpsmxOesController {
 		  .headers(Headers.of(headersMap))
 		  .post(uploadFileOkHttp(data,files))
 		  .build()
-  
+
 		def response = okHttpClient.newCall(request).execute()
 		return response.body()?.string() ?: "Unknown reason: " + response.code()
 	  }.call() as Object
