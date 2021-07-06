@@ -262,9 +262,10 @@ class OpsmxAutopilotController {
   Object getAutoResponse5(@PathVariable("type") String type,
                          @PathVariable("source") String source,
                          @PathVariable("source1") String source1,
-                         @PathVariable("source2") String source2) {
+                         @PathVariable("source2") String source2,
+                         @RequestParam(value = "canaryId", required = false) Integer canaryId) {
 
-    return opsmxAutopilotService.getAutoResponse5(type, source, source1, source2)
+    return opsmxAutopilotService.getAutoResponse5(type, source, source1, source2,canaryId)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
