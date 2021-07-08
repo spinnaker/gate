@@ -53,7 +53,9 @@ interface OpsmxOesService {
   Object getOesResponse5(@Path('type') String type,
                          @Path('source') String source,
                          @Path('source1') String source1,
-                         @Path('source2') String source2)
+                         @Path('source2') String source2,
+                         @Query("isTreeView") boolean isTreeView,
+                         @Query("isLatest") boolean isLatest)
 
   @GET("/oes/{type}/{source}/{source1}/{source2}/{source3}")
   Object getOesResponse6(@Path('type') String type,
