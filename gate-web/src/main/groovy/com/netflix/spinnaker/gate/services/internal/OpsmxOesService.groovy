@@ -89,7 +89,8 @@ interface OpsmxOesService {
   Object deleteOesResponse5(@Path('type') String type,
                             @Path('source') String source,
                             @Path('source1') String source1,
-                            @Path('source2') String source2)
+                            @Path('source2') String source2,
+                            @Query("accountId") Integer accountId)
 
   @DELETE("/oes/{type}/{source}/{source1}/{source2}/{source3}")
   Object deleteOesResponse6(@Path('type') String type,
