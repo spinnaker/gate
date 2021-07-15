@@ -40,7 +40,10 @@ interface OpsmxVisibilityService {
                              @Path('source') String source,
                                @Query("source1") String source1,
                                @Query("approvalGateInstances") List<Integer> approvalgateinstances,
-                               @Query("approvalGateInstanceIds") List<Integer> approvalGateInstanceIds)
+                               @Query("approvalGateInstanceIds") List<Integer> approvalGateInstanceIds,
+                               @Query("noOfDays") String noOfDays,
+                               @Query("pageNo") Integer pageNo,
+                               @Query("pageLimit") Integer pageLimit)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,
@@ -49,7 +52,8 @@ interface OpsmxVisibilityService {
                               @Path('source1') String source1,
                               @Query("status") String status,
                                 @Query("images") String images,
-                                @Query("executionId") String executionId)
+                                @Query("executionId") String executionId,
+                                @Query("noOfDays") String noOfDays)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getVisibilityResponse5(@Path('version') String version,

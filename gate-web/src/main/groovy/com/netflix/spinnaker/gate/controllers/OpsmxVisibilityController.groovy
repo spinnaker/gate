@@ -101,8 +101,11 @@ class OpsmxVisibilityController {
                                @PathVariable("source") String source,
                                @RequestParam(value = "source1", required = false) String source1,
                                @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances,
-                               @RequestParam(value = "approvalGateInstanceIds", required = false) List<Integer> approvalGateInstanceIds) {
-    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds)
+                               @RequestParam(value = "approvalGateInstanceIds", required = false) List<Integer> approvalGateInstanceIds,
+                               @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                               @RequestParam(value = "pageLimit", required = false) Integer pageLimit){
+    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds, noOfDays, pageNo, pageLimit)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -113,9 +116,10 @@ class OpsmxVisibilityController {
                               @PathVariable("source1") String source1,
                               @RequestParam(value = "status", required = false) String status,
                                 @RequestParam(value = "images", required = false) String images,
-                                @RequestParam(value = "executionId", required = false) String executionId) {
+                                @RequestParam(value = "executionId", required = false) String executionId,
+                                @RequestParam(value = "noOfDays", required = false) String noOfDays ) {
 
-    return opsmxVisibilityService.getVisibilityResponse4(version, type, source, source1, status, images, executionId)
+    return opsmxVisibilityService.getVisibilityResponse4(version, type, source, source1, status, images, executionId, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
