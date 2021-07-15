@@ -43,7 +43,8 @@ interface OpsmxVisibilityService {
                                @Query("approvalGateInstanceIds") List<Integer> approvalGateInstanceIds,
                                @Query("noOfDays") String noOfDays,
                                @Query("pageNo") Integer pageNo,
-                               @Query("pageLimit") Integer pageLimit)
+                               @Query("pageLimit") Integer pageLimit,
+                               @Query("search") String search)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,
