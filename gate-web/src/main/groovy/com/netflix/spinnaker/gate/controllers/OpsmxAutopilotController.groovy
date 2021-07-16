@@ -142,9 +142,10 @@ class OpsmxAutopilotController {
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
-  Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data) throws Exception {
+  Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data,
+                               @RequestHeader(value = "x-spinnaker-user",required = false) String xSpinnakerUser) throws Exception {
 
-    Response response = opsmxAutopilotService.triggerRegisterCanary(version, data)
+    Response response = opsmxAutopilotService.triggerRegisterCanary(version, data,xSpinnakerUser)
     InputStream inputStream = null
 
     try {
