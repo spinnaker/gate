@@ -40,6 +40,8 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface KeelService {
 
   @POST("/graphql")
@@ -82,6 +84,10 @@ public interface KeelService {
   @POST("/delivery-configs")
   @Headers("Accept: application/json")
   DeliveryConfig upsertManifest(@Body DeliveryConfig manifest);
+
+  @POST("/delivery-configs/upsert")
+  @Headers("Accept: application/x-yaml")
+  DeliveryConfig upsertManifestRaw(@Body String req);
 
   @DELETE("/delivery-configs/{name}")
   DeliveryConfig deleteManifest(@Path("name") String name);

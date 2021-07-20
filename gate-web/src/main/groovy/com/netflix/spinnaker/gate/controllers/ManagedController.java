@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Criticality(Criticality.Value.LOW)
 @RequestMapping("/managed")
@@ -204,6 +208,21 @@ public class ManagedController {
     return retryRegistry
         .retry("managed-write")
         .executeCallable(() -> keelService.upsertManifest(manifest));
+  }
+
+  @SneakyThrows
+  @ApiOperation(
+    value = "Create or update a delivery config manifest - new",
+    response = DeliveryConfig.class)
+  @PostMapping(
+    path = "/delivery-configs/upsert",
+    consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
+    produces = {APPLICATION_JSON_VALUE})
+  DeliveryConfig upsertManifestRaw(HttpServletRequest req) {
+    var body = req.getReader().lines().collect(Collectors.joining());
+    return retryRegistry
+      .retry("managed-write")
+      .executeCallable(() -> keelService.upsertManifestRaw(body));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
