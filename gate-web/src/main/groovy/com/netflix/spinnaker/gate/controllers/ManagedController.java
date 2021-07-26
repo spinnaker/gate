@@ -198,31 +198,17 @@ public class ManagedController {
 
   @SneakyThrows
   @ApiOperation(
-      value = "Create or update a delivery config manifest",
-      response = DeliveryConfig.class)
-  @PostMapping(
-      path = "/delivery-configs",
-      consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
-      produces = {APPLICATION_JSON_VALUE})
-  DeliveryConfig upsertManifest(@RequestBody DeliveryConfig manifest) {
-    return retryRegistry
-        .retry("managed-write")
-        .executeCallable(() -> keelService.upsertManifest(manifest));
-  }
-
-  @SneakyThrows
-  @ApiOperation(
-    value = "Create or update a delivery config manifest - new",
+    value = "Create or update a delivery config manifest",
     response = DeliveryConfig.class)
   @PostMapping(
-    path = "/delivery-configs/upsert",
+    path = "/delivery-configs",
     consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
     produces = {APPLICATION_JSON_VALUE})
   DeliveryConfig upsertManifestRaw(HttpServletRequest req) {
     var body = req.getReader().lines().collect(Collectors.joining());
     return retryRegistry
       .retry("managed-write")
-      .executeCallable(() -> keelService.upsertManifestRaw(body));
+      .executeCallable(() -> keelService.upsertManifest(body));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)

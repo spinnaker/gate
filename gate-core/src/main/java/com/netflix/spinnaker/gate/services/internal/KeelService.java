@@ -82,12 +82,8 @@ public interface KeelService {
   List<Map<String, Object>> getManifestArtifacts(@Path("name") String name);
 
   @POST("/delivery-configs")
-  @Headers("Accept: application/json")
-  DeliveryConfig upsertManifest(@Body DeliveryConfig manifest);
-
-  @POST("/delivery-configs/upsert")
   @Headers("Accept: application/x-yaml")
-  DeliveryConfig upsertManifestRaw(@Body String req);
+  DeliveryConfig upsertManifest(@Body String req);
 
   @DELETE("/delivery-configs/{name}")
   DeliveryConfig deleteManifest(@Path("name") String name);
