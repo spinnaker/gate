@@ -20,15 +20,17 @@ import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,11 +206,13 @@ public class ManagedController {
     path = "/delivery-configs",
     consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
     produces = {APPLICATION_JSON_VALUE})
-  DeliveryConfig upsertManifestRaw(HttpServletRequest req) {
-    var body = req.getReader().lines().collect(Collectors.joining());
+  DeliveryConfig upsertManifestRaw(@io.swagger.v3.oas.annotations.parameters.RequestBody InputStream body) {
+    StringWriter writer = new StringWriter();
+    IOUtils.copy(body, writer, StandardCharsets.UTF_8);
+    String config = writer.toString();
     return retryRegistry
       .retry("managed-write")
-      .executeCallable(() -> keelService.upsertManifest(body));
+      .executeCallable(() -> keelService.upsertManifest(config));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
