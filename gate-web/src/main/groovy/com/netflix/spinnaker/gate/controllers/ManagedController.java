@@ -206,13 +206,27 @@ public class ManagedController {
     path = "/delivery-configs",
     consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
     produces = {APPLICATION_JSON_VALUE})
-  DeliveryConfig upsertManifestRaw(@io.swagger.v3.oas.annotations.parameters.RequestBody InputStream body) {
+  DeliveryConfig upsertManifest(@RequestBody DeliveryConfig manifest) {
+    return retryRegistry
+      .retry("managed-write")
+      .executeCallable(() -> keelService.upsertManifest(manifest));
+  }
+
+  @SneakyThrows
+  @ApiOperation(
+    value = "Create or update a delivery config manifest",
+    response = DeliveryConfig.class)
+  @PostMapping(
+    path = "/delivery-configs/upsert",
+    consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
+    produces = {APPLICATION_JSON_VALUE})
+  DeliveryConfig upsertManifestRaw(InputStream body) {
     StringWriter writer = new StringWriter();
     IOUtils.copy(body, writer, StandardCharsets.UTF_8);
     String config = writer.toString();
     return retryRegistry
       .retry("managed-write")
-      .executeCallable(() -> keelService.upsertManifest(config));
+      .executeCallable(() -> keelService.upsertManifestRaw(config));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
