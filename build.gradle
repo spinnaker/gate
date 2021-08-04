@@ -34,6 +34,7 @@ allprojects {
       annotationProcessor "org.projectlombok:lombok"
       testAnnotationProcessor "org.projectlombok:lombok"
       compile("org.springframework.cloud:spring-cloud-starter-vault-config")
+      compile("io.micrometer:micrometer-registry-prometheus")
 
 
       implementation "org.codehaus.groovy:groovy-all"
