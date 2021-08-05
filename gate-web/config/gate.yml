@@ -180,19 +180,3 @@ security:
       firstName:
       lastName: name
       username: login
-
-management:
-  health:
-    elasticsearch:
-      enabled: false
-    ldap:
-      enabled: false
-  endpoints:
-    web:
-      base-path: /mgmt
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
-      show-components: always
