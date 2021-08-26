@@ -12,10 +12,11 @@ COPY /docker_build/nginx.repo /etc/yum.repos.d/nginx.repo
 RUN adduser opsmx \
     && usermod -aG wheel opsmx \
     && mkdir -p /opsmx/workdir/logs \
-    && mkdir -p /opt/spinnaker/config
+    && mkdir -p /opt/spinnaker/config \
+    && mkdir -p /opt/spinnaker/plugins 
 
 # Install procps(ps)
-RUN yum install -y procps nginx net-tools
+RUN yum install -y procps nginx net-tools wget
 # Install java 11 
 RUN yum -y install java-11-openjdk-headless.x86_64
 # Install ping
@@ -31,6 +32,24 @@ RUN  chmod +x /usr/local/bin/run.sh
 COPY /docker_build/gate.yml /opt/spinnaker/config/
 COPY /docker_build/startup.sh /opsmx/workdir/
 RUN  chmod +x /opsmx/workdir/startup.sh
+
+# === CUSTOM PLUGINS
+ARG CUSTOMPLUGIN_RELEASEVERSION
+ENV CUSTOMPLUGIN_RELEASEVERSION=$CUSTOMPLUGIN_RELEASEVERSION
+COPY /docker_build/custom-plugin.json /opt/spinnaker/plugins/plugins.json
+RUN wget -O VerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/VerificationPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O TestVerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O policyPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/policyPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip
+RUN mv VerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
+    && mv TestVerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
+    && mv policyPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
+    && mv ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ 
+
+RUN sed -i 's/"VERIFICATION_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/VerificationPlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json \
+    && sed -i 's/"TESTVERIFICATION_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json \
+    && sed -i 's/"POLICY_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/policyPlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json \
+    && sed -i 's/"APPROVAL_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json
 
 # === Copy Gate Build Files ===
 COPY /gate-web/build/install/gate  /opsmx/workdir/gate
