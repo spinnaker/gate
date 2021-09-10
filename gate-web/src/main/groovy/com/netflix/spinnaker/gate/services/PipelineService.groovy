@@ -97,6 +97,9 @@ class PipelineService {
     parameters.put("eventId", eventId)
     parameters.put("executionId", executionId)
 
+    // Note that the Gate generated UUID is used as the event id and set it at the top level of the Map.
+    // This conforms to Event.java as used by Echo to deserialize the event upon receipt.
+    // This also prevents Echo from generating yet another UUID.
     Map eventMap = [
       content: [
         application     : application,
@@ -106,7 +109,8 @@ class PipelineService {
       ],
       details: [
         type: "manual"
-      ]
+      ],
+      eventId: eventId
     ]
     echoService.postEvent(eventMap)
     return [
