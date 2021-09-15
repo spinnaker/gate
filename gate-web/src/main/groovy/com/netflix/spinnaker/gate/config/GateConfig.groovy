@@ -52,6 +52,7 @@ import com.netflix.spinnaker.kork.web.selector.SelectableService
 import com.netflix.spinnaker.kork.web.selector.ServiceSelector
 import com.netflix.spinnaker.okhttp.OkHttp3MetricsInterceptor
 import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
+import com.opsmx.spinnaker.gate.services.OpsmxAuditClientService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import okhttp3.OkHttpClient
@@ -257,6 +258,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty("services.visibility.enabled")
   OpsmxVisibilityService opsmxVisibilityService(OkHttpClient okHttpClient) {
     createClient "visibility", OpsmxVisibilityService, okHttpClient
+  }
+
+  @Bean
+  @ConditionalOnProperty("services.auditclient.enabled")
+  OpsmxAuditClientService opsmxAuditClientService(OkHttpClient okHttpClient) {
+    createClient "auditclient", OpsmxAuditClientService, okHttpClient
   }
 
   @Bean
