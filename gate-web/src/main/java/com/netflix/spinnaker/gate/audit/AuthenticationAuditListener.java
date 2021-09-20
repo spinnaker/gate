@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 OpsMx, Inc.
+ * Copyright 2021 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.audit;
+package com.netflix.spinnaker.gate.audit;
 
 import com.google.gson.Gson;
 import java.util.Map;
