@@ -45,7 +45,7 @@ import javax.servlet.Filter
 import javax.servlet.http.HttpServletResponse
 
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = ["com.netflix", "com.opsmx"])
 public class GateWebConfig implements WebMvcConfigurer {
   @Autowired
   Registry registry
