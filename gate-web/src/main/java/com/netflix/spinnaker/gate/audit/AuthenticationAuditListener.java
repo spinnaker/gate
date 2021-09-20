@@ -32,8 +32,10 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
   @Override
   public void onApplicationEvent(AbstractAuthenticationEvent event) {
     log.info("Authentication audit events received : {}", event.getAuthentication());
+    log.info("event : {}", event);
     try {
       //      User user = (User) event.getAuthentication().getPrincipal();
+
       Map<String, Object> principal =
           gson.fromJson(gson.toJson(event.getAuthentication().getPrincipal()), Map.class);
       Map<String, Object> details =
