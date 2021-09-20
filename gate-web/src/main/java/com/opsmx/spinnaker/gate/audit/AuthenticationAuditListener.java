@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.audit;
+package com.opsmx.spinnaker.gate.audit;
 
 import com.google.gson.Gson;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.authentication.event.LogoutSuccessEvent;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -34,15 +37,27 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
     log.info("Authentication audit events received : {}", event.getAuthentication());
     log.info("event : {}", event);
     try {
-      //      User user = (User) event.getAuthentication().getPrincipal();
+      if (event.getAuthentication().isAuthenticated()
+          && event instanceof AuthenticationSuccessEvent) {
+        log.info(
+            "********************************* Auth success *******************************************");
+        Map<String, Object> principal =
+            gson.fromJson(gson.toJson(event.getAuthentication().getPrincipal()), Map.class);
+        Map<String, Object> details =
+            gson.fromJson(gson.toJson(event.getAuthentication().getDetails()), Map.class);
 
-      Map<String, Object> principal =
-          gson.fromJson(gson.toJson(event.getAuthentication().getPrincipal()), Map.class);
-      Map<String, Object> details =
-          gson.fromJson(gson.toJson(event.getAuthentication().getDetails()), Map.class);
+        log.info("principal : {}", principal);
+        log.info("details : {}", details);
 
-      log.info("principal : {}", principal);
-      log.info("details : {}", details);
+      } else if (!event.getAuthentication().isAuthenticated()
+          && event instanceof AbstractAuthenticationFailureEvent) {
+        log.info(
+            "***************************************** auth failed ************************************");
+
+      } else if (event instanceof LogoutSuccessEvent) {
+        log.info("*************** Logut success *****************************************");
+      }
+
     } catch (Exception e) {
       log.error("Exception occured while capturing audit events : {}", e);
     }
