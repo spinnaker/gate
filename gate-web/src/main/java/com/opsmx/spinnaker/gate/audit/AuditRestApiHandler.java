@@ -23,11 +23,9 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableFeignClients
 @ConditionalOnExpression("${services.auditservice.enabled:true}")
 public class AuditRestApiHandler implements AuditHandler {
 
