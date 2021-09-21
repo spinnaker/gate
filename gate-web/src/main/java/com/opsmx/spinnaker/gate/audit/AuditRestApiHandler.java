@@ -16,8 +16,8 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
+import com.netflix.spinnaker.gate.client.AuditService;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
-import com.opsmx.spinnaker.gate.feign.client.AuditService;
 import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
