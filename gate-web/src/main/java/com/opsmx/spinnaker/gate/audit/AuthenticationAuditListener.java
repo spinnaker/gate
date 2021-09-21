@@ -22,7 +22,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@EnableFeignClients
 public class AuthenticationAuditListener extends AbstractAuthenticationAuditListener {
 
   @Autowired private AuditHandler auditHandler;
