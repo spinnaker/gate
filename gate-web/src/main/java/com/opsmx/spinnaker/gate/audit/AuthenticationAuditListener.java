@@ -22,10 +22,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
-import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
-import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.authentication.event.LogoutSuccessEvent;
+import org.springframework.security.authentication.event.*;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -45,21 +42,31 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
       log.info("Authentication audit events received : {}", authEvent);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
+        AuthenticationSuccessEvent authenticationSuccessEvent = (AuthenticationSuccessEvent) event;
         Map<String, Object> auditData =
-            gson.fromJson(gson.toJson(event, AuthenticationSuccessEvent.class), Map.class);
+            gson.fromJson(
+                gson.toJson(authenticationSuccessEvent, AuthenticationSuccessEvent.class),
+                Map.class);
         log.info("auth success audit : {}", auditData);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, auditData);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
+        AuthenticationFailureBadCredentialsEvent authenticationFailureBadCredentialsEvent =
+            (AuthenticationFailureBadCredentialsEvent) event;
         Map<String, Object> auditData =
-            gson.fromJson(gson.toJson(event, AbstractAuthenticationFailureEvent.class), Map.class);
+            gson.fromJson(
+                gson.toJson(
+                    authenticationFailureBadCredentialsEvent,
+                    AuthenticationFailureBadCredentialsEvent.class),
+                Map.class);
         log.info("auth failure audit : {}", auditData);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, auditData);
 
       } else if (event instanceof LogoutSuccessEvent) {
+        LogoutSuccessEvent logoutSuccessEvent = (LogoutSuccessEvent) event;
         Map<String, Object> auditData =
-            gson.fromJson(gson.toJson(event, LogoutSuccessEvent.class), Map.class);
+            gson.fromJson(gson.toJson(logoutSuccessEvent, LogoutSuccessEvent.class), Map.class);
         log.info("logout success audit : {}", auditData);
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, auditData);
       }
