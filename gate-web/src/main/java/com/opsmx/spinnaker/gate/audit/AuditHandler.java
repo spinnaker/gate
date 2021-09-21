@@ -17,9 +17,8 @@
 package com.opsmx.spinnaker.gate.audit;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
-import java.util.Map;
 
 public interface AuditHandler {
 
-  void publishEvent(AuditEventType auditEventType, Map<String, Object> auditData);
+  void publishEvent(AuditEventType auditEventType, Object auditData);
 }

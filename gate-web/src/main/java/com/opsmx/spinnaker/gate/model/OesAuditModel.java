@@ -17,7 +17,6 @@
 package com.opsmx.spinnaker.gate.model;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
-import java.util.Map;
 import lombok.Data;
 
 @Data
@@ -25,5 +24,5 @@ public class OesAuditModel {
 
   private AuditEventType eventType;
   private String eventId;
-  private Map<String, Object> auditData;
+  private Object auditData;
 }

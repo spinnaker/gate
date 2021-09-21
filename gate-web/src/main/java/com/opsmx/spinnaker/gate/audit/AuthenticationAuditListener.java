@@ -42,13 +42,9 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
       log.info("Authentication audit events received : {}", authEvent);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
-        AuthenticationSuccessEvent authenticationSuccessEvent = (AuthenticationSuccessEvent) event;
-        Map<String, Object> auditData =
-            gson.fromJson(
-                gson.toJson(authenticationSuccessEvent, AuthenticationSuccessEvent.class),
-                Map.class);
-        log.info("auth success audit : {}", auditData);
-        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, auditData);
+
+        log.info("auth success audit : {}", event);
+        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {

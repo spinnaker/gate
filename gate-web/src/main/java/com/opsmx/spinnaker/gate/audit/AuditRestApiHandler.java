@@ -17,9 +17,10 @@
 package com.opsmx.spinnaker.gate.audit;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
+import com.opsmx.spinnaker.gate.feign.client.AuditService;
 import com.opsmx.spinnaker.gate.model.OesAuditModel;
-import java.util.Map;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +28,14 @@ import org.springframework.stereotype.Component;
 @ConditionalOnExpression("${services.auditservice.enabled:true}")
 public class AuditRestApiHandler implements AuditHandler {
 
-  // @Autowired private AuditService auditService;
+  @Autowired AuditService auditService;
 
   @Override
-  public void publishEvent(AuditEventType auditEventType, Map<String, Object> auditData) {
+  public void publishEvent(AuditEventType auditEventType, Object auditData) {
     OesAuditModel oesAuditModel = new OesAuditModel();
     oesAuditModel.setEventId(UUID.randomUUID().toString());
     oesAuditModel.setAuditData(auditData);
     oesAuditModel.setEventType(auditEventType);
-    // auditService.publishAuditData(oesAuditModel, "OES");
+    auditService.publishAuditData(oesAuditModel, "OES");
   }
 }
