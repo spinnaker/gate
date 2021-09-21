@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Netflix, Inc.
+ * Copyright 2021 OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package com.opsmx.spinnaker.gate.audit;
 
 import com.google.gson.Gson;
+import com.opsmx.spinnaker.gate.enums.AuditEventType;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -30,32 +32,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationAuditListener extends AbstractAuthenticationAuditListener {
 
+  @Autowired private AuditHandler auditHandler;
+
   private Gson gson = new Gson();
 
   @Override
   public void onApplicationEvent(AbstractAuthenticationEvent event) {
-    log.info("Authentication audit events received : {}", event.getAuthentication());
-    log.info("event : {}", event);
+
     try {
+      Map<String, Object> authEvent =
+          gson.fromJson(gson.toJson(event, AbstractAuthenticationEvent.class), Map.class);
+      log.info("Authentication audit events received : {}", authEvent);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
-        log.info(
-            "********************************* Auth success *******************************************");
-        Map<String, Object> principal =
-            gson.fromJson(gson.toJson(event.getAuthentication().getPrincipal()), Map.class);
-        Map<String, Object> details =
-            gson.fromJson(gson.toJson(event.getAuthentication().getDetails()), Map.class);
-
-        log.info("principal : {}", principal);
-        log.info("details : {}", details);
+        Map<String, Object> auditData =
+            gson.fromJson(gson.toJson(event, AuthenticationSuccessEvent.class), Map.class);
+        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, auditData);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
-        log.info(
-            "***************************************** auth failed ************************************");
+        Map<String, Object> auditData =
+            gson.fromJson(gson.toJson(event, AbstractAuthenticationFailureEvent.class), Map.class);
+        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, auditData);
 
       } else if (event instanceof LogoutSuccessEvent) {
-        log.info("*************** Logut success *****************************************");
+        Map<String, Object> auditData =
+            gson.fromJson(gson.toJson(event, LogoutSuccessEvent.class), Map.class);
+        auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, auditData);
       }
 
     } catch (Exception e) {

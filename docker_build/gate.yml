@@ -15,6 +15,9 @@ services:
   visibility:
     baseUrl: http://localhost:8096
     enabled: true
+  auditservice:
+    baseUrl: http://localhost:8097
+    enabled: true
   auditclient:
     baseUrl: http://localhost:8098
     enabled: true
