@@ -45,7 +45,6 @@ import javax.servlet.Filter
 import javax.servlet.http.HttpServletResponse
 
 @Configuration
-//@ComponentScan(basePackages = ["com.netflix.spinnaker.gate", "com.opsmx.spinnaker.gate"])
 @ComponentScan
 public class GateWebConfig implements WebMvcConfigurer {
   @Autowired

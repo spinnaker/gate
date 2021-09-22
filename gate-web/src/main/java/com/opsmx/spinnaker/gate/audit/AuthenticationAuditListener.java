@@ -33,15 +33,13 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
   public void onApplicationEvent(AbstractAuthenticationEvent event) {
 
     try {
-      log.info("Authentication audit events received : {}", event);
+      log.debug("Authentication audit events received : {}", event);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
-
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
-
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
 
       } else if (event instanceof LogoutSuccessEvent) {

@@ -22,12 +22,10 @@ import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAuto
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.annotation.EnableAsync
 
 @EnableAsync
-@EnableFeignClients
 @EnableConfigurationProperties
 @SpringBootApplication(
   scanBasePackages = [
