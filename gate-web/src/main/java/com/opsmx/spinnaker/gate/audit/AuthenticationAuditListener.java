@@ -16,9 +16,7 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
-import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
@@ -31,40 +29,23 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
   @Autowired private AuditHandler auditHandler;
 
-  private Gson gson = new Gson();
-
   @Override
   public void onApplicationEvent(AbstractAuthenticationEvent event) {
 
     try {
-      Map<String, Object> authEvent =
-          gson.fromJson(gson.toJson(event, AbstractAuthenticationEvent.class), Map.class);
-      log.info("Authentication audit events received : {}", authEvent);
+      log.info("Authentication audit events received : {}", event);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
 
-        log.info("auth success audit : {}", event);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
-        AuthenticationFailureBadCredentialsEvent authenticationFailureBadCredentialsEvent =
-            (AuthenticationFailureBadCredentialsEvent) event;
-        Map<String, Object> auditData =
-            gson.fromJson(
-                gson.toJson(
-                    authenticationFailureBadCredentialsEvent,
-                    AuthenticationFailureBadCredentialsEvent.class),
-                Map.class);
-        log.info("auth failure audit : {}", auditData);
-        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, auditData);
+
+        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
 
       } else if (event instanceof LogoutSuccessEvent) {
-        LogoutSuccessEvent logoutSuccessEvent = (LogoutSuccessEvent) event;
-        Map<String, Object> auditData =
-            gson.fromJson(gson.toJson(logoutSuccessEvent, LogoutSuccessEvent.class), Map.class);
-        log.info("logout success audit : {}", auditData);
-        auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, auditData);
+        auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
       }
 
     } catch (Exception e) {
