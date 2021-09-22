@@ -22,9 +22,11 @@ import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableFeignClients(basePackageClasses = AuditService.class)
 @ConditionalOnExpression("${services.auditservice.enabled:true}")
 public class AuditRestApiHandler implements AuditHandler {
 
