@@ -30,7 +30,8 @@ import org.springframework.scheduling.annotation.EnableAsync
 @SpringBootApplication(
   scanBasePackages = [
     "com.netflix.spinnaker.gate",
-    "com.netflix.spinnaker.config"
+    "com.netflix.spinnaker.config",
+    "com.opsmx.spinnaker.gate"
   ],
   exclude = [GroovyTemplateAutoConfiguration, GsonAutoConfiguration,
     LdapHealthContributorAutoConfiguration]

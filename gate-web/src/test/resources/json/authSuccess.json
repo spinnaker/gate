@@ -1,0 +1,65 @@
+{
+  "source": {
+    "name": "user2",
+    "details": {
+      "sessionId": "6d08a0fa-67e1-4ce6-a2bc-d1e583587bc7",
+      "remoteAddress": "10.240.64.6"
+    },
+    "principal": {
+      "roles": ["admin", "administrators", "allusers"],
+      "enabled": true,
+      "username": "user2",
+      "authorities": [{
+        "authority": "admin"
+      }, {
+        "authority": "administrators"
+      }, {
+        "authority": "allusers"
+      }],
+      "allowedAccounts": [],
+      "accountNonLocked": true,
+      "accountNonExpired": true,
+      "credentialsNonExpired": true
+    },
+    "authorities": [{
+      "authority": "admin"
+    }, {
+      "authority": "administrators"
+    }, {
+      "authority": "allusers"
+    }],
+    "authenticated": true
+  },
+  "timestamp": 1632294587940,
+  "authentication": {
+    "name": "user2",
+    "details": {
+      "sessionId": "6d08a0fa-67e1-4ce6-a2bc-d1e583587bc7",
+      "remoteAddress": "10.240.64.6"
+    },
+    "principal": {
+      "roles": ["admin", "administrators", "allusers"],
+      "enabled": true,
+      "username": "user2",
+      "authorities": [{
+        "authority": "admin"
+      }, {
+        "authority": "administrators"
+      }, {
+        "authority": "allusers"
+      }],
+      "allowedAccounts": [],
+      "accountNonLocked": true,
+      "accountNonExpired": true,
+      "credentialsNonExpired": true
+    },
+    "authorities": [{
+      "authority": "admin"
+    }, {
+      "authority": "administrators"
+    }, {
+      "authority": "allusers"
+    }],
+    "authenticated": true
+  }
+}
