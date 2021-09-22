@@ -16,9 +16,10 @@
 
 package com.opsmx.spinnaker.gate.config;
 
+import com.opsmx.spinnaker.gate.feignclient.AuditService;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients
+@EnableFeignClients(basePackageClasses = AuditService.class)
 public class FeignConfig {}
