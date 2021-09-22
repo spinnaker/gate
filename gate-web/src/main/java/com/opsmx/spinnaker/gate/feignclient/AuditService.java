@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.client;
+package com.opsmx.spinnaker.gate.feignclient;
 
 import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import org.springframework.cloud.openfeign.FeignClient;

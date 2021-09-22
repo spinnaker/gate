@@ -16,8 +16,8 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
-import com.netflix.spinnaker.gate.client.AuditService;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
+import com.opsmx.spinnaker.gate.feignclient.AuditService;
 import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnExpression("${services.auditservice.enabled:true}")
 public class AuditRestApiHandler implements AuditHandler {
 
-  @Autowired AuditService auditService;
+  @Autowired private AuditService auditService;
 
   @Override
   public void publishEvent(AuditEventType auditEventType, Object auditData) {
