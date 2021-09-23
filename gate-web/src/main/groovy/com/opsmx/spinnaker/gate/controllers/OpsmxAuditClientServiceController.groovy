@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/auditclientservice")
@@ -55,9 +56,13 @@ class OpsmxAuditClientServiceController {
   Object getAuditClientResponse3(@PathVariable("version") String version,
                               @PathVariable("type") String type,
                               @PathVariable("source") String source,
-                              @PathVariable("source1") String source1) {
+                              @PathVariable("source1") String source1,
+                              @RequestParam(value = "isTreeView", required = false) Boolean isTreeView,
+                                 @RequestParam(value = "isLatest", required = false) Boolean isLatest,
+                              @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                                 @RequestParam(value = "size", required = false) Integer size) {
 
-    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1)
+    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, size)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
