@@ -37,6 +37,7 @@ interface OpsmxAuditClientService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Query("isTreeView") Boolean isTreeView,
+                                 @Query("isLatest") Boolean isLatest,
                                  @Query("pageNo") Integer pageNo,
                                  @Query("size") Integer size)
 

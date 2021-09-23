@@ -58,10 +58,11 @@ class OpsmxAuditClientServiceController {
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
                               @RequestParam(value = "isTreeView", required = false) Boolean isTreeView,
+                                 @RequestParam(value = "isLatest", required = false) Boolean isLatest,
                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                  @RequestParam(value = "size", required = false) Integer size) {
 
-    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, pageNo, size)
+    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, size)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
