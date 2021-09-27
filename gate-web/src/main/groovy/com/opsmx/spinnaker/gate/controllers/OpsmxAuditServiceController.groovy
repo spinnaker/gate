@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Slf4j
@@ -37,9 +36,9 @@ class OpsmxAuditServiceController {
   @Autowired
   OpsmxAuditService opsmxAuditService
 
-  @ApiOperation(value = "Endpoint for audit-client rest services")
+  @ApiOperation(value = "Endpoint for audit rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.POST)
-  Object getAuditClientResponse3(@PathVariable("version") String version,
+  Object postAuditService1(@PathVariable("version") String version,
                                  @PathVariable("type") String type,
                                  @PathVariable("source") String source,
                                  @PathVariable("source1") String source1,
