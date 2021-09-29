@@ -26,6 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpHeaders
+import retrofit.client.Response
+import org.apache.commons.io.IOUtils
+import org.springframework.http.MediaType
+import java.util.stream.Collectors
+import org.springframework.http.ResponseEntity
 
 @RequestMapping("/auditclientservice")
 @RestController
@@ -113,5 +119,30 @@ class OpsmxAuditClientServiceController {
                                  @PathVariable("source4") String source5) {
 
     return opsmxAuditClientService.getAuditClientResponse7(version, type, source, source1, source2, source3, source4, source5)
+  }
+
+  @ApiOperation(value = "Endpoint for Insights controller to download csv file")
+  @RequestMapping(value = "/{version}/users/{username}/{source}/download", produces = "text/csv", method = RequestMethod.GET)
+  Object downloadCSVFileAuditService(@PathVariable("version") String version,
+                                     @PathVariable("username") String username,
+                                     @PathVariable("source") String source,
+                                     @RequestParam(value = "isTreeView", required = false) Boolean isTreeView,
+                                     @RequestParam(value = "isLatest", required = false) Boolean isLatest,
+                                     @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                                     @RequestParam(value = "size", required = false) Integer size) {
+    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size)
+    log.info("response for the insgiths endpoint:" + response.getHeaders());
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte[] csvFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.setContentType(MediaType.parseMediaType("text/csv"));
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(csvFile)
+    } finally {
+      if (inputStream != null) {
+        inputStream.close()
+      }
+    }
   }
 }

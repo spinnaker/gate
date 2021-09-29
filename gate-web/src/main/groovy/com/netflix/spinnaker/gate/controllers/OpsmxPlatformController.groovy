@@ -23,7 +23,13 @@ import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.*
+import retrofit.client.Response
+import org.apache.commons.io.IOUtils
+import org.springframework.http.MediaType
+import java.util.stream.Collectors
+import org.springframework.http.ResponseEntity
 
 @RequestMapping("/platformservice")
 @RestController
@@ -117,6 +123,27 @@ class OpsmxPlatformController {
                               @PathVariable("source4") String source4) {
 
     return opsmxPlatformService.getPlatformResponse7(version, type, source, source1, source2, source3, source4)
+  }
+
+  @ApiOperation(value = "Endpoint for Insights controller to download csv file")
+  @GetMapping(value = "/{version}/insights/download", produces = "text/csv")
+  Object downloadCsvFile(@PathVariable("version") String version,
+                         @RequestParam(value = "chartId", required = false) Integer chartId,
+                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+    Response response = opsmxPlatformService.downloadCSVFile(version, chartId, noOfDays)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte[] csvFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.setContentType(MediaType.parseMediaType("text/csv"));
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(csvFile)
+
+    } finally {
+      if (inputStream != null) {
+        inputStream.close()
+      }
+    }
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
