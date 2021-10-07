@@ -126,10 +126,11 @@ interface OpsmxAutopilotService {
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAutoResponse6(@Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2,
-                         @Path('source3') String source3)
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Path('source3') String source3,
+                          @Query("verificationType") String verificationType)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getAutoResponse7(@Path('type') String type,
