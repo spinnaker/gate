@@ -272,12 +272,13 @@ class OpsmxAutopilotController {
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.GET)
   Object getAutoResponse6(@PathVariable("type") String type,
-                         @PathVariable("source") String source,
-                         @PathVariable("source1") String source1,
-                         @PathVariable("source2") String source2,
-                         @PathVariable("source3") String source3) {
+                          @PathVariable("source") String source,
+                          @PathVariable("source1") String source1,
+                          @PathVariable("source2") String source2,
+                          @PathVariable("source3") String source3,
+                          @RequestParam(value = "verificationType", required = false) String verificationType) {
 
-    return opsmxAutopilotService.getAutoResponse6(type, source, source1, source2, source3)
+    return opsmxAutopilotService.getAutoResponse6(type, source, source1, source2, source3, verificationType)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
