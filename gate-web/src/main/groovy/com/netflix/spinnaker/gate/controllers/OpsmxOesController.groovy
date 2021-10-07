@@ -27,6 +27,7 @@ import java.util.stream.Collectors
 
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
+import com.netflix.spinnaker.gate.exceptions.OesRequestException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 
 import groovy.util.logging.Slf4j
@@ -298,7 +299,7 @@ class OpsmxOesController {
       else
         headersMap.putAt(key,"")
     }
-    AuthenticatedRequest.propagate {
+    def obj =  AuthenticatedRequest.propagate {
       def request = new Request.Builder()
         .url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/spinnaker/addOrUpdateCloudProviderAccount")
         .headers(Headers.of(headersMap))
@@ -306,8 +307,15 @@ class OpsmxOesController {
         .build()
 
       def response = okHttpClient.newCall(request).execute()
-      return response.body()?.string() ?: "Unknown reason: " + response.code()
-    }.call() as String
+      return response
+    }.call() as okhttp3.Response
+
+    if (!obj.isSuccessful()) {
+      def error = obj.body().string();
+      throw new OesRequestException(error)
+    } else{
+      return obj.body()?.string() ?: "Unknown reason: " + obj.code() as Object
+    }
   }
 
   Object addOrUpdateSpinnaker(MultipartFile files, String data) {
@@ -332,25 +340,32 @@ class OpsmxOesController {
   }
 
   private Object createOrUpdateSpinnaker(MultipartFile files, String data, String version) {
-	  Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
-	  Map headersMap = new HashMap()
-	  authenticationHeaders.each { key, val ->
-		if(val.isPresent())
-		  headersMap.putAt(key,val.get())
-		else
-		  headersMap.putAt(key,"")
-	  }
-	  AuthenticatedRequest.propagate {
-		def request = new Request.Builder()
-		  .url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/version/spinnakerX509".replace("version", version))
-		  .headers(Headers.of(headersMap))
-		  .post(uploadFileOkHttp(data,files))
-		  .build()
+    Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+    Map headersMap = new HashMap()
+    authenticationHeaders.each { key, val ->
+      if(val.isPresent())
+        headersMap.putAt(key,val.get())
+      else
+        headersMap.putAt(key,"")
+    }
+    def obj = AuthenticatedRequest.propagate {
+      def request = new Request.Builder()
+        .url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/version/spinnakerX509".replace("version", version))
+        .headers(Headers.of(headersMap))
+        .post(uploadFileOkHttp(data,files))
+        .build()
+      def response = okHttpClient.newCall(request).execute()
+      return response
+    }.call() as okhttp3.Response
 
-		def response = okHttpClient.newCall(request).execute()
-		return response.body()?.string() ?: "Unknown reason: " + response.code()
-	  }.call() as Object
-	}
+    if (!obj.isSuccessful()) {
+      def error = obj.body().string();
+      log.error("Failed to setup the Spinnaker : {}", error)
+      throw new OesRequestException(error)
+    } else{
+      return obj.body()?.string() ?: "Unknown reason: " + obj.code() as Object
+    }
+  }
 
   private String addOrUpdateCloudProverAccount(MultipartFile files, String data) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
