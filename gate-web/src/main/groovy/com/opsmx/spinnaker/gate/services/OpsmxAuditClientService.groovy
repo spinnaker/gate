@@ -29,8 +29,11 @@ interface OpsmxAuditClientService {
 
   @GET("/auditclientservice/{version}/{type}/{source}")
   Object getAuditClientResponse2(@Path('version') String version,
-                             @Path('type') String type,
-                             @Path('source') String source)
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Query('chartId') Integer chartId,
+                                 @Query('startTime') Long startTime,
+                                 @Query('endTime') Long endTime)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}")
   Object getAuditClientResponse3(@Path('version') String version,
@@ -84,13 +87,5 @@ interface OpsmxAuditClientService {
                            @Query("isLatest") Boolean isLatest,
                            @Query("pageNo") Integer pageNo,
                            @Query("size") Integer size)
-
-  @GET("/auditclientservice/{version}/{type}/{source}")
-  Object getAuditClientResponse8(@Path('version') String version,
-                                 @Path('type') String type,
-                                 @Path('source') String source,
-                                 @Query('chartId') Integer chartId,
-                                 @Query('startTime') Long startTime,
-                                 @Query('endTime') Long endTime)
 
 }
