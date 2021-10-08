@@ -152,7 +152,7 @@ class OpsmxAuditClientServiceController {
                                  @PathVariable("type") String type,
                                  @RequestParam(value = "chartId", required = false) Integer chartId,
                                  @RequestParam(value = "startTime", required = false) Long startTime,
-                                 @RequestParam(value = "endTime", required = false) Long endTime,) {
+                                 @RequestParam(value = "endTime", required = false) Long endTime) {
 
     return opsmxAuditClientService.getAuditClientResponse8(version, type, source, chartId, startTime,endTime)
   }
