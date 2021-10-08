@@ -104,7 +104,7 @@ public class UserActivityAuditListener implements ApplicationListener {
   private Map<String, Object> populateAuditData(
       ServletRequestHandledEvent servletRequestHandledEvent) {
     Map<String, Object> auditData = new HashMap<>();
-    auditData.put("baseUrl", servletRequestHandledEvent.getRequestUrl());
+    auditData.put("requestUrl", servletRequestHandledEvent.getRequestUrl());
     auditData.put("description", servletRequestHandledEvent.getDescription());
     auditData.put("method", servletRequestHandledEvent.getMethod());
     auditData.put("servletName", servletRequestHandledEvent.getServletName());
