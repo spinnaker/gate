@@ -1,0 +1,17 @@
+{
+  "eventId": "224ff369-8e31-4ddc-9d0c-c7746a111b64",
+  "auditData": {
+    "method": "GET",
+    "requestUrl": "/platformservice/v1/featureList",
+    "userName": "user2",
+    "sessionId": "34c5021a-5c19-4296-b93f-6c553ad627da",
+    "timestamp": 1633539211077,
+    "statusCode": 200,
+    "description": "url=[/platformservice/v1/featureList]; client=[10.240.64.10]; method=[GET]; servlet=[dispatcherServlet]; session=[34c5021a-5c19-4296-b93f-6c553ad627da]; user=[user2]; time=[131ms]; status=[OK]",
+    "servletName": "dispatcherServlet",
+    "clientAddress": "10.240.64.10",
+    "shortDescription": "url=[/platformservice/v1/featureList]; client=[10.240.64.10]; session=[34c5021a-5c19-4296-b93f-6c553ad627da]; user=[user2]; ",
+    "processingTimeMillis": 131
+  },
+  "eventType": "USER_ACTIVITY_AUDIT"
+}
