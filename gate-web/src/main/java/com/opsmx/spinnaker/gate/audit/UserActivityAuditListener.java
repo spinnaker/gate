@@ -84,7 +84,10 @@ public class UserActivityAuditListener implements ApplicationListener {
 
     String baseUrl = "";
     if (url != null) {
-      baseUrl = url.split("/")[1];
+      String[] urlComponents = url.split("/");
+      if (urlComponents != null && urlComponents.length > 1) {
+        baseUrl = urlComponents[1];
+      }
     }
     return baseUrl;
   }
