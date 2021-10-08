@@ -85,4 +85,12 @@ interface OpsmxAuditClientService {
                            @Query("pageNo") Integer pageNo,
                            @Query("size") Integer size)
 
+  @GET("/auditclientservice/{version}/{type}/{source}")
+  Object getAuditClientResponse8(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Query('chartId') Integer chartId,
+                                 @Query('startTime') Long startTime,
+                                 @Query('endTime') Long endTime)
+
 }

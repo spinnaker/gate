@@ -145,4 +145,15 @@ class OpsmxAuditClientServiceController {
       }
     }
   }
+
+  @ApiOperation(value = "Endpoint for audit-client rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
+  Object getAuditClientResponse4(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @RequestParam(value = "chartId", required = false) Integer chartId,
+                                 @RequestParam(value = "startTime", required = false) Long startTime,
+                                 @RequestParam(value = "endTime", required = false) Long endTime,) {
+
+    return opsmxAuditClientService.getAuditClientResponse8(version, type, source, chartId, startTime,endTime)
+  }
 }
