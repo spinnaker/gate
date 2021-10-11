@@ -16,11 +16,13 @@
 
 package com.opsmx.spinnaker.gate.enums;
 
-public enum AuditEventType {
-  AUTHENTICATION_SUCCESSFUL_AUDIT("AUTHENTICATION_SUCCESSFUL_AUDIT"),
-  SUCCESSFUL_USER_LOGOUT_AUDIT("SUCCESSFUL_USER_LOGOUT_AUDIT"),
-  AUTHENTICATION_FAILURE_AUDIT("AUTHENTICATION_FAILURE_AUDIT"),
-  USER_ACTIVITY_AUDIT("USER_ACTIVITY_AUDIT");
+public enum OesServices {
+  dashboardservice("dashboardservice"),
+  platformservice("platformservice"),
+  oes("oes"),
+  autopilot("autopilot"),
+  visibilityservice("visibilityservice"),
+  auditclientservice("auditclientservice");
 
   public String description;
 
@@ -28,7 +30,7 @@ public enum AuditEventType {
     return this.description;
   }
 
-  AuditEventType(String description) {
+  OesServices(String description) {
     this.description = description;
   }
 }
