@@ -154,4 +154,13 @@ interface OpsmxOesService {
                             @Path('source2') String source2,
                             @Path('source3') String source3,
                             @Body Object data)
+
+  @POST("/{version}/data/**")
+  Object evaluateRuntimePolicy(@Path('version') String version,
+                               @Body Object data)
+
+  @POST("/{version}/staticPolicy/eval")
+  Object evaluateStaticPolicy(@Path('version') String version,
+                              @Body Object data)
+
 }

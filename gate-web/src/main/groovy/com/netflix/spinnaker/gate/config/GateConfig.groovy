@@ -54,7 +54,6 @@ import com.netflix.spinnaker.okhttp.OkHttp3MetricsInterceptor
 import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
 import com.opsmx.spinnaker.gate.services.OpsmxAuditClientService
 import com.opsmx.spinnaker.gate.services.OpsmxAuditService
-import com.opsmx.spinnaker.gate.services.OpsmxSaporPolicyService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import okhttp3.OkHttpClient
@@ -272,12 +271,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @ConditionalOnProperty("services.auditservice.enabled")
   OpsmxAuditService opsmxAuditService(OkHttpClient okHttpClient) {
     createClient "auditservice", OpsmxAuditService, okHttpClient
-  }
-
-  @Bean
-  @ConditionalOnProperty("services.opsmx.enabled")
-  OpsmxSaporPolicyService opsmxSaporPolicyService(OkHttpClient okHttpClient) {
-    createClient "saporPolicyService", OpsmxSaporPolicyService, okHttpClient
   }
 
   @Bean

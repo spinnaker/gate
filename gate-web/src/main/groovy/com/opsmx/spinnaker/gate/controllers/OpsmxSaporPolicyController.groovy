@@ -16,7 +16,7 @@
 
 package com.opsmx.spinnaker.gate.controllers
 
-import com.opsmx.spinnaker.gate.services.OpsmxSaporPolicyService
+import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,14 +33,14 @@ import org.springframework.web.bind.annotation.RestController
 class OpsmxSaporPolicyController {
 
   @Autowired
-  OpsmxSaporPolicyService opsmxSaporPolicyService
+  OpsmxOesService opsmxOesService
 
   @ApiOperation(value = "Endpoint for sapor runtime policy evaluation rest services")
   @PostMapping(value = "{version}/data/**", consumes = MediaType.APPLICATION_JSON_VALUE)
   Object evaluateRuntimePolicy(@PathVariable("version") String version,
                          @RequestBody(required = false) Object data) {
 
-    return opsmxSaporPolicyService.evaluateRuntimePolicy(version, data)
+    return opsmxOesService.evaluateRuntimePolicy(version, data)
   }
 
   @ApiOperation(value = "Endpoint for sapor static policy evaluation rest services")
@@ -48,7 +48,7 @@ class OpsmxSaporPolicyController {
   Object evaluateStaticPolicy(@PathVariable("version") String version,
                      @RequestBody(required = false) Object data) {
 
-    return opsmxSaporPolicyService.evaluateStaticPolicy(version, data)
+    return opsmxOesService.evaluateStaticPolicy(version, data)
   }
 
 
