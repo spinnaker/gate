@@ -18,6 +18,7 @@ package com.opsmx.spinnaker.gate.exception
 
 import com.opsmx.spinnaker.gate.controllers.OpsmxSaporPolicyController
 import groovy.util.logging.Slf4j
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
