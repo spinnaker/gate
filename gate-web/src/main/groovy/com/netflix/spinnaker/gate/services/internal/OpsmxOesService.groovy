@@ -157,7 +157,8 @@ interface OpsmxOesService {
 
   @POST("/{version}/data/**")
   Object evaluateRuntimePolicy(@Path('version') String version,
-                               @Body Object data)
+                               @Body Object data,
+                               @Query("requestUri") String requestUri)
 
   @POST("/{version}/staticPolicy/eval")
   Object evaluateStaticPolicy(@Path('version') String version,
