@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+import javax.servlet.http.HttpServletRequest
+
 @Slf4j
 @RestController
 @ConditionalOnExpression('${services.opsmx.enabled:false}')
@@ -38,9 +40,11 @@ class OpsmxSaporPolicyController {
   @ApiOperation(value = "Endpoint for sapor runtime policy evaluation rest services")
   @PostMapping(value = "{version}/data/**", consumes = MediaType.APPLICATION_JSON_VALUE)
   Object evaluateRuntimePolicy(@PathVariable("version") String version,
-                         @RequestBody(required = false) Object data) {
+                         @RequestBody(required = false) Object data,
+                          HttpServletRequest request) {
 
-    return opsmxOesService.evaluateRuntimePolicy(version, data)
+    String requestUri = request.getRequestURI()
+    return opsmxOesService.evaluateRuntimePolicy(version, data, requestUri)
   }
 
   @ApiOperation(value = "Endpoint for sapor static policy evaluation rest services")
