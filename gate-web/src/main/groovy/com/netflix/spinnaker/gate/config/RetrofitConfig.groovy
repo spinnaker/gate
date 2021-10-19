@@ -17,18 +17,37 @@
 package com.netflix.spinnaker.gate.config
 
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
+import groovy.transform.Canonical
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
 
+import java.util.concurrent.TimeUnit
+
+@Canonical
 @Configuration
+@ConfigurationProperties(prefix = "retrofit")
 class RetrofitConfig {
+
+  Long connectTimeout
+  Long readTimeout
+  Long callTimeout
+  Long writeTimeout
+  Boolean retryOnConnectionFailure
+
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
   OkHttpClient okHttpClient(OkHttp3ClientConfiguration okHttpClientConfig) {
-    return okHttpClientConfig.create().build()
+    return okHttpClientConfig.create()
+      .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+      .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+      .callTimeout(callTimeout, TimeUnit.MILLISECONDS)
+      .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+      .retryOnConnectionFailure(retryOnConnectionFailure)
+      .build()
   }
 
 }

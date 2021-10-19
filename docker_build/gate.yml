@@ -23,6 +23,14 @@ services:
     enabled: true
   oesui:
     externalUrl: http://150.238.22.102
+
+retrofit:
+  connectTimeout: 30000
+  readTimeout: 30000
+  callTimeout: 30000
+  writeTimeout: 30000
+  retryOnConnectionFailure: true
+
 security:
   basic:
     enabled: false
