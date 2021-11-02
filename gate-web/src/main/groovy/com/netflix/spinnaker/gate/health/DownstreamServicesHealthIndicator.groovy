@@ -27,6 +27,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.health.AbstractHealthIndicator
 import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestContextHolder
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 @Component
 @Slf4j
+@ConditionalOnProperty(value = "gate.installation.mode", havingValue = "common")
 class DownstreamServicesHealthIndicator extends AbstractHealthIndicator {
   final Map<String, HealthCheckableService> healthCheckableServices
 

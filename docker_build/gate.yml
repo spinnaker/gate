@@ -24,6 +24,10 @@ services:
   oesui:
     externalUrl: http://150.238.22.102
 
+gate:
+  installation:
+    mode: common #allowed values are --> oes , common
+
 retrofit:
   connectTimeout: 30000
   readTimeout: 30000

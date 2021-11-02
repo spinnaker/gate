@@ -21,10 +21,12 @@ import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.security.AuthenticatedRequest
+import com.opsmx.spinnaker.gate.enums.GateInstallationModes
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -55,14 +57,20 @@ class ApplicationService {
   @Autowired
   ExecutorService executorService
 
+  @Value('${gate.installation.mode}')
+  GateInstallationModes gateInstallationMode
+
+
   private AtomicReference<List<Map>> allApplicationsCache = new AtomicReference<>([])
 
   @Scheduled(fixedDelayString = '${services.front50.applicationRefreshIntervalMs:5000}')
   void refreshApplicationsCache() {
     try {
-      log.debug("Refreshing Application List")
-      allApplicationsCache.set(tick(true))
-      log.debug("Refreshed Application List (applications: {})", allApplicationsCache.get().size())
+      if (gateInstallationMode.equals(GateInstallationModes.common)) {
+        log.debug("Refreshing Application List")
+        allApplicationsCache.set(tick(true))
+        log.debug("Refreshed Application List (applications: {})", allApplicationsCache.get().size())
+      }
     } catch (e) {
       log.error("Unable to refresh application list, reason: ${e.message}")
     }
