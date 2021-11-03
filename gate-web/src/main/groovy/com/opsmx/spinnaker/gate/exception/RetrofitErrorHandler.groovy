@@ -40,8 +40,15 @@ class RetrofitErrorHandler {
 
   @ExceptionHandler([RetrofitError.class])
   @ResponseBody ResponseEntity<Object> handleRetrofitError(RetrofitError retrofitError){
-    log.warn("Exception occurred in OES downstream services : {}", retrofitError)
     if (retrofitError!=null){
+      log.warn("Exception occurred in OES downstream services : {}", retrofitError.getMessage())
+      if (retrofitError.getKind() == RetrofitError.Kind.NETWORK){
+        NetworkErrorResponseModel networkErrorResponseModel = new NetworkErrorResponseModel()
+        networkErrorResponseModel.setErrorMsg("Network Error")
+        networkErrorResponseModel.setTimeStampMillis(System.currentTimeMillis())
+        networkErrorResponseModel.setPath(retrofitError.getResponse().getUrl())
+        return new ResponseEntity<Object>(networkErrorResponseModel, HttpStatus.INTERNAL_SERVER_ERROR)
+      }
       if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
         return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
       }
