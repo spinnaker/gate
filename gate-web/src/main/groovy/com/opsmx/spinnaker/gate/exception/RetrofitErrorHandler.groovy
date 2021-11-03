@@ -46,7 +46,7 @@ class RetrofitErrorHandler {
         NetworkErrorResponseModel networkErrorResponseModel = new NetworkErrorResponseModel()
         networkErrorResponseModel.setErrorMsg("Network Error")
         networkErrorResponseModel.setTimeStampMillis(System.currentTimeMillis())
-        networkErrorResponseModel.setPath(retrofitError.getResponse().getUrl())
+        networkErrorResponseModel.setPath(retrofitError.getUrl())
         return new ResponseEntity<Object>(networkErrorResponseModel, HttpStatus.INTERNAL_SERVER_ERROR)
       }
       if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
