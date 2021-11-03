@@ -21,6 +21,7 @@ import groovy.transform.Canonical
 @Canonical
 class NetworkErrorResponseModel {
   Long timeStampMillis
+  String errorType
   String errorMsg
   String path
 }
