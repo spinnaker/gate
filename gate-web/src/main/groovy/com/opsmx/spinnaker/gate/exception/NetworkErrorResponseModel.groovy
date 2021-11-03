@@ -23,5 +23,5 @@ class NetworkErrorResponseModel {
   Long timeStampMillis
   String errorType
   String errorMsg
-  String path
+  String url
 }
