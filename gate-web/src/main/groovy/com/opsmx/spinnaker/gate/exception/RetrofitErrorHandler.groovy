@@ -16,6 +16,13 @@
 
 package com.opsmx.spinnaker.gate.exception
 
+import com.netflix.spinnaker.gate.controllers.OpsmxAutopilotController
+import com.netflix.spinnaker.gate.controllers.OpsmxDashboardController
+import com.netflix.spinnaker.gate.controllers.OpsmxOesController
+import com.netflix.spinnaker.gate.controllers.OpsmxPlatformController
+import com.netflix.spinnaker.gate.controllers.OpsmxVisibilityController
+import com.opsmx.spinnaker.gate.controllers.OpsmxAuditClientServiceController
+import com.opsmx.spinnaker.gate.controllers.OpsmxAuditServiceController
 import com.opsmx.spinnaker.gate.controllers.OpsmxSaporPolicyController
 import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
@@ -26,12 +33,14 @@ import org.springframework.web.bind.annotation.ResponseBody
 import retrofit.RetrofitError
 
 @Slf4j
-@ControllerAdvice(basePackageClasses = OpsmxSaporPolicyController.class)
+@ControllerAdvice(basePackageClasses = [OpsmxSaporPolicyController.class, OpsmxAutopilotController.class,
+OpsmxAuditClientServiceController.class, OpsmxDashboardController.class, OpsmxPlatformController.class,
+OpsmxOesController.class, OpsmxVisibilityController.class, OpsmxAuditServiceController.class])
 class RetrofitErrorHandler {
 
   @ExceptionHandler([RetrofitError.class])
   @ResponseBody ResponseEntity<Object> handleRetrofitError(RetrofitError retrofitError){
-    log.debug("Handling the retrofit error : {}", retrofitError.getMessage())
+    log.warn("Exception occurred in OES downstream services : {}", retrofitError)
     return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
   }
 }
