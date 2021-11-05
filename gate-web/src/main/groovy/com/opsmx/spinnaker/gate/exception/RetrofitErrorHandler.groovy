@@ -16,6 +16,13 @@
 
 package com.opsmx.spinnaker.gate.exception
 
+import com.netflix.spinnaker.gate.controllers.OpsmxAutopilotController
+import com.netflix.spinnaker.gate.controllers.OpsmxDashboardController
+import com.netflix.spinnaker.gate.controllers.OpsmxOesController
+import com.netflix.spinnaker.gate.controllers.OpsmxPlatformController
+import com.netflix.spinnaker.gate.controllers.OpsmxVisibilityController
+import com.opsmx.spinnaker.gate.controllers.OpsmxAuditClientServiceController
+import com.opsmx.spinnaker.gate.controllers.OpsmxAuditServiceController
 import com.opsmx.spinnaker.gate.controllers.OpsmxSaporPolicyController
 import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
@@ -26,12 +33,44 @@ import org.springframework.web.bind.annotation.ResponseBody
 import retrofit.RetrofitError
 
 @Slf4j
-@ControllerAdvice(basePackageClasses = OpsmxSaporPolicyController.class)
+@ControllerAdvice(basePackageClasses = [OpsmxSaporPolicyController.class, OpsmxAutopilotController.class,
+OpsmxAuditClientServiceController.class, OpsmxDashboardController.class, OpsmxPlatformController.class,
+OpsmxOesController.class, OpsmxVisibilityController.class, OpsmxAuditServiceController.class])
 class RetrofitErrorHandler {
 
   @ExceptionHandler([RetrofitError.class])
   @ResponseBody ResponseEntity<Object> handleRetrofitError(RetrofitError retrofitError){
-    log.debug("Handling the retrofit error : {}", retrofitError.getMessage())
-    return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
+    if (retrofitError!=null){
+      log.warn("Exception occurred in OES downstream services : {}", retrofitError.getMessage())
+      if (retrofitError.getKind() == RetrofitError.Kind.NETWORK){
+        ErrorResponseModel networkErrorResponse = populateNetworkErrorResponse(retrofitError)
+        return new ResponseEntity<Object>(networkErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
+      }
+      if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
+        return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
+      }
+      return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+    ErrorResponseModel defaultErrorResponse = populateDefaultErrorResponseModel()
+    return new ResponseEntity<Object>(defaultErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+
+
+  private ErrorResponseModel populateDefaultErrorResponseModel() {
+    ErrorResponseModel defaultErrorResponse = new ErrorResponseModel()
+    defaultErrorResponse.setErrorType("Unknown Error")
+    defaultErrorResponse.setErrorMsg("Something went wrong")
+    defaultErrorResponse.setTimeStampMillis(System.currentTimeMillis())
+    return defaultErrorResponse
+  }
+
+
+  private ErrorResponseModel populateNetworkErrorResponse(RetrofitError retrofitError) {
+    ErrorResponseModel errorResponseModel = new ErrorResponseModel()
+    errorResponseModel.setErrorType("Network Error")
+    errorResponseModel.setErrorMsg(retrofitError.getMessage())
+    errorResponseModel.setTimeStampMillis(System.currentTimeMillis())
+    errorResponseModel.setUrl(retrofitError.getUrl())
+    return errorResponseModel
   }
 }
