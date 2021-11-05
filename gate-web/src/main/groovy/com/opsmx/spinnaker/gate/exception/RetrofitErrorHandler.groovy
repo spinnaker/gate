@@ -43,18 +43,34 @@ class RetrofitErrorHandler {
     if (retrofitError!=null){
       log.warn("Exception occurred in OES downstream services : {}", retrofitError.getMessage())
       if (retrofitError.getKind() == RetrofitError.Kind.NETWORK){
-        NetworkErrorResponseModel networkErrorResponseModel = new NetworkErrorResponseModel()
-        networkErrorResponseModel.setErrorType("Network Error")
-        networkErrorResponseModel.setErrorMsg(retrofitError.getMessage())
-        networkErrorResponseModel.setTimeStampMillis(System.currentTimeMillis())
-        networkErrorResponseModel.setUrl(retrofitError.getUrl())
-        return new ResponseEntity<Object>(networkErrorResponseModel, HttpStatus.INTERNAL_SERVER_ERROR)
+        ErrorResponseModel networkErrorResponse = populateNetworkErrorResponse(retrofitError)
+        return new ResponseEntity<Object>(networkErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
       }
       if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
         return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
       }
       return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.INTERNAL_SERVER_ERROR)
     }
-    return new ResponseEntity<Object>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR)
+    ErrorResponseModel defaultErrorResponse = populateDefaultErrorResponseModel()
+    return new ResponseEntity<Object>(defaultErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+
+
+  private ErrorResponseModel populateDefaultErrorResponseModel() {
+    ErrorResponseModel defaultErrorResponse = new ErrorResponseModel()
+    defaultErrorResponse.setErrorType("Unknown Error")
+    defaultErrorResponse.setErrorMsg("Something went wrong")
+    defaultErrorResponse.setTimeStampMillis(System.currentTimeMillis())
+    return defaultErrorResponse
+  }
+
+
+  private ErrorResponseModel populateNetworkErrorResponse(RetrofitError retrofitError) {
+    ErrorResponseModel errorResponseModel = new ErrorResponseModel()
+    errorResponseModel.setErrorType("Network Error")
+    errorResponseModel.setErrorMsg(retrofitError.getMessage())
+    errorResponseModel.setTimeStampMillis(System.currentTimeMillis())
+    errorResponseModel.setUrl(retrofitError.getUrl())
+    return errorResponseModel
   }
 }

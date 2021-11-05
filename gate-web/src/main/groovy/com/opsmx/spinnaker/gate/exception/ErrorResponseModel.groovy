@@ -19,7 +19,7 @@ package com.opsmx.spinnaker.gate.exception
 import groovy.transform.Canonical
 
 @Canonical
-class NetworkErrorResponseModel {
+class ErrorResponseModel {
   Long timeStampMillis
   String errorType
   String errorMsg
