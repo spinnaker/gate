@@ -89,7 +89,7 @@ interface OpsmxAuditClientService {
                            @Query("size") Integer size)
 
   @GET("/auditclientservice/{version}/{type}/{source}/download")
-  Object downloadDeliveryInsightsCSVFile(@Path('version') String version,
+  Response downloadDeliveryInsightsCSVFile(@Path('version') String version,
                                          @Path('type') String type,
                                          @Path('source') String source,
                                          @Query('chartId') Integer chartId,
