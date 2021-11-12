@@ -149,4 +149,28 @@ class OpsmxAuditClientServiceController {
     }
   }
 
+  @ApiOperation(value = "Endpoint for Delivery Insights controller to download csv file")
+  @RequestMapping(value = "/{version}/{type}/{source}/download", produces = "text/csv", method = RequestMethod.GET)
+  Object downloadCSVFileAuditService(@PathVariable("version") String version,
+                                     @PathVariable("type") String type,
+                                     @PathVariable("source") String source,
+                                     @RequestParam(value = "chartId", required = false) Integer chartId,
+                                     @RequestParam(value = "startTime", required = false) Long startTime,
+                                     @RequestParam(value = "endTime", required = false) Long endTime) {
+    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime)
+    log.info("response for the delivery insights endpoint:" + response.getHeaders());
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte[] csvFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.setContentType(MediaType.parseMediaType("text/csv"));
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(csvFile)
+    } finally {
+      if (inputStream != null) {
+        inputStream.close()
+      }
+    }
+  }
+
 }
