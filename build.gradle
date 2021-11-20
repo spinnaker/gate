@@ -8,7 +8,7 @@ plugins {
 allprojects {
   apply plugin: 'io.spinnaker.project'
 
-  group = "com.netflix.spinnaker.gate"
+  group = "io.spinnaker.gate"
 
   if ([korkVersion, fiatVersion].find { it.endsWith('-SNAPSHOT') }) {
     repositories {
@@ -26,10 +26,10 @@ allprojects {
     }
 
     dependencies {
-      implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
-      annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      implementation platform("io.spinnaker.kork:kork-bom:$korkVersion")
+      annotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
       annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-      testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+      testAnnotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
       compileOnly "org.projectlombok:lombok"
       annotationProcessor "org.projectlombok:lombok"
       testAnnotationProcessor "org.projectlombok:lombok"
