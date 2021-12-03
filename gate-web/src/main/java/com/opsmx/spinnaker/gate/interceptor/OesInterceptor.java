@@ -29,6 +29,7 @@ public class OesInterceptor implements Interceptor {
 
   @Override
   public Response intercept(Chain chain) throws IOException {
+    log.info("retrofit request interepted");
     Request request = chain.request();
     Response response = chain.proceed(request);
     if (response.isSuccessful()) {
