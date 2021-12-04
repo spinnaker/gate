@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Netflix, Inc.
+ * Copyright 2021 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'java-library'
 
-dependencies {
-  implementation platform("io.spinnaker.kork:kork-bom:$korkVersion")
-  annotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
+package com.netflix.spinnaker.gate.model.manageddelivery;
 
-  api "io.spinnaker.kork:kork-plugins-api"
-  api "io.spinnaker.kork:kork-annotations"
+import javax.annotation.Nonnull;
+import lombok.Data;
 
-  compileOnly("org.projectlombok:lombok")
-  annotationProcessor("org.projectlombok:lombok")
+@Data
+public class RetryVerificationRequest {
+  @Nonnull String verificationId;
+  @Nonnull String artifactReference;
+  @Nonnull String artifactVersion;
 }

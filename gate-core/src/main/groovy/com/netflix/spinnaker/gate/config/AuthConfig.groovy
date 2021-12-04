@@ -73,6 +73,9 @@ class AuthConfig {
   @Value('${fiat.session-filter.enabled:true}')
   boolean fiatSessionFilterEnabled
 
+  @Value('${security.webhooks.default-auth-enabled:false}')
+  boolean webhookDefaultAuthEnabled
+
   void configure(HttpSecurity http) throws Exception {
     // @formatter:off
     http
@@ -85,6 +88,7 @@ class AuthConfig {
         .antMatchers('/plugins/deck/**').permitAll()
         .antMatchers(HttpMethod.POST, '/webhooks/**').permitAll()
         .antMatchers(HttpMethod.POST, '/notifications/callbacks/**').permitAll()
+        .antMatchers(HttpMethod.POST, '/managed/notifications/callbacks/**').permitAll()
         .antMatchers('/health').permitAll()
         .antMatchers('/**').authenticated()
     if (fiatSessionFilterEnabled) {
@@ -94,6 +98,10 @@ class AuthConfig {
         permissionEvaluator)
 
       http.addFilterBefore(fiatSessionFilter, AnonymousAuthenticationFilter.class)
+    }
+
+    if (webhookDefaultAuthEnabled) {
+      http.authorizeRequests().antMatchers(HttpMethod.POST, '/webhooks/**').authenticated()
     }
 
     http.logout()

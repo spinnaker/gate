@@ -22,7 +22,10 @@ import com.netflix.spinnaker.gate.model.manageddelivery.ConstraintStatus;
 import com.netflix.spinnaker.gate.model.manageddelivery.DeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
+import com.netflix.spinnaker.gate.model.manageddelivery.GraphQLRequest;
+import com.netflix.spinnaker.gate.model.manageddelivery.OverrideVerificationRequest;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
+import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +33,18 @@ import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.http.QueryMap;
 
 public interface KeelService {
+
+  @POST("/graphql")
+  @Headers("Accept: application/json")
+  Map<String, Object> graphql(@Body GraphQLRequest query);
 
   @GET("/resources/events/{name}")
   List<Map<String, Object>> getResourceEvents(
@@ -150,6 +159,9 @@ public interface KeelService {
   @POST("/application/{application}/veto")
   Response veto(@Path("application") String application, @Body EnvironmentArtifactVeto veto);
 
+  @POST("/application/{application}/mark/bad")
+  Response markBad(@Path("application") String application, @Body EnvironmentArtifactVeto veto);
+
   @DELETE("/application/{application}/veto/{targetEnvironment}/{reference}/{version}")
   Response deleteVeto(
       @Path("application") String application,
@@ -157,6 +169,32 @@ public interface KeelService {
       @Path("reference") String reference,
       @Path("version") String version);
 
+  @POST("/application/{application}/mark/good")
+  Response markGood(@Path("application") String application, @Body EnvironmentArtifactVeto veto);
+
+  @POST("/application/{application}/environment/{environment}/verifications")
+  Response overrideVerification(
+      @Path("application") String application,
+      @Path("environment") String environment,
+      @Body OverrideVerificationRequest payload);
+
+  @POST("/application/{application}/environment/{environment}/verifications/retry")
+  Response retryVerification(
+      @Path("application") String application,
+      @Path("environment") String environment,
+      @Body RetryVerificationRequest payload);
+
   @GET("/installedPlugins")
   List<SpinnakerPluginDescriptor> getInstalledPlugins();
+
+  @GET("/reports/onboarding")
+  Response getOnboardingReport(
+      @Header("Accept") String accept, @QueryMap Map<String, String> params);
+
+  @GET("/reports/adoption")
+  @Headers("Accept: text/html")
+  Response getAdoptionReport(@QueryMap Map<String, String> params);
+
+  @GET("/environments/{application}")
+  List<Map<String, Object>> getEnvironments(@Path("application") String application);
 }
