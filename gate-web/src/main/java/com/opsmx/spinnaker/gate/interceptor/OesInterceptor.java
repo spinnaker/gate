@@ -58,9 +58,11 @@ public class OesInterceptor implements Interceptor {
         if (isCacheEmpty(concurrentMapCache)) {
           response = chain.proceed(request);
           if (response.isSuccessful()) {
+            log.info("username : {}", request.header("x-spinnaker-user"));
             handle(response, request.header("x-spinnaker-user"));
           }
         } else {
+          log.info("username 2 : {}", request.header("x-spinnaker-user"));
           response =
               datasourceCaching.getResponse(request.header("x-spinnaker-user") + "-datasource");
           if (response == null) {
@@ -107,13 +109,17 @@ public class OesInterceptor implements Interceptor {
   }
 
   private void handle(Response response, String userName) throws IOException {
-    Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
-    String responseBody = new String(resp.body().bytes());
-    List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
-    datasources.forEach(
-        datasource ->
-            datasourceCaching.populateDatasourceCache(
-                userName + "-" + datasource.get("id"), datasource));
+    try {
+      Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
+      String responseBody = resp.body().string();
+      List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
+      datasources.forEach(
+          datasource ->
+              datasourceCaching.populateDatasourceCache(
+                  userName + "-" + datasource.get("id"), datasource));
+    } catch (Exception e) {
+      log.error("Exception occurred while caching the response : {}", e);
+    }
   }
 
   private boolean isRegisteredCachingEndpoint(String path) {
