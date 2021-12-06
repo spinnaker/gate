@@ -18,6 +18,7 @@ package com.opsmx.spinnaker.gate.interceptor;
 
 import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.cache.DatasourceCaching;
+import com.opsmx.spinnaker.gate.cache.OesCacheManager;
 import com.opsmx.spinnaker.gate.enums.OesServices;
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +28,6 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.stereotype.Component;
@@ -38,9 +38,7 @@ public class OesInterceptor implements Interceptor {
 
   private Gson gson = new Gson();
 
-  @Autowired
-  @Qualifier(value = "concurrentMapCacheManager")
-  private CacheManager cacheManager;
+  @Autowired private OesCacheManager oesCacheManager;
 
   @Autowired private DatasourceCaching datasourceCaching;
 
@@ -49,6 +47,7 @@ public class OesInterceptor implements Interceptor {
     log.info("retrofit request interepted");
     Request request = chain.request();
     Response response = null;
+    CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
     log.info("cacheManager : {}", cacheManager);
     ConcurrentMapCache concurrentMapCache =
         (ConcurrentMapCache) cacheManager.getCache("datasource");

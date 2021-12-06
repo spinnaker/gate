@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.cache;
 
+import lombok.Getter;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +25,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OesCacheManager {
 
+  @Getter private CacheManager concurrentMapCacheManager;
+
   @Bean(name = "concurrentMapCacheManager")
   public CacheManager concurrentMapCacheManager() {
-    return new ConcurrentMapCacheManager("datasource", "datasourceResponse");
+    concurrentMapCacheManager = new ConcurrentMapCacheManager("datasource", "datasourceResponse");
+    return concurrentMapCacheManager;
   }
 }
