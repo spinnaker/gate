@@ -49,8 +49,10 @@ public class OesInterceptor implements Interceptor {
     log.info("retrofit request interepted");
     Request request = chain.request();
     Response response = null;
+    log.info("cacheManager : {}", cacheManager);
     ConcurrentMapCache concurrentMapCache =
         (ConcurrentMapCache) cacheManager.getCache("datasource");
+    log.info("concurrentMapCache : {}", concurrentMapCache);
     if (isCacheEmpty(concurrentMapCache)) {
       response = chain.proceed(request);
       if (response.isSuccessful()) {
@@ -69,6 +71,7 @@ public class OesInterceptor implements Interceptor {
         handle(response, request.header("x-spinnaker-user"));
       }
     }
+    log.info("response : {}", response);
     return response;
   }
 
