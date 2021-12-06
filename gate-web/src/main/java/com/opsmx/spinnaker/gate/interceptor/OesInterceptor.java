@@ -47,30 +47,29 @@ public class OesInterceptor implements Interceptor {
     log.info("retrofit request interepted");
     Request request = chain.request();
     Response response = null;
-    log.info("oesCacheManager : {}", oesCacheManager);
-    CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
-    log.info("cacheManager : {}", cacheManager);
-    ConcurrentMapCache concurrentMapCache =
-        (ConcurrentMapCache) cacheManager.getCache("datasource");
-    log.info("concurrentMapCache : {}", concurrentMapCache);
     try {
-      if (isCacheEmpty(concurrentMapCache)) {
-        response = chain.proceed(request);
-        if (response.isSuccessful()) {
-          String path = response.request().url().url().getPath();
-          String base = getBaseUrl(path);
-          if (isOesService(base)) {
-            if (isRegisteredCachingEndpoint(path)) {
-              handle(response, request.header("x-spinnaker-user"));
-            }
+
+      String path = request.url().url().getPath();
+      String base = getBaseUrl(path);
+      if (isOesService(base) && isRegisteredCachingEndpoint(path)) {
+        CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
+        ConcurrentMapCache concurrentMapCache =
+            (ConcurrentMapCache) cacheManager.getCache("datasource");
+        if (isCacheEmpty(concurrentMapCache)) {
+          response = chain.proceed(request);
+          if (response.isSuccessful()) {
+            handle(response, request.header("x-spinnaker-user"));
+          }
+        } else {
+          response =
+              datasourceCaching.getResponse(request.header("x-spinnaker-user") + "-datasource");
+          if (response == null) {
+            response = chain.proceed(request);
+            handle(response, request.header("x-spinnaker-user"));
           }
         }
       } else {
-        response = datasourceCaching.getResponse(request.header("x-spinnaker-user"));
-        if (response == null) {
-          response = chain.proceed(request);
-          handle(response, request.header("x-spinnaker-user"));
-        }
+        response = chain.proceed(request);
       }
     } catch (Exception e) {
       log.error("Exception occurred while intercepting request : {}", e);
@@ -108,7 +107,7 @@ public class OesInterceptor implements Interceptor {
   }
 
   private void handle(Response response, String userName) throws IOException {
-    Response resp = datasourceCaching.cacheResponse(userName, response);
+    Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
     String responseBody = new String(resp.body().bytes());
     List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
     datasources.forEach(
