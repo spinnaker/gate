@@ -47,6 +47,7 @@ public class OesInterceptor implements Interceptor {
     log.info("retrofit request interepted");
     Request request = chain.request();
     Response response = null;
+    log.info("oesCacheManager : {}", oesCacheManager);
     CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
     log.info("cacheManager : {}", cacheManager);
     ConcurrentMapCache concurrentMapCache =
