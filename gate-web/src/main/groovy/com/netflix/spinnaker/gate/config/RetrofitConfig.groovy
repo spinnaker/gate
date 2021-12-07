@@ -42,7 +42,7 @@ class RetrofitConfig {
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
   OkHttpClient okHttpClient(OkHttp3ClientConfiguration okHttpClientConfig) {
-    
+
     return okHttpClientConfig.create()
       .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
       .readTimeout(readTimeout, TimeUnit.MILLISECONDS)

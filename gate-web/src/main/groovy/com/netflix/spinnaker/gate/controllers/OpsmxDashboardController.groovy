@@ -66,6 +66,7 @@ class OpsmxDashboardController {
     log.info("path : {}", path)
     if (dashboardService.isRegisteredCachingEndpoint(path)) {
       String userName = httpServletRequest.getHeader("x-spinnaker-user")
+      userName = "user2"
       log.info("userName : {}", userName)
 
       if (dashboardService.isCacheEmpty("datasource", userName)) {
