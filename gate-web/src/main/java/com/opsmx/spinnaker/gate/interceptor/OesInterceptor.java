@@ -59,7 +59,7 @@ public class OesInterceptor implements Interceptor {
           response = chain.proceed(request);
           if (response.isSuccessful()) {
             log.info("username : {}", request.header("x-spinnaker-user"));
-            handle(response, request.header("x-spinnaker-user"));
+            // handle(response, request.header("x-spinnaker-user"));
           }
         } else {
           log.info("username 2 : {}", request.header("x-spinnaker-user"));
@@ -67,7 +67,7 @@ public class OesInterceptor implements Interceptor {
               datasourceCaching.getResponse(request.header("x-spinnaker-user") + "-datasource");
           if (response == null) {
             response = chain.proceed(request);
-            handle(response, request.header("x-spinnaker-user"));
+            // handle(response, request.header("x-spinnaker-user"));
           }
         }
       } else {
