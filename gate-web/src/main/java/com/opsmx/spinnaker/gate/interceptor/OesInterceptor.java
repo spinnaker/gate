@@ -32,10 +32,13 @@ import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@EnableAsync
 public class OesInterceptor implements Interceptor {
 
   private Gson gson = new Gson();
@@ -110,8 +113,10 @@ public class OesInterceptor implements Interceptor {
     return flag;
   }
 
+  @Async
   private void handle(Response response, String userName) throws IOException {
     try {
+      Thread.sleep(5000);
       // Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
       String responseBody = parseResponse(response);
       log.info("response body : {}", responseBody);
