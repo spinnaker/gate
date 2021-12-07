@@ -23,8 +23,6 @@ import com.opsmx.spinnaker.gate.enums.OesServices;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -132,15 +130,15 @@ public class OesInterceptor implements Interceptor {
   private void handle(Response response, String userName) throws IOException {
     try {
       Thread.sleep(5000);
-      // Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
-      String responseBody = parseResponse(response);
-      log.info("response body : {}", responseBody);
-      List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
-      log.info("datasources : {}", datasources);
-      //      datasources.forEach(
-      //          datasource ->
-      //              datasourceCaching.populateDatasourceCache(
-      //                  userName + "-" + datasource.get("id"), datasource));
+      Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
+      //      String responseBody = parseResponse(response);
+      //      log.info("response body : {}", responseBody);
+      //      List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
+      //      log.info("datasources : {}", datasources);
+      //            datasources.forEach(
+      //                datasource ->
+      //                    datasourceCaching.populateDatasourceCache(
+      //                        userName + "-" + datasource.get("id"), datasource));
     } catch (Exception e) {
       log.error("Exception occurred while caching the response : {}", e);
     }
