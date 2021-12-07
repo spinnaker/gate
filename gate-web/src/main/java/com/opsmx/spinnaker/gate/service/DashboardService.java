@@ -62,6 +62,10 @@ public class DashboardService {
   }
 
   public boolean isCacheEmpty(String cacheName, String userName) {
+    log.info(
+        "checking if cache is empty for the cache name : {} and userName : {}",
+        cacheName,
+        userName);
     CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
     ConcurrentMapCache concurrentMapCache = (ConcurrentMapCache) cacheManager.getCache(cacheName);
     Set<Object> keySet = concurrentMapCache.getNativeCache().keySet();

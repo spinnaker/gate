@@ -69,7 +69,9 @@ class OpsmxDashboardController {
       userName = "user2"
       log.info("userName : {}", userName)
 
-      if (dashboardService.isCacheEmpty("datasource", userName)) {
+      boolean isCacheEmpty = dashboardService.isCacheEmpty("datasource", userName)
+      log.info("isCacheEmpty : {}", isCacheEmpty)
+      if (!isCacheEmpty) {
         response = opsmxDashboardService.getDashboardResponse1(version, type)
         dashboardService.cacheResponse(response, userName)
       } else {
