@@ -18,12 +18,15 @@ package com.netflix.spinnaker.gate.controllers
 
 
 import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
+import com.opsmx.spinnaker.gate.service.DashboardService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
+
+import javax.servlet.http.HttpServletRequest
 
 @RequestMapping("/dashboardservice")
 @RestController
@@ -49,11 +52,33 @@ class OpsmxDashboardController {
   @Autowired
   OpsmxDashboardService opsmxDashboardService
 
+  @Autowired
+  DashboardService dashboardService
+
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getDashboardResponse1(@PathVariable("version") String version,
-                             @PathVariable("type") String type) {
-    return opsmxDashboardService.getDashboardResponse1(version, type)
+                             @PathVariable("type") String type, HttpServletRequest httpServletRequest) {
+
+    Object response = null
+
+    String path = httpServletRequest.getRequestURI()
+    log.info("path : {}", path)
+    if (dashboardService.isRegisteredCachingEndpoint(path)) {
+      String userName = httpServletRequest.getHeader("x-spinnaker-user")
+      log.info("userName : {}", userName)
+
+      if (dashboardService.isCacheEmpty("datasource", userName)) {
+        response = opsmxDashboardService.getDashboardResponse1(version, type)
+        dashboardService.cacheResponse(response, userName)
+      } else {
+        response = dashboardService.fetchResponseFromCache("datasource", userName)
+      }
+    } else {
+      response = opsmxDashboardService.getDashboardResponse1(version, type)
+    }
+
+    return response
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
