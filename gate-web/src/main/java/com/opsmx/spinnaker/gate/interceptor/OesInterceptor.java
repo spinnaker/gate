@@ -33,12 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@EnableAsync
 public class OesInterceptor implements Interceptor {
 
   private Gson gson = new Gson();
