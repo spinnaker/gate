@@ -59,7 +59,7 @@ public class OesInterceptor implements Interceptor {
           response = chain.proceed(request);
           if (response.isSuccessful()) {
             log.info("username : {}", request.header("x-spinnaker-user"));
-            // handle(response, request.header("x-spinnaker-user"));
+            handle(response, request.header("x-spinnaker-user"));
           }
         } else {
           log.info("username 2 : {}", request.header("x-spinnaker-user"));
@@ -67,7 +67,7 @@ public class OesInterceptor implements Interceptor {
               datasourceCaching.getResponse(request.header("x-spinnaker-user") + "-datasource");
           if (response == null) {
             response = chain.proceed(request);
-            // handle(response, request.header("x-spinnaker-user"));
+            handle(response, request.header("x-spinnaker-user"));
           }
         }
       } else {
@@ -112,11 +112,13 @@ public class OesInterceptor implements Interceptor {
     try {
       // Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
       String responseBody = response.body().string();
+      log.info("response body : {}", responseBody);
       List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
-      datasources.forEach(
-          datasource ->
-              datasourceCaching.populateDatasourceCache(
-                  userName + "-" + datasource.get("id"), datasource));
+      log.info("datasources : {}", datasources);
+      //      datasources.forEach(
+      //          datasource ->
+      //              datasourceCaching.populateDatasourceCache(
+      //                  userName + "-" + datasource.get("id"), datasource));
     } catch (Exception e) {
       log.error("Exception occurred while caching the response : {}", e);
     }
