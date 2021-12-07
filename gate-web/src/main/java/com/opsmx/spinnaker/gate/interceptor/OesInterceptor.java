@@ -110,8 +110,8 @@ public class OesInterceptor implements Interceptor {
 
   private void handle(Response response, String userName) throws IOException {
     try {
-      Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
-      String responseBody = resp.body().string();
+      // Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
+      String responseBody = response.body().string();
       List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
       datasources.forEach(
           datasource ->
