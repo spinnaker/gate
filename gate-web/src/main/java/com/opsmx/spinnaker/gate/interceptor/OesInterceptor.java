@@ -20,7 +20,9 @@ import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.cache.DatasourceCaching;
 import com.opsmx.spinnaker.gate.cache.OesCacheManager;
 import com.opsmx.spinnaker.gate.enums.OesServices;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -111,7 +113,7 @@ public class OesInterceptor implements Interceptor {
   private void handle(Response response, String userName) throws IOException {
     try {
       // Response resp = datasourceCaching.cacheResponse(userName + "-datasource", response);
-      String responseBody = response.body().string();
+      String responseBody = parseResponse(response);
       log.info("response body : {}", responseBody);
       List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
       log.info("datasources : {}", datasources);
@@ -136,5 +138,22 @@ public class OesInterceptor implements Interceptor {
 
   private boolean isCacheEmpty(ConcurrentMapCache concurrentMapCache) {
     return concurrentMapCache.getNativeCache().isEmpty();
+  }
+
+  private String parseResponse(Response response) {
+    try (InputStreamReader isr = new InputStreamReader(response.body().byteStream());
+        BufferedReader br = new BufferedReader(isr)) {
+
+      StringBuilder sb = new StringBuilder();
+      String line;
+      while ((line = br.readLine()) != null) {
+        sb.append(line);
+        sb.append("\n");
+      }
+      return sb.toString();
+    } catch (IOException e) {
+      log.error("Exception occurred while parsing the json : {}", e);
+      return null;
+    }
   }
 }
