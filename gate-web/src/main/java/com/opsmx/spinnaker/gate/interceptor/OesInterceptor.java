@@ -32,7 +32,6 @@ import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -62,7 +61,16 @@ public class OesInterceptor implements Interceptor {
           response = chain.proceed(request);
           if (response.isSuccessful()) {
             log.info("username : {}", request.header("x-spinnaker-user"));
-            handle(response, request.header("x-spinnaker-user"));
+            Response finalResponse = response;
+            Runnable runnable =
+                () -> {
+                  try {
+                    handle(finalResponse, request.header("x-spinnaker-user"));
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                };
+            runnable.run();
           }
         } else {
           log.info("username 2 : {}", request.header("x-spinnaker-user"));
@@ -78,6 +86,16 @@ public class OesInterceptor implements Interceptor {
       }
     } catch (Exception e) {
       log.error("Exception occurred while intercepting request : {}", e);
+      Response finalResponse1 = response;
+      Runnable runnable =
+          () -> {
+            try {
+              handle(finalResponse1, request.header("x-spinnaker-user"));
+            } catch (IOException ie) {
+              ie.printStackTrace();
+            }
+          };
+      runnable.run();
       response = chain.proceed(request);
     }
     log.info("response : {}", response);
@@ -111,7 +129,6 @@ public class OesInterceptor implements Interceptor {
     return flag;
   }
 
-  @Async
   private void handle(Response response, String userName) throws IOException {
     try {
       Thread.sleep(5000);
