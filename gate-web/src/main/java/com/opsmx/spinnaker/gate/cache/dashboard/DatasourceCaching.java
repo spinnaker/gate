@@ -17,7 +17,9 @@
 package com.opsmx.spinnaker.gate.cache.dashboard;
 
 import java.util.Map;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 
 public interface DatasourceCaching {
 
@@ -26,4 +28,16 @@ public interface DatasourceCaching {
       key = "#datasourceKey",
       cacheManager = "concurrentMapCacheManager")
   Map<String, Object> populateDatasourceCache(String datasourceKey, Map<String, Object> datasource);
+
+  @CacheEvict(
+      value = "datasource",
+      key = "#datasourceKey",
+      cacheManager = "concurrentMapCacheManager")
+  void evictRecord(String datasourceKey);
+
+  @Cacheable(
+      value = "datasource",
+      key = "#datasourceKey",
+      cacheManager = "concurrentMapCacheManager")
+  Map<String, Object> getRecord(String datasourceKey);
 }

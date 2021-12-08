@@ -19,6 +19,8 @@ package com.opsmx.spinnaker.gate.service;
 import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.cache.OesCacheManager;
 import com.opsmx.spinnaker.gate.cache.dashboard.DatasourceCaching;
+import com.opsmx.spinnaker.gate.feignclient.DashboardClient;
+import com.opsmx.spinnaker.gate.model.CreateDatasourceModel;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,8 @@ public class DatasourceCachingServiceImpl implements DashboardCachingService {
   @Autowired private OesCacheManager oesCacheManager;
 
   @Autowired private DatasourceCaching datasourceCaching;
+
+  @Autowired private DashboardClient dashboardClient;
 
   @Override
   public void cacheResponse(Object response, String userName) {
@@ -78,5 +82,29 @@ public class DatasourceCachingServiceImpl implements DashboardCachingService {
     return filteredKeySet.stream()
         .map(key -> concurrentMapCache.getNativeCache().get(key))
         .collect(Collectors.toList());
+  }
+
+  public void createDatasourceInCache(CreateDatasourceModel createDatasourceModel) {
+
+    Map<String, Object> datasource =
+        dashboardClient
+            .getDatasourceById(createDatasourceModel.getId(), createDatasourceModel.getUserName())
+            .getBody();
+    if (datasource != null && !datasource.isEmpty()) {
+      datasourceCaching.populateDatasourceCache(
+          createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId(), datasource);
+    }
+  }
+
+  public void evictRecordFromCache(CreateDatasourceModel createDatasourceModel) {
+
+    datasourceCaching.evictRecord(
+        createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId());
+  }
+
+  public Map<String, Object> getRecordFromCache(CreateDatasourceModel createDatasourceModel) {
+
+    return datasourceCaching.getRecord(
+        createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId());
   }
 }
