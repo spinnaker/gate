@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.POST;
@@ -30,6 +32,21 @@ public interface ClouddriverService {
 
   @GET("/credentials/{account}")
   AccountDetails getAccount(@Path("account") String account);
+
+  @GET("/accounts?accountType={type}")
+  List<AccountDefinition> getAccountDefinitionsByType(
+      @Path("type") String type,
+      @Query("limit") Integer limit,
+      @Query("startingAccountName") String startingAccountName);
+
+  @POST("/accounts")
+  AccountDefinition createAccountDefinition(@Body AccountDefinition accountDefinition);
+
+  @PUT("/accounts")
+  AccountDefinition updateAccountDefinition(@Body AccountDefinition accountDefinition);
+
+  @DELETE("/accounts/{account}")
+  void deleteAccountDefinition(@Path("account") String account);
 
   @GET("/task/{taskDetailsId}")
   Map getTaskDetails(@Path("taskDetailsId") String taskDetailsId);
@@ -492,5 +509,30 @@ public interface ClouddriverService {
     private Boolean primaryAccount;
     private String cloudProvider;
     private final Map<String, Object> details = new HashMap<String, Object>();
+  }
+
+  class AccountDefinition {
+    private final Map<String, Object> details = new HashMap<>();
+    private String type;
+
+    @JsonAnyGetter
+    public Map<String, Object> details() {
+      return details;
+    }
+
+    @JsonAnySetter
+    public void set(String name, Object value) {
+      details.put(name, value);
+    }
+
+    @JsonProperty("@type")
+    public String getType() {
+      return type;
+    }
+
+    @JsonProperty("@type")
+    public void setType(String type) {
+      this.type = type;
+    }
   }
 }
