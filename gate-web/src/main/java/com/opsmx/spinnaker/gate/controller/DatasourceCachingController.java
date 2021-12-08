@@ -19,7 +19,6 @@ package com.opsmx.spinnaker.gate.controller;
 import com.opsmx.spinnaker.gate.model.DatasourceRequestModel;
 import com.opsmx.spinnaker.gate.service.DatasourceCachingServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,20 +34,12 @@ public class DatasourceCachingController {
     this.datasourceCachingService = datasourceCachingService;
   }
 
-  @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity createDatasourceInCache(
+  @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity saveDatasourceInCache(
       @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
-    datasourceCachingService.createDatasourceInCache(datasourceRequestModel);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
-  }
-
-  @PutMapping(value = "/update")
-  public ResponseEntity updateDatasourceInCache(
-      @RequestBody DatasourceRequestModel datasourceRequestModel) {
-
-    datasourceCachingService.createDatasourceInCache(datasourceRequestModel);
-    return ResponseEntity.noContent().build();
+    datasourceCachingService.saveDatasourceInCache(datasourceRequestModel);
+    return ResponseEntity.ok().build();
   }
 
   @DeleteMapping(value = "/evict")

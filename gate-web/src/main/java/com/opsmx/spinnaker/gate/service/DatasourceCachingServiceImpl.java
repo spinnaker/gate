@@ -84,7 +84,7 @@ public class DatasourceCachingServiceImpl implements DashboardCachingService {
         .collect(Collectors.toList());
   }
 
-  public void createDatasourceInCache(DatasourceRequestModel datasourceRequestModel) {
+  public void saveDatasourceInCache(DatasourceRequestModel datasourceRequestModel) {
 
     Map<String, Object> datasource =
         dashboardClient
