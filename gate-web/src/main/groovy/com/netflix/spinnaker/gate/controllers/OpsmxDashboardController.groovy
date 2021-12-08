@@ -18,12 +18,15 @@ package com.netflix.spinnaker.gate.controllers
 
 
 import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
+import com.opsmx.spinnaker.gate.factory.dashboard.DashboardCachingServiceBeanFactory
+import com.opsmx.spinnaker.gate.service.DashboardCachingService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
+
+import javax.servlet.http.HttpServletRequest
 
 @RequestMapping("/dashboardservice")
 @RestController
@@ -49,12 +52,45 @@ class OpsmxDashboardController {
   @Autowired
   OpsmxDashboardService opsmxDashboardService
 
+  @Autowired
+  DashboardCachingServiceBeanFactory dashboardCachingServiceBeanFactory
+
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getDashboardResponse1(@PathVariable("version") String version,
-                             @PathVariable("type") String type) {
-    return opsmxDashboardService.getDashboardResponse1(version, type)
+                             @PathVariable("type") String type, HttpServletRequest httpServletRequest) {
+
+    Object response = null
+    String path = httpServletRequest.getRequestURI()
+
+    if (DashboardCachingService.isRegisteredCachingEndpoint(path)) {
+      DashboardCachingService dashboardCachingService = dashboardCachingServiceBeanFactory.getBean(path)
+      response = handleCaching(httpServletRequest, version, type, dashboardCachingService)
+    } else {
+      response = opsmxDashboardService.getDashboardResponse1(version, type)
+    }
+
+    return response
   }
+
+  private Object handleCaching(
+                HttpServletRequest httpServletRequest,
+                String version,
+                String type,
+                DashboardCachingService dashboardCachingService) {
+
+    String userName = httpServletRequest.getUserPrincipal().getName()
+    Object response
+
+    if (dashboardCachingService.isCacheNotEmpty(userName)) {
+      response = dashboardCachingService.fetchResponseFromCache(userName)
+    } else {
+      response = opsmxDashboardService.getDashboardResponse1(version, type)
+      dashboardCachingService.cacheResponse(response, userName)
+    }
+    return response
+  }
+
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
