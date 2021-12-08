@@ -14,25 +14,9 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.service;
+package com.opsmx.spinnaker.gate.cache;
 
-import com.opsmx.spinnaker.gate.cache.Constants;
+public interface Constants {
 
-public interface DashboardCachingService {
-
-  void cacheResponse(Object response, String userName);
-
-  boolean isCacheNotEmpty(String userName);
-
-  Object fetchResponseFromCache(String userName);
-
-  static boolean isRegisteredCachingEndpoint(String path) {
-    boolean flag = Boolean.FALSE;
-    switch (path) {
-      case Constants.GET_ALL_DATASOURCES_ENDPOINT:
-        flag = Boolean.TRUE;
-        break;
-    }
-    return flag;
-  }
+  String GET_ALL_DATASOURCES_ENDPOINT = "/dashboardservice/v4/getAllDatasources";
 }

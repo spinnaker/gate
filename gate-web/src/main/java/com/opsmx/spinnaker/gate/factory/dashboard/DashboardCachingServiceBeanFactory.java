@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.factory.dashboard;
 
+import com.opsmx.spinnaker.gate.cache.Constants;
 import com.opsmx.spinnaker.gate.service.DashboardCachingService;
 import com.opsmx.spinnaker.gate.service.DatasourceCachingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class DashboardCachingServiceBeanFactory {
     DashboardCachingService dashboardCachingService = null;
 
     switch (path) {
-      case "/dashboardservice/v3/getAllDatasources":
+      case Constants.GET_ALL_DATASOURCES_ENDPOINT:
         dashboardCachingService = datasourceCachingService;
         break;
     }
