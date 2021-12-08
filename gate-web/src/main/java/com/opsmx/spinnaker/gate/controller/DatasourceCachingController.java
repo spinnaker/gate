@@ -16,9 +16,8 @@
 
 package com.opsmx.spinnaker.gate.controller;
 
-import com.opsmx.spinnaker.gate.model.CreateDatasourceModel;
+import com.opsmx.spinnaker.gate.model.DatasourceRequestModel;
 import com.opsmx.spinnaker.gate.service.DatasourceCachingServiceImpl;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,34 +37,25 @@ public class DatasourceCachingController {
 
   @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity createDatasourceInCache(
-      @RequestBody CreateDatasourceModel createDatasourceModel) {
+      @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
-    datasourceCachingService.createDatasourceInCache(createDatasourceModel);
-    Map<String, Object> datasource =
-        datasourceCachingService.getRecordFromCache(createDatasourceModel);
-    log.info("datasource record in create API : {}", datasource);
+    datasourceCachingService.createDatasourceInCache(datasourceRequestModel);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @PutMapping(value = "/update")
   public ResponseEntity updateDatasourceInCache(
-      @RequestBody CreateDatasourceModel createDatasourceModel) {
+      @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
-    datasourceCachingService.createDatasourceInCache(createDatasourceModel);
-    Map<String, Object> datasource =
-        datasourceCachingService.getRecordFromCache(createDatasourceModel);
-    log.info("datasource record in update API : {}", datasource);
+    datasourceCachingService.createDatasourceInCache(datasourceRequestModel);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping(value = "/evict")
   public ResponseEntity evictRecordFromCache(
-      @RequestBody CreateDatasourceModel createDatasourceModel) {
+      @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
-    datasourceCachingService.evictRecordFromCache(createDatasourceModel);
-    Map<String, Object> datasource =
-        datasourceCachingService.getRecordFromCache(createDatasourceModel);
-    log.info("datasource record in delete API : {}", datasource);
+    datasourceCachingService.evictRecordFromCache(datasourceRequestModel);
     return ResponseEntity.noContent().build();
   }
 }

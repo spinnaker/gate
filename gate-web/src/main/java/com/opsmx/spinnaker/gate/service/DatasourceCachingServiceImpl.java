@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.cache.OesCacheManager;
 import com.opsmx.spinnaker.gate.cache.dashboard.DatasourceCaching;
 import com.opsmx.spinnaker.gate.feignclient.DashboardClient;
-import com.opsmx.spinnaker.gate.model.CreateDatasourceModel;
+import com.opsmx.spinnaker.gate.model.DatasourceRequestModel;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,27 +84,27 @@ public class DatasourceCachingServiceImpl implements DashboardCachingService {
         .collect(Collectors.toList());
   }
 
-  public void createDatasourceInCache(CreateDatasourceModel createDatasourceModel) {
+  public void createDatasourceInCache(DatasourceRequestModel datasourceRequestModel) {
 
     Map<String, Object> datasource =
         dashboardClient
-            .getDatasourceById(createDatasourceModel.getId(), createDatasourceModel.getUserName())
+            .getDatasourceById(datasourceRequestModel.getId(), datasourceRequestModel.getUserName())
             .getBody();
     if (datasource != null && !datasource.isEmpty()) {
       datasourceCaching.populateDatasourceCache(
-          createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId(), datasource);
+          datasourceRequestModel.getUserName() + "-" + datasourceRequestModel.getId(), datasource);
     }
   }
 
-  public void evictRecordFromCache(CreateDatasourceModel createDatasourceModel) {
+  public void evictRecordFromCache(DatasourceRequestModel datasourceRequestModel) {
 
     datasourceCaching.evictRecord(
-        createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId());
+        datasourceRequestModel.getUserName() + "-" + datasourceRequestModel.getId());
   }
 
-  public Map<String, Object> getRecordFromCache(CreateDatasourceModel createDatasourceModel) {
+  public Map<String, Object> getRecordFromCache(DatasourceRequestModel datasourceRequestModel) {
 
     return datasourceCaching.getRecord(
-        createDatasourceModel.getUserName() + "-" + createDatasourceModel.getId());
+        datasourceRequestModel.getUserName() + "-" + datasourceRequestModel.getId());
   }
 }

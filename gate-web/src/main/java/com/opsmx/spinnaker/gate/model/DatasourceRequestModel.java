@@ -19,7 +19,7 @@ package com.opsmx.spinnaker.gate.model;
 import lombok.Data;
 
 @Data
-public class CreateDatasourceModel {
+public class DatasourceRequestModel {
 
   private Integer id;
   private String userName;
