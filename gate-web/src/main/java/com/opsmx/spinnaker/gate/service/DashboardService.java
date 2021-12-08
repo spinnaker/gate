@@ -61,7 +61,7 @@ public class DashboardService {
     return flag;
   }
 
-  public boolean isCacheEmpty(String cacheName, String userName) {
+  public boolean isCacheNotEmpty(String cacheName, String userName) {
     log.info(
         "checking if cache is empty for the cache name : {} and userName : {}",
         cacheName,

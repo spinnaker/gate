@@ -21,7 +21,6 @@ import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
 import com.opsmx.spinnaker.gate.service.DashboardService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.web.bind.annotation.*
@@ -65,23 +64,27 @@ class OpsmxDashboardController {
     String path = httpServletRequest.getRequestURI()
     log.info("path : {}", path)
     if (dashboardService.isRegisteredCachingEndpoint(path)) {
-      String userName = httpServletRequest.getHeader("x-spinnaker-user")
-      userName = "user2"
-      log.info("userName : {}", userName)
-
-      boolean isCacheEmpty = dashboardService.isCacheEmpty("datasource", userName)
-      log.info("isCacheEmpty : {}", isCacheEmpty)
-      if (!isCacheEmpty) {
-        response = opsmxDashboardService.getDashboardResponse1(version, type)
-        dashboardService.cacheResponse(response, userName)
-      } else {
-        response = dashboardService.fetchResponseFromCache("datasource", userName)
-      }
+      response = handleCaching(httpServletRequest, version, type, response)
     } else {
       response = opsmxDashboardService.getDashboardResponse1(version, type)
     }
 
     return response
+  }
+
+  private Object handleCaching(HttpServletRequest httpServletRequest, String version, String type, Object response) {
+    String userName = httpServletRequest.getUserPrincipal().getName()
+    log.info("userName : {}", userName)
+
+    boolean isCacheNotEmpty = dashboardService.isCacheNotEmpty("datasource", userName)
+    log.info("isCacheNotEmpty : {}", isCacheNotEmpty)
+    if (isCacheNotEmpty) {
+      response = dashboardService.fetchResponseFromCache("datasource", userName)
+    } else {
+      response = opsmxDashboardService.getDashboardResponse1(version, type)
+      dashboardService.cacheResponse(response, userName)
+    }
+    response
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
