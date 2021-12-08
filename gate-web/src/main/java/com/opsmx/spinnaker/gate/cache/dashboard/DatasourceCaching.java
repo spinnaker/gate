@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 OpsMx, Inc.
+ * Copyright 2021 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.cache;
+package com.opsmx.spinnaker.gate.cache.dashboard;
 
 import java.util.Map;
-import okhttp3.Response;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 
 public interface DatasourceCaching {
-
-  @CachePut(
-      value = "datasourceResponse",
-      key = "#cacheKey",
-      cacheManager = "concurrentMapCacheManager")
-  Response cacheResponse(String cacheKey, Response response);
-
-  @Cacheable(
-      value = "datasourceResponse",
-      key = "#cacheKey",
-      cacheManager = "concurrentMapCacheManager")
-  Response getResponse(String cacheKey);
 
   @CachePut(
       value = "datasource",

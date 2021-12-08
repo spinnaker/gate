@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 OpsMx, Inc.
+ * Copyright 2021 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.cache;
+package com.opsmx.spinnaker.gate.cache.dashboard;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class DatasourceCachingImpl implements DatasourceCaching {
-
-  @Override
-  public Response cacheResponse(String cacheKey, Response response) {
-    log.debug("caching the retrofit response");
-    return response;
-  }
-
-  @Override
-  public Response getResponse(String cacheKey) {
-    log.debug("returning response");
-    return null;
-  }
 
   @Override
   public Map<String, Object> populateDatasourceCache(

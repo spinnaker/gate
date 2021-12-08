@@ -17,8 +17,8 @@
 package com.opsmx.spinnaker.gate.service;
 
 import com.google.gson.Gson;
-import com.opsmx.spinnaker.gate.cache.DatasourceCaching;
 import com.opsmx.spinnaker.gate.cache.OesCacheManager;
+import com.opsmx.spinnaker.gate.cache.dashboard.DatasourceCaching;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class DashboardService {
+public class DatasourceCachingServiceImpl implements DashboardCachingService {
 
   private Gson gson = new Gson();
 
@@ -39,35 +39,23 @@ public class DashboardService {
 
   @Autowired private DatasourceCaching datasourceCaching;
 
+  @Override
   public void cacheResponse(Object response, String userName) {
-
     String responseBody = gson.toJson(response);
-    log.info("response body : {}", responseBody);
     List<Map<String, Object>> datasources = gson.fromJson(responseBody, List.class);
-    log.info("datasources : {}", datasources);
+    log.debug("datasources : {}", datasources);
     datasources.forEach(
         datasource ->
             datasourceCaching.populateDatasourceCache(
                 userName + "-" + datasource.get("id"), datasource));
   }
 
-  public boolean isRegisteredCachingEndpoint(String path) {
-    boolean flag = Boolean.FALSE;
-    switch (path) {
-      case "/dashboardservice/v3/getAllDatasources":
-        flag = Boolean.TRUE;
-        break;
-    }
-    return flag;
-  }
+  @Override
+  public boolean isCacheNotEmpty(String userName) {
 
-  public boolean isCacheNotEmpty(String cacheName, String userName) {
-    log.info(
-        "checking if cache is empty for the cache name : {} and userName : {}",
-        cacheName,
-        userName);
     CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
-    ConcurrentMapCache concurrentMapCache = (ConcurrentMapCache) cacheManager.getCache(cacheName);
+    ConcurrentMapCache concurrentMapCache =
+        (ConcurrentMapCache) cacheManager.getCache("datasource");
     Set<Object> keySet = concurrentMapCache.getNativeCache().keySet();
     return keySet.stream()
         .filter(key -> ((String) key).trim().contains(userName))
@@ -75,15 +63,18 @@ public class DashboardService {
         .isPresent();
   }
 
-  public Object fetchResponseFromCache(String cacheName, String userName) {
+  @Override
+  public Object fetchResponseFromCache(String userName) {
 
     CacheManager cacheManager = oesCacheManager.getConcurrentMapCacheManager();
-    ConcurrentMapCache concurrentMapCache = (ConcurrentMapCache) cacheManager.getCache(cacheName);
+    ConcurrentMapCache concurrentMapCache =
+        (ConcurrentMapCache) cacheManager.getCache("datasource");
     Set<Object> keySet = concurrentMapCache.getNativeCache().keySet();
     Set<Object> filteredKeySet =
         keySet.stream()
             .filter(key -> ((String) key).trim().contains(userName))
             .collect(Collectors.toSet());
+
     return filteredKeySet.stream()
         .map(key -> concurrentMapCache.getNativeCache().get(key))
         .collect(Collectors.toList());

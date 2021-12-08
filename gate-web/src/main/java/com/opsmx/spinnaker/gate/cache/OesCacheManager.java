@@ -29,7 +29,7 @@ public class OesCacheManager {
 
   @Bean(name = "concurrentMapCacheManager")
   public CacheManager concurrentMapCacheManager() {
-    concurrentMapCacheManager = new ConcurrentMapCacheManager("datasource", "datasourceResponse");
+    concurrentMapCacheManager = new ConcurrentMapCacheManager("datasource");
     return concurrentMapCacheManager;
   }
 }

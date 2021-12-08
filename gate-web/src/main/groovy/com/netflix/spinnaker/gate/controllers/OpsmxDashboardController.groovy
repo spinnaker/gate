@@ -18,7 +18,8 @@ package com.netflix.spinnaker.gate.controllers
 
 
 import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
-import com.opsmx.spinnaker.gate.service.DashboardService
+import com.opsmx.spinnaker.gate.factory.dashboard.DashboardCachingServiceBeanFactory
+import com.opsmx.spinnaker.gate.service.DashboardCachingService
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,7 +53,7 @@ class OpsmxDashboardController {
   OpsmxDashboardService opsmxDashboardService
 
   @Autowired
-  DashboardService dashboardService
+  DashboardCachingServiceBeanFactory dashboardCachingServiceBeanFactory
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
@@ -60,11 +61,11 @@ class OpsmxDashboardController {
                              @PathVariable("type") String type, HttpServletRequest httpServletRequest) {
 
     Object response = null
-
     String path = httpServletRequest.getRequestURI()
-    log.info("path : {}", path)
-    if (dashboardService.isRegisteredCachingEndpoint(path)) {
-      response = handleCaching(httpServletRequest, version, type, response)
+
+    if (DashboardCachingService.isRegisteredCachingEndpoint(path)) {
+      DashboardCachingService dashboardCachingService = dashboardCachingServiceBeanFactory.getBean(path)
+      response = handleCaching(httpServletRequest, version, type, dashboardCachingService)
     } else {
       response = opsmxDashboardService.getDashboardResponse1(version, type)
     }
@@ -72,20 +73,24 @@ class OpsmxDashboardController {
     return response
   }
 
-  private Object handleCaching(HttpServletRequest httpServletRequest, String version, String type, Object response) {
-    String userName = httpServletRequest.getUserPrincipal().getName()
-    log.info("userName : {}", userName)
+  private Object handleCaching(
+                HttpServletRequest httpServletRequest,
+                String version,
+                String type,
+                DashboardCachingService dashboardCachingService) {
 
-    boolean isCacheNotEmpty = dashboardService.isCacheNotEmpty("datasource", userName)
-    log.info("isCacheNotEmpty : {}", isCacheNotEmpty)
-    if (isCacheNotEmpty) {
-      response = dashboardService.fetchResponseFromCache("datasource", userName)
+    String userName = httpServletRequest.getUserPrincipal().getName()
+    Object response
+
+    if (dashboardCachingService.isCacheNotEmpty(userName)) {
+      response = dashboardCachingService.fetchResponseFromCache(userName)
     } else {
       response = opsmxDashboardService.getDashboardResponse1(version, type)
-      dashboardService.cacheResponse(response, userName)
+      dashboardCachingService.cacheResponse(response, userName)
     }
-    response
+    return response
   }
+
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.GET)
