@@ -30,4 +30,15 @@ public class DatasourceCachingImpl implements DatasourceCaching {
     log.debug("Populating datasource cache with key : {}", datasourceKey);
     return datasource;
   }
+
+  @Override
+  public void evictRecord(String datasourceKey) {
+    log.debug("Evicting record from cache");
+  }
+
+  @Override
+  public Map<String, Object> getRecord(String datasourceKey) {
+    log.debug("Fetching record from cache");
+    return null;
+  }
 }

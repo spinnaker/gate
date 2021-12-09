@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.cache;
+package com.opsmx.spinnaker.gate.model;
 
-public interface Constants {
+import lombok.Data;
 
-  String GET_ALL_DATASOURCES_ENDPOINT = "/dashboardservice/v4/getAllDatasources";
-  String GET_DATASOURCE_BY_ID_ENDPOINT = "/dashboardservice/v4/datasource/{id}";
+@Data
+public class DatasourceRequestModel {
+
+  private Integer id;
+  private String userName;
 }
