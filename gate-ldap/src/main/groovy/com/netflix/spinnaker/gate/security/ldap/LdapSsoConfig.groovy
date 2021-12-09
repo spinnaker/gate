@@ -22,6 +22,7 @@ import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
+import opsmx.spinnaker.gate.security.ldap.RetryOnExceptionAuthManager
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -75,7 +76,6 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   LoginProps loginProps
-
 
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -136,6 +136,11 @@ class LdapSsoConfig extends WebSecurityConfigurerAdapter {
     }
 
     }
+
+  @Override
+  protected AuthenticationManager authenticationManager() throws Exception {
+    return new RetryOnExceptionAuthManager(super.authenticationManager());
+  }
 
   @Override
   void configure(WebSecurity web) throws Exception {
