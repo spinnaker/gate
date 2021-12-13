@@ -25,6 +25,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class OesCacheManager {
@@ -36,6 +37,7 @@ public class OesCacheManager {
   @Value("${cache.expiryTime:600000}")
   private String cacheExpiryTimeout;
 
+  @Primary
   @Bean(name = "concurrentMapCacheManager")
   public CacheManager concurrentMapCacheManager() {
     concurrentMapCacheManager = new ConcurrentMapCacheManager("datasource");
