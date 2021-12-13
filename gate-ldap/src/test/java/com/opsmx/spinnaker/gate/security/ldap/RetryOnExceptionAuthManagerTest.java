@@ -1,4 +1,4 @@
-package opsmx.spinnaker.gate.security.ldap;
+package com.opsmx.spinnaker.gate.security.ldap;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;

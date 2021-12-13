@@ -22,7 +22,7 @@ import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
-import opsmx.spinnaker.gate.security.ldap.RetryOnExceptionAuthManager
+import com.opsmx.spinnaker.gate.security.ldap.RetryOnExceptionAuthManager
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
