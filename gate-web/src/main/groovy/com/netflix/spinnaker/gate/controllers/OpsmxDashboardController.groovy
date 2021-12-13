@@ -20,6 +20,7 @@ package com.netflix.spinnaker.gate.controllers
 import com.netflix.spinnaker.gate.services.internal.OpsmxDashboardService
 import com.opsmx.spinnaker.gate.factory.dashboard.DashboardCachingServiceBeanFactory
 import com.opsmx.spinnaker.gate.service.DashboardCachingService
+import com.opsmx.spinnaker.gate.util.CacheUtil
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,7 +64,7 @@ class OpsmxDashboardController {
     Object response = null
     String path = httpServletRequest.getRequestURI()
 
-    if (DashboardCachingService.isRegisteredCachingEndpoint(path)) {
+    if (CacheUtil.isRegisteredCachingEndpoint(path)) {
       DashboardCachingService dashboardCachingService = dashboardCachingServiceBeanFactory.getBean(path)
       response = handleCaching(httpServletRequest, version, type, dashboardCachingService)
     } else {

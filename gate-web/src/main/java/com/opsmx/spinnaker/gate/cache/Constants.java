@@ -20,4 +20,5 @@ public interface Constants {
 
   String GET_ALL_DATASOURCES_ENDPOINT = "/dashboardservice/v4/getAllDatasources";
   String GET_DATASOURCE_BY_ID_ENDPOINT = "/dashboardservice/v4/datasource/{id}";
+  String CHECK_IS_ADMIN_ENDPOINT = "/platformservice/v1/users/{username}/isadmin";
 }

@@ -18,6 +18,9 @@ package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.OpsmxPlatformService
+import com.opsmx.spinnaker.gate.factory.platform.PlatformCachingServiceBeanFactory
+import com.opsmx.spinnaker.gate.service.PlatformCachingService
+import com.opsmx.spinnaker.gate.util.CacheUtil
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import okhttp3.OkHttpClient
@@ -28,6 +31,8 @@ import org.springframework.web.bind.annotation.*
 import retrofit.client.Response
 import org.apache.commons.io.IOUtils
 import org.springframework.http.MediaType
+
+import javax.servlet.http.HttpServletRequest
 import java.util.stream.Collectors
 import org.springframework.http.ResponseEntity
 
@@ -55,6 +60,9 @@ class OpsmxPlatformController {
   @Autowired
   OpsmxPlatformService opsmxPlatformService
 
+  @Autowired
+  PlatformCachingServiceBeanFactory platformCachingServiceBeanFactory
+
   @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getPlatformResponse1(@PathVariable("version") String version,
@@ -78,13 +86,33 @@ class OpsmxPlatformController {
   @ApiOperation(value = "Endpoint for platform rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.GET)
   Object getPlatformResponse4(@PathVariable("version") String version,
-                          @PathVariable("type") String type,
-                          @PathVariable("source") String source,
-                          @PathVariable("source1") String source1,
-                          @RequestParam(value = "datasourceType", required = false) String datasourceType,
-                          @RequestParam(value = "permissionId", required = false) String permissionId) {
+                              @PathVariable("type") String type,
+                              @PathVariable("source") String source,
+                              @PathVariable("source1") String source1,
+                              @RequestParam(value = "datasourceType", required = false) String datasourceType,
+                              @RequestParam(value = "permissionId", required = false) String permissionId, HttpServletRequest httpServletRequest) {
 
-    return opsmxPlatformService.getPlatformResponse4(version, type, source, source1,datasourceType, permissionId)
+    String path = httpServletRequest.getRequestURI()
+    if (CacheUtil.isRegisteredCachingEndpoint(path)){
+
+      return handleCaching(path, httpServletRequest, version, type, source, source1, datasourceType, permissionId)
+    } else {
+
+      return opsmxPlatformService.getPlatformResponse4(version, type, source, source1, datasourceType, permissionId)
+    }
+  }
+
+  private Object handleCaching(String path, HttpServletRequest httpServletRequest, String version, String type, String source, String source1, String datasourceType, String permissionId) {
+    Object response
+    PlatformCachingService platformCachingService = platformCachingServiceBeanFactory.getBean(path)
+
+    String userName = httpServletRequest.getUserPrincipal().getName()
+    response = platformCachingService.fetchResponseFromCache(userName)
+    if (response == null) {
+      response = opsmxPlatformService.getPlatformResponse4(version, type, source, source1, datasourceType, permissionId)
+      platformCachingService.cacheResponse(response, userName)
+    }
+    return response
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")

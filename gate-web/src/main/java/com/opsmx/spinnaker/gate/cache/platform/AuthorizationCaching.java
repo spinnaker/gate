@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.service;
+package com.opsmx.spinnaker.gate.cache.platform;
 
-public interface DashboardCachingService {
+import java.util.Map;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 
-  void cacheResponse(Object response, String userName);
+public interface AuthorizationCaching {
 
-  boolean isCacheNotEmpty(String userName);
+  @CachePut(value = "adminAuth", key = "#userName", cacheManager = "caffeineCacheManager")
+  Map<String, Object> populateAdminAuthCache(String userName, Map<String, Object> response);
 
-  Object fetchResponseFromCache(String userName);
+  @Cacheable(value = "adminAuth", key = "#userName", cacheManager = "caffeineCacheManager")
+  Map<String, Object> getRecordFromAdminAuthCache(String userName);
 }
