@@ -47,7 +47,7 @@ public interface CacheUtil {
               endpoint -> {
                 String[] paths = endpoint.split("/");
                 if (pathVariables.size() == paths.length) {
-                  for (int index = 0; index <= paths.length; index++) {
+                  for (int index = 0; index < paths.length; index++) {
                     String variable = paths[index];
                     if (variable.startsWith("{") && variable.endsWith("}")) {
                       pathVariables.set(index, variable);
