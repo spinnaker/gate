@@ -20,12 +20,17 @@ import com.opsmx.spinnaker.gate.cache.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface CacheUtil {
+
+  Logger logger = LoggerFactory.getLogger(CacheUtil.class);
 
   static boolean isRegisteredCachingEndpoint(String path) {
     boolean flag = Boolean.FALSE;
     path = formatPath(path);
+    logger.info("formatted path : {}", path);
     switch (path) {
       case Constants.CHECK_IS_ADMIN_ENDPOINT:
         flag = Boolean.TRUE;

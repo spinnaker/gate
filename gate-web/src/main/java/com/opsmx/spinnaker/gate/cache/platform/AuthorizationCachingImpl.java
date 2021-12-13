@@ -26,13 +26,13 @@ public class AuthorizationCachingImpl implements AuthorizationCaching {
 
   @Override
   public Map<String, Object> populateAdminAuthCache(String userName, Map<String, Object> response) {
-    log.debug("populating admin auth cache");
+    log.info("populating admin auth cache");
     return response;
   }
 
   @Override
   public Map<String, Object> getRecordFromAdminAuthCache(String userName) {
-    log.debug("getting record from admin auth cache");
+    log.info("getting record from admin auth cache");
     return null;
   }
 }
