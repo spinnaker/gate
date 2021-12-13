@@ -33,7 +33,7 @@ public class OesCacheManager {
 
   @Getter private CaffeineCacheManager caffeineCacheManager;
 
-  @Value("${cache.expiryTime}")
+  @Value("${cache.expiryTime:600000}")
   private String cacheExpiryTimeout;
 
   @Bean(name = "concurrentMapCacheManager")
