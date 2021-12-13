@@ -60,7 +60,7 @@ public interface CacheUtil {
                   }
                 }
               });
-      formattedPath = "/".concat(String.join("/", pathVariables));
+      formattedPath = String.join("/", pathVariables);
     }
     return formattedPath;
   }
