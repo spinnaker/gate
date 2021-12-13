@@ -48,7 +48,7 @@ public class OesCacheManager {
     CaffeineCacheManager cacheManager = new CaffeineCacheManager("adminAuth");
     cacheManager.setCaffeine(
         Caffeine.newBuilder()
-            .expireAfterWrite(Integer.parseInt(cacheExpiryTimeout), TimeUnit.MILLISECONDS));
+            .expireAfterWrite(Long.parseLong(cacheExpiryTimeout), TimeUnit.MILLISECONDS));
     caffeineCacheManager = cacheManager;
     return cacheManager;
   }
