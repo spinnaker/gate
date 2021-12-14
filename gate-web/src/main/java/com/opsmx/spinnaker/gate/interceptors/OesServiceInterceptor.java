@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.interceptors;
 
+import com.opsmx.spinnaker.gate.exception.InvalidApiKeyException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +31,12 @@ public class OesServiceInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
 
-    log.info("request intercepted for API : {}", request.getRequestURI());
+    if (request.getHeader("apiKey") == null
+        || request.getHeader("apiKey").isBlank()
+        || !request.getHeader("apiKey").equals(apiKey)) {
 
-    if (request.getHeader("apiKey") != null && request.getHeader("apiKey").equals(apiKey)) {
-      log.info("api key matched");
-      return true;
+      throw new InvalidApiKeyException("Access forbidden . Invalid API key");
     }
-    log.error("api key not matched");
-    return false;
+    return true;
   }
 }
