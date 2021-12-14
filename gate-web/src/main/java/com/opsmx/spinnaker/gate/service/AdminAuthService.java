@@ -40,8 +40,6 @@ public class AdminAuthService implements PlatformCachingService {
   @Override
   public void cacheResponse(Object response, String userName) {
 
-    log.info("caching the response");
-
     String responseBody = gson.toJson(response);
     Map<String, Object> adminAuthResponse = gson.fromJson(responseBody, Map.class);
     authorizationCaching.populateAdminAuthCache(userName, adminAuthResponse);

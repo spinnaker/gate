@@ -30,7 +30,7 @@ public interface CacheUtil {
   static boolean isRegisteredCachingEndpoint(String path) {
     boolean flag = Boolean.FALSE;
     path = formatPath(path);
-    logger.info("formatted path : {}", path);
+    logger.debug("formatted path : {}", path);
     switch (path) {
       case Constants.CHECK_IS_ADMIN_ENDPOINT:
         flag = Boolean.TRUE;

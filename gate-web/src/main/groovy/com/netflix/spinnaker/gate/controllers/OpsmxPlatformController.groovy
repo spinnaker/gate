@@ -93,13 +93,9 @@ class OpsmxPlatformController {
                               @RequestParam(value = "permissionId", required = false) String permissionId, HttpServletRequest httpServletRequest) {
 
     String path = httpServletRequest.getRequestURI()
-    log.info("path : {}", path)
     if (CacheUtil.isRegisteredCachingEndpoint(path)){
-      log.info("is registered endpoint : {}", path)
-
       return handleCaching(path, httpServletRequest, version, type, source, source1, datasourceType, permissionId)
     } else {
-
       return opsmxPlatformService.getPlatformResponse4(version, type, source, source1, datasourceType, permissionId)
     }
   }
