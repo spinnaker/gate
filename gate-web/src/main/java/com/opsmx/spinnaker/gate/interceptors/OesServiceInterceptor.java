@@ -18,8 +18,10 @@ package com.opsmx.spinnaker.gate.interceptors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Slf4j
 public class OesServiceInterceptor implements HandlerInterceptor {
 
   private static final String apiKey = "b5c6b2d5-88e2-4866-9df3-0e17bf5e72c5";
@@ -27,6 +29,8 @@ public class OesServiceInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
+
+    log.info("request intercepted for API : {}", request.getRequestURI());
 
     if (request.getHeader("apiKey") != null && request.getHeader("apiKey").equals(apiKey)) {
       return true;
