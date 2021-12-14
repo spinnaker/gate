@@ -38,6 +38,7 @@ public class DatasourceCachingController {
   public ResponseEntity saveDatasourceInCache(
       @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
+    log.info("datasource save cache API invoked");
     datasourceCachingService.saveDatasourceInCache(datasourceRequestModel);
     return ResponseEntity.ok().build();
   }
@@ -46,6 +47,7 @@ public class DatasourceCachingController {
   public ResponseEntity evictRecordFromCache(
       @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
+    log.info("datasource evict cache API invoked");
     datasourceCachingService.evictRecordFromCache(datasourceRequestModel);
     return ResponseEntity.noContent().build();
   }

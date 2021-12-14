@@ -33,8 +33,10 @@ public class OesServiceInterceptor implements HandlerInterceptor {
     log.info("request intercepted for API : {}", request.getRequestURI());
 
     if (request.getHeader("apiKey") != null && request.getHeader("apiKey").equals(apiKey)) {
+      log.info("api key matched");
       return true;
     }
+    log.error("api key not matched");
     return false;
   }
 }
