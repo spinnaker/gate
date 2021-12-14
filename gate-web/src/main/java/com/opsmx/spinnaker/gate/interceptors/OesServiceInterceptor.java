@@ -35,7 +35,7 @@ public class OesServiceInterceptor implements HandlerInterceptor {
         || request.getHeader("apiKey").isBlank()
         || !request.getHeader("apiKey").equals(apiKey)) {
 
-      throw new InvalidApiKeyException("Access forbidden . Invalid API key");
+      throw new InvalidApiKeyException("Access forbidden. Invalid API key");
     }
     return true;
   }
