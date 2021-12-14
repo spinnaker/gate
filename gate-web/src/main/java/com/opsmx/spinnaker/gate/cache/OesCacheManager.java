@@ -16,20 +16,42 @@
 
 package com.opsmx.spinnaker.gate.cache;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class OesCacheManager {
 
   @Getter private CacheManager concurrentMapCacheManager;
 
+  @Getter private CaffeineCacheManager caffeineCacheManager;
+
+  @Value("${cache.expiryTime:600000}")
+  private String cacheExpiryTimeout;
+
+  @Primary
   @Bean(name = "concurrentMapCacheManager")
   public CacheManager concurrentMapCacheManager() {
     concurrentMapCacheManager = new ConcurrentMapCacheManager("datasource");
     return concurrentMapCacheManager;
+  }
+
+  @Bean(name = "caffeineCacheManager")
+  public CacheManager cacheManager() {
+
+    CaffeineCacheManager cacheManager = new CaffeineCacheManager("adminAuth");
+    cacheManager.setCaffeine(
+        Caffeine.newBuilder()
+            .expireAfterWrite(Long.parseLong(cacheExpiryTimeout), TimeUnit.MILLISECONDS));
+    caffeineCacheManager = cacheManager;
+    return cacheManager;
   }
 }

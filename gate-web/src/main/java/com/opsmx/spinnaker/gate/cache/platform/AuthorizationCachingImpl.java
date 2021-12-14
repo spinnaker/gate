@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package com.opsmx.spinnaker.gate.service;
+package com.opsmx.spinnaker.gate.cache.platform;
 
-public interface DashboardCachingService {
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-  void cacheResponse(Object response, String userName);
+@Slf4j
+@Component
+public class AuthorizationCachingImpl implements AuthorizationCaching {
 
-  boolean isCacheNotEmpty(String userName);
+  @Override
+  public Map<String, Object> populateAdminAuthCache(String userName, Map<String, Object> response) {
+    log.debug("populating admin auth cache");
+    return response;
+  }
 
-  Object fetchResponseFromCache(String userName);
+  @Override
+  public Map<String, Object> getRecordFromAdminAuthCache(String userName) {
+    log.debug("getting record from admin auth cache");
+    return null;
+  }
 }

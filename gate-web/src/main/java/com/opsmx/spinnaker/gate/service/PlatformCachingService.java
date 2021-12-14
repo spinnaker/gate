@@ -16,7 +16,7 @@
 
 package com.opsmx.spinnaker.gate.service;
 
-public interface DashboardCachingService {
+public interface PlatformCachingService {
 
   void cacheResponse(Object response, String userName);
 

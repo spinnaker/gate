@@ -59,6 +59,8 @@ dependencies {
   implementation "io.springfox:springfox-swagger2"
 
   implementation 'org.springframework.boot:spring-boot-starter-cache'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.9.2'
+
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.4.RELEASE'
 

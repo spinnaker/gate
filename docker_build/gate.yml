@@ -35,6 +35,9 @@ retrofit:
   writeTimeout: 30000
   retryOnConnectionFailure: true
 
+cache:
+  expiryTime: 600000
+
 security:
   basic:
     enabled: false
