@@ -52,6 +52,11 @@ allprojects {
     configurations.all {
       exclude group: 'javax.servlet', module: 'servlet-api'
       exclude group: 'javax.servlet', module: 'javax.servlet-api'
+      resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.apache.logging.log4j') {
+          details.useVersion '2.16.0'
+        }
+      }
     }
 
     tasks.withType(JavaExec) {
