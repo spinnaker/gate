@@ -78,7 +78,7 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
     if (!shouldRetry()) {
       throw e;
     } else {
-      log.debug("Ldap exception occurred so retrying the authentication, The exception is : {}", e);
+      log.warn("Ldap exception occurred so retrying the authentication, The exception is : {}", e);
     }
     waitUntilNextTry();
   }
