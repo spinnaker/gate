@@ -29,7 +29,7 @@ public class RetryOnExceptionAuthManagerTest {
     try {
       fixture.authenticate(authentication);
       fail("Should fail when try attempts are finished");
-    } catch (UncategorizedLdapException e) {
+    } catch (LDAPConnectionClosedException e) {
 
     } catch (Exception e) {
       fail("UncategorizedLdapException is expected");

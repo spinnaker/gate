@@ -35,14 +35,19 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    Authentication auth = null;
     while (true) {
       try {
-        return delegate.authenticate(authentication);
+        auth = delegate.authenticate(authentication);
+        log.info("Authenticated without connection issue");
+        break;
       } catch (UncategorizedLdapException ldapException) {
         exceptionOccurred(ldapException);
         continue;
       }
     }
+
+    return auth;
   }
 
   /*
@@ -73,12 +78,13 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
    * @throws Exception
    * @param e
    */
-  private void exceptionOccurred(UncategorizedLdapException e) throws UncategorizedLdapException {
+  private void exceptionOccurred(UncategorizedLdapException e)
+      throws LDAPConnectionClosedException {
     numRetries--;
     if (!shouldRetry()) {
-      throw e;
+      throw new LDAPConnectionClosedException(e.getMessage());
     } else {
-      log.warn("Ldap exception occurred so retrying the authentication, The exception is : {}", e);
+      log.info("Ldap exception occurred so retrying the authentication, The exception is : {}", e);
     }
     waitUntilNextTry();
   }
