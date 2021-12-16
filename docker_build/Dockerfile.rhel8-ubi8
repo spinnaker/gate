@@ -37,10 +37,10 @@ RUN  chmod +x /opsmx/workdir/startup.sh
 ARG CUSTOMPLUGIN_RELEASEVERSION
 ENV CUSTOMPLUGIN_RELEASEVERSION=$CUSTOMPLUGIN_RELEASEVERSION
 COPY /docker_build/custom-plugin.json /opt/spinnaker/plugins/plugins.json
-RUN wget -O VerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/VerificationPlugin-v1.0.1-SNAPSHOT.zip \
-    && wget -O TestVerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip \
-    && wget -O policyPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/policyPlugin-v1.0.1-SNAPSHOT.zip \
-    && wget -O ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Pf4jCustomStagePlugin/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip
+RUN wget -O VerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Customplugins/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/VerificationPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O TestVerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Customplugins/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O policyPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Customplugins/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/policyPlugin-v1.0.1-SNAPSHOT.zip \
+    && wget -O ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/Customplugins/releases/download/${CUSTOMPLUGIN_RELEASEVERSION}/ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip
 RUN mv VerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
     && mv TestVerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
     && mv policyPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
