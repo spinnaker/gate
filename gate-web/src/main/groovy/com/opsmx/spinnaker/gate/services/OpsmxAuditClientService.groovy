@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.services
 
+import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.GET
 import retrofit.http.Path
@@ -37,13 +38,15 @@ interface OpsmxAuditClientService {
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}")
   Object getAuditClientResponse3(@Path('version') String version,
-                              @Path('type') String type,
-                              @Path('source') String source,
-                              @Path('source1') String source1,
-                              @Query("isTreeView") Boolean isTreeView,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Query("isTreeView") Boolean isTreeView,
                                  @Query("isLatest") Boolean isLatest,
                                  @Query("pageNo") Integer pageNo,
-                                 @Query("size") Integer size)
+                                 @Query("pageLimit") Integer pageLimit,
+                                 @Query("noOfDays") String noOfDays,
+                                 @Query("search") String search)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getAuditClientResponse4(@Path('version') String version,
@@ -58,7 +61,8 @@ interface OpsmxAuditClientService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Path('source2') String source2,
-                              @Path('source3') String source3)
+                              @Path('source3') String source3,
+                              @Query("noOfDays") String noOfDays)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getAuditClientResponse6(@Path('version') String version,

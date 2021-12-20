@@ -69,9 +69,10 @@ class OpsmxAuditClientServiceController {
                               @RequestParam(value = "isTreeView", required = false) Boolean isTreeView,
                                  @RequestParam(value = "isLatest", required = false) Boolean isLatest,
                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
-                                 @RequestParam(value = "size", required = false) Integer size) {
-
-    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, size)
+                                 @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                                 @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                 @RequestParam(value = "search", required = false) String search) {
+    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, pageLimit,noOfDays,search)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -92,9 +93,9 @@ class OpsmxAuditClientServiceController {
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
                               @PathVariable("source2") String source2,
-                              @PathVariable("source3") String source3) {
-
-    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3)
+                              @PathVariable("source3") String source3,
+                              @RequestParam(value = "noOfDays", required = false) String noOfDays) {
+    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3,noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
