@@ -20,6 +20,7 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
   private int numRetries;
   private long timeToWaitMS;
   private AuthenticationManager delegate;
+  private int originalNumRetries;
 
   // CONSTRUCTORS
   public RetryOnExceptionAuthManager(
@@ -27,6 +28,7 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
     this.numRetries = _numRetries;
     this.timeToWaitMS = _timeToWaitMS;
     this.delegate = delegate;
+    this.originalNumRetries = _numRetries;
   }
 
   public RetryOnExceptionAuthManager(AuthenticationManager delegate) {
@@ -40,10 +42,10 @@ public class RetryOnExceptionAuthManager implements AuthenticationManager {
       try {
         auth = delegate.authenticate(authentication);
         log.info("Authenticated without connection issue");
+        numRetries = originalNumRetries;
         break;
       } catch (UncategorizedLdapException ldapException) {
         exceptionOccurred(ldapException);
-        continue;
       }
     }
 
