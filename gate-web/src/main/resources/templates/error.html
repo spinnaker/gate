@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- google fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700|Roboto:300,400,500,700&display=swap" rel="stylesheet">
+
+  <!-- awsomefonts -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+  <title>OES - Error Page</title>
+</head>
+<body>
+<div id="wrapper">
+  <div class="login-reg">
+    <div class="login-reg-header">
+      <img src="images/logo.png" alt="">
+    </div>
+    <!-- /.login-reg-header -->
+
+    <div class="login-reg-body">
+      <div class="container login-reg-container">
+        <div class="card">
+          <div class="card-body">
+            <div class="lrcb-inner">
+              <div class="login-reg-icon text-center">
+                <img src="images/login-icon.png" class="img-fluid" alt="login" />
+              </div>
+              <!-- /.login-reg-icon -->
+              <h3>Sign in</h3>
+              <form>
+                <div th:if="${param.error}" class="d-inline-block align-middle mr-2 error-message">
+                  Invalid username and password.
+                </div>
+                <div class="form-group mb-3">
+                  <label>error1</label>
+                  <input type="text" id="username" name="username" class="form-control" placeholder="Username" autofocus required/>
+                </div>
+                <!-- /.form-group -->
+                <div class="form-group mb-3">
+                  <label>error2</label>
+                  <input type="password" id="password" name="password" class="form-control" placeholder="Password" />
+                </div>
+                <!-- /.form-group -->
+                <!--<div class="form-group d-flex align-items-center justify-content-between mb-3">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="rememberCheck" checked>
+                    <label class="custom-control-label" for="rememberCheck">Remember Me</label>
+                  </div>
+                  <a href="#" class="text-primary text-decoration-none">Forgot Password?</a>
+                </div>
+                -->
+                <!-- /.form-group -->
+                <div class="form-group mb-3">
+                  <button type="submit" class="btn btn-primary btn-block">Log in</button>
+                </div>
+                <!-- /.form-group -->
+                <!--<hr />
+                <div class="mt-2 text-center text-muted">
+                  Don't have an account? <a href="#" class="text-primary">Sign Up</a>
+                </div>
+                -->
+              </form>
+            </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+      <!-- /.login-reg-container -->
+    </div>
+    <!-- /.login-reg-body -->
+  </div>
+  <!-- /.login-reg -->
+</div>
+<!-- /#wrapper -->
+
+<!-- Optional JavaScript -->
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+
+
+<style>
+  .align-center {
+      margin: auto;
+      width: 50%;
+      padding: 2%;
+      text-align: center;
+  }
+  .error-message {
+      margin: auto;
+      color: red;
+      padding: 3%;
+      text-align: center;
+   }
+
+</style>
+
+</body>
+</html>

@@ -166,6 +166,12 @@ public class RequestSheddingFilter extends HttpFilter {
       registry.counter(requestsId.withTag("action", "allowed")).increment();
     }
 
+    String uri = request.getRequestURI();
+    if ("/error".equals(uri)) {
+      response.sendRedirect("/oes/error");
+      return;
+    }
+
     chain.doFilter(request, response);
   }
 
