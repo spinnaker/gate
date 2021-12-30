@@ -61,10 +61,7 @@ public class DatasourceCachingServiceImpl implements DashboardCachingService {
     ConcurrentMapCache concurrentMapCache =
         (ConcurrentMapCache) cacheManager.getCache("datasource");
     Set<Object> keySet = concurrentMapCache.getNativeCache().keySet();
-    return keySet.stream()
-        .filter(key -> ((String) key).trim().contains(userName))
-        .findFirst()
-        .isPresent();
+    return keySet.stream().anyMatch(key -> ((String) key).trim().contains(userName));
   }
 
   @Override

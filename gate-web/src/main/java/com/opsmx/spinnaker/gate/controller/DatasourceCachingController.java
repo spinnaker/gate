@@ -39,7 +39,9 @@ public class DatasourceCachingController {
       @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
     log.debug("datasource save cache API invoked");
-    datasourceCachingService.saveDatasourceInCache(datasourceRequestModel);
+    if (datasourceCachingService.isCacheNotEmpty(datasourceRequestModel.getUserName())) {
+      datasourceCachingService.saveDatasourceInCache(datasourceRequestModel);
+    }
     return ResponseEntity.ok().build();
   }
 
@@ -48,7 +50,9 @@ public class DatasourceCachingController {
       @RequestBody DatasourceRequestModel datasourceRequestModel) {
 
     log.debug("datasource evict cache API invoked");
-    datasourceCachingService.evictRecordFromCache(datasourceRequestModel);
+    if (datasourceCachingService.isCacheNotEmpty(datasourceRequestModel.getUserName())) {
+      datasourceCachingService.evictRecordFromCache(datasourceRequestModel);
+    }
     return ResponseEntity.noContent().build();
   }
 }
