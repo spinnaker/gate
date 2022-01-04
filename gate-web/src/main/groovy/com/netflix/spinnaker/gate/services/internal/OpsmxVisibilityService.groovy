@@ -44,7 +44,9 @@ interface OpsmxVisibilityService {
                                @Query("noOfDays") String noOfDays,
                                @Query("pageNo") Integer pageNo,
                                @Query("pageLimit") Integer pageLimit,
-                               @Query("search") String search)
+                               @Query("search") String search,
+                               @Query("deploymentId") Integer deploymentId,
+                               @Query("history") Boolean history)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}")
   Object getVisibilityResponse4(@Path('version') String version,

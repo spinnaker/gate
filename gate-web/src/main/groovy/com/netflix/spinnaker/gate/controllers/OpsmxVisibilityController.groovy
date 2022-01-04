@@ -105,8 +105,10 @@ class OpsmxVisibilityController {
                                @RequestParam(value = "noOfDays", required = false) String noOfDays,
                                @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
-                               @RequestParam(value = "search", required = false) String search){
-    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds, noOfDays, pageNo, pageLimit, search)
+                               @RequestParam(value = "search", required = false) String search,
+                               @RequestParam(value = "deploymentId", required = false) Integer deploymentId,
+                               @RequestParam(value = "history", required = false) Boolean history){
+    return opsmxVisibilityService.getVisibilityResponse(version, type, source, source1, approvalgateinstances, approvalGateInstanceIds, noOfDays, pageNo, pageLimit, search, deploymentId, history)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
