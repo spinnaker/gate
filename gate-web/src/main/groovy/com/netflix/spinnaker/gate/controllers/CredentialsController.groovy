@@ -24,6 +24,7 @@ import com.netflix.spinnaker.gate.services.AccountLookupService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.Account
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService.AccountDetails
+import com.netflix.spinnaker.kork.annotations.Alpha
 import com.netflix.spinnaker.security.User
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -94,6 +95,7 @@ class CredentialsController {
   @GetMapping('/type/{accountType}')
   @ApiOperation('Looks up account definitions by type.')
   @PostFilter("hasPermission(filterObject.name, 'ACCOUNT', 'WRITE')")
+  @Alpha
   List<ClouddriverService.AccountDefinition> getAccountsByType(
     @ApiParam(value = 'Value of the "@type" key for accounts to search for.', example = 'kubernetes')
     @PathVariable String accountType,
@@ -108,6 +110,7 @@ class CredentialsController {
   @PostMapping
   @ApiOperation('Creates a new account definition.')
   @PreAuthorize('isAuthenticated()')
+  @Alpha
   ClouddriverService.AccountDefinition createAccount(
     @ApiParam('Account definition body including a discriminator field named "@type" with the account type.')
     @RequestBody ClouddriverService.AccountDefinition accountDefinition
@@ -118,6 +121,7 @@ class CredentialsController {
   @PutMapping
   @ApiOperation('Updates an existing account definition.')
   @PreAuthorize("hasPermission(#definition.name, 'ACCOUNT', 'WRITE')")
+  @Alpha
   ClouddriverService.AccountDefinition updateAccount(
     @ApiParam('Account definition body including a discriminator field named "@type" with the account type.')
     @RequestBody ClouddriverService.AccountDefinition accountDefinition
@@ -129,6 +133,7 @@ class CredentialsController {
   @ApiOperation(value = 'Deletes an account definition by name.',
     notes = 'Deleted accounts can be restored via the update API. Previously deleted accounts cannot be "created" again to avoid conflicts with existing pipelines.')
   @PreAuthorize("hasPermission(#definition.name, 'ACCOUNT', 'WRITE')")
+  @Alpha
   void deleteAccount(
     @ApiParam('Name of account definition to delete.')
     @PathVariable String accountName
