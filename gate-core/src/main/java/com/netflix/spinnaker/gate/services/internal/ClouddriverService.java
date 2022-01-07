@@ -33,19 +33,19 @@ public interface ClouddriverService {
   @GET("/credentials/{account}")
   AccountDetails getAccount(@Path("account") String account);
 
-  @GET("/accounts?accountType={type}")
+  @GET("/credentials/type/{type}")
   List<AccountDefinition> getAccountDefinitionsByType(
       @Path("type") String type,
       @Query("limit") Integer limit,
       @Query("startingAccountName") String startingAccountName);
 
-  @POST("/accounts")
+  @POST("/credentials")
   AccountDefinition createAccountDefinition(@Body AccountDefinition accountDefinition);
 
-  @PUT("/accounts")
+  @PUT("/credentials")
   AccountDefinition updateAccountDefinition(@Body AccountDefinition accountDefinition);
 
-  @DELETE("/accounts/{account}")
+  @DELETE("/credentials/{account}")
   void deleteAccountDefinition(@Path("account") String account);
 
   @GET("/task/{taskDetailsId}")
