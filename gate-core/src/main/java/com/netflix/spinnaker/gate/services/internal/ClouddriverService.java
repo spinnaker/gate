@@ -511,6 +511,16 @@ public interface ClouddriverService {
     private final Map<String, Object> details = new HashMap<String, Object>();
   }
 
+  /**
+   * Wrapper type for Clouddriver account definitions. Clouddriver account definitions implement
+   * {@code CredentialsDefinition}, and its type discriminator is present in a property named
+   * {@code @type}. An instance of an account definition may have fairly different properties than
+   * its corresponding {@code AccountCredentials} instance. Account definitions must store all the
+   * relevant properties unchanged while {@link Account} and {@link AccountDetails} may summarize
+   * and remove data returned from their corresponding APIs. Account definitions must be transformed
+   * by a {@code CredentialsParser} before their corresponding credentials may be used by
+   * Clouddriver.
+   */
   class AccountDefinition {
     private final Map<String, Object> details = new HashMap<>();
     private String type;
