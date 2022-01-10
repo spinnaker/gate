@@ -24,7 +24,7 @@ interface OpsmxPlatformService {
 
   @GET("/platformservice/{version}/{type}")
   Object getPlatformResponse1(@Path('version') String version,
-                               @Path('type') String type,
+                              @Path('type') String type,
                               @Query("datasourceType") String datasourceType,
                               @Query("accountName") String accountName)
 
@@ -46,20 +46,21 @@ interface OpsmxPlatformService {
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getPlatformResponse5(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2,
-                         @Query("permissionId") String permissionId,
-                         @Query("resourceType") String resourceType)
+                              @Path('type') String type,
+                              @Path('source') String source,
+                              @Path('source1') String source1,
+                              @Path('source2') String source2,
+                              @Query("permissionId") String permissionId,
+                              @Query("resourceType") String resourceType,
+                              @Query("featureType") String featureType)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getPlatformResponse6(@Path('version') String version,
-                         @Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2,
-                         @Path('source3') String source3)
+                              @Path('type') String type,
+                              @Path('source') String source,
+                              @Path('source1') String source1,
+                              @Path('source2') String source2,
+                              @Path('source3') String source3)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getPlatformResponse7(@Path('version') String version,
@@ -82,19 +83,28 @@ interface OpsmxPlatformService {
 
   @DELETE("/platformservice/{version}/{type}/{source}")
   Object deletePlatformResponse1(@Path('version') String version,
-                           @Path('type') String type,
-                           @Path('source') String source)
+                                 @Path('type') String type,
+                                 @Path('source') String source)
 
   @DELETE("/platformservice/{version}/{type}/{source}/{source1}")
   Object deletePlatformResponse4(@Path('version') String version,
-                            @Path('type') String type,
-                            @Path('source') String source,
-                            @Path('source1') String source1)
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1)
+
+  @DELETE("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object deletePlatformResponse5(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Query("featureType") String featureType
+  )
 
   @POST("/platformservice/{version}/{type}")
   Object postPlatformResponse(@Path('version') String version,
-                         @Path('type') String type,
-                         @Body Object data)
+                              @Path('type') String type,
+                              @Body Object data)
 
   @POST("/platformservice/{version}/{type}/{source}")
   Object postPlatformResponse3(@Path('version') String version,
@@ -104,38 +114,38 @@ interface OpsmxPlatformService {
 
   @POST("/platformservice/{version}/{type}/{source}/{source1}")
   Object postPlatformResponse4(@Path('version') String version,
-                          @Path('type') String type,
-                          @Path('source') String source,
-                          @Path('source1') String source1,
-                          @Body Object data)
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Body Object data)
 
   @POST("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
   Object postPlatformResponse5(@Path('version') String version,
-                          @Path('type') String type,
-                          @Path('source') String source,
-                          @Path('source1') String source1,
-                          @Path('source2') String source2,
-                          @Body Object data)
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Body Object data)
 
   @POST("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object postPlatformResponse6(@Path('version') String version,
-                          @Path('type') String type,
-                          @Path('source') String source,
-                          @Path('source1') String source1,
-                          @Path('source2') String source2,
-                          @Path('source3') String source3,
-                          @Body Object data)
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Path('source3') String source3,
+                               @Body Object data)
 
   @PUT("/platformservice/{version}/{type}")
   Object updatePlatformResponse(@Path('version') String version,
-                           @Path('type') String type,
-                           @Body Object data)
+                                @Path('type') String type,
+                                @Body Object data)
 
   @PUT("/platformservice/{version}/{type}/{source}")
   Object updatePlatformResponse1(@Path('version') String version,
-                                @Path('type') String type,
-                                @Path('source') String source,
-                                @Body Object data)
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Body Object data)
 
   @PUT("/platformservice/{version}/{type}/{source}/{source1}")
   Object updatePlatformResponse2(@Path('version') String version,
@@ -160,6 +170,7 @@ interface OpsmxPlatformService {
                                  @Path('source2') String source2,
                                  @Path('source3') String source3,
                                  @Path('source4') String source4,
+                                 @Query("featureType") String featureType,
                                  @Body Object data)
 
 }
