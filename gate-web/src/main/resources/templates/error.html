@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      font-family: 'Source Sans Pro', sans-serif;
+      margin: 0px;
+      background-color: #f5f6f7;
+    }
+    .login-reg-body{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+    .logoContent{
+      width: 106px;
+    margin-left: -6px;
+    }
+    .login-reg-header{
+      border-bottom: 3px solid #0099ff;
+      padding: 18px 25px;
+      background: #304151;
+      color: #fff;
+    }
+    .login-reg {
+    min-height: 100vh;
+}
+.errorDisplay{
+  display: flex;
+}
+.errorMessage {
+  margin-left: 15%;
+  width: 50%;
+}
+
+.errorMessage p{
+  line-height: 25px;
+  padding-right: 25px;
+
+}
+.stack-container{
+  width: 30%;
+}
+.errorDisplay h3{
+  font-size: 30px;
+  font-weight: normal;
+}
+.errorDisplay p{
+  font-size: 16px;
+}
+
+.writing {
+    width: 320px;
+    height: 200px;
+    background-color: #3f3f3f;
+    border: 1px solid #bbbbbb;
+    border-radius: 6px 6px 4px 4px;
+    position: relative;
+}
+
+.writing .topbar{
+    position: absolute;
+    width: 100%;
+    height: 12px;
+    background-color: #f1f1f1;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.writing .topbar div{
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    margin: 3px;
+    float: left;
+}
+
+.writing .topbar div.green{
+    background-color: #60d060;
+}
+.writing .topbar div.red{
+    background-color: red;
+}
+.writing .topbar div.yellow{
+    background-color: #e6c015;
+}
+
+.writing .code {
+    padding: 15px;
+}
+
+.writing .code ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.writing .code ul li {
+    background-color: #9e9e9e;
+    width: 0;
+    height: 7px;
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+.container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    height: 100vh;
+    width: 100%;
+    -webkit-transition: -webkit-transform .5s;
+    transition: -webkit-transform .5s;
+    transition: transform .5s;
+    transition: transform .5s, -webkit-transform .5s;
+}
+
+.stack-container {
+    position: relative;
+    /* width: 420px; */
+    height: 210px;
+    -webkit-transition: width 1s, height 1s;
+    transition: width 1s, height 1s;
+}
+
+.pokeup {
+    -webkit-transition: all .3s ease;
+    transition: all .3s ease;
+}
+
+.pokeup:hover {
+    -webkit-transform: translateY(-10px);
+            transform: translateY(-10px);
+    -webkit-transition: .3s ease;
+    transition: .3s ease;
+}
+
+
+.error {
+    width: 400px;
+    padding: 40px;
+    text-align: center;
+}
+
+.error h1 {
+    font-size: 125px;
+    padding: 0;
+    margin: 0;
+    font-weight: 700;
+}
+
+.error h2 {
+    margin: -30px 0 0 0;
+    padding: 0px;
+    font-size: 47px;
+    letter-spacing: 12px;
+}
+
+.perspec {
+    -webkit-perspective: 1000px;
+            perspective: 1000px;
+}
+
+.writeLine{
+    -webkit-animation: writeLine .4s linear forwards;
+            animation: writeLine .4s linear forwards;
+}
+
+.explode{
+    -webkit-animation: explode .5s ease-in-out forwards;
+            animation: explode .5s ease-in-out forwards;
+}
+
+.card {
+    -webkit-animation: tiltcard .5s ease-in-out 1s forwards;
+            animation: tiltcard .5s ease-in-out 1s forwards;
+    position: absolute;
+}
+
+@-webkit-keyframes tiltcard {
+    0% {
+        -webkit-transform: rotateY(0deg);
+                transform: rotateY(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotateY(-30deg);
+                transform: rotateY(-30deg);
+    }
+}
+
+@keyframes tiltcard {
+    0% {
+        -webkit-transform: rotateY(0deg);
+                transform: rotateY(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotateY(-30deg);
+                transform: rotateY(-30deg);
+    }
+}
+
+@-webkit-keyframes explode {
+    0% {
+        -webkit-transform: translate(0, 0) scale(1);
+                transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        -webkit-transform: translate(var(--spreaddist), var(--vertdist)) scale(var(--scaledist));
+                transform: translate(var(--spreaddist), var(--vertdist)) scale(var(--scaledist));
+    }
+}
+
+@keyframes explode {
+    0% {
+        -webkit-transform: translate(0, 0) scale(1);
+                transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        -webkit-transform: translate(var(--spreaddist), var(--vertdist)) scale(var(--scaledist));
+                transform: translate(var(--spreaddist), var(--vertdist)) scale(var(--scaledist));
+    }
+}
+
+@-webkit-keyframes writeLine {
+    0% {
+        width:0;
+    }
+
+    100% {
+        width: var(--linelength);
+    }
+}
+
+@keyframes writeLine {
+    0% {
+        width:0;
+    }
+
+    100% {
+        width: var(--linelength);
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .container {
+      -webkit-transform: scale(.85);
+              transform: scale(.85);
+    }
+  }
+
+  @media screen and (max-width: 850px) {
+    .container {
+      -webkit-transform: scale(.75);
+              transform: scale(.75);
+    }
+  }
+
+  @media screen and (max-width: 775px) {
+    .container {
+      -ms-flex-wrap: wrap-reverse;
+          flex-wrap: wrap-reverse;
+      -webkit-box-align: inherit;
+          -ms-flex-align: inherit;
+              align-items: inherit;
+    }
+  }
+
+  @media screen and (max-width: 370px) {
+    .container {
+        -webkit-transform: scale(.6);
+                transform: scale(.6);
+      }
+  }
+  </style>
+
+  <!-- google fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700|Roboto:300,400,500,700&display=swap" rel="stylesheet">
+
+  <!-- awsomefonts -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+  <title>OES - Error Page</title>
+</head>
+<body>
+<div id="wrapper">
+  <div class="login-reg">
+    <div class="login-reg-header ">
+      <img class="logoContent" src= "../static/images/OpsMx_Logo_White.svg" alt="">
+    </div>
+    <!-- /.login-reg-header -->
+
+    <div class="login-reg-body">
+      <div class="container login-reg-container">
+      <div class="errorDisplay">
+          <div class="errorMessage">
+              <h3>Oops, something went wrong.</h3>
+              <p>We encountered an error and cannot fulfill the request. The error has been traced and we will work hard to get a fix
+                out as soon as possible."<span style="font-weight: bold"><a style="text-decoration: none;" href="/application">Click here</a> to navigate to Home page or feel free to contact us if the problem persists.</span>"</p>
+                <p>
+                  
+                </p>
+          </div>
+
+
+                  <div class="stack-container">
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 125px; --scaledist: .75; --vertdist: -25px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 100px; --scaledist: .8; --vertdist: -20px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 75px; --scaledist: .85; --vertdist: -15px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 50px; --scaledist: .9; --vertdist: -10px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 25px; --scaledist: .95; --vertdist: -5px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-container">
+                      <div class="perspec" style="--spreaddist: 0px; --scaledist: 1; --vertdist: 0px;">
+                        <div class="card">
+                          <div class="writing">
+                            <div class="topbar">
+                              <div class="red"></div>
+                              <div class="yellow"></div>
+                              <div class="green"></div>
+                            </div>
+                            <div class="code">
+                              <ul></ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+        </div>
+        <!-- /.card -->
+      </div>
+      <!-- /.login-reg-container -->
+    </div>
+    <!-- /.login-reg-body -->
+  </div>
+  <!-- /.login-reg -->
+</div>
+<!-- /#wrapper -->
+
+<!-- Optional JavaScript -->
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+
+
+<style>
+  .align-center {
+      margin: auto;
+      width: 50%;
+      padding: 2%;
+      text-align: center;
+  }
+  .error-message {
+      margin: auto;
+      color: red;
+      padding: 3%;
+      text-align: center;
+   }
+
+</style>
+
+</body>
+</html>
