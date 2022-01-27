@@ -125,7 +125,8 @@ interface OpsmxDashboardService {
                                   @Path('source1') String source1,
                                   @Path('source2') String source2,
                                   @Path('source3') String source3,
-                                  @Path('source4') String source4)
+                                  @Path('source4') String source4,
+                                  @Header('x-user-cookie') String cookie)
 
   @DELETE("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}")
   Object deleteDashboardResponse8(@Path('version') String version,
@@ -153,6 +154,7 @@ interface OpsmxDashboardService {
                           @Path('type') String type,
                           @Path('source') String source,
                           @Path('source1') String source1,
+                                @Header('x-user-cookie') String cookie,
                           @Body Object data)
 
   @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
@@ -217,7 +219,8 @@ interface OpsmxDashboardService {
                                   @Path('source') String source,
                                   @Path('source1') String source1,
                                   @Path('source2') String source2,
-                                  @Body Object data)
+                                  @Body Object data,
+                                  @Header('x-user-cookie') String cookie)
 
   @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object updateDashboardResponse4(@Path('version') String version,
