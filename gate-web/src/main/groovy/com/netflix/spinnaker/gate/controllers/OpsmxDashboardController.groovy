@@ -60,16 +60,20 @@ class OpsmxDashboardController {
   @ApiOperation(value = "Endpoint for dashboard rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getDashboardResponse1(@PathVariable("version") String version,
-                             @PathVariable("type") String type, HttpServletRequest httpServletRequest) {
+                               @PathVariable("type") String type,
+                               @RequestParam(value = "datasourceType", required = false) String datasourceType,
+                               @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                               @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                               @RequestParam(value = "search", required = false) String search, HttpServletRequest httpServletRequest) {
 
     Object response = null
     String path = httpServletRequest.getRequestURI()
 
     if (CacheUtil.isRegisteredCachingEndpoint(path)) {
       DashboardCachingService dashboardCachingService = dashboardCachingServiceBeanFactory.getBean(path)
-      response = handleCaching(httpServletRequest, version, type, dashboardCachingService)
+      response = handleCaching(httpServletRequest, version, type, datasourceType, pageNo, pageLimit, search, dashboardCachingService)
     } else {
-      response = opsmxDashboardService.getDashboardResponse1(version, type)
+      response = opsmxDashboardService.getDashboardResponse1(version, type, datasourceType, pageNo, pageLimit, search)
     }
 
     return response
@@ -79,6 +83,10 @@ class OpsmxDashboardController {
                 HttpServletRequest httpServletRequest,
                 String version,
                 String type,
+                String datasourceType,
+                Integer pageNo,
+                Integer pageLimit,
+                String search,
                 DashboardCachingService dashboardCachingService) {
 
     String userName = httpServletRequest.getUserPrincipal().getName()
@@ -87,7 +95,7 @@ class OpsmxDashboardController {
     if (dashboardCachingService.isCacheNotEmpty(userName)) {
       response = dashboardCachingService.fetchResponseFromCache(userName)
     } else {
-      response = opsmxDashboardService.getDashboardResponse1(version, type)
+      response = opsmxDashboardService.getDashboardResponse1(version, type, datasourceType, pageNo, pageLimit, search)
       dashboardCachingService.cacheResponse(response, userName)
     }
     return response
