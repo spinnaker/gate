@@ -135,19 +135,22 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                      @RequestParam(value = "size", required = false) Integer size) {
     Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size)
-    log.info("response for the insgiths endpoint:" + response.getHeaders());
-    InputStream inputStream = response.getBody().in()
-    try {
-      byte[] csvFile = IOUtils.toByteArray(inputStream)
-      HttpHeaders headers = new HttpHeaders()
-      headers.setContentType(MediaType.parseMediaType("text/csv"));
-      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
-      return ResponseEntity.ok().headers(headers).body(csvFile)
-    } finally {
-      if (inputStream != null) {
-        inputStream.close()
+    log.info("response for the insgiths endpoint:" + response.getHeaders())
+    if (response.getBody()!=null) {
+      InputStream inputStream = response.getBody().in()
+      try {
+        byte[] csvFile = IOUtils.toByteArray(inputStream)
+        HttpHeaders headers = new HttpHeaders()
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+        return ResponseEntity.ok().headers(headers).body(csvFile)
+      } finally {
+        if (inputStream != null) {
+          inputStream.close()
+        }
       }
     }
+    return ResponseEntity.status(response.getStatus()).build()
   }
 
   @ApiOperation(value = "Endpoint for Delivery Insights controller to download csv file")
@@ -159,19 +162,22 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "startTime", required = false) Long startTime,
                                      @RequestParam(value = "endTime", required = false) Long endTime) {
     Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime)
-    log.info("response for the delivery insights endpoint:" + response.getHeaders());
-    InputStream inputStream = response.getBody().in()
-    try {
-      byte[] csvFile = IOUtils.toByteArray(inputStream)
-      HttpHeaders headers = new HttpHeaders()
-      headers.setContentType(MediaType.parseMediaType("text/csv"));
-      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
-      return ResponseEntity.ok().headers(headers).body(csvFile)
-    } finally {
-      if (inputStream != null) {
-        inputStream.close()
+    log.info("response for the delivery insights endpoint:" + response.getHeaders())
+    if (response.getBody()!=null) {
+      InputStream inputStream = response.getBody().in()
+      try {
+        byte[] csvFile = IOUtils.toByteArray(inputStream)
+        HttpHeaders headers = new HttpHeaders()
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+        return ResponseEntity.ok().headers(headers).body(csvFile)
+      } finally {
+        if (inputStream != null) {
+          inputStream.close()
+        }
       }
     }
+    return ResponseEntity.status(response.getStatus()).build()
   }
 
 }
