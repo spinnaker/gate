@@ -194,6 +194,7 @@ public class ApplicationFeatureRbac {
     HttpMethod method = HttpMethod.valueOf(httpMethod);
     Integer applicationId = getApplicationId(endpointUrl);
     List<String> permissions;
+    log.info("authorizing the endpoint : {}", endpointUrl);
 
     switch (method) {
       case GET:
