@@ -1,6 +1,7 @@
 
 package com.netflix.spinnaker.gate.services
 
+import com.netflix.spinnaker.gate.model.PermissionModel
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -22,6 +23,6 @@ interface OesAuthorizationService {
   ResponseEntity<Map<String, String>> isFeatureVisibility(@PathVariable("username") String username, @PathVariable("featureType") String featureType, @RequestHeader(value = "x-spinnaker-user") String userName)
 
   @GetMapping(value = "/platformservice/v6/users/{username}/features/{featureType}/{resourceId}/permission", produces = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<List<String>> fetchPermissions(@PathVariable("username") String username, @PathVariable("featureType") String featureType, @PathVariable("resourceId") Integer resourceId, @RequestHeader(value = "x-spinnaker-user") String userName)
+  ResponseEntity<PermissionModel> fetchPermissions(@PathVariable("username") String username, @PathVariable("featureType") String featureType, @PathVariable("resourceId") Integer resourceId, @RequestHeader(value = "x-spinnaker-user") String userName)
 
 }

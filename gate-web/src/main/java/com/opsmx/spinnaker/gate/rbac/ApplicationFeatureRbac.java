@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.rbac;
 
+import com.netflix.spinnaker.gate.model.PermissionModel;
 import com.netflix.spinnaker.gate.services.OesAuthorizationService;
 import com.opsmx.spinnaker.gate.enums.PermissionEnum;
 import com.opsmx.spinnaker.gate.enums.RbacFeatureType;
@@ -193,17 +194,19 @@ public class ApplicationFeatureRbac {
 
     HttpMethod method = HttpMethod.valueOf(httpMethod);
     Integer applicationId = getApplicationId(endpointUrl);
-    List<String> permissions;
+    PermissionModel permission;
+
     log.info("authorizing the endpoint : {}", endpointUrl);
 
     switch (method) {
       case GET:
-        permissions =
+        permission =
             oesAuthorizationService
                 .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
                 .getBody();
-        log.info("permissions for the GET API : {}", permissions);
-        if (permissions == null || !permissions.contains(PermissionEnum.view.name())) {
+        log.info("permissions for the GET API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.view.name())) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
                   + PermissionEnum.view.name()
@@ -215,12 +218,13 @@ public class ApplicationFeatureRbac {
 
       case POST:
       case PUT:
-        permissions =
+        permission =
             oesAuthorizationService
                 .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
                 .getBody();
-        log.info("permissions for the POST or PUT API : {}", permissions);
-        if (permissions == null || !permissions.contains(PermissionEnum.create_or_edit.name())) {
+        log.info("permissions for the POST or PUT API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
                   + PermissionEnum.create_or_edit.name()
@@ -231,12 +235,13 @@ public class ApplicationFeatureRbac {
         break;
 
       case DELETE:
-        permissions =
+        permission =
             oesAuthorizationService
                 .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
                 .getBody();
-        log.info("permissions for the DELETE API : {}", permissions);
-        if (permissions == null || !permissions.contains(PermissionEnum.delete.name())) {
+        log.info("permissions for the DELETE API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.delete.name())) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
                   + PermissionEnum.delete.name()
