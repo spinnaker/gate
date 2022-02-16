@@ -37,6 +37,6 @@ public class ApplicationIdRbacInterceptor implements HandlerInterceptor {
         "Request intercepted for authorizing if the user is having enough access to perform the action");
     applicationFeatureRbac.authorizeUser(
         request.getUserPrincipal().getName(), request.getRequestURI(), request.getMethod());
-    return false;
+    return true;
   }
 }
