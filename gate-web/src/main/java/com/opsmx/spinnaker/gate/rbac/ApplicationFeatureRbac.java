@@ -65,7 +65,7 @@ public class ApplicationFeatureRbac {
     log.info("is feature visibility enabled : {}", isFeatureVisibility);
     if (!isFeatureVisibility) {
       throw new AccessForbiddenException(
-          "You do not have permission for the feature type : " + RbacFeatureType.APP.name());
+          "You do not have permission for the feature type : " + RbacFeatureType.APP.description);
     }
   }
 
