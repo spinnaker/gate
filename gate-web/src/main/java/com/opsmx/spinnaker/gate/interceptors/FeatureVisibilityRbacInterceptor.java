@@ -34,7 +34,7 @@ public class FeatureVisibilityRbacInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
     log.info("request intercepted to authorize if the user is having feature visibility");
-    applicationFeatureRbac.authorizeUser(request.getUserPrincipal().getName());
+    applicationFeatureRbac.authorizeUserForFeatureVisibility(request.getUserPrincipal().getName());
     return true;
   }
 }

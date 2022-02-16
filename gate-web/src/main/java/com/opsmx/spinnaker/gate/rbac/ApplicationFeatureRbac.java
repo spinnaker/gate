@@ -39,6 +39,9 @@ public class ApplicationFeatureRbac {
   private static final List<String> runtime_access = new ArrayList<>();
   public static final List<String> applicationFeatureRbacEndpoints = new ArrayList<>();
   public static final List<String> endpointsWithApplicationId = new ArrayList<>();
+  public static final List<String> endpointsWithServiceId = new ArrayList<>();
+  public static final List<String> endpointsWithPipelineId = new ArrayList<>();
+  public static final List<String> endpointsWithGateId = new ArrayList<>();
 
   private static final String YOU_DO_NOT_HAVE = "You do not have : ";
   private static final String PERMISSION_FOR_THE_FEATURE_TYPE =
@@ -46,6 +49,293 @@ public class ApplicationFeatureRbac {
   private static final String TO_PERFORM_THIS_OPERATION = " to perform this operation";
 
   static {
+    populateDashboardServiceApis();
+  }
+
+  public void authorizeUserForFeatureVisibility(String userName) {
+
+    Boolean isFeatureVisibility;
+
+    isFeatureVisibility =
+        Boolean.parseBoolean(
+            oesAuthorizationService
+                .isFeatureVisibility(userName, RbacFeatureType.APP.name(), userName)
+                .getBody()
+                .get("isEnabled"));
+    log.info("is feature visibility enabled : {}", isFeatureVisibility);
+    if (!isFeatureVisibility) {
+      throw new AccessForbiddenException(
+          "You do not have permission for the feature type : " + RbacFeatureType.APP.name());
+    }
+  }
+
+  public void authorizeUserForApplicationId(
+      String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer applicationId = getApplicationId(endpointUrl);
+    PermissionModel permission;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        permission =
+            oesAuthorizationService
+                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
+                .getBody();
+        log.info("permissions for the GET API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.view.name())) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        permission =
+            oesAuthorizationService
+                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
+                .getBody();
+        log.info("permissions for the POST or PUT API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        permission =
+            oesAuthorizationService
+                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
+                .getBody();
+        log.info("permissions for the DELETE API : {}", permission);
+        if (permission == null
+            || !permission.getPermissions().contains(PermissionEnum.delete.name())) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getApplicationId(String endpoint) {
+    Integer applicationId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("applications")) {
+      int index = pathComps.indexOf("applications");
+      applicationId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("application")) {
+      int index = pathComps.indexOf("application");
+      applicationId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (applicationId == null || applicationId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return applicationId;
+  }
+
+  public void authorizeUserForServiceId(String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer serviceId = getServiceId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint for service Id : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.view.name(), serviceId, null, null, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the service Id GET API: {}, {}", serviceId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        serviceId,
+                        null,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the service Id POST or PUT API: {}, {}", serviceId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.delete.name(), serviceId, null, null, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the service Id DELETE API: {}, {}", serviceId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getServiceId(String endpoint) {
+    Integer serviceId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("services")) {
+      int index = pathComps.indexOf("services");
+      serviceId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("service")) {
+      int index = pathComps.indexOf("service");
+      serviceId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (serviceId == null || serviceId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return serviceId;
+  }
+
+  public void authorizeUserForPipelineId(String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer pipelineId = getPipelineId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.view.name(), null, pipelineId, null, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the pipeline Id GET API: {}, {}", pipelineId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        null,
+                        pipelineId,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the pipeline Id POST or PUT API: {}, {}", pipelineId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.delete.name(), null, pipelineId, null, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the pipeline Id DELETE API: {}, {}", pipelineId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getPipelineId(String endpoint) {
+    Integer pipelineId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("pipelines")) {
+      int index = pathComps.indexOf("pipelines");
+      pipelineId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("pipeline")) {
+      int index = pathComps.indexOf("pipeline");
+      pipelineId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (pipelineId == null || pipelineId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return pipelineId;
+  }
+
+  private static void populateDashboardServiceApis() {
+
     applicationFeatureRbacEndpoints.add(
         "/dashboardservice/v2/applications/{applicationId}/service/{serviceId}");
     applicationFeatureRbacEndpoints.add(
@@ -171,102 +461,19 @@ public class ApplicationFeatureRbac {
         "/dashboardservice/v2/applications/{applicationId}/pending_approvals");
     endpointsWithApplicationId.add("/dashboardservice/v2/applications/{applicationId}/services");
     endpointsWithApplicationId.add("/dashboardservice/v2/applications/{applicationId}");
-  }
 
-  public void authorizeUser(String userName) {
+    endpointsWithServiceId.add(
+        "/dashboardservice/v2/visibilityservice/service/{serviceId}/feature/configuration/{approvalGateId}");
+    endpointsWithServiceId.add("/dashboardservice/v2/services/{serviceId}/gates");
+    endpointsWithServiceId.add("/dashboardservice/v2/services/{serviceId}/gates/{id}");
 
-    Boolean isFeatureVisibility;
-
-    isFeatureVisibility =
-        Boolean.parseBoolean(
-            oesAuthorizationService
-                .isFeatureVisibility(userName, RbacFeatureType.APP.name(), userName)
-                .getBody()
-                .get("isEnabled"));
-    log.info("is feature visibility enabled : {}", isFeatureVisibility);
-    if (!isFeatureVisibility) {
-      throw new AccessForbiddenException(
-          "You do not have permission for the feature type : " + RbacFeatureType.APP.name());
-    }
-  }
-
-  public void authorizeUser(String username, String endpointUrl, String httpMethod) {
-
-    HttpMethod method = HttpMethod.valueOf(httpMethod);
-    Integer applicationId = getApplicationId(endpointUrl);
-    PermissionModel permission;
-
-    log.info("authorizing the endpoint : {}", endpointUrl);
-
-    switch (method) {
-      case GET:
-        permission =
-            oesAuthorizationService
-                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
-                .getBody();
-        log.info("permissions for the GET API : {}", permission);
-        if (permission == null
-            || !permission.getPermissions().contains(PermissionEnum.view.name())) {
-          throw new AccessForbiddenException(
-              YOU_DO_NOT_HAVE
-                  + PermissionEnum.view.name()
-                  + PERMISSION_FOR_THE_FEATURE_TYPE
-                  + RbacFeatureType.APP.name()
-                  + TO_PERFORM_THIS_OPERATION);
-        }
-        break;
-
-      case POST:
-      case PUT:
-        permission =
-            oesAuthorizationService
-                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
-                .getBody();
-        log.info("permissions for the POST or PUT API : {}", permission);
-        if (permission == null
-            || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
-          throw new AccessForbiddenException(
-              YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
-                  + PERMISSION_FOR_THE_FEATURE_TYPE
-                  + RbacFeatureType.APP.name()
-                  + TO_PERFORM_THIS_OPERATION);
-        }
-        break;
-
-      case DELETE:
-        permission =
-            oesAuthorizationService
-                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
-                .getBody();
-        log.info("permissions for the DELETE API : {}", permission);
-        if (permission == null
-            || !permission.getPermissions().contains(PermissionEnum.delete.name())) {
-          throw new AccessForbiddenException(
-              YOU_DO_NOT_HAVE
-                  + PermissionEnum.delete.name()
-                  + PERMISSION_FOR_THE_FEATURE_TYPE
-                  + RbacFeatureType.APP.name()
-                  + TO_PERFORM_THIS_OPERATION);
-        }
-        break;
-    }
-  }
-
-  private Integer getApplicationId(String endpoint) {
-    Integer applicationId = 0;
-    List<String> pathComps = Arrays.asList(endpoint.split("/"));
-    if (pathComps.contains("applications")) {
-      int index = pathComps.indexOf("applications");
-      applicationId = Integer.parseInt(pathComps.get(index + 1));
-    } else if (pathComps.contains("application")) {
-      int index = pathComps.indexOf("application");
-      applicationId = Integer.parseInt(pathComps.get(index + 1));
-    }
-
-    if (applicationId == null || applicationId.equals(0)) {
-      throw new InvalidResourceIdException("Invalid resource Id");
-    }
-    return applicationId;
+    endpointsWithPipelineId.add("/dashboardservice/v3/pipelines/{pipelineId}/gates");
+    endpointsWithPipelineId.add("/dashboardservice/v3/pipelines/{pipelineId}/gates/{gateId}");
+    endpointsWithPipelineId.add(
+        "/dashboardservice/v3/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    endpointsWithPipelineId.add("/dashboardservice/v4/pipelines/{pipelineId}/gates");
+    endpointsWithPipelineId.add("/dashboardservice/v4/pipelines/{pipelineId}/gates/{gateId}");
+    endpointsWithPipelineId.add(
+        "/dashboardservice/v4/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
   }
 }

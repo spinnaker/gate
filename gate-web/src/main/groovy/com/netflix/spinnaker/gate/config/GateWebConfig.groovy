@@ -27,6 +27,8 @@ import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
 import com.opsmx.spinnaker.gate.interceptors.ApplicationIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.OesServiceInterceptor
 import com.opsmx.spinnaker.gate.interceptors.FeatureVisibilityRbacInterceptor
+import com.opsmx.spinnaker.gate.interceptors.PipelineIdRbacInterceptor
+import com.opsmx.spinnaker.gate.interceptors.ServiceIdRbacInterceptor
 import com.opsmx.spinnaker.gate.rbac.ApplicationFeatureRbac
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -69,6 +71,12 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Autowired
   ApplicationIdRbacInterceptor applicationIdRbacInterceptor
 
+  @Autowired
+  ServiceIdRbacInterceptor serviceIdRbacInterceptor
+
+  @Autowired
+  PipelineIdRbacInterceptor pipelineIdRbacInterceptor
+
 
 
   @Override
@@ -89,6 +97,8 @@ public class GateWebConfig implements WebMvcConfigurer {
 
     registry.addInterceptor(featureVisibilityRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.applicationFeatureRbacEndpoints).order(1)
     registry.addInterceptor(applicationIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApplicationId).order(2)
+    registry.addInterceptor(serviceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithServiceId).order(3)
+    registry.addInterceptor(pipelineIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithPipelineId).order(4)
 
   }
 

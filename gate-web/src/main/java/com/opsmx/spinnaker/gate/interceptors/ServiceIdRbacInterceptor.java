@@ -26,7 +26,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-public class ApplicationIdRbacInterceptor implements HandlerInterceptor {
+public class ServiceIdRbacInterceptor implements HandlerInterceptor {
 
   @Autowired private ApplicationFeatureRbac applicationFeatureRbac;
 
@@ -35,7 +35,7 @@ public class ApplicationIdRbacInterceptor implements HandlerInterceptor {
       throws Exception {
     log.info(
         "Request intercepted for authorizing if the user is having enough access to perform the action");
-    applicationFeatureRbac.authorizeUserForApplicationId(
+    applicationFeatureRbac.authorizeUserForServiceId(
         request.getUserPrincipal().getName(), request.getRequestURI(), request.getMethod());
 
     return true;
