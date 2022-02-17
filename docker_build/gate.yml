@@ -38,6 +38,9 @@ retrofit:
 cache:
   expiryTime: 600000
 
+rbac:
+  enabled: false
+
 security:
   basic:
     enabled: false

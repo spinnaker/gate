@@ -24,7 +24,12 @@ import com.netflix.spinnaker.gate.interceptors.RequestIdInterceptor
 import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
+import com.opsmx.spinnaker.gate.interceptors.ApplicationIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.OesServiceInterceptor
+import com.opsmx.spinnaker.gate.interceptors.FeatureVisibilityRbacInterceptor
+import com.opsmx.spinnaker.gate.interceptors.PipelineIdRbacInterceptor
+import com.opsmx.spinnaker.gate.interceptors.ServiceIdRbacInterceptor
+import com.opsmx.spinnaker.gate.rbac.ApplicationFeatureRbac
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationContext
@@ -60,6 +65,18 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
 
+  @Autowired(required = false)
+  FeatureVisibilityRbacInterceptor featureVisibilityRbacInterceptor
+
+  @Autowired(required = false)
+  ApplicationIdRbacInterceptor applicationIdRbacInterceptor
+
+  @Autowired(required = false)
+  ServiceIdRbacInterceptor serviceIdRbacInterceptor
+
+  @Autowired(required = false)
+  PipelineIdRbacInterceptor pipelineIdRbacInterceptor
+
 
 
   @Override
@@ -77,6 +94,15 @@ public class GateWebConfig implements WebMvcConfigurer {
     oesServicePathPatterns.add("/datasource/cache/save")
     oesServicePathPatterns.add("/datasource/cache/evict")
     registry.addInterceptor(new OesServiceInterceptor()).addPathPatterns(oesServicePathPatterns)
+
+    if (featureVisibilityRbacInterceptor!=null && applicationIdRbacInterceptor!=null && serviceIdRbacInterceptor!=null && pipelineIdRbacInterceptor!=null) {
+
+      registry.addInterceptor(featureVisibilityRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.applicationFeatureRbacEndpoints).order(1)
+      registry.addInterceptor(applicationIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApplicationId).order(2)
+      registry.addInterceptor(serviceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithServiceId).order(3)
+      registry.addInterceptor(pipelineIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithPipelineId).order(4)
+    }
+
   }
 
   @Bean
