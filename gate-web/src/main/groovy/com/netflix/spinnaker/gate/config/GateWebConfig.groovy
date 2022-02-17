@@ -95,10 +95,13 @@ public class GateWebConfig implements WebMvcConfigurer {
     oesServicePathPatterns.add("/datasource/cache/evict")
     registry.addInterceptor(new OesServiceInterceptor()).addPathPatterns(oesServicePathPatterns)
 
-    registry.addInterceptor(featureVisibilityRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.applicationFeatureRbacEndpoints).order(1)
-    registry.addInterceptor(applicationIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApplicationId).order(2)
-    registry.addInterceptor(serviceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithServiceId).order(3)
-    registry.addInterceptor(pipelineIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithPipelineId).order(4)
+    if (featureVisibilityRbacInterceptor!=null && applicationIdRbacInterceptor!=null && serviceIdRbacInterceptor!=null && pipelineIdRbacInterceptor!=null) {
+
+      registry.addInterceptor(featureVisibilityRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.applicationFeatureRbacEndpoints).order(1)
+      registry.addInterceptor(applicationIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApplicationId).order(2)
+      registry.addInterceptor(serviceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithServiceId).order(3)
+      registry.addInterceptor(pipelineIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithPipelineId).order(4)
+    }
 
   }
 
