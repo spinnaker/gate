@@ -78,7 +78,7 @@ public class ApplicationFeatureRbac {
     Integer applicationId = getApplicationId(endpointUrl);
     PermissionModel permission;
 
-    log.info("authorizing the endpoint : {}", endpointUrl);
+    log.debug("authorizing the endpoint : {}", endpointUrl);
 
     switch (method) {
       case GET:
