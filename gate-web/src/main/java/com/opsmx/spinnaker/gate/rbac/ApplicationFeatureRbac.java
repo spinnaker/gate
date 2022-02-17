@@ -27,11 +27,13 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@ConditionalOnExpression("${rbac.enabled:false}")
 public class ApplicationFeatureRbac {
 
   @Autowired private OesAuthorizationService oesAuthorizationService;
