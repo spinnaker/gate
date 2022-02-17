@@ -65,16 +65,16 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
 
-  @Autowired
+  @Autowired(required = false)
   FeatureVisibilityRbacInterceptor featureVisibilityRbacInterceptor
 
-  @Autowired
+  @Autowired(required = false)
   ApplicationIdRbacInterceptor applicationIdRbacInterceptor
 
-  @Autowired
+  @Autowired(required = false)
   ServiceIdRbacInterceptor serviceIdRbacInterceptor
 
-  @Autowired
+  @Autowired(required = false)
   PipelineIdRbacInterceptor pipelineIdRbacInterceptor
 
 
