@@ -52,6 +52,7 @@ public class ApplicationFeatureRbac {
 
   static {
     populateDashboardServiceApis();
+    populatePlatformServiceApis();
   }
 
   public void authorizeUserForFeatureVisibility(String userName) {
@@ -336,6 +337,94 @@ public class ApplicationFeatureRbac {
     return pipelineId;
   }
 
+  public void authorizeUserForGateId(String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer gateId = getGateId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.view.name(), null, null, gateId, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the gate Id GET API: {}, {}", gateId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        null,
+                        null,
+                        gateId,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the gate Id POST or PUT API: {}, {}", gateId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username, PermissionEnum.delete.name(), null, null, gateId, username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info("is authorized for the gate Id DELETE API: {}, {}", gateId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getGateId(String endpoint) {
+    Integer gateId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("gates")) {
+      int index = pathComps.indexOf("gates");
+      gateId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (gateId == null || gateId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return gateId;
+  }
+
   private static void populateDashboardServiceApis() {
 
     applicationFeatureRbacEndpoints.add(
@@ -362,7 +451,6 @@ public class ApplicationFeatureRbac {
     applicationFeatureRbacEndpoints.add("/dashboardservice/v2/application/{applicationId}");
     applicationFeatureRbacEndpoints.add(
         "/dashboardservice/v2/users/{username}/applications/latest-canary");
-    applicationFeatureRbacEndpoints.add("/dashboardservice/v2/application/{applicationId}");
     applicationFeatureRbacEndpoints.add(
         "/dashboardservice/v2/applications/{applicationId}/usergroups/permissions");
     applicationFeatureRbacEndpoints.add(
@@ -417,7 +505,6 @@ public class ApplicationFeatureRbac {
     applicationFeatureRbacEndpoints.add("/dashboardservice/v2/services/{serviceId}/gates/{id}");
     applicationFeatureRbacEndpoints.add(
         "/dashboardservice/v2/applications/{applicationId}/services}");
-    applicationFeatureRbacEndpoints.add("/dashboardservice/v2/applications/{applicationId}");
     applicationFeatureRbacEndpoints.add("/dashboardservice/v2/{userId}/applications");
     applicationFeatureRbacEndpoints.add("/dashboardservice/v2/users/{username}/applications");
 
@@ -477,5 +564,246 @@ public class ApplicationFeatureRbac {
     endpointsWithPipelineId.add("/dashboardservice/v4/pipelines/{pipelineId}/gates/{gateId}");
     endpointsWithPipelineId.add(
         "/dashboardservice/v4/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+  }
+
+  private static void populatePlatformServiceApis() {
+
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deploymentsCurrent/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deploymentsHistory/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/pipeline/latest");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/gate/executions/track");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/gate/executions/pipelines/{pipelineId}/{executionId}/track");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/deployments/applications/{applicationName}/pipelines/uuid/{pipelineUuid}/name/{pipelineName}/executions/{executionId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/deployments/pipelinetype");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/deployments/history");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/current");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/history");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/service/deploymentCurrents/{deploymentCurrentId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/deployments/count/applications/{applicationId}/services/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/deployments/count/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/deployments/count/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/service/deploymentHistory/{deploymentHistoryId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/pipelines/{pipelineId}/deploymentsHistory/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/deploymentsHistory/gates");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/pipeline/executions/track");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipeline/executions/{executionId}/track");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/applications/{applicationId}/service/{id}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/applications/{applicationId}/service");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/service/feature");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/services/{serviceId}/features");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/services/{serviceId}/features");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/users/{username}/applications/{featureType}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/services/{serviceId}/features/{feature}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/services/count");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/applications/{applicationId}/service");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/service/{serviceId}/pipelinemap");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/service/{serviceId}/setdisplay");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/applications/{applicationId}/usergroups/permissions");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/users/{username}/applications");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/users/{username}/applicationscount");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/users/{username}/services");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/users/{username}/verifications/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/applications/{applicationName}/does-exist");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v1/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/environments/{environmentName}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/environment");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/applications/{applicationId}/environment");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/applications/name/{applicationName}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/services/{serviceId}/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v2/applications/{applicationId}/environments");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/services/{serviceId}/gates/{id}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/gates/{gateId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/services/{serviceId}/pipeline");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v2/services/{serviceId}/gates/{id}/references/{refId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v2/applications/{applicationId}/services");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v2/applications/{applicationId}/environments");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v2/services/{serviceId}/pipeline/refresh");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/spinnaker/stage/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/services/gates");
+    applicationFeatureRbacEndpoints.add("/platformservice/v2/users/{username}/applications");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/services/{serviceId}/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/pipelines/{pipelineId}/gates/{gateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelines/{id}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelines/{pipelineId}/gates");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/services/{serviceId}/pipelines");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelineStages/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/services");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelines/{pipelineId}/services");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/services/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/environments/order/services/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/applications/{applicationId}/service/{serviceId}/pipelines");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelines");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v3/spinnaker/stage/pipelines/{pipelineId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/services/gates");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/applications/pipelines");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/users/{username}/services");
+    applicationFeatureRbacEndpoints.add("/platformservice/v3/pipelines/{pipelineId}/view");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/latest/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/gates/{gateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipelines/uuid/{pipelineUuid}/name/{pipelineName}/applications/{applicationName}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/spinnaker/stage/pipelines/{pipelineId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipelines/uuid/{pipelineUuid}/name/{pipelineName}/gates/references/{refId}/type/{gateType}/applications/{applicationName}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/pipelines/{pipelineId}/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipelines/{pipelineName}/uuid/{pipelineUuid}/applications/{applicationName}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/pipeline");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/pipelines/{pipelineName}/applications/{applicationName}");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/services/gates");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/pipelines/{pipelineId}/view");
+    applicationFeatureRbacEndpoints.add("/platformservice/v4/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v4/users/{username}/approvalgates/applications");
+
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deploymentsCurrent/pipelines");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deploymentsHistory/pipelines");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/pipeline/latest");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/deployments/history");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/current");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/history");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/gates");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/deployments/count/applications/{applicationId}/services/{serviceId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/deployments/count/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/pipelines/{pipelineId}/deploymentsHistory/gates");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/deploymentsHistory/gates");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deployments/pipelines");
+    endpointsWithApplicationId.add("/platformservice/v1/applications/{applicationId}/service/{id}");
+    endpointsWithApplicationId.add("/platformservice/v1/applications/{applicationId}/service");
+    endpointsWithApplicationId.add(
+        "/platformservice/v1/applications/{applicationId}/service/{serviceId}");
+    endpointsWithApplicationId.add("/platformservice/v3/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v3/applications/{applicationId}/services/count");
+    endpointsWithApplicationId.add(
+        "/platformservice/v3/applications/{applicationId}/service/{serviceId}");
+    endpointsWithApplicationId.add("/platformservice/v3/applications/{applicationId}/service");
+    endpointsWithApplicationId.add("/platformservice/v1/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/environments/{environmentName}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v4/applications/{applicationId}/services/{serviceId}/environment");
+    endpointsWithApplicationId.add("/platformservice/v4/applications/{applicationId}/environment");
+    endpointsWithApplicationId.add("/platformservice/v2/applications/{applicationId}/environments");
+    endpointsWithApplicationId.add("/platformservice/v2/applications/{applicationId}");
+    endpointsWithApplicationId.add("/platformservice/v2/applications/{applicationId}/services");
+    endpointsWithApplicationId.add("/platformservice/v3/applications/{applicationId}/pipelines");
+    endpointsWithApplicationId.add("/platformservice/v3/applications/{applicationId}/services");
+    endpointsWithApplicationId.add(
+        "/platformservice/v3/applications/{applicationId}/services/pipelines");
+    endpointsWithApplicationId.add(
+        "/platformservice/v3/applications/{applicationId}/service/{serviceId}/pipelines");
+    endpointsWithApplicationId.add("/platformservice/v4/latest/applications/{applicationId}");
+    endpointsWithApplicationId.add("/platformservice/v4/applications/{applicationId}");
+
+    endpointsWithServiceId.add("/platformservice/v1/services/{serviceId}/features");
+    endpointsWithServiceId.add("/platformservice/v1/services/{serviceId}/features/{feature}");
+    endpointsWithServiceId.add("/platformservice/v3/service/{serviceId}/pipelinemap");
+    endpointsWithServiceId.add("/platformservice/v3/service/{serviceId}/setdisplay");
+    endpointsWithServiceId.add("/platformservice/v2/services/{serviceId}/gates");
+    endpointsWithServiceId.add("/platformservice/v2/services/{serviceId}/gates/{id}");
+    endpointsWithServiceId.add("/platformservice/v2/services/{serviceId}/pipeline");
+    endpointsWithServiceId.add(
+        "/platformservice/v2/services/{serviceId}/gates/{id}/references/{refId}");
+    endpointsWithServiceId.add("/platformservice/v2/services/{serviceId}/pipeline/refresh");
+    endpointsWithServiceId.add("/platformservice/v2/spinnaker/stage/service/{serviceId}");
+    endpointsWithServiceId.add("/platformservice/v3/services/{serviceId}/gates");
+    endpointsWithServiceId.add("/platformservice/v3/services/{serviceId}/pipelines");
+    endpointsWithServiceId.add("/platformservice/v3/environments/order/services/{serviceId}");
+
+    endpointsWithPipelineId.add(
+        "/platformservice/v4/gate/executions/pipelines/{pipelineId}/{executionId}/track");
+    endpointsWithPipelineId.add("/platformservice/v3/pipelines/{pipelineId}/gates/{gateId}");
+    endpointsWithPipelineId.add(
+        "/platformservice/v3/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    endpointsWithPipelineId.add("/platformservice/v3/pipelines/{id}");
+    endpointsWithPipelineId.add("/platformservice/v3/pipelines/{pipelineId}/gates");
+    endpointsWithPipelineId.add("/platformservice/v3/pipelines/{pipelineId}/services");
+    endpointsWithPipelineId.add("/platformservice/v3/spinnaker/stage/pipelines/{pipelineId}");
+    endpointsWithPipelineId.add("/platformservice/v3/pipelines/{pipelineId}/view");
+    endpointsWithPipelineId.add(
+        "/platformservice/v4/pipelines/{pipelineId}/gates/{gateId}/references/{refId}");
+    endpointsWithPipelineId.add("/platformservice/v4/spinnaker/stage/pipelines/{pipelineId}");
+    endpointsWithPipelineId.add("/platformservice/v4/pipelines/{pipelineId}/gates");
+    endpointsWithPipelineId.add("/platformservice/v4/pipelines/{pipelineId}/view");
+
+    endpointsWithGateId.add("/platformservice/v2/gates/{gateId}");
+    endpointsWithGateId.add("/platformservice/v4/gates/{gateId}");
   }
 }

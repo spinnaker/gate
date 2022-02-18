@@ -25,6 +25,7 @@ import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
 import com.opsmx.spinnaker.gate.interceptors.ApplicationIdRbacInterceptor
+import com.opsmx.spinnaker.gate.interceptors.GateIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.OesServiceInterceptor
 import com.opsmx.spinnaker.gate.interceptors.FeatureVisibilityRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.PipelineIdRbacInterceptor
@@ -77,6 +78,9 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Autowired(required = false)
   PipelineIdRbacInterceptor pipelineIdRbacInterceptor
 
+  @Autowired(required = false)
+  GateIdRbacInterceptor gateIdRbacInterceptor
+
 
 
   @Override
@@ -95,12 +99,13 @@ public class GateWebConfig implements WebMvcConfigurer {
     oesServicePathPatterns.add("/datasource/cache/evict")
     registry.addInterceptor(new OesServiceInterceptor()).addPathPatterns(oesServicePathPatterns)
 
-    if (featureVisibilityRbacInterceptor!=null && applicationIdRbacInterceptor!=null && serviceIdRbacInterceptor!=null && pipelineIdRbacInterceptor!=null) {
+    if (featureVisibilityRbacInterceptor!=null && applicationIdRbacInterceptor!=null && serviceIdRbacInterceptor!=null && pipelineIdRbacInterceptor!=null && gateIdRbacInterceptor!=null) {
 
       registry.addInterceptor(featureVisibilityRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.applicationFeatureRbacEndpoints).order(1)
       registry.addInterceptor(applicationIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApplicationId).order(2)
       registry.addInterceptor(serviceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithServiceId).order(3)
       registry.addInterceptor(pipelineIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithPipelineId).order(4)
+      registry.addInterceptor(gateIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithGateId).order(5)
     }
 
   }
