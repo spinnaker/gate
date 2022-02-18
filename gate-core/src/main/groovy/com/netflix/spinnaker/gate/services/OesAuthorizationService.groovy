@@ -29,6 +29,8 @@ interface OesAuthorizationService {
 
   @GetMapping(value = "/platformservice/v6/users/{username}/feature",produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<Map<String, String>> isAuthorizedUser(@PathVariable("username") String username, @RequestParam("permission") String permission, @RequestParam("serviceId") Integer serviceId,
-                                                       @RequestParam("pipelineId") Integer pipelineId, @RequestParam("gateId") Integer gateId, @RequestHeader(value = "x-spinnaker-user") String userName)
+                                                       @RequestParam("pipelineId") Integer pipelineId, @RequestParam("gateId") Integer gateId, @RequestParam("approvalGateId") Integer approvalGateId,
+                                                       @RequestParam("approvalGateInstanceId") Integer approvalGateInstanceId, @RequestParam("approvalGatePolicyId") Integer approvalGatePolicyId,
+                                                       @RequestHeader(value = "x-spinnaker-user") String userName)
 
 }
