@@ -44,6 +44,9 @@ public class ApplicationFeatureRbac {
   public static final List<String> endpointsWithServiceId = new ArrayList<>();
   public static final List<String> endpointsWithPipelineId = new ArrayList<>();
   public static final List<String> endpointsWithGateId = new ArrayList<>();
+  public static final List<String> endpointsWithApprovalGateId = new ArrayList<>();
+  public static final List<String> endpointsWithApprovalGateInstanceId = new ArrayList<>();
+  public static final List<String> endpointsWithApprovalPolicyId = new ArrayList<>();
 
   private static final String YOU_DO_NOT_HAVE = "You do not have : ";
   private static final String PERMISSION_FOR_THE_FEATURE_TYPE =
@@ -53,6 +56,7 @@ public class ApplicationFeatureRbac {
   static {
     populateDashboardServiceApis();
     populatePlatformServiceApis();
+    populateVisibilityServiceApis();
   }
 
   public void authorizeUserForFeatureVisibility(String userName) {
@@ -167,7 +171,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.view.name(), serviceId, null, null, username)
+                        username,
+                        PermissionEnum.view.name(),
+                        serviceId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the service Id GET API: {}, {}", serviceId, isAuthorized);
@@ -192,6 +204,9 @@ public class ApplicationFeatureRbac {
                         serviceId,
                         null,
                         null,
+                        null,
+                        null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -212,7 +227,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.delete.name(), serviceId, null, null, username)
+                        username,
+                        PermissionEnum.delete.name(),
+                        serviceId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the service Id DELETE API: {}, {}", serviceId, isAuthorized);
@@ -259,7 +282,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.view.name(), null, pipelineId, null, username)
+                        username,
+                        PermissionEnum.view.name(),
+                        null,
+                        pipelineId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the pipeline Id GET API: {}, {}", pipelineId, isAuthorized);
@@ -284,6 +315,9 @@ public class ApplicationFeatureRbac {
                         null,
                         pipelineId,
                         null,
+                        null,
+                        null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -304,7 +338,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.delete.name(), null, pipelineId, null, username)
+                        username,
+                        PermissionEnum.delete.name(),
+                        null,
+                        pipelineId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the pipeline Id DELETE API: {}, {}", pipelineId, isAuthorized);
@@ -351,7 +393,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.view.name(), null, null, gateId, username)
+                        username,
+                        PermissionEnum.view.name(),
+                        null,
+                        null,
+                        gateId,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the gate Id GET API: {}, {}", gateId, isAuthorized);
@@ -375,6 +425,9 @@ public class ApplicationFeatureRbac {
                         PermissionEnum.create_or_edit.name(),
                         null,
                         null,
+                        null,
+                        null,
+                        null,
                         gateId,
                         username)
                     .getBody()
@@ -395,7 +448,15 @@ public class ApplicationFeatureRbac {
             Boolean.parseBoolean(
                 oesAuthorizationService
                     .isAuthorizedUser(
-                        username, PermissionEnum.delete.name(), null, null, gateId, username)
+                        username,
+                        PermissionEnum.delete.name(),
+                        null,
+                        null,
+                        gateId,
+                        null,
+                        null,
+                        null,
+                        username)
                     .getBody()
                     .get("isEnabled"));
         log.info("is authorized for the gate Id DELETE API: {}, {}", gateId, isAuthorized);
@@ -423,6 +484,355 @@ public class ApplicationFeatureRbac {
       throw new InvalidResourceIdException("Invalid resource Id");
     }
     return gateId;
+  }
+
+  public void authorizeUserForApprovalGateId(
+      String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer approvalGateId = getApprovalGateId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.view.name(),
+                        null,
+                        null,
+                        null,
+                        approvalGateId,
+                        null,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate Id GET API: {}, {}", approvalGateId, isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        null,
+                        null,
+                        null,
+                        approvalGateId,
+                        null,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate Id POST or PUT API: {}, {}",
+            approvalGateId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.delete.name(),
+                        null,
+                        null,
+                        null,
+                        approvalGateId,
+                        null,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate Id DELETE API: {}, {}",
+            approvalGateId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getApprovalGateId(String endpoint) {
+    Integer approvalGateId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("approvalGates")) {
+      int index = pathComps.indexOf("approvalGates");
+      approvalGateId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (approvalGateId == null || approvalGateId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return approvalGateId;
+  }
+
+  public void authorizeUserForApprovalGateInstanceId(
+      String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer approvalGateInstanceId = getApprovalGateInstanceId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.view.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalGateInstanceId,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate instance Id GET API: {}, {}",
+            approvalGateInstanceId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalGateInstanceId,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate instance Id POST or PUT API: {}, {}",
+            approvalGateInstanceId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.delete.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalGateInstanceId,
+                        null,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval gate instance Id DELETE API: {}, {}",
+            approvalGateInstanceId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getApprovalGateInstanceId(String endpoint) {
+    Integer approvalGateInstanceId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("approvalGateInstances")) {
+      int index = pathComps.indexOf("approvalGateInstances");
+      approvalGateInstanceId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (approvalGateInstanceId == null || approvalGateInstanceId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return approvalGateInstanceId;
+  }
+
+  public void authorizeUserForApprovalPolicyId(
+      String username, String endpointUrl, String httpMethod) {
+
+    HttpMethod method = HttpMethod.valueOf(httpMethod);
+    Integer approvalPolicyId = getApprovalPolicyId(endpointUrl);
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    switch (method) {
+      case GET:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.view.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalPolicyId,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval policy Id GET API: {}, {}",
+            approvalPolicyId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.view.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case POST:
+      case PUT:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.create_or_edit.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalPolicyId,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval policy Id POST or PUT API: {}, {}",
+            approvalPolicyId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.create_or_edit.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+
+      case DELETE:
+        isAuthorized =
+            Boolean.parseBoolean(
+                oesAuthorizationService
+                    .isAuthorizedUser(
+                        username,
+                        PermissionEnum.delete.name(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        approvalPolicyId,
+                        username)
+                    .getBody()
+                    .get("isEnabled"));
+        log.info(
+            "is authorized for the approval policy Id DELETE API: {}, {}",
+            approvalPolicyId,
+            isAuthorized);
+        if (isAuthorized == null || !isAuthorized) {
+          throw new AccessForbiddenException(
+              YOU_DO_NOT_HAVE
+                  + PermissionEnum.delete.name()
+                  + PERMISSION_FOR_THE_FEATURE_TYPE
+                  + RbacFeatureType.APP.description
+                  + TO_PERFORM_THIS_OPERATION);
+        }
+        break;
+    }
+  }
+
+  private Integer getApprovalPolicyId(String endpoint) {
+    Integer approvalGateInstanceId = 0;
+    List<String> pathComps = Arrays.asList(endpoint.split("/"));
+    if (pathComps.contains("policy")) {
+      int index = pathComps.indexOf("policy");
+      approvalGateInstanceId = Integer.parseInt(pathComps.get(index + 1));
+    }
+
+    if (approvalGateInstanceId == null || approvalGateInstanceId.equals(0)) {
+      throw new InvalidResourceIdException("Invalid resource Id");
+    }
+    return approvalGateInstanceId;
   }
 
   private static void populateDashboardServiceApis() {
@@ -805,5 +1215,135 @@ public class ApplicationFeatureRbac {
 
     endpointsWithGateId.add("/platformservice/v2/gates/{gateId}");
     endpointsWithGateId.add("/platformservice/v4/gates/{gateId}");
+  }
+
+  private static void populateVisibilityServiceApis() {
+
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v3/serviceGates/{serviceGateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGateInstances/activeCount");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/pipelines/{pipelineId}/approvalGates");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGates/{approvalGateId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/applications/{applicationId}/services/{serviceId}/approvalGateInstances/activeCount");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/approvalGateInstances/{id}/status");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/summary/count");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGates/{id}/toolTemplates/{templateId}/connector");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/{id}/instances");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/summary");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGates/{id}/templates/toolConnectors");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGates/{id}/configuredtoolConnectors");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/{id}/toolconnectors");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v4/applications/{applicationId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v5/policy/{policyId}/approvalGates");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v2/users/{username}/approvalGateInstances/{id}");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/approvalGates");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/approvalGates/{approvalGateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v2/applications/{applicationId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v2/applications/{applicationId}/approvalGates/{approvalGateId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/approvalGates/{approvalGateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v2/users/{userid}/approvalGates/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v2/serviceGates/{serviceGateId}/status");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/services/{serviceId}/approvalGates");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGateParameter/{connectorType}/{approvalGateParameterId}");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGateInstances/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/toolConnectors/{connectorType}/visibilityserviceData");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGateInstances/{id}/review");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/customConnectors");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/approvalGateInstances/{approvalGateInstanceId}/customConnectors/{id}/visibilityserviceData");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/toolConnectors/{connectorType}/visibilityserviceData/deployments");
+    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalData/deployments");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/users/{userid}/approvalGateInstances/activeCount");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/users/{userid}/approvalGates/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGateInstances/latest");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGateInstances/activeCount");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGates");
+    applicationFeatureRbacEndpoints.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGates}");
+
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGateInstances/activeCount");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGates/{approvalGateId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v3/applications/{applicationId}/services/{serviceId}/approvalGateInstances/activeCount");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v4/applications/{applicationId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v2/applications/{applicationId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v2/applications/{applicationId}/approvalGates/{approvalGateId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGateInstances/latest");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGateInstances/activeCount");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v1/applications/{applicationId}/approvalGates");
+    endpointsWithApplicationId.add(
+        "/visibilityservice/v3/applications/{applicationId}/approvalGates");
+
+    endpointsWithServiceId.add("/visibilityservice/v2/services/{serviceId}/approvalGates");
+
+    endpointsWithPipelineId.add("/visibilityservice/v3/pipelines/{pipelineId}/approvalGates");
+
+    endpointsWithGateId.add("/visibilityservice/v3/serviceGates/{serviceGateId}");
+    endpointsWithGateId.add("/visibilityservice/v2/serviceGates/{serviceGateId}/status");
+
+    endpointsWithApprovalGateId.add(
+        "/visibilityservice/v1/approvalGates/{id}/toolTemplates/{templateId}/connector");
+    endpointsWithApprovalGateId.add("/visibilityservice/v1/approvalGates/{id}/instances");
+    endpointsWithApprovalGateId.add(
+        "/visibilityservice/v1/approvalGates/{id}/templates/toolConnectors");
+    endpointsWithApprovalGateId.add(
+        "/visibilityservice/v1/approvalGates/{id}/configuredtoolConnectors");
+    endpointsWithApprovalGateId.add("/visibilityservice/v1/approvalGates/{id}/toolconnectors");
+    endpointsWithApprovalGateId.add("/visibilityservice/v1/approvalGates/{id}/toolConnectors");
+    endpointsWithApprovalGateId.add("/visibilityservice/v1/approvalGates/{id}");
+    endpointsWithApprovalGateId.add("/visibilityservice/v2/approvalGates/{approvalGateId}");
+
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v2/approvalGateInstances/{id}/status");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/status");
+    endpointsWithApprovalGateInstanceId.add("/visibilityservice/v1/approvalGateInstances/{id}");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/toolConnectors/{connectorType}/visibilityserviceData");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/review");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v1/approvalGateInstances/{id}/customConnectors");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v1/approvalGateInstances/{approvalGateInstanceId}/customConnectors/{id}/visibilityserviceData");
+    endpointsWithApprovalGateInstanceId.add(
+        "/visibilityservice/v2/users/{username}/approvalGateInstances/{id}");
+
+    endpointsWithApprovalPolicyId.add("/visibilityservice/v5/policy/{policyId}/approvalGates");
   }
 }
