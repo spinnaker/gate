@@ -35,6 +35,7 @@ public class GateIdRbacInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
+
     log.info(
         "Request intercepted for authorizing if the user is having enough access to perform the action");
     applicationFeatureRbac.authorizeUserForGateId(
