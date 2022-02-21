@@ -58,6 +58,7 @@ public class ApplicationFeatureRbac {
     populatePlatformServiceApis();
     populateVisibilityServiceApis();
     populateSaporServiceApis();
+    populateAnalyticServiceApis();
   }
 
   public void authorizeUserForFeatureVisibility(String userName) {
@@ -152,6 +153,9 @@ public class ApplicationFeatureRbac {
       applicationId = Integer.parseInt(pathComps.get(index + 1));
     } else if (pathComps.contains("deleteApplication")) {
       int index = pathComps.indexOf("deleteApplication");
+      applicationId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("template")) {
+      int index = pathComps.indexOf("template");
       applicationId = Integer.parseInt(pathComps.get(index + 1));
     }
 
@@ -484,6 +488,12 @@ public class ApplicationFeatureRbac {
       gateId = Integer.parseInt(pathComps.get(index + 1));
     } else if (pathComps.contains("gate")) {
       int index = pathComps.indexOf("gate");
+      gateId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("serviceGates")) {
+      int index = pathComps.indexOf("serviceGates");
+      gateId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("serviceGate")) {
+      int index = pathComps.indexOf("serviceGate");
       gateId = Integer.parseInt(pathComps.get(index + 1));
     }
 
@@ -1391,5 +1401,127 @@ public class ApplicationFeatureRbac {
     endpointsWithGateId.add("/oes/policy/gate/{gateId}/executions/{executionId}/status");
     endpointsWithGateId.add("/oes/policy/gate/{gateId}");
     endpointsWithGateId.add("/oes/policy/gate/{gateId}/status");
+  }
+
+  private static void populateAnalyticServiceApis() {
+
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/latestcanary");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/dashboardservice/applications");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/dashboardservice/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{id}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{applicationId}/details");
+    applicationFeatureRbacEndpoints.add("/autopilot/canaries/applicationNames");
+    applicationFeatureRbacEndpoints.add("/autopilot/canaries/applicationServiceNames");
+    applicationFeatureRbacEndpoints.add("/autopilot/canaries/verification/getVerificationSummary");
+    applicationFeatureRbacEndpoints.add("/autopilot/canaries/verification/getVerificationHistory");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/correlation/log/{riskAnalysisId}/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/correlation/metric/{riskAnalysisId}/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/correlation/log/{riskAnalysisId}/{serviceId}/{clusterId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{applicationId}/tags/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{applicationId}/tags");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v1/applications/{applicationId}/tags/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/logTemplates/{logTemplateName}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/metricTemplates/{metricTemplateName}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/deleteMetricTemplate/{templateName}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/metricTemplates");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}/template");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/logTemplates");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/logTemplates/{logTemplateName}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/metricTemplates");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v1/applications/{applicationId}/deleteLogTemplate/{templateName}");
+    applicationFeatureRbacEndpoints.add("/autopilot/logs/template/{applicationId}/{templateId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v2/applications/getApplicationHealth");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v2/serviceGates/{gateId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v2/applications/{id}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/gates/{id}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v2/applications/{id}/failures_count");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/gates/{id}/score");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v2/applications/{applicationId}/services/{serviceId}/failures_count");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/template");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v3/applications/{applicationId}/details");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v3/applications/{applicationId}/service/{serviceId}");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v3/applications/{applicationId}/gates/{gateId}");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v3/applications/{applicationId}/service");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v3/applications/{applicationId}/services/{serviceId}/images");
+    applicationFeatureRbacEndpoints.add("/autopilot/api/v3/applications/{applicationId}/gates");
+    applicationFeatureRbacEndpoints.add(
+        "/autopilot/api/v3/applications/{applicationId}/service/{serviceId}/gates/{gateId}/images/score");
+
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{applicationId}");
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{id}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/dashboardservice/applications/{applicationId}");
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{applicationId}/details");
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{applicationId}/tags/{id}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}");
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{applicationId}/tags");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/logTemplates/{logTemplateName}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/metricTemplates/{metricTemplateName}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/deleteMetricTemplate/{templateName}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/metricTemplates");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}/template");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/service/{serviceId}");
+    endpointsWithApplicationId.add("/autopilot/api/v1/applications/{applicationId}/logTemplates");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/logTemplates/{logTemplateName}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v1/applications/{applicationId}/deleteLogTemplate/{templateName}");
+    endpointsWithApplicationId.add("/autopilot/logs/template/{applicationId}/{templateId}");
+    endpointsWithApplicationId.add("/autopilot/api/v2/applications/{id}");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/gates/{id}");
+    endpointsWithApplicationId.add("/autopilot/api/v2/applications/{id}/failures_count");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/gates/{id}/score");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v2/applications/{applicationId}/services/{serviceId}/failures_count");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v2/applications/{applicationId}/service/{serviceId}/template");
+    endpointsWithApplicationId.add("/autopilot/api/v3/applications/{applicationId}/details");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v3/applications/{applicationId}/service/{serviceId}");
+    endpointsWithApplicationId.add("/autopilot/api/v3/applications/{applicationId}/gates/{gateId}");
+    endpointsWithApplicationId.add("/autopilot/api/v3/applications/{applicationId}/service");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v3/applications/{applicationId}/services/{serviceId}/images");
+    endpointsWithApplicationId.add("/autopilot/api/v3/applications/{applicationId}/gates");
+    endpointsWithApplicationId.add(
+        "/autopilot/api/v3/applications/{applicationId}/service/{serviceId}/gates/{gateId}/images/score");
+
+    endpointsWithGateId.add("/autopilot/api/v2/serviceGates/{gateId}");
   }
 }
