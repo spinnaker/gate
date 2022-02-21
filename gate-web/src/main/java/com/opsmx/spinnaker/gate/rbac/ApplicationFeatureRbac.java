@@ -150,6 +150,9 @@ public class ApplicationFeatureRbac {
     } else if (pathComps.contains("application")) {
       int index = pathComps.indexOf("application");
       applicationId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("deleteApplication")) {
+      int index = pathComps.indexOf("deleteApplication");
+      applicationId = Integer.parseInt(pathComps.get(index + 1));
     }
 
     if (applicationId == null || applicationId.equals(0)) {
@@ -478,6 +481,9 @@ public class ApplicationFeatureRbac {
     List<String> pathComps = Arrays.asList(endpoint.split("/"));
     if (pathComps.contains("gates")) {
       int index = pathComps.indexOf("gates");
+      gateId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("gate")) {
+      int index = pathComps.indexOf("gate");
       gateId = Integer.parseInt(pathComps.get(index + 1));
     }
 
