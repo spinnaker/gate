@@ -57,6 +57,7 @@ public class ApplicationFeatureRbac {
     populateDashboardServiceApis();
     populatePlatformServiceApis();
     populateVisibilityServiceApis();
+    populateSaporServiceApis();
   }
 
   public void authorizeUserForFeatureVisibility(String userName) {
@@ -148,6 +149,9 @@ public class ApplicationFeatureRbac {
       applicationId = Integer.parseInt(pathComps.get(index + 1));
     } else if (pathComps.contains("application")) {
       int index = pathComps.indexOf("application");
+      applicationId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("deleteApplication")) {
+      int index = pathComps.indexOf("deleteApplication");
       applicationId = Integer.parseInt(pathComps.get(index + 1));
     }
 
@@ -477,6 +481,9 @@ public class ApplicationFeatureRbac {
     List<String> pathComps = Arrays.asList(endpoint.split("/"));
     if (pathComps.contains("gates")) {
       int index = pathComps.indexOf("gates");
+      gateId = Integer.parseInt(pathComps.get(index + 1));
+    } else if (pathComps.contains("gate")) {
+      int index = pathComps.indexOf("gate");
       gateId = Integer.parseInt(pathComps.get(index + 1));
     }
 
@@ -1345,5 +1352,44 @@ public class ApplicationFeatureRbac {
         "/visibilityservice/v2/users/{username}/approvalGateInstances/{id}");
 
     endpointsWithApprovalPolicyId.add("/visibilityservice/v5/policy/{policyId}/approvalGates");
+  }
+
+  private static void populateSaporServiceApis() {
+
+    applicationFeatureRbacEndpoints.add("/oes/appOnboarding/deleteApplication/{applicationId}");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/appOnboarding/applications/{applicationId}/environments");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/appOnboarding/applications/{applicationId}/imagesource");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/appOnboarding/applications/{applicationId}/services/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/oes/appOnboarding/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add("/oes/appOnboarding/spinnaker/applications");
+    applicationFeatureRbacEndpoints.add("/oes/appOnboarding/spinnaker/{application}/pipeline");
+    applicationFeatureRbacEndpoints.add("/oes/appOnboarding/spinnaker/pipeline/stage");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/appOnboarding/spinnaker/{application}/pipeline/{pipelineName}");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/policy/violations/applications/{applicationName}/services/{serviceId}");
+    applicationFeatureRbacEndpoints.add("/oes/policy/gate");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/policy/gate/{gateId}/executions/{executionId}/status");
+    applicationFeatureRbacEndpoints.add("/oes/policy/gate/{gateId}");
+    applicationFeatureRbacEndpoints.add(
+        "/oes/policy/applications/{applicationId}/services/{serviceId}/images");
+    applicationFeatureRbacEndpoints.add("/oes/policy/gate/{gateId}/status");
+
+    endpointsWithApplicationId.add("/oes/appOnboarding/deleteApplication/{applicationId}");
+    endpointsWithApplicationId.add("/oes/appOnboarding/applications/{applicationId}/environments");
+    endpointsWithApplicationId.add("/oes/appOnboarding/applications/{applicationId}/imagesource");
+    endpointsWithApplicationId.add(
+        "/oes/appOnboarding/applications/{applicationId}/services/{serviceId}");
+    endpointsWithApplicationId.add("/oes/appOnboarding/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/oes/policy/applications/{applicationId}/services/{serviceId}/images");
+
+    endpointsWithGateId.add("/oes/policy/gate/{gateId}/executions/{executionId}/status");
+    endpointsWithGateId.add("/oes/policy/gate/{gateId}");
+    endpointsWithGateId.add("/oes/policy/gate/{gateId}/status");
   }
 }
