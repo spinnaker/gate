@@ -119,10 +119,12 @@ interface OpsmxAutopilotService {
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
-                         @Path('source') String source,
-                         @Path('source1') String source1,
-                         @Path('source2') String source2,
-                         @Query("canaryId") Integer canaryId )
+                          @Path('source') String source,
+                          @Path('source1') String source1,
+                          @Path('source2') String source2,
+                          @Query("canaryId") Integer canaryId,
+                          @Query("verificationType") String verificationType,
+                          @Query("permissionId") String permissionId)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAutoResponse6(@Path('type') String type,
