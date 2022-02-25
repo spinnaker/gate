@@ -1146,6 +1146,10 @@ public class ApplicationFeatureRbac {
     applicationFeatureRbacEndpoints.add("/platformservice/v4/applications/{applicationId}");
     applicationFeatureRbacEndpoints.add(
         "/platformservice/v4/users/{username}/approvalgates/applications");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/usergroups/permissions/applications/{applicationId}");
+    applicationFeatureRbacEndpoints.add(
+        "/platformservice/v1/usergroups/permissions/applications/{applicationId}/approvalGates/{approvalGateId}");
 
     endpointsWithApplicationId.add(
         "/platformservice/v4/applications/{applicationId}/services/{serviceId}/deploymentsCurrent/pipelines");
@@ -1198,6 +1202,10 @@ public class ApplicationFeatureRbac {
         "/platformservice/v3/applications/{applicationId}/service/{serviceId}/pipelines");
     endpointsWithApplicationId.add("/platformservice/v4/latest/applications/{applicationId}");
     endpointsWithApplicationId.add("/platformservice/v4/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v1/usergroups/permissions/applications/{applicationId}");
+    endpointsWithApplicationId.add(
+        "/platformservice/v1/usergroups/permissions/applications/{applicationId}/approvalGates/{approvalGateId}");
 
     endpointsWithServiceId.add("/platformservice/v1/services/{serviceId}/features");
     endpointsWithServiceId.add("/platformservice/v1/services/{serviceId}/features/{feature}");
