@@ -35,10 +35,14 @@ public class PipelineIdRbacInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
-    log.info(
-        "Request intercepted for authorizing if the user is having enough access to perform the action");
-    applicationFeatureRbac.authorizeUserForPipelineId(
-        request.getUserPrincipal().getName(), request.getRequestURI(), request.getMethod());
+    try {
+      log.info(
+          "Request intercepted for authorizing if the user is having enough access to perform the action");
+      applicationFeatureRbac.authorizeUserForPipelineId(
+          request.getUserPrincipal().getName(), request.getRequestURI(), request.getMethod());
+    } catch (NumberFormatException nfe) {
+      log.debug("Ignoring the rbac check as it threw number format exception");
+    }
 
     return true;
   }
