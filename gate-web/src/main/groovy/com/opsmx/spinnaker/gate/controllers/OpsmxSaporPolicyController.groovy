@@ -17,6 +17,8 @@
 package com.opsmx.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
+import com.opsmx.spinnaker.gate.exception.XSpinnakerUserHeaderMissingException
+import com.opsmx.spinnaker.gate.rbac.ApplicationFeatureRbac
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,6 +39,9 @@ class OpsmxSaporPolicyController {
   @Autowired
   OpsmxOesService opsmxOesService
 
+  @Autowired(required = false)
+  ApplicationFeatureRbac applicationFeatureRbac
+
   @ApiOperation(value = "Endpoint for sapor runtime policy evaluation rest services")
   @PostMapping(value = "{version}/data/**", consumes = MediaType.APPLICATION_JSON_VALUE)
   Object evaluateRuntimePolicy(@PathVariable("version") String version,
@@ -44,6 +49,12 @@ class OpsmxSaporPolicyController {
                           HttpServletRequest request) {
 
     String requestUri = request.getRequestURI()
+
+    if (applicationFeatureRbac!=null){
+//      String x_spinnaker_user = request.getHeader("x-spinnaker-user")
+//      applicationFeatureRbac.authorizeUserForPolicyGateTrigger(x_spinnaker_user, data, requestUri)
+    }
+
     return opsmxOesService.evaluateRuntimePolicy(version, data, requestUri)
   }
 

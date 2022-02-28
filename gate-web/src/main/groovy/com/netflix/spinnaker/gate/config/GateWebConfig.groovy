@@ -28,6 +28,7 @@ import com.opsmx.spinnaker.gate.interceptors.ApplicationIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.ApprovalGateIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.ApprovalGateInstanceIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.ApprovalPolicyIdInterceptor
+import com.opsmx.spinnaker.gate.interceptors.CustomGatesTriggerRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.GateIdRbacInterceptor
 import com.opsmx.spinnaker.gate.interceptors.OesServiceInterceptor
 import com.opsmx.spinnaker.gate.interceptors.FeatureVisibilityRbacInterceptor
@@ -96,6 +97,9 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Autowired(required = false)
   ApprovalPolicyIdInterceptor approvalPolicyIdInterceptor
 
+  @Autowired(required = false)
+  CustomGatesTriggerRbacInterceptor customGatesTriggerRbacInterceptor
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(
@@ -121,6 +125,7 @@ public class GateWebConfig implements WebMvcConfigurer {
       registry.addInterceptor(approvalGateIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApprovalGateId).order(6)
       registry.addInterceptor(approvalGateInstanceIdRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApprovalGateInstanceId).order(7)
       registry.addInterceptor(approvalPolicyIdInterceptor).addPathPatterns(ApplicationFeatureRbac.endpointsWithApprovalPolicyId).order(8)
+      registry.addInterceptor(customGatesTriggerRbacInterceptor).addPathPatterns(ApplicationFeatureRbac.runtime_access).order(9)
     }
 
   }
