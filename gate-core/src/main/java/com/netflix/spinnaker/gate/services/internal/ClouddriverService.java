@@ -46,7 +46,7 @@ public interface ClouddriverService {
   AccountDefinition updateAccountDefinition(@Body AccountDefinition accountDefinition);
 
   @DELETE("/credentials/{account}")
-  void deleteAccountDefinition(@Path("account") String account);
+  Response deleteAccountDefinition(@Path("account") String account);
 
   @GET("/task/{taskDetailsId}")
   Map getTaskDetails(@Path("taskDetailsId") String taskDetailsId);
@@ -524,6 +524,7 @@ public interface ClouddriverService {
   class AccountDefinition {
     private final Map<String, Object> details = new HashMap<>();
     private String type;
+    private String name;
 
     @JsonAnyGetter
     public Map<String, Object> details() {
@@ -543,6 +544,14 @@ public interface ClouddriverService {
     @JsonProperty("@type")
     public void setType(String type) {
       this.type = type;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
     }
   }
 }
