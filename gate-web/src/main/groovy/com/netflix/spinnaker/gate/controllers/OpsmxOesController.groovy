@@ -277,11 +277,18 @@ class OpsmxOesController {
     return addOrUpdateSpinnaker(files, postData.get("postData"))
   }
 
-  @ApiOperation(value = "Add or Update spinnaker cloudprovider account configured in Spinnaker", response = String.class )
+  @ApiOperation(value = "Add or Update spinnaker cloudprovider account configured in Spinnaker")
   @RequestMapping(value = "/accountsConfig/spinnaker/addOrUpdateCloudProviderAccount", method = RequestMethod.POST)
-  String addOrUpdateSpinnakerCloudProver(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
+  Object addOrUpdateSpinnakerCloudProver(@RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
     String filename = files ? files.getOriginalFilename() : ''
-    return addOrUpdateSpinnakerCloudProverAccount(files, postData.get("postData"))
+    return addOrUpdateSpinnakerCloudProverAccount(files, postData.get("postData"), null)
+  }
+
+  @ApiOperation(value = "Add or Update spinnaker cloudprovider account configured in Spinnaker" )
+  @RequestMapping(value = "/accountsConfig/{version}/spinnaker/addOrUpdateCloudProviderAccount", method = RequestMethod.POST)
+  Object addOrUpdateVersionSpinnakerCloudProver(@PathVariable("version") String version, @RequestParam MultipartFile files, @RequestParam Map<String, String> postData) {
+    String filename = files ? files.getOriginalFilename() : ''
+    return addOrUpdateSpinnakerCloudProverAccount(files, postData.get("postData"), version)
   }
 
   @ApiOperation(value = "Add or Update Spinnaker x509")
@@ -290,8 +297,12 @@ class OpsmxOesController {
 	return createOrUpdateSpinnaker(files, postData.get("postData"), version)
   }
 
-  private String addOrUpdateSpinnakerCloudProverAccount(MultipartFile files, String data) {
+  private Object addOrUpdateSpinnakerCloudProverAccount(MultipartFile files, String data, String version) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+    String oesUrl = "/oes/accountsConfig/spinnaker/addOrUpdateCloudProviderAccount";
+    if(version != null){
+      oesUrl = "/oes/accountsConfig/version/spinnaker/addOrUpdateCloudProviderAccount".replace("version", version);
+    }
     Map headersMap = new HashMap()
     authenticationHeaders.each { key, val ->
       if(val.isPresent())
@@ -301,7 +312,7 @@ class OpsmxOesController {
     }
     def obj =  AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("opsmx").url +"/oes/accountsConfig/spinnaker/addOrUpdateCloudProviderAccount")
+        .url(serviceConfiguration.getServiceEndpoint("opsmx").url + oesUrl)
         .headers(Headers.of(headersMap))
         .post(uploadFileOkHttp(data,files))
         .build()
