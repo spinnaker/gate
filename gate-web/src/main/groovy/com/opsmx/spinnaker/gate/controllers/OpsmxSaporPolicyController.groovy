@@ -51,8 +51,7 @@ class OpsmxSaporPolicyController {
     String requestUri = request.getRequestURI()
 
     if (applicationFeatureRbac!=null){
-//      String x_spinnaker_user = request.getHeader("x-spinnaker-user")
-//      applicationFeatureRbac.authorizeUserForPolicyGateTrigger(x_spinnaker_user, data, requestUri)
+      applicationFeatureRbac.authorizeUserForPolicyGateTrigger(request, data)
     }
 
     return opsmxOesService.evaluateRuntimePolicy(version, data, requestUri)

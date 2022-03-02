@@ -27,7 +27,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-@ConditionalOnExpression("${rbac.enabled:false}")
+@ConditionalOnExpression("${rbac.feature.application.enabled:true}")
 public class ApplicationIdRbacInterceptor implements HandlerInterceptor {
 
   @Autowired private ApplicationFeatureRbac applicationFeatureRbac;

@@ -70,7 +70,7 @@ public class GateWebConfig implements WebMvcConfigurer {
   @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
 
-  @Value('${rbac.enabled:false}')
+  @Value('${rbac.feature.application.enabled:true}')
   Boolean isRbacEnabled
 
   @Autowired(required = false)

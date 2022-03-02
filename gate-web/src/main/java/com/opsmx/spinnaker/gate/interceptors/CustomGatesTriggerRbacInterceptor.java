@@ -29,7 +29,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-@ConditionalOnExpression("${rbac.enabled:false}")
+@ConditionalOnExpression("${rbac.feature.application.enabled:true}")
 public class CustomGatesTriggerRbacInterceptor implements HandlerInterceptor {
 
   @Autowired private ApplicationFeatureRbac applicationFeatureRbac;
@@ -46,8 +46,7 @@ public class CustomGatesTriggerRbacInterceptor implements HandlerInterceptor {
       String x_spinnaker_user = request.getHeader("x-spinnaker-user");
       log.info(
           "Request intercepted for authorizing if the user is having enough access to perform the action");
-      //      applicationFeatureRbac.authorizeUserForApprovalGateTrigger(
-      //        x_spinnaker_user, request.getRequestURI());
+      applicationFeatureRbac.authorizeUserForApprovalGateTrigger(request);
     } catch (NumberFormatException nfe) {
       log.debug("Ignoring the rbac check as it threw number format exception");
     }

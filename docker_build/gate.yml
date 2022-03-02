@@ -39,7 +39,9 @@ cache:
   expiryTime: 600000
 
 rbac:
-  enabled: false
+  feature:
+    application:
+      enabled: true
 
 security:
   basic:

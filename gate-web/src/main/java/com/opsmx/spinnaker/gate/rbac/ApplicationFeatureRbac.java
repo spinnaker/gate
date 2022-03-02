@@ -24,9 +24,12 @@ import com.opsmx.spinnaker.gate.enums.PermissionEnum;
 import com.opsmx.spinnaker.gate.enums.RbacFeatureType;
 import com.opsmx.spinnaker.gate.exception.AccessForbiddenException;
 import com.opsmx.spinnaker.gate.exception.InvalidResourceIdException;
+import com.opsmx.spinnaker.gate.exception.XSpinnakerUserHeaderMissingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -35,7 +38,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnExpression("${rbac.enabled:false}")
+@ConditionalOnExpression("${rbac.feature.application.enabled:true}")
 public class ApplicationFeatureRbac {
 
   @Autowired private OesAuthorizationService oesAuthorizationService;
@@ -112,19 +115,38 @@ public class ApplicationFeatureRbac {
       case POST:
       case PUT:
       case DELETE:
-        permission =
-            oesAuthorizationService
-                .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
-                .getBody();
-        log.info("permissions for the POST, PUT or DELETE API : {}", permission);
-        if (permission == null
-            || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
-          throw new AccessForbiddenException(
-              YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
-                  + PERMISSION_FOR_THE_FEATURE_TYPE
-                  + RbacFeatureType.APP.description
-                  + TO_PERFORM_THIS_OPERATION);
+        if (method.equals(HttpMethod.DELETE)
+            && endpointUrl.split("/").length == 4
+            && endpointUrl.trim().contains("/dashboardservice/v3/applications")) {
+          permission =
+              oesAuthorizationService
+                  .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
+                  .getBody();
+          log.info("permissions for the DELETE API : {}", permission);
+          if (permission == null
+              || !permission.getPermissions().contains(PermissionEnum.delete.name())) {
+            throw new AccessForbiddenException(
+                YOU_DO_NOT_HAVE
+                    + PermissionEnum.delete.name()
+                    + PERMISSION_FOR_THE_FEATURE_TYPE
+                    + RbacFeatureType.APP.description
+                    + TO_PERFORM_THIS_OPERATION);
+          }
+        } else {
+          permission =
+              oesAuthorizationService
+                  .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
+                  .getBody();
+          log.info("permissions for the POST, PUT or DELETE API : {}", permission);
+          if (permission == null
+              || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
+            throw new AccessForbiddenException(
+                YOU_DO_NOT_HAVE
+                    + PermissionEnum.create_or_edit.name()
+                    + PERMISSION_FOR_THE_FEATURE_TYPE
+                    + RbacFeatureType.APP.description
+                    + TO_PERFORM_THIS_OPERATION);
+          }
         }
         break;
     }
@@ -175,6 +197,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -199,6 +222,7 @@ public class ApplicationFeatureRbac {
                         username,
                         PermissionEnum.create_or_edit.name(),
                         serviceId,
+                        null,
                         null,
                         null,
                         null,
@@ -262,6 +286,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -287,6 +312,7 @@ public class ApplicationFeatureRbac {
                         PermissionEnum.create_or_edit.name(),
                         null,
                         pipelineId,
+                        null,
                         null,
                         null,
                         null,
@@ -349,6 +375,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -374,10 +401,11 @@ public class ApplicationFeatureRbac {
                         PermissionEnum.create_or_edit.name(),
                         null,
                         null,
-                        null,
-                        null,
-                        null,
                         gateId,
+                        null,
+                        null,
+                        null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -441,6 +469,7 @@ public class ApplicationFeatureRbac {
                         approvalGateId,
                         null,
                         null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -469,6 +498,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         approvalGateId,
+                        null,
                         null,
                         null,
                         username)
@@ -527,6 +557,7 @@ public class ApplicationFeatureRbac {
                         null,
                         approvalGateInstanceId,
                         null,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -558,6 +589,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         approvalGateInstanceId,
+                        null,
                         null,
                         username)
                     .getBody()
@@ -615,6 +647,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         approvalPolicyId,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -647,6 +680,7 @@ public class ApplicationFeatureRbac {
                         null,
                         null,
                         approvalPolicyId,
+                        null,
                         username)
                     .getBody()
                     .get("isEnabled"));
@@ -680,7 +714,19 @@ public class ApplicationFeatureRbac {
     return approvalGateInstanceId;
   }
 
-  public void authorizeUserForApprovalGateTrigger(String username, String endpointUrl) {
+  private String readXSpinnakerUserFromHeader(HttpServletRequest request) {
+
+    Optional.ofNullable(request.getHeader("x-spinnaker-user"))
+        .orElseThrow(
+            () -> new XSpinnakerUserHeaderMissingException("x-spinnaker-user header missing"));
+
+    return request.getHeader("x-spinnaker-user");
+  }
+
+  public void authorizeUserForApprovalGateTrigger(HttpServletRequest request) {
+
+    String username = readXSpinnakerUserFromHeader(request);
+    String endpointUrl = request.getRequestURI();
 
     Integer approvalGateId = getApprovalGateId(endpointUrl);
     Boolean isAuthorized;
@@ -699,6 +745,7 @@ public class ApplicationFeatureRbac {
                     approvalGateId,
                     null,
                     null,
+                    null,
                     username)
                 .getBody()
                 .get("isEnabled"));
@@ -713,7 +760,10 @@ public class ApplicationFeatureRbac {
     }
   }
 
-  public void authorizeUserForPolicyGateTrigger(String username, Object input, String endpointUrl) {
+  public void authorizeUserForPolicyGateTrigger(HttpServletRequest request, Object input) {
+
+    String username = readXSpinnakerUserFromHeader(request);
+    String endpointUrl = request.getRequestURI();
 
     String inputStr = gson.toJson(input);
     JsonObject inputJson = gson.fromJson(inputStr, JsonObject.class);
@@ -742,6 +792,52 @@ public class ApplicationFeatureRbac {
                     null,
                     null,
                     null,
+                    appName,
+                    username)
+                .getBody()
+                .get("isEnabled"));
+
+    if (isAuthorized == null || !isAuthorized) {
+      throw new AccessForbiddenException(
+          YOU_DO_NOT_HAVE
+              + PermissionEnum.runtime_access.name()
+              + PERMISSION_FOR_THE_FEATURE_TYPE
+              + RbacFeatureType.APP.description
+              + TO_PERFORM_THIS_OPERATION);
+    }
+  }
+
+  public void authorizeUserForVerificationAndTestVerificationGateTrigger(
+      HttpServletRequest request, Object input) {
+
+    String username = readXSpinnakerUserFromHeader(request);
+    String endpointUrl = request.getRequestURI();
+
+    String inputStr = gson.toJson(input);
+    JsonObject inputJson = gson.fromJson(inputStr, JsonObject.class);
+    String appName = null;
+
+    if (inputJson.has("application")) {
+      appName = inputJson.get("application").getAsString();
+    }
+
+    Boolean isAuthorized;
+
+    log.info("authorizing the endpoint : {}", endpointUrl);
+
+    isAuthorized =
+        Boolean.parseBoolean(
+            oesAuthorizationService
+                .isAuthorizedUser(
+                    username,
+                    PermissionEnum.runtime_access.name(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    appName,
                     username)
                 .getBody()
                 .get("isEnabled"));
