@@ -185,3 +185,4 @@ security:
 #Otherwise, it will allow unauthenticated access to the endpoints. Default will be false.
 allowUnauthenticatedAccess:
   agentAPI: false
+  webhooks: false
