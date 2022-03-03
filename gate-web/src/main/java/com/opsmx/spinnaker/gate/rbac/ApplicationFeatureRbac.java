@@ -112,7 +112,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         if (method.equals(HttpMethod.DELETE)
@@ -137,12 +136,12 @@ public class ApplicationFeatureRbac {
               oesAuthorizationService
                   .fetchPermissions(username, RbacFeatureType.APP.name(), applicationId, username)
                   .getBody();
-          log.info("permissions for the POST, PUT or DELETE API : {}", permission);
+          log.info("permissions for the PUT or DELETE API : {}", permission);
           if (permission == null
-              || !permission.getPermissions().contains(PermissionEnum.create_or_edit.name())) {
+              || !permission.getPermissions().contains(PermissionEnum.edit.name())) {
             throw new AccessForbiddenException(
                 YOU_DO_NOT_HAVE
-                    + PermissionEnum.create_or_edit.name()
+                    + PermissionEnum.edit.name()
                     + PERMISSION_FOR_THE_FEATURE_TYPE
                     + RbacFeatureType.APP.description
                     + TO_PERFORM_THIS_OPERATION);
@@ -212,7 +211,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -220,7 +218,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         serviceId,
                         null,
                         null,
@@ -232,13 +230,11 @@ public class ApplicationFeatureRbac {
                     .getBody()
                     .get("isEnabled"));
         log.info(
-            "is authorized for the service Id POST, PUT or DELETE API: {}, {}",
-            serviceId,
-            isAuthorized);
+            "is authorized for the service Id PUT or DELETE API: {}, {}", serviceId, isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -301,7 +297,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -309,7 +304,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         null,
                         pipelineId,
                         null,
@@ -321,13 +316,13 @@ public class ApplicationFeatureRbac {
                     .getBody()
                     .get("isEnabled"));
         log.info(
-            "is authorized for the pipeline Id POST, PUT or DELETE API: {}, {}",
+            "is authorized for the pipeline Id PUT or DELETE API: {}, {}",
             pipelineId,
             isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -390,7 +385,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -398,7 +392,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         null,
                         null,
                         gateId,
@@ -409,12 +403,11 @@ public class ApplicationFeatureRbac {
                         username)
                     .getBody()
                     .get("isEnabled"));
-        log.info(
-            "is authorized for the gate Id POST, PUT or DELETE API: {}, {}", gateId, isAuthorized);
+        log.info("is authorized for the gate Id PUT or DELETE API: {}, {}", gateId, isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -485,7 +478,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -493,7 +485,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         null,
                         null,
                         null,
@@ -505,13 +497,13 @@ public class ApplicationFeatureRbac {
                     .getBody()
                     .get("isEnabled"));
         log.info(
-            "is authorized for the approval gate Id POST, PUT or DELETE API: {}, {}",
+            "is authorized for the approval gate Id PUT or DELETE API: {}, {}",
             approvalGateId,
             isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -575,7 +567,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -583,7 +574,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         null,
                         null,
                         null,
@@ -595,13 +586,13 @@ public class ApplicationFeatureRbac {
                     .getBody()
                     .get("isEnabled"));
         log.info(
-            "is authorized for the approval gate instance Id POST, PUT or DELETE API: {}, {}",
+            "is authorized for the approval gate instance Id PUT or DELETE API: {}, {}",
             approvalGateInstanceId,
             isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -665,7 +656,6 @@ public class ApplicationFeatureRbac {
         }
         break;
 
-      case POST:
       case PUT:
       case DELETE:
         isAuthorized =
@@ -673,7 +663,7 @@ public class ApplicationFeatureRbac {
                 oesAuthorizationService
                     .isAuthorizedUser(
                         username,
-                        PermissionEnum.create_or_edit.name(),
+                        PermissionEnum.edit.name(),
                         null,
                         null,
                         null,
@@ -685,13 +675,13 @@ public class ApplicationFeatureRbac {
                     .getBody()
                     .get("isEnabled"));
         log.info(
-            "is authorized for the approval policy Id POST, PUT or DELETE API: {}, {}",
+            "is authorized for the approval policy Id PUT or DELETE API: {}, {}",
             approvalPolicyId,
             isAuthorized);
         if (isAuthorized == null || !isAuthorized) {
           throw new AccessForbiddenException(
               YOU_DO_NOT_HAVE
-                  + PermissionEnum.create_or_edit.name()
+                  + PermissionEnum.edit.name()
                   + PERMISSION_FOR_THE_FEATURE_TYPE
                   + RbacFeatureType.APP.description
                   + TO_PERFORM_THIS_OPERATION);
@@ -715,6 +705,11 @@ public class ApplicationFeatureRbac {
   }
 
   private String readXSpinnakerUserFromHeader(HttpServletRequest request) {
+
+    if (request.getUserPrincipal() != null && request.getUserPrincipal().getName() != null) {
+
+      return request.getUserPrincipal().getName();
+    }
 
     Optional.ofNullable(request.getHeader("x-spinnaker-user"))
         .orElseThrow(
