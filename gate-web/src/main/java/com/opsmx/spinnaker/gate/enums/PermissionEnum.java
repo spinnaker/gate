@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public enum PermissionEnum {
   view("view a feature"),
-  create_or_edit("create or edit a feature"),
+  edit("edit a feature"),
   delete("delete a feature"),
   runtime_access("execute (trigger custom gate)"),
   approve_gate("approve a visibility gate");
@@ -56,8 +56,8 @@ public enum PermissionEnum {
       case view:
         displayName = "View";
         break;
-      case create_or_edit:
-        displayName = "Create/Edit";
+      case edit:
+        displayName = "Edit";
         break;
       case delete:
         displayName = "Delete";
