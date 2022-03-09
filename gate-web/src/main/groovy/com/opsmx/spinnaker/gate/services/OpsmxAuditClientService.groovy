@@ -29,12 +29,13 @@ interface OpsmxAuditClientService {
                               @Path('type') String type)
 
   @GET("/auditclientservice/{version}/{type}/{source}")
-  Object getAuditClientResponse2(@Path('version') String version,
+  Object getDeliveryInsightCharts(@Path('version') String version,
                                  @Path('type') String type,
                                  @Path('source') String source,
                                  @Query('chartId') Integer chartId,
                                  @Query('startTime') Long startTime,
-                                 @Query('endTime') Long endTime)
+                                 @Query('endTime') Long endTime,
+                                 @Query('days') Integer days)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}")
   Object getAuditClientResponse3(@Path('version') String version,
@@ -98,6 +99,6 @@ interface OpsmxAuditClientService {
                                          @Path('source') String source,
                                          @Query('chartId') Integer chartId,
                                          @Query('startTime') Long startTime,
-                                         @Query('endTime') Long endTime)
-
+                                         @Query('endTime') Long endTime,
+                                           @Query('days') Integer days)
 }
