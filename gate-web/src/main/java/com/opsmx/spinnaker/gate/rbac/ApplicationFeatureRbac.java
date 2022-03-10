@@ -1250,7 +1250,6 @@ public class ApplicationFeatureRbac {
         "/visibilityservice/v3/applications/{applicationId}/approvalGateInstances/latest");
     applicationFeatureRbacEndpoints.add(
         "/visibilityservice/v3/applications/{applicationId}/services/{serviceId}/approvalGateInstances/activeCount");
-    applicationFeatureRbacEndpoints.add("/visibilityservice/v2/approvalGateInstances/{id}/status");
     applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGates/summary/count");
     applicationFeatureRbacEndpoints.add(
         "/visibilityservice/v1/approvalGates/{id}/toolTemplates/{templateId}/connector");
@@ -1348,10 +1347,6 @@ public class ApplicationFeatureRbac {
     endpointsWithApprovalGateId.add("/visibilityservice/v1/approvalGates/{id}");
     endpointsWithApprovalGateId.add("/visibilityservice/v2/approvalGates/{approvalGateId}");
 
-    endpointsWithApprovalGateInstanceId.add(
-        "/visibilityservice/v2/approvalGateInstances/{id}/status");
-    endpointsWithApprovalGateInstanceId.add(
-        "/visibilityservice/v1/approvalGateInstances/{id}/status");
     endpointsWithApprovalGateInstanceId.add("/visibilityservice/v1/approvalGateInstances/{id}");
     endpointsWithApprovalGateInstanceId.add(
         "/visibilityservice/v1/approvalGateInstances/{id}/toolConnectors/{connectorType}/visibilityserviceData");
