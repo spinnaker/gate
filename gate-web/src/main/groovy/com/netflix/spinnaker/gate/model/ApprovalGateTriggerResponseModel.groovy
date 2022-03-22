@@ -17,63 +17,21 @@
 
 package com.netflix.spinnaker.gate.model
 
+import groovy.transform.Canonical
 
+@Canonical
 class ApprovalGateTriggerResponseModel {
-  private Integer id
-  private Integer approvalGateId
-  private String activatedTime
-  private String approvalCallbackURL
-  private String rejectionCallbackURL
+  Integer id
+  Integer approvalGateId
+  String activatedTime
+  String approvalCallbackURL
+  String rejectionCallbackURL
+  ApprovalStatus approvalStatus
+  String navigationalURL
 
+  @Canonical
   static class ApprovalStatus{
-      private String status
-
-    String getStatus() {
-      return status
-    }
-
-    void setStatus(String status) {
-      this.status = status
-    }
+    String status
   }
 
-  Integer getId() {
-    return id
-  }
-
-  void setId(Integer id) {
-    this.id = id
-  }
-
-  Integer getApprovalGateId() {
-    return approvalGateId
-  }
-
-  void setApprovalGateId(Integer approvalGateId) {
-    this.approvalGateId = approvalGateId
-  }
-
-  String getActivatedTime() {
-    return activatedTime
-  }
-
-  void setActivatedTime(String activatedTime) {
-    this.activatedTime = activatedTime
-  }
-
-  String getApprovalCallbackURL() {
-    return approvalCallbackURL
-  }
-
-  void setApprovalCallbackURL(String approvalCallbackURL) {
-    this.approvalCallbackURL = approvalCallbackURL
-  }
-
-  String getRejectionCallbackURL() {
-    return rejectionCallbackURL
-  }
-
-  void setRejectionCallbackURL(String rejectionCallbackURL) {
-    this.rejectionCallbackURL = rejectionCallbackURL
-  }
 }
