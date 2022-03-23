@@ -122,6 +122,7 @@ class AuthConfig {
         .antMatchers(HttpMethod.POST,'/visibilityservice/v5/approvalGates/{id}/trigger').permitAll()
         .antMatchers(HttpMethod.GET,'/visibilityservice/v2/approvalGateInstances/{id}/status').permitAll()
         .antMatchers(HttpMethod.GET,'/visibilityservice/v1/approvalGateInstances/{id}/status').permitAll()
+        .antMatchers(HttpMethod.PUT,'/visibilityservice/v1/approvalGateInstances/{id}/review').permitAll()
         .antMatchers(HttpMethod.POST,'/oes/echo').permitAll()
         .antMatchers(HttpMethod.POST,'/oes/echo/').permitAll()
         .antMatchers(HttpMethod.POST,'/auditservice/v1/echo/events/data').permitAll()
