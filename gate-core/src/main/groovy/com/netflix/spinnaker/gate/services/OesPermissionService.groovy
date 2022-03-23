@@ -22,6 +22,8 @@ class OesPermissionService extends PermissionService{
   @Autowired
   OesAuthorizationService oesAuthorizationService
 
+  static final String defaultGroup = "anonymous"
+
   @Override
   void loginWithRoles(String userId, Collection<String> roles) {
     if (fiatStatus.isEnabled()) {
@@ -36,9 +38,15 @@ class OesPermissionService extends PermissionService{
     }
     if (isOesAuthorizationServiceEnabled){
       try {
+        if (roles == null){
+          roles = new ArrayList<>()
+          roles.add(defaultGroup)
+        } else if (!roles.isEmpty()){
+          roles.add(defaultGroup)
+        }
         oesAuthorizationService.cacheUserGroups(roles, userId)
       } catch(Exception e1){
-        log.error("Exception occured while login with roles : {}", e1)
+        log.error("Exception occurred while login with roles : {}", e1)
       }
     }
   }
