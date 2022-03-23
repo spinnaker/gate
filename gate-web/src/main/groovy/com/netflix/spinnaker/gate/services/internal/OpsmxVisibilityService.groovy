@@ -236,4 +236,10 @@ interface OpsmxVisibilityService {
                                    @Path('source5') String source5,
                                    @Body Object data)
 
+  @PUT("/visibilityservice/{version}/approvalGateInstances/{id}/spinnakerReview")
+  Object updateVisibilityResponse7(@Path('version') String version,
+                                   @Path('id') Integer id,
+                                   @Header('x-spinnaker-user') String xSpinnakerUser,
+                                    @Body Object data)
+
 }

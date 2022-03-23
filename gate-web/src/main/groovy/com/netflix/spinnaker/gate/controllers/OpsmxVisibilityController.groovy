@@ -393,4 +393,14 @@ class OpsmxVisibilityController {
 
     return opsmxVisibilityService.updateVisibilityResponse5(version, type, source, source1, source2, source3, source4, source5, data)
   }
+
+  @ApiOperation(value = "Endpoint for visibility rest services")
+  @RequestMapping(value = "/{version}/approvalGateInstances/{id}/spinnakerReview", method = RequestMethod.PUT)
+  Object updateVisibilityResponse7(@PathVariable("version") String version,
+                                   @PathVariable("id") Integer id,
+                                   @RequestHeader(value = "x-spinnaker-user",required = false) String xSpinnakerUser,
+                                   @RequestBody(required = false) Object data) {
+
+    return opsmxVisibilityService.updateVisibilityResponse7(version, id, xSpinnakerUser, data)
+  }
 }
