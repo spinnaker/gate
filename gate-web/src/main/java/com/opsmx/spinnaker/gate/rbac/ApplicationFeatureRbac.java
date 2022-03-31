@@ -1284,7 +1284,6 @@ public class ApplicationFeatureRbac {
     applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGateInstances/{id}");
     applicationFeatureRbacEndpoints.add(
         "/visibilityservice/v1/approvalGateInstances/{id}/toolConnectors/{connectorType}/visibilityserviceData");
-    applicationFeatureRbacEndpoints.add("/visibilityservice/v1/approvalGateInstances/{id}/review");
     applicationFeatureRbacEndpoints.add(
         "/visibilityservice/v1/approvalGateInstances/{id}/customConnectors");
     applicationFeatureRbacEndpoints.add(
@@ -1350,8 +1349,6 @@ public class ApplicationFeatureRbac {
     endpointsWithApprovalGateInstanceId.add("/visibilityservice/v1/approvalGateInstances/{id}");
     endpointsWithApprovalGateInstanceId.add(
         "/visibilityservice/v1/approvalGateInstances/{id}/toolConnectors/{connectorType}/visibilityserviceData");
-    endpointsWithApprovalGateInstanceId.add(
-        "/visibilityservice/v1/approvalGateInstances/{id}/review");
     endpointsWithApprovalGateInstanceId.add(
         "/visibilityservice/v1/approvalGateInstances/{id}/customConnectors");
     endpointsWithApprovalGateInstanceId.add(
