@@ -16,6 +16,7 @@
 
 package com.opsmx.spinnaker.gate.exception
 
+import com.google.gson.Gson
 import com.netflix.spinnaker.gate.controllers.OpsmxAutopilotController
 import com.netflix.spinnaker.gate.controllers.OpsmxDashboardController
 import com.netflix.spinnaker.gate.controllers.OpsmxOesController
@@ -25,18 +26,22 @@ import com.opsmx.spinnaker.gate.controllers.OpsmxAuditClientServiceController
 import com.opsmx.spinnaker.gate.controllers.OpsmxAuditServiceController
 import com.opsmx.spinnaker.gate.controllers.OpsmxSaporPolicyController
 import groovy.util.logging.Slf4j
+import org.apache.commons.io.IOUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import retrofit.RetrofitError
+import retrofit.client.Response
 
 @Slf4j
 @ControllerAdvice(basePackageClasses = [OpsmxSaporPolicyController.class, OpsmxAutopilotController.class,
 OpsmxAuditClientServiceController.class, OpsmxDashboardController.class, OpsmxPlatformController.class,
 OpsmxOesController.class, OpsmxVisibilityController.class, OpsmxAuditServiceController.class])
 class RetrofitErrorHandler {
+
+  static final Gson gson = new Gson()
 
   @ExceptionHandler([RetrofitError.class])
   @ResponseBody ResponseEntity<Object> handleRetrofitError(RetrofitError retrofitError){
@@ -47,6 +52,18 @@ class RetrofitErrorHandler {
         return new ResponseEntity<Object>(networkErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
       }
       if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
+        if (retrofitError.getResponse().getBody() !=null){
+          InputStream inputStream = null
+          try {
+            inputStream = retrofitError.getResponse().getBody().in()
+            String errorResponse = new String(IOUtils.toByteArray(inputStream))
+            return new ResponseEntity<Object>(gson.fromJson(errorResponse, Map.class), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
+          } finally {
+            if (inputStream!=null){
+              inputStream.close()
+            }
+          }
+        }
         return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.valueOf(retrofitError.getResponse().getStatus()))
       }
       return new ResponseEntity<Object>(retrofitError.getBody(), HttpStatus.INTERNAL_SERVER_ERROR)
