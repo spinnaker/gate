@@ -52,7 +52,7 @@ class RetrofitErrorHandler {
         return new ResponseEntity<Object>(networkErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
       }
       if (retrofitError.getResponse()!=null && retrofitError.getResponse().getStatus() > 0){
-        if (retrofitError.getBody() instanceof Response){
+        if (retrofitError.getResponse().getBody() !=null){
           InputStream inputStream = null
           try {
             inputStream = retrofitError.getResponse().getBody().in()
