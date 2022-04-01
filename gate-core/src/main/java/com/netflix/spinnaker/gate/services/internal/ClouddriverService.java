@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.POST;
@@ -30,6 +31,21 @@ public interface ClouddriverService {
 
   @GET("/credentials/{account}")
   AccountDetails getAccount(@Path("account") String account);
+
+  @GET("/credentials/type/{type}")
+  List<AccountDefinition> getAccountDefinitionsByType(
+      @Path("type") String type,
+      @Query("limit") Integer limit,
+      @Query("startingAccountName") String startingAccountName);
+
+  @POST("/credentials")
+  AccountDefinition createAccountDefinition(@Body AccountDefinition accountDefinition);
+
+  @PUT("/credentials")
+  AccountDefinition updateAccountDefinition(@Body AccountDefinition accountDefinition);
+
+  @DELETE("/credentials/{account}")
+  Response deleteAccountDefinition(@Path("account") String account);
 
   @GET("/task/{taskDetailsId}")
   Map getTaskDetails(@Path("taskDetailsId") String taskDetailsId);
@@ -492,5 +508,47 @@ public interface ClouddriverService {
     private Boolean primaryAccount;
     private String cloudProvider;
     private final Map<String, Object> details = new HashMap<String, Object>();
+  }
+
+  /**
+   * Wrapper type for Clouddriver account definitions. Clouddriver account definitions implement
+   * {@code CredentialsDefinition}, and its type discriminator is present in a property named
+   * {@code @type}. An instance of an account definition may have fairly different properties than
+   * its corresponding {@code AccountCredentials} instance. Account definitions must store all the
+   * relevant properties unchanged while {@link Account} and {@link AccountDetails} may summarize
+   * and remove data returned from their corresponding APIs. Account definitions must be transformed
+   * by a {@code CredentialsParser} before their corresponding credentials may be used by
+   * Clouddriver.
+   */
+  class AccountDefinition {
+    private final Map<String, Object> details = new HashMap<>();
+    private String type;
+    private String name;
+
+    @JsonAnyGetter
+    public Map<String, Object> details() {
+      return details;
+    }
+
+    @JsonAnySetter
+    public void set(String name, Object value) {
+      details.put(name, value);
+    }
+
+    public String getType() {
+      return type;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
   }
 }
