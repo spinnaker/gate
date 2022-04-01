@@ -100,6 +100,8 @@ class AuthConfig {
       http
         .requestMatcher(requestMatcherProvider.requestMatcher())
         .authorizeRequests()
+        .antMatchers("/error").permitAll()
+        .antMatchers('/favicon.ico').permitAll()
         .antMatchers("/resources/**").permitAll()
         .antMatchers("/images/**").permitAll()
         .antMatchers("/js/**").permitAll()
@@ -156,6 +158,8 @@ class AuthConfig {
       http
         .requestMatcher(requestMatcherProvider.requestMatcher())
         .authorizeRequests()
+        .antMatchers("/error").permitAll()
+        .antMatchers('/favicon.ico').permitAll()
         .antMatchers("/resources/**").permitAll()
         .antMatchers("/images/**").permitAll()
         .antMatchers("/js/**").permitAll()
@@ -211,6 +215,8 @@ class AuthConfig {
       http
         .requestMatcher(requestMatcherProvider.requestMatcher())
         .authorizeRequests()
+        .antMatchers("/error").permitAll()
+        .antMatchers('/favicon.ico').permitAll()
         .antMatchers("/resources/**").permitAll()
         .antMatchers("/images/**").permitAll()
         .antMatchers("/js/**").permitAll()
@@ -257,6 +263,8 @@ class AuthConfig {
       http
         .requestMatcher(requestMatcherProvider.requestMatcher())
         .authorizeRequests()
+        .antMatchers("/error").permitAll()
+        .antMatchers('/favicon.ico').permitAll()
         .antMatchers("/resources/**").permitAll()
         .antMatchers("/images/**").permitAll()
         .antMatchers("/js/**").permitAll()
