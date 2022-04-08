@@ -53,6 +53,8 @@ RUN sed -i 's/"VERIFICATION_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/Verif
 
 # === Copy Gate Build Files ===
 COPY /gate-web/build/install/gate  /opsmx/workdir/gate
+#  Copy jaeger jar
+COPY /jaeger/opentelemetry-javaagent.jar /${WORK_DIR}/jaeger/opentelemetry-javaagent.jar
 RUN chown -R opsmx:root ${WORK_DIR}/* /opt/* && chmod 777 /opt/* ${WORK_DIR}/*
 
 # === Start Gate Service ===
