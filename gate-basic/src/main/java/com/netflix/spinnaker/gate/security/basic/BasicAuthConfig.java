@@ -18,7 +18,11 @@ package com.netflix.spinnaker.gate.security.basic;
 
 import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.gate.services.PermissionService;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
@@ -42,14 +46,24 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired DefaultCookieSerializer defaultCookieSerializer;
 
+  @Value("${security.user.roles:}")
+  String roles;
+
   @Autowired
-  public BasicAuthConfig(AuthConfig authConfig, SecurityProperties securityProperties) {
+  public BasicAuthConfig(
+      AuthConfig authConfig,
+      SecurityProperties securityProperties,
+      PermissionService permissionService) {
     this.authConfig = authConfig;
-    this.authProvider = new BasicAuthProvider(securityProperties);
+    this.authProvider = new BasicAuthProvider(securityProperties, permissionService);
   }
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) {
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    if (roles != null && !roles.isEmpty()) {
+      authProvider.setRoles(
+          Stream.of(roles.split(",")).map(String::trim).collect(Collectors.toList()));
+    }
     auth.authenticationProvider(authProvider);
   }
 

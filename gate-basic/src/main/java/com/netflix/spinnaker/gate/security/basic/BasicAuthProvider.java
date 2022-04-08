@@ -15,9 +15,13 @@
  */
 package com.netflix.spinnaker.gate.security.basic;
 
+import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.security.User;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -25,14 +29,26 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+@Slf4j
 public class BasicAuthProvider implements AuthenticationProvider {
 
   private final SecurityProperties securityProperties;
 
-  public BasicAuthProvider(SecurityProperties securityProperties) {
-    this.securityProperties = securityProperties;
+  private final PermissionService permissionService;
 
+  private List<String> roles;
+
+  public void setRoles(List<String> roles) {
+    this.roles = roles;
+  }
+
+  public BasicAuthProvider(
+      SecurityProperties securityProperties, PermissionService permissionService) {
+    this.securityProperties = securityProperties;
+    this.permissionService = permissionService;
     if (securityProperties.getUser() == null) {
       throw new AuthenticationServiceException("User credentials are not configured");
     }
@@ -43,17 +59,28 @@ public class BasicAuthProvider implements AuthenticationProvider {
     String name = authentication.getName();
     String password =
         authentication.getCredentials() != null ? authentication.getCredentials().toString() : null;
-
     if (!securityProperties.getUser().getName().equals(name)
         || !securityProperties.getUser().getPassword().equals(password)) {
       throw new BadCredentialsException("Invalid username/password combination");
     }
 
+    log.debug("roles configured for user: {} are roles: {}", name, roles);
     User user = new User();
     user.setEmail(name);
     user.setUsername(name);
     user.setRoles(Collections.singletonList("USER"));
-    return new UsernamePasswordAuthenticationToken(user, password, new ArrayList<>());
+
+    List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+    if (roles != null && !roles.isEmpty() && permissionService != null) {
+      user.setRoles(roles);
+      grantedAuthorities =
+          roles.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+      permissionService.loginWithRoles(name, roles);
+    } else {
+      log.debug("If rbac is enabled at spinnaker then roles need to be configured for basic auth.");
+    }
+
+    return new UsernamePasswordAuthenticationToken(user, password, grantedAuthorities);
   }
 
   @Override
