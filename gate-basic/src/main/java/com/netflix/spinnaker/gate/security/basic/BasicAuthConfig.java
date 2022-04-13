@@ -18,14 +18,16 @@ package com.netflix.spinnaker.gate.security.basic;
 
 import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.gate.services.OesAuthorizationService;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -38,6 +40,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
+@Slf4j
 public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   private final AuthConfig authConfig;
@@ -49,21 +52,41 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
   @Value("${security.user.roles:}")
   String roles;
 
+  @Value("${security.user.name:}")
+  String name;
+
+  @Value("${security.user.password:}")
+  String password;
+
+  @Autowired PermissionService permissionService;
+
   @Autowired
   public BasicAuthConfig(
       AuthConfig authConfig,
-      SecurityProperties securityProperties,
-      PermissionService permissionService) {
+      PermissionService permissionService,
+      OesAuthorizationService oesAuthorizationService) {
     this.authConfig = authConfig;
-    this.authProvider = new BasicAuthProvider(securityProperties, permissionService);
+    this.authProvider = new BasicAuthProvider(permissionService, oesAuthorizationService);
   }
 
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-    if (roles != null && !roles.isEmpty()) {
+    if (name == null || name.isEmpty() || password == null || password.isEmpty()) {
+      throw new AuthenticationServiceException(
+          "User credentials are not configured properly. Please check username and password are properly configured");
+    }
+
+    if (roles == null || roles.isEmpty()) {
+      log.warn(
+          "No roles are configured for the user. This would leads to authorizations issues if RBAC is enabled");
+    } else {
       authProvider.setRoles(
           Stream.of(roles.split(",")).map(String::trim).collect(Collectors.toList()));
     }
+
+    authProvider.setName(this.name);
+    authProvider.setPassword(this.password);
+
     auth.authenticationProvider(authProvider);
   }
 
