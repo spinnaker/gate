@@ -13,29 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.netflix.spinnaker.gate.services;
 
 import static org.mockito.Mockito.*;
 
+import com.netflix.spinnaker.gate.config.TaskServiceProperties;
+import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector;
 import com.netflix.spinnaker.gate.services.internal.OrcaService;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = {TaskService.class, TaskServiceProperties.class})
 public class TaskServiceTest {
 
-  @Mock private OrcaServiceSelector selector;
-  @Mock private OrcaService orcaService;
+  @MockBean private OrcaServiceSelector selector;
+  @MockBean private ClouddriverServiceSelector clouddriverServiceSelector;
+  @MockBean private OrcaService orcaService;
+
+  @Autowired TaskService taskService;
 
   @Test
   public void callAsManyTimesAsSet() {
-    TaskService taskService = new TaskService(selector, null);
     Map operation = new LinkedHashMap();
 
     Map task = Map.of("ref", "apps/bob/someRandomId");
