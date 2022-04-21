@@ -22,10 +22,14 @@ import com.netflix.spinnaker.security.AuthenticatedRequest;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
+
+  @Value("${taskServce.maxNumberOfPolls:32}")
+  private int maxNumberOfPolls;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -124,7 +128,7 @@ public class TaskService {
   }
 
   public Map createAndWaitForCompletion(Map body) {
-    return createAndWaitForCompletion(body, 32, 1000);
+    return createAndWaitForCompletion(body, maxNumberOfPolls, 1000);
   }
 
   /** @deprecated This pipeline operation does not belong here. */
