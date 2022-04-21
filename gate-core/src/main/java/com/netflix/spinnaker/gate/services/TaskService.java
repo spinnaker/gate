@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
 
-  @Value("${taskServce.maxNumberOfPolls:32}")
+  @Value("${taskService.maxNumberOfPolls:32}")
   private int maxNumberOfPolls;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
