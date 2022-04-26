@@ -20,6 +20,7 @@ import com.google.gson.Gson
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.model.ApprovalGateTriggerResponseModel
 import com.netflix.spinnaker.gate.services.internal.OpsmxVisibilityService
+import feign.Request
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -132,9 +133,14 @@ class OpsmxVisibilityController {
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
                               @PathVariable("source2") String source2,
-                                @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances) {
+                                @RequestParam(value = "approvalgateinstances", required = false) List<Integer> approvalgateinstances,
+                                @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                                @RequestParam(value = "search", required = false) String search,
+                                @RequestParam(value = "pendingApproval", required = false) Boolean pendingApproval) {
 
-    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2, approvalgateinstances)
+    return opsmxVisibilityService.getVisibilityResponse5(version, type, source, source1, source2, approvalgateinstances,noOfDays,pageNo,pageLimit,search,pendingApproval)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -144,9 +150,9 @@ class OpsmxVisibilityController {
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
                               @PathVariable("source2") String source2,
-                              @PathVariable("source3") String source3) {
-
-    return opsmxVisibilityService.getVisibilityResponse6(version, type, source, source1, source2, source3)
+                              @PathVariable("source3") String source3,
+                                @RequestParam(value = "noOfDays", required = false) String noOfDays) {
+    return opsmxVisibilityService.getVisibilityResponse6(version, type, source, source1, source2, source3,noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")

@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.*
 
@@ -64,7 +65,12 @@ interface OpsmxVisibilityService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Path('source2') String source2,
-                                @Query("approvalGateInstances") List<Integer> approvalgateinstances)
+                                @Query("approvalGateInstances") List<Integer> approvalgateinstances,
+                                @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                                @RequestParam(value = "search", required = false) String search,
+                                @RequestParam(value = "pendingApproval", required = false) Boolean pendingApproval)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getVisibilityResponse6(@Path('version') String version,
@@ -72,7 +78,8 @@ interface OpsmxVisibilityService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Path('source2') String source2,
-                              @Path('source3') String source3)
+                              @Path('source3') String source3,
+                                @RequestParam(value = "noOfDays", required = false) String noOfDays)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getVisibilityResponse7(@Path('version') String version,
