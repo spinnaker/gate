@@ -286,7 +286,8 @@ class OpsmxAutopilotController {
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
                           @PathVariable("source3") String source3,
-                          @RequestParam(value = "verificationType", required = false) String verificationType) {
+                          @RequestParam(value = "verificationType", required = false) String verificationType,
+                          @RequestParam(value = "verificationFailures", required = false) String verificationFailures) {
 
     return opsmxAutopilotService.getAutoResponse6(type, source, source1, source2, source3, verificationType)
   }
