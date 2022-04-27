@@ -16,15 +16,19 @@
 
 package com.netflix.spinnaker.gate.services;
 
+import com.netflix.spinnaker.gate.config.TaskServiceProperties;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import java.util.*;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Data
 public class TaskService {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -32,12 +36,16 @@ public class TaskService {
 
   private OrcaServiceSelector orcaServiceSelector;
   private ClouddriverServiceSelector clouddriverServiceSelector;
+  private TaskServiceProperties taskServiceProperties;
 
+  @Autowired
   public TaskService(
       OrcaServiceSelector orcaServiceSelector,
-      ClouddriverServiceSelector clouddriverServiceSelector) {
+      ClouddriverServiceSelector clouddriverServiceSelector,
+      TaskServiceProperties taskServiceProperties) {
     this.orcaServiceSelector = orcaServiceSelector;
     this.clouddriverServiceSelector = clouddriverServiceSelector;
+    this.taskServiceProperties = taskServiceProperties;
   }
 
   public Map create(Map body) {
@@ -127,7 +135,10 @@ public class TaskService {
   }
 
   public Map createAndWaitForCompletion(Map body) {
-    return createAndWaitForCompletion(body, 32, 1000);
+    return createAndWaitForCompletion(
+        body,
+        taskServiceProperties.getMaxNumberOfPolls(),
+        taskServiceProperties.getDefaultIntervalBetweenPolls());
   }
 
   /** @deprecated This pipeline operation does not belong here. */
@@ -151,21 +162,5 @@ public class TaskService {
     } catch (Exception e) {
       log.error("Error loading execution {} from orca", id, e);
     }
-  }
-
-  public OrcaServiceSelector getOrcaServiceSelector() {
-    return orcaServiceSelector;
-  }
-
-  public void setOrcaServiceSelector(OrcaServiceSelector orcaServiceSelector) {
-    this.orcaServiceSelector = orcaServiceSelector;
-  }
-
-  public ClouddriverServiceSelector getClouddriverServiceSelector() {
-    return clouddriverServiceSelector;
-  }
-
-  public void setClouddriverServiceSelector(ClouddriverServiceSelector clouddriverServiceSelector) {
-    this.clouddriverServiceSelector = clouddriverServiceSelector;
   }
 }
