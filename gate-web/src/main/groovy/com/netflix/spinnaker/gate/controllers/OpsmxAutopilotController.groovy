@@ -286,9 +286,14 @@ class OpsmxAutopilotController {
                           @PathVariable("source1") String source1,
                           @PathVariable("source2") String source2,
                           @PathVariable("source3") String source3,
-                          @RequestParam(value = "verificationType", required = false) String verificationType) {
+                          @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                          @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                          @RequestParam(value = "search", required = false) String search,
+                          @RequestParam(value = "verificationType", required = false) String verificationType,
+                          @RequestParam(value = "verificationFailures", required = false) String verificationFailures) {
 
-    return opsmxAutopilotService.getAutoResponse6(type, source, source1, source2, source3, verificationType)
+    return opsmxAutopilotService.getAutoResponse6(type, source, source1, source2, source3,pageNo,pageLimit,noOfDays,search,verificationType,verificationFailures)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
