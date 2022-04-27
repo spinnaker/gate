@@ -132,6 +132,10 @@ interface OpsmxAutopilotService {
                           @Path('source1') String source1,
                           @Path('source2') String source2,
                           @Path('source3') String source3,
+                          @Query("pageNo") Integer pageNo,
+                          @Query("pageLimit") Integer pageLimit,
+                          @Query("noOfDays") Integer noOfDays,
+                          @Query("search") String search,
                           @Query("verificationType") String verificationType,
                           @Query("verificationFailures") String verificationFailures)
 
