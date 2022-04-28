@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,14 @@ import org.springframework.web.context.support.ServletRequestHandledEvent;
 @EnableAsync
 public class UserActivityAuditListener implements ApplicationListener {
 
-  @Autowired private AuditHandler auditHandler;
+  // @Autowired private AuditHandler auditHandler;
+
+  private AuditHandler auditHandler;
+
+  @Autowired
+  public UserActivityAuditListener(@Lazy AuditHandler auditHandler) {
+    this.auditHandler = auditHandler;
+  }
 
   @Async
   @Override
