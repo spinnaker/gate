@@ -26,7 +26,12 @@ interface OpsmxAuditClientService {
 
   @GET("/auditclientservice/{version}/{type}")
   Object getAuditClientResponse1(@Path('version') String version,
-                              @Path('type') String type)
+                              @Path('type') String type,
+                                 @Query("applicationName") String applicationName,
+                                 @Query("noOfDays") Integer noOfDays,
+                                 @Query("pageNo") Integer page,
+                                 @Query("size") Integer size,
+                                 @Query("policyDeny") String policyDeny)
 
   @GET("/auditclientservice/{version}/{type}/{source}")
   Object getDeliveryInsightCharts(@Path('version') String version,

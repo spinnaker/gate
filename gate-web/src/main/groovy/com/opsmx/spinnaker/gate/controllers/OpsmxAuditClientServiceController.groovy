@@ -45,8 +45,13 @@ class OpsmxAuditClientServiceController {
   @ApiOperation(value = "Endpoint for audit-client rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getAuditClientResponse1(@PathVariable("version") String version,
-                              @PathVariable("type") String type) {
-    return opsmxAuditClientService.getAuditClientResponse1(version, type)
+                              @PathVariable("type") String type,
+                                 @RequestParam(value = "applicationName",required = false) String applicationName,
+                                 @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                                 @RequestParam(value = "pageNo",required = false) Integer page,
+                                 @RequestParam(value = "size", required = false) Integer size,
+                                 @RequestParam(value = "policyDeny",required = false) String policyDeny) {
+    return opsmxAuditClientService.getAuditClientResponse1(version, type,applicationName,noOfDays,page,size,policyDeny)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")

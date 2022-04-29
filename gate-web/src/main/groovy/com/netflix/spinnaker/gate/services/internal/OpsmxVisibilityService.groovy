@@ -70,7 +70,7 @@ interface OpsmxVisibilityService {
                                 @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                 @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                                 @RequestParam(value = "search", required = false) String search,
-                                @RequestParam(value = "pendingApproval", required = false) Boolean pendingApproval)
+                                @RequestParam(value = "status", required = false) String status)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getVisibilityResponse6(@Path('version') String version,
