@@ -154,6 +154,29 @@ class OpsmxPlatformController {
     return opsmxPlatformService.getPlatformResponse7(version, type, source, source1, source2, source3, source4)
   }
 
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{source}", method = RequestMethod.GET)
+  Object getPlatformResponse8(@RequestParam(value = "username", required = false) String username,
+                              @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                              @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                              @RequestParam(value = "sortBy", required = false) String sortBy,
+                              @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                              @RequestParam(value = "search", required = false) String search,
+                              @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+
+    return opsmxPlatformService.getPlatformResponse8(version, source, username, pageNo,pageLimit, sortBy, sortOrder, search, noOfDays)
+  }
+
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{source}", method = RequestMethod.GET)
+  Object getPlatformResponse9(@RequestParam(value = "username", required = false) String username,
+                              @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                              @RequestParam(value = "applicationName", required = false) String applicationName,
+                              @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+
+    return opsmxPlatformService.getPlatformResponse9(version, source, username, applicationId, applicationName, noOfDays)
+  }
+
   @ApiOperation(value = "Endpoint for Insights controller to download csv file")
   @GetMapping(value = "/{version}/insights/download", produces = "text/csv")
   Object downloadCsvFile(@PathVariable("version") String version,
