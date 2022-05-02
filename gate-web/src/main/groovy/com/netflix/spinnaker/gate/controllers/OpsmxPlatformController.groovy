@@ -80,7 +80,7 @@ class OpsmxPlatformController {
                               @RequestParam(value = "applicationId", required = false) Integer applicationId,
                               @RequestParam(value = "applicationName", required = false) String applicationName,
                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
-    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission)
+    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission, search, username, pageNo, pageLimit, sortBy, sortOrder, applicationId, applicationName, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")

@@ -29,12 +29,12 @@ interface OpsmxPlatformService {
                               @Query("accountName") String accountName,
                               @Query("source") String source,
                               @Query("permission") String permission,
+                              @Query("search") String search,
                               @Query("username") String username,
                               @Query("pageNo") Integer pageNo,
                               @Query("pageLimit") Integer pageLimit,
                               @Query("sortBy") String sortBy,
                               @Query("sortOrder") String sortOrder,
-                              @Query("search") String search,
                               @Query("applicationId") Integer applicationId,
                               @Query("applicationName") String applicationName,
                               @Query("noOfDays") Integer noOfDays)
