@@ -28,7 +28,16 @@ interface OpsmxPlatformService {
                               @Query("datasourceType") String datasourceType,
                               @Query("accountName") String accountName,
                               @Query("source") String source,
-                              @Query("permission") String permission)
+                              @Query("permission") String permission,
+                              @Query("search") String search,
+                              @Query("username") String username,
+                              @Query("pageNo") Integer pageNo,
+                              @Query("pageLimit") Integer pageLimit,
+                              @Query("sortBy") String sortBy,
+                              @Query("sortOrder") String sortOrder,
+                              @Query("applicationId") Integer applicationId,
+                              @Query("applicationName") String applicationName,
+                              @Query("noOfDays") Integer noOfDays)
 
   @GET("/platformservice/{version}/{type}/{source}")
   Object getPlatformResponse(@Path('version') String version,

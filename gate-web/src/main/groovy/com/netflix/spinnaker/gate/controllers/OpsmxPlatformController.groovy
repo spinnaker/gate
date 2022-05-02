@@ -70,8 +70,17 @@ class OpsmxPlatformController {
                               @RequestParam(value = "datasourceType", required = false) String datasourceType,
                               @RequestParam(value = "accountName", required = false) String accountName,
                               @RequestParam(value = "source", required = false) String source,
-                              @RequestParam(value = "permission", required = false) String permission) {
-    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission)
+                              @RequestParam(value = "permission", required = false) String permission,
+                              @RequestParam(value = "search", required = false) String search,
+                              @RequestParam(value = "username", required = false) String username,
+                              @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                              @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                              @RequestParam(value = "sortBy", required = false) String sortBy,
+                              @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                              @RequestParam(value = "applicationId", required = false) Integer applicationId,
+                              @RequestParam(value = "applicationName", required = false) String applicationName,
+                              @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission, search, username, pageNo, pageLimit, sortBy, sortOrder, applicationId, applicationName, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
@@ -153,6 +162,7 @@ class OpsmxPlatformController {
 
     return opsmxPlatformService.getPlatformResponse7(version, type, source, source1, source2, source3, source4)
   }
+
 
   @ApiOperation(value = "Endpoint for Insights controller to download csv file")
   @GetMapping(value = "/{version}/insights/download", produces = "text/csv")
