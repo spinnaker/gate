@@ -137,7 +137,7 @@ interface OpsmxAutopilotService {
                           @Query("noOfDays") Integer noOfDays,
                           @Query("search") String search,
                           @Query("verificationType") String verificationType,
-                          @Query("verificationFailures") String verificationFailures)
+                          @Query("status") String status)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getAutoResponse7(@Path('type') String type,
