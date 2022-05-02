@@ -28,7 +28,16 @@ interface OpsmxPlatformService {
                               @Query("datasourceType") String datasourceType,
                               @Query("accountName") String accountName,
                               @Query("source") String source,
-                              @Query("permission") String permission)
+                              @Query("permission") String permission,
+                              @Query("username") String username,
+                              @Query("pageNo") Integer pageNo,
+                              @Query("pageLimit") Integer pageLimit,
+                              @Query("sortBy") String sortBy,
+                              @Query("sortOrder") String sortOrder,
+                              @Query("search") String search,
+                              @Query("applicationId") Integer applicationId,
+                              @Query("applicationName") String applicationName,
+                              @Query("noOfDays") Integer noOfDays)
 
   @GET("/platformservice/{version}/{type}/{source}")
   Object getPlatformResponse(@Path('version') String version,
@@ -72,21 +81,6 @@ interface OpsmxPlatformService {
                               @Path('source2') String source2,
                               @Path('source3') String source3,
                               @Path('source4') String source4)
-
-  @GET("/platformservice/{version}/{source}")
-  Object getPlatformResponse8(@Query("username") String username,
-                              @Query("pageNo") Integer pageNo,
-                              @Query("pageLimit") Integer pageLimit,
-                              @Query("sortBy") String sortBy,
-                              @Query("sortOrder") String sortOrder,
-                              @Query("search") String search,
-                              @Query("noOfDays") Integer noOfDays)
-
-  @GET("/platformservice/{version}/{source}")
-  Object getPlatformResponse9(@Query("username") String username,
-                              @Query("applicationId") Integer applicationId,
-                              @Query("applicationName") String applicationName,
-                              @Query("noOfDays") Integer noOfDays)
 
   @GET("/platformservice/{version}/insights/download")
   Response downloadCSVFile(@Path('version') String version,
