@@ -79,7 +79,7 @@ interface OpsmxVisibilityService {
                               @Path('source1') String source1,
                               @Path('source2') String source2,
                               @Path('source3') String source3,
-                                @RequestParam(value = "noOfDays", required = false) String noOfDays)
+                                @Query("noOfDays") String noOfDays)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getVisibilityResponse7(@Path('version') String version,
