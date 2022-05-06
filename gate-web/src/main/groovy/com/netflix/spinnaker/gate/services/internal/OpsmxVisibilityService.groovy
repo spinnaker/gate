@@ -66,11 +66,11 @@ interface OpsmxVisibilityService {
                               @Path('source1') String source1,
                               @Path('source2') String source2,
                                 @Query("approvalGateInstances") List<Integer> approvalgateinstances,
-                                @RequestParam(value = "noOfDays", required = false) String noOfDays,
-                                @RequestParam(value = "pageNo", required = false) Integer pageNo,
-                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
-                                @RequestParam(value = "search", required = false) String search,
-                                @RequestParam(value = "status", required = false) String status)
+                                @Query("noOfDays") String noOfDays,
+                                @Query("pageNo") Integer pageNo,
+                                @Query("pageLimit") Integer pageLimit,
+                                @Query("search") String search,
+                                @Query("status") String status)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getVisibilityResponse6(@Path('version') String version,
