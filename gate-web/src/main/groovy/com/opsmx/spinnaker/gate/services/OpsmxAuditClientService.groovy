@@ -31,7 +31,8 @@ interface OpsmxAuditClientService {
                                  @Query("noOfDays") Integer noOfDays,
                                  @Query("pageNo") Integer page,
                                  @Query("size") Integer size,
-                                 @Query("policyStatus") String policyStatus)
+                                 @Query("policyStatus") String policyStatus,
+                                 @Query("search") String search)
 
   @GET("/auditclientservice/{version}/{type}/{source}")
   Object getDeliveryInsightCharts(@Path('version') String version,
