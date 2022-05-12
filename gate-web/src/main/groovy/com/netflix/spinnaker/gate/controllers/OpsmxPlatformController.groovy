@@ -162,7 +162,7 @@ class OpsmxPlatformController {
     return opsmxPlatformService.getPlatformResponse7(version, type, source, source1, source2, source3, source4)
   }
   @ApiOperation(value = "Endpoint for platform rest services")
-  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}", method = RequestMethod.GET)
   Object getPlatformResponse8(@PathVariable("version") String version,
                               @PathVariable("type") String type,
                               @PathVariable("source") String source,
@@ -172,9 +172,8 @@ class OpsmxPlatformController {
                               @PathVariable("source4") String source4,
                               @PathVariable("source5") String source5,
                               @PathVariable("source6") String source6,
-                              @PathVariable("source7") String source7,
                               @RequestParam(value = "type", required = false) String gateType) {
-    return opsmxPlatformService.getPlatformResponse8(version, type, source, source1, source2, source3, source4, source5, source6, source7, gateType)
+    return opsmxPlatformService.getPlatformResponse8(version, type, source, source1, source2, source3, source4, source5, source6, gateType)
   }
 
   @ApiOperation(value = "Endpoint for Insights controller to download csv file")
