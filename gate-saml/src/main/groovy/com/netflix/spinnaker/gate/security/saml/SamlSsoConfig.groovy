@@ -24,6 +24,7 @@ import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig
 import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.kork.core.RetrySupport
 import com.netflix.spinnaker.security.User
+import com.opsmx.spinnaker.gate.security.saml.SamlAuthTokenUpdateFilter
 import groovy.util.logging.Slf4j
 import org.opensaml.saml2.core.Assertion
 import org.opensaml.saml2.core.Attribute
@@ -43,11 +44,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.extensions.saml2.config.SAMLConfigurer
-import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
+import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.session.web.http.DefaultCookieSerializer
 import org.springframework.stereotype.Component
 
@@ -168,7 +170,9 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .keyPassword(samlSecurityConfigProperties.keyStorePassword)
 
       saml.init(http)
-
+    SamlAuthTokenUpdateFilter authTokenUpdateFilter = new SamlAuthTokenUpdateFilter()
+    http.addFilterAfter(authTokenUpdateFilter,
+        BasicAuthenticationFilter.class)
     // @formatter:on
 
   }
