@@ -21,6 +21,7 @@ import com.netflix.spinnaker.fiat.model.resources.Role
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
+import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
 import com.netflix.spinnaker.gate.security.SpinnakerUser
 import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService
 import com.netflix.spinnaker.kork.core.RetrySupport
@@ -42,6 +43,8 @@ import javax.annotation.Nonnull
 import java.time.Duration
 
 import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyError
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 @Slf4j
 @Component
@@ -90,6 +93,8 @@ class PermissionService {
     }
   }
 
+
+  @Retryable(value = UpstreamBadRequest.class, maxAttempts = 3, backoff = @Backoff(delay = 4000l))
   void loginWithRoles(String userId, Collection<String> roles) {
     if (fiatStatus.isEnabled()) {
       try {
@@ -98,6 +103,7 @@ class PermissionService {
           permissionEvaluator.invalidatePermission(userId)
         })
       } catch (RetrofitError e) {
+        log.error("Exception caught while updating the roles. Will wait and retry: {}" , e)
         throw classifyError(e)
       }
     }
