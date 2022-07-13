@@ -109,7 +109,7 @@ class FunctionalSpec extends Specification {
   }
 
   def cleanup() {
-    ctx.close()
+    ctx?.close()
   }
 
   void "should call ApplicationService for applications"() {
