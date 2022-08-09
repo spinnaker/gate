@@ -121,6 +121,7 @@ spring:
   profiles: googleOAuth
 
 security:
+  contentSecurityPolicy: "object-src 'none'; script-src 'unsafe-eval' 'unsafe-inline' https: http:;"
   oauth2:
     client:
       # Set these values in your own config file (e.g. spinnaker-local.yml or gate-googleOAuth.yml).
