@@ -42,8 +42,10 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
           "event.getAuthentication().isAuthenticated() : {} and event instanceof AuthenticationSuccessEvent: {} ",
           event.getAuthentication().isAuthenticated(),
           event instanceof AuthenticationSuccessEvent);
+
       if (event.getAuthentication().isAuthenticated()
-          && event instanceof AuthenticationSuccessEvent) {
+          && (event instanceof AuthenticationSuccessEvent
+              || event instanceof InteractiveAuthenticationSuccessEvent)) {
         log.debug(" publishEvent AuthenticationSuccessEvent", event);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
