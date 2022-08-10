@@ -23,6 +23,7 @@ import org.springframework.boot.actuate.security.AbstractAuthenticationAuditList
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.event.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -47,6 +48,13 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
           && (event instanceof AuthenticationSuccessEvent
               || event instanceof InteractiveAuthenticationSuccessEvent)) {
         log.debug(" publishEvent AuthenticationSuccessEvent", event);
+        if (event instanceof InteractiveAuthenticationSuccessEvent) {
+          InteractiveAuthenticationSuccessEvent casted =
+              (InteractiveAuthenticationSuccessEvent) event;
+          Authentication auth = casted.getAuthentication();
+          auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, auth);
+          return;
+        }
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
       } else if (!event.getAuthentication().isAuthenticated()
