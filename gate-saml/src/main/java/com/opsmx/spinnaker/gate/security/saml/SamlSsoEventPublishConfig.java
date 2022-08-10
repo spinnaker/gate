@@ -1,5 +1,6 @@
 package com.opsmx.spinnaker.gate.security.saml;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class SamlSsoEventPublishConfig {
   public FilterChainProxy getFilters() {
     log.info("The applicationEventPublisher is: " + applicationEventPublisher.getClass());
     FilterChainProxy filterChainProxy = (FilterChainProxy) springSecurityFilterChain;
+    log.info("The FilterChainProxy is: " + filterChainProxy);
     List<SecurityFilterChain> list = filterChainProxy.getFilterChains();
     list.stream()
         .flatMap(chain -> chain.getFilters().stream())
@@ -44,8 +46,20 @@ public class SamlSsoEventPublishConfig {
 
     list.stream()
         .flatMap(chain -> chain.getFilters().stream())
+        .filter(filter -> filter.getClass() == FilterChainProxy.class)
+        .findAny()
+        .map(FilterChainProxy.class::cast)
+        .map(
+            fltrChnPrxy -> {
+              log.info("The internal FilterChainProxy is: " + fltrChnPrxy);
+              return fltrChnPrxy.getFilterChains();
+            })
+        .orElse(new ArrayList<>())
+        .stream()
+        .flatMap(chin -> chin.getFilters().stream())
         .filter(filter -> filter.getClass() == SAMLProcessingFilter.class)
         .findAny()
+        .map(FilterChainProxy.class::cast)
         .map(SAMLProcessingFilter.class::cast)
         .ifPresent(
             filter -> {
