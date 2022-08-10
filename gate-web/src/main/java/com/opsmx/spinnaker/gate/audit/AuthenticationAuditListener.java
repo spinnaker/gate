@@ -38,15 +38,22 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
+      log.debug(
+          "event.getAuthentication().isAuthenticated() : {} and event instanceof AuthenticationSuccessEvent: {} ",
+          event.getAuthentication().isAuthenticated(),
+          event instanceof AuthenticationSuccessEvent);
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
+        log.debug(" publishEvent AuthenticationSuccessEvent", event);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
 
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
+        log.debug(" publishEvent AbstractAuthenticationFailureEvent", event);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
 
       } else if (event instanceof LogoutSuccessEvent) {
+        log.debug(" publishEvent LogoutSuccessEvent", event);
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
       }
 
