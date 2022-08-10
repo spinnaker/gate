@@ -59,7 +59,6 @@ public class SamlSsoEventPublishConfig {
         .flatMap(chin -> chin.getFilters().stream())
         .filter(filter -> filter.getClass() == SAMLProcessingFilter.class)
         .findAny()
-        .map(FilterChainProxy.class::cast)
         .map(SAMLProcessingFilter.class::cast)
         .ifPresent(
             filter -> {
