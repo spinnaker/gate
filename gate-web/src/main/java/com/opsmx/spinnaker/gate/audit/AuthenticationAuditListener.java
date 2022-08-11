@@ -54,11 +54,10 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
               (InteractiveAuthenticationSuccessEvent) event;
           AbstractAuthenticationToken auth =
               (AbstractAuthenticationToken) casted.getAuthentication();
-          auth.setDetails(null);
-          AuditData data = new AuditData();
           String name = auth.getName();
           log.info("Name is: {}", name);
-          data.setName(name);
+          AuditData data = new AuditData(name);
+
           auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
           return;
         }

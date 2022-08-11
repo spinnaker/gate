@@ -20,5 +20,18 @@ import lombok.Data;
 
 @Data
 public class AuditData {
-  private String name;
+  private Source source;
+
+  public AuditData(String name) {
+    this.source = new Source(name);
+  }
+
+  @Data
+  public class Source {
+    private String name;
+
+    public Source(String name) {
+      this.name = name;
+    }
+  }
 }
