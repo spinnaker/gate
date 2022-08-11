@@ -17,6 +17,7 @@
 package com.opsmx.spinnaker.gate.audit;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
+import com.opsmx.spinnaker.gate.model.AuditData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
@@ -54,7 +55,9 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
           AbstractAuthenticationToken auth =
               (AbstractAuthenticationToken) casted.getAuthentication();
           auth.setDetails(null);
-          auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, auth);
+          AuditData data = new AuditData();
+          data.setName((String) auth.getPrincipal());
+          auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
           return;
         }
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
