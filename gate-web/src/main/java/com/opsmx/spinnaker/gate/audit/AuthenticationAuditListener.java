@@ -40,23 +40,24 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
-
+      // OP-17106: If saml event handle differently
       if (event.getAuthentication().isAuthenticated()
           && event instanceof InteractiveAuthenticationSuccessEvent) {
+        log.debug("publishEvent InteractiveAuthenticationSuccessEvent");
         handleInteractiveAuthenticationSuccessEvent(event);
         return;
       }
 
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
-        log.debug(" publishEvent AuthenticationSuccessEvent", event);
+        log.debug("publishEvent AuthenticationSuccessEvent");
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
-        log.debug(" publishEvent AbstractAuthenticationFailureEvent", event);
+        log.debug("publishEvent AbstractAuthenticationFailureEvent");
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
       } else if (event instanceof LogoutSuccessEvent) {
-        log.debug(" publishEvent LogoutSuccessEvent", event);
+        log.debug("publishEvent LogoutSuccessEvent");
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
       }
 
