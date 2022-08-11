@@ -56,7 +56,9 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
               (AbstractAuthenticationToken) casted.getAuthentication();
           auth.setDetails(null);
           AuditData data = new AuditData();
-          data.setName((String) auth.getPrincipal());
+          String name = auth.getName();
+          log.info("Name is: {}", name);
+          data.setName(name);
           auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
           return;
         }
