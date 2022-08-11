@@ -40,34 +40,21 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
-      log.debug(
-          "event.getAuthentication().isAuthenticated() : {} and event instanceof AuthenticationSuccessEvent: {} ",
-          event.getAuthentication().isAuthenticated(),
-          event instanceof AuthenticationSuccessEvent);
 
       if (event.getAuthentication().isAuthenticated()
-          && (event instanceof AuthenticationSuccessEvent
-              || event instanceof InteractiveAuthenticationSuccessEvent)) {
+          && event instanceof InteractiveAuthenticationSuccessEvent) {
+        handleInteractiveAuthenticationSuccessEvent(event);
+        return;
+      }
+
+      if (event.getAuthentication().isAuthenticated()
+          && event instanceof AuthenticationSuccessEvent) {
         log.debug(" publishEvent AuthenticationSuccessEvent", event);
-        if (event instanceof InteractiveAuthenticationSuccessEvent) {
-          InteractiveAuthenticationSuccessEvent casted =
-              (InteractiveAuthenticationSuccessEvent) event;
-          AbstractAuthenticationToken auth =
-              (AbstractAuthenticationToken) casted.getAuthentication();
-          String name = auth.getName();
-          log.info("Name is: {}", name);
-          AuditData data = new AuditData(name);
-
-          auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
-          return;
-        }
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
-
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
         log.debug(" publishEvent AbstractAuthenticationFailureEvent", event);
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
-
       } else if (event instanceof LogoutSuccessEvent) {
         log.debug(" publishEvent LogoutSuccessEvent", event);
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
@@ -76,5 +63,12 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
     } catch (Exception e) {
       log.error("Exception occured while capturing audit events : {}", e);
     }
+  }
+
+  private void handleInteractiveAuthenticationSuccessEvent(AbstractAuthenticationEvent event) {
+    AbstractAuthenticationToken auth = (AbstractAuthenticationToken) event.getAuthentication();
+    String name = auth.getName();
+    AuditData data = new AuditData(name);
+    auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
   }
 }
