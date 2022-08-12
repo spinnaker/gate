@@ -49,7 +49,7 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
       if (event.getAuthentication().isAuthenticated()
           && event instanceof InteractiveAuthenticationSuccessEvent) {
         log.debug("publishEvent InteractiveAuthenticationSuccessEvent");
-        handleAuthenticationEvent(event, AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT);
+        handleInteractiveAuthenticationSuccessEvent(event);
         return;
       }
 
@@ -62,15 +62,6 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
         log.debug("publishEvent AbstractAuthenticationFailureEvent");
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
       } else if (event instanceof LogoutSuccessEvent) {
-        if (event
-            .getAuthentication()
-            .getClass()
-            .getName()
-            .equals("org.springframework.security.providers.ExpiringUsernameAuthenticationToken")) {
-          log.debug("publishEvent LogoutSuccessEvent with ExpiringUsernameAuthenticationToken");
-          handleAuthenticationEvent(event, AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT);
-          return;
-        }
         log.debug("publishEvent LogoutSuccessEvent");
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
       }
@@ -80,8 +71,7 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
     }
   }
 
-  private void handleAuthenticationEvent(
-      AbstractAuthenticationEvent event, AuditEventType eventType) {
+  private void handleInteractiveAuthenticationSuccessEvent(AbstractAuthenticationEvent event) {
     AbstractAuthenticationToken auth = (AbstractAuthenticationToken) event.getAuthentication();
     String name = auth.getName();
     List<String> roles =
@@ -89,6 +79,6 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList());
     AuditData data = new AuditData(name, roles);
-    auditHandler.publishEvent(eventType, data);
+    auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
   }
 }
