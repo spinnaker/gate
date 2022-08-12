@@ -16,22 +16,34 @@
 
 package com.opsmx.spinnaker.gate.model;
 
+import java.util.List;
 import lombok.Data;
 
 @Data
 public class AuditData {
   private Source source;
 
-  public AuditData(String name) {
-    this.source = new Source(name);
+  public AuditData(String name, List<String> roles) {
+    this.source = new Source(name, roles);
   }
 
   @Data
   public class Source {
     private String name;
+    private Principal principal;
 
-    public Source(String name) {
+    public Source(String name, List<String> roles) {
       this.name = name;
+      this.principal = new Principal(roles);
+    }
+  }
+
+  @Data
+  public class Principal {
+    private List<String> roles;
+
+    public Principal(List<String> roles) {
+      this.roles = roles;
     }
   }
 }
