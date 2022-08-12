@@ -18,6 +18,10 @@ package com.opsmx.spinnaker.gate.audit;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
 import com.opsmx.spinnaker.gate.model.AuditData;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
@@ -25,6 +29,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.event.*;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -40,7 +45,7 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
-      // OP-17106: If saml event handle differently
+      // OP-17106: looks like a saml event fetch name and roles to publish
       if (event.getAuthentication().isAuthenticated()
           && event instanceof InteractiveAuthenticationSuccessEvent) {
         log.debug("publishEvent InteractiveAuthenticationSuccessEvent");
@@ -69,7 +74,11 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
   private void handleInteractiveAuthenticationSuccessEvent(AbstractAuthenticationEvent event) {
     AbstractAuthenticationToken auth = (AbstractAuthenticationToken) event.getAuthentication();
     String name = auth.getName();
-    AuditData data = new AuditData(name);
+    List<String> roles =
+        Optional.ofNullable(auth.getAuthorities()).orElse(new ArrayList<>()).stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
+    AuditData data = new AuditData(name, roles);
     auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
   }
 }
