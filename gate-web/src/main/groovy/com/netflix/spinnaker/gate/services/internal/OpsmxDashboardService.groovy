@@ -103,6 +103,18 @@ interface OpsmxDashboardService {
                                @Path('source5') String source5,
                                @Path('source6') String source6)
 
+  @GET("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}/{source7}")
+  Object getDashboardResponse10(@Path('version') String version,
+                               @Path('type') String type,
+                               @Path('source') String source,
+                               @Path('source1') String source1,
+                               @Path('source2') String source2,
+                               @Path('source3') String source3,
+                               @Path('source4') String source4,
+                               @Path('source5') String source5,
+                               @Path('source6') String source6,
+                                @Path('source7') String source7)
+
   @DELETE("/dashboardservice/{version}/{type}")
   Object deleteDashboardResponse(@Path('version') String version,
                            @Path('type') String type)
