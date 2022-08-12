@@ -503,9 +503,11 @@ class OpsmxOesController {
                          @PathVariable("source2") String source2,
                          @PathVariable("source3") String source3,
                          @PathVariable("source4") String source4,
-                         @PathVariable("source5") String source5) {
+                         @PathVariable("source5") String source5,
+                         @RequestParam(value = "gateIds", required = false) String gateIds
+  ) {
 
-    return opsmxOesService.getOesResponse8(type, source, source1, source2, source3, source4, source5)
+    return opsmxOesService.getOesResponse8(type, source, source1, source2, source3, source4, source5,gateIds)
   }
 
   @ApiOperation(value = "Endpoint for Oes rest services")
