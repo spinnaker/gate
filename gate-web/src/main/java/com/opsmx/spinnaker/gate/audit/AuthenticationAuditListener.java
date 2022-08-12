@@ -45,7 +45,7 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
-      // OP-17106: If saml event handle differently
+      // OP-17106: looks like a saml event fetch name and roles to publish
       if (event.getAuthentication().isAuthenticated()
           && event instanceof InteractiveAuthenticationSuccessEvent) {
         log.debug("publishEvent InteractiveAuthenticationSuccessEvent");
@@ -78,7 +78,6 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
         Optional.ofNullable(auth.getAuthorities()).orElse(new ArrayList<>()).stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList());
-    log.info("The roles are: {}", roles);
     AuditData data = new AuditData(name, roles);
     auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
   }
