@@ -17,11 +17,13 @@
 package com.opsmx.spinnaker.gate.audit;
 
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
+import com.opsmx.spinnaker.gate.model.AuditData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.event.*;
 import org.springframework.stereotype.Component;
 
@@ -38,20 +40,36 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 
     try {
       log.debug("Authentication audit events received : {}", event);
+      // OP-17106: If saml event handle differently
+      if (event.getAuthentication().isAuthenticated()
+          && event instanceof InteractiveAuthenticationSuccessEvent) {
+        log.debug("publishEvent InteractiveAuthenticationSuccessEvent");
+        handleInteractiveAuthenticationSuccessEvent(event);
+        return;
+      }
+
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
+        log.debug("publishEvent AuthenticationSuccessEvent");
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
-
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
+        log.debug("publishEvent AbstractAuthenticationFailureEvent");
         auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
-
       } else if (event instanceof LogoutSuccessEvent) {
+        log.debug("publishEvent LogoutSuccessEvent");
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
       }
 
     } catch (Exception e) {
       log.error("Exception occured while capturing audit events : {}", e);
     }
+  }
+
+  private void handleInteractiveAuthenticationSuccessEvent(AbstractAuthenticationEvent event) {
+    AbstractAuthenticationToken auth = (AbstractAuthenticationToken) event.getAuthentication();
+    String name = auth.getName();
+    AuditData data = new AuditData(name);
+    auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, data);
   }
 }
