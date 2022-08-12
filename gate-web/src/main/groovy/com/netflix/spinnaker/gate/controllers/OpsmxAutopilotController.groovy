@@ -342,6 +342,23 @@ class OpsmxAutopilotController {
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}/{source6}", method = RequestMethod.GET)
+  Object getAutoResponse10(@PathVariable("type") String type,
+                           @PathVariable("source") String source,
+                           @PathVariable("source1") String source1,
+                           @PathVariable("source2") String source2,
+                           @PathVariable("source3") String source3,
+                           @PathVariable("source4") String source4,
+                           @PathVariable("source5") String source5,
+                           @PathVariable("source6") String source6,
+                           @RequestParam(value = "imageId", required = false) String imageId,
+                           @RequestParam(value = "canaryIds", required = false) String canaryIds,
+                           @RequestParam(value = "gateIds", required = false) String gateIds) {
+
+    return opsmxAutopilotService.getAutoResponse10(type, source, source1, source2, source3, source4, source5, source6,imageId, canaryIds, gateIds)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
   Object deleteAutoResponse1(@PathVariable("type") String type) {
 
