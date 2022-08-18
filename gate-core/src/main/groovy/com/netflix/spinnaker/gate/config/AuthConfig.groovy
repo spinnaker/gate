@@ -94,7 +94,7 @@ class AuthConfig {
   @Value('${allowUnauthenticatedAccess.webhooks:false}')
   boolean isSpinnakerWebhooksUnauthenticatedAccessEnabled
 
-  @Value('${security.contentSecurityPolicy:\'object-src \'none\'; script-src \'unsafe-eval\' \'unsafe-inline\' https: http:;\'}')
+  @Value('${security.contentSecurityPolicy:object-src \'none\'; script-src \'unsafe-eval\' \'unsafe-inline\' https: http:;}')
   String contentSecurityPolicy
 
   void configure(HttpSecurity http) throws Exception {
