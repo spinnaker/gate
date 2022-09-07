@@ -80,8 +80,10 @@ class OpsmxPlatformController {
                               @RequestParam(value = "applicationId", required = false) Integer applicationId,
                               @RequestParam(value = "applicationName", required = false) String applicationName,
                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
-                              @RequestParam(value = "filterBy", required = false) String filterBy) {
-    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission, search, username, pageNo, pageLimit, sortBy, sortOrder, applicationId, applicationName, noOfDays, filterBy)
+                              @RequestParam(value = "filterBy", required = false) String filterBy,
+                              @RequestParam(value = "cdTool", required = false) String cdTool) {
+    return opsmxPlatformService.getPlatformResponse1(version, type, datasourceType, accountName, source, permission,
+       search, username, pageNo, pageLimit, sortBy, sortOrder, applicationId, applicationName, noOfDays, filterBy, cdTool)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
@@ -187,7 +189,7 @@ class OpsmxPlatformController {
     try {
       byte[] csvFile = IOUtils.toByteArray(inputStream)
       HttpHeaders headers = new HttpHeaders()
-      headers.setContentType(MediaType.parseMediaType("text/csv"));
+      headers.setContentType(MediaType.parseMediaType("text/csv"))
       headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
       return ResponseEntity.ok().headers(headers).body(csvFile)
 

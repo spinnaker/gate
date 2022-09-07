@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+
 import retrofit.client.Response
 import retrofit.http.*
 
@@ -38,7 +39,8 @@ interface OpsmxPlatformService {
                               @Query("applicationId") Integer applicationId,
                               @Query("applicationName") String applicationName,
                               @Query("noOfDays") Integer noOfDays,
-                              @Query("filterBy") String filterBy)
+                              @Query("filterBy") String filterBy,
+                              @Query(value = "cdTool")String cdTool)
 
   @GET("/platformservice/{version}/{type}/{source}")
   Object getPlatformResponse(@Path('version') String version,
