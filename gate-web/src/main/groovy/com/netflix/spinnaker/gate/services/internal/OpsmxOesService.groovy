@@ -66,6 +66,7 @@ interface OpsmxOesService {
                          @Path('source1') String source1,
                          @Path('source2') String source2,
                          @Path('source3') String source3,
+                         @Query("cdType") String cdType,
                          @Query("permissionId") String permissionId,
                          @Query("noOfDays") Integer noOfDays)
 
@@ -135,6 +136,7 @@ interface OpsmxOesService {
   Object postOesResponse4(@Path('type') String type,
                           @Path('source') String source,
                           @Path('source1') String source1,
+                          @Query("cdType") String cdType,
                           @Body Object data)
 
   @POST("/oes/{type}/{source}/{source1}/{source2}")
@@ -150,6 +152,7 @@ interface OpsmxOesService {
                           @Path('source1') String source1,
                           @Path('source2') String source2,
                           @Path('source3') String source3,
+                          @Query("cdType") String cdType,
                           @Body Object data)
 
   @POST("/oes/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
@@ -177,6 +180,7 @@ interface OpsmxOesService {
                             @Path('source') String source,
                             @Path('source1') String source1,
                             @Path('source2') String source2,
+                            @Query("cdType") String cdType,
                             @Body Object data)
 
   @PUT("/oes/{type}/{source}/{source1}/{source2}/{source3}")

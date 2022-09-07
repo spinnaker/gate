@@ -41,7 +41,14 @@ interface OpsmxAuditClientService {
                                  @Query('chartId') Integer chartId,
                                  @Query('startTime') Long startTime,
                                  @Query('endTime') Long endTime,
-                                 @Query('days') Integer days)
+                                 @Query('days') Integer days,
+                                 @Query("noOfDays") String noOfDays,
+                                 @Query("argoName") String argoName,
+                                 @Query("search") String search,
+                                 @Query("sort") String sort,
+                                 @Query("pageNo") Integer page,
+                                 @Query("pageLimit") Integer pageLimit,
+                                 @Query("sortBy") String sortBy)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}")
   Object getAuditClientResponse3(@Path('version') String version,
@@ -107,5 +114,7 @@ interface OpsmxAuditClientService {
                                          @Query('chartId') Integer chartId,
                                          @Query('startTime') Long startTime,
                                          @Query('endTime') Long endTime,
-                                           @Query('days') Integer days)
+                                         @Query('days') Integer days,
+                                         @Query('argoName') String argoName,
+                                         @Query('search') String search)
 }
