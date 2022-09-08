@@ -97,6 +97,10 @@ interface OpsmxPlatformService {
                               @Path('source6') String source6,
                               @Query("type") String gateType)
 
+  @GET("/platformservice/v7/datasource/groups")
+  Object getPlatformResponse9(@Query("name") String name,
+                              @Query("isArgoEnabled") boolean isArgoEnabled)
+
 
   @GET("/platformservice/{version}/insights/download")
   Response downloadCSVFile(@Path('version') String version,

@@ -179,6 +179,13 @@ class OpsmxPlatformController {
     return opsmxPlatformService.getPlatformResponse8(version, type, source, source1, source2, source3, source4, source5, source6, gateType)
   }
 
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value ="/v7/datasource/groups", method = RequestMethod.GET)
+  Object getPlatformResponse9(@RequestParam(required = false) String name,
+    @RequestParam("isArgoEnabled") Boolean isArgoEnabled){
+    return opsmxPlatformService.getPlatformResponse9(name,isArgoEnabled)
+  }
+
   @ApiOperation(value = "Endpoint for Insights controller to download csv file")
   @GetMapping(value = "/{version}/insights/download", produces = "text/csv")
   Object downloadCsvFile(@PathVariable("version") String version,
