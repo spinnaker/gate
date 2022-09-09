@@ -358,6 +358,23 @@ class OpsmxAutopilotController {
     return opsmxAutopilotService.getAutoResponse10(type, source, source1, source2, source3, source4, source5, source6,imageId, canaryIds, gateIds)
   }
 
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/api/v5/global/template", method = RequestMethod.GET)
+  Object getAutoResponse11(@RequestParam(value = "templateType") String templateType,
+                          @RequestParam(value = "templateName") String templateName,
+                          @RequestParam(value = "versionNo", required = false) String versionNo) {
+    return opsmxAutopilotService.getAutoResponse11(templateType, templateName, versionNo)
+  }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/api/v5/global/templates", method = RequestMethod.GET)
+  Object getAutoResponse12(@RequestParam(value = "templateType") String templateType,
+                           @RequestParam(value = "isFindAllVersions", required = false) String isFindAllVersions) {
+
+    return opsmxAutopilotService.getAutoResponse12( templateType, isFindAllVersions)
+  }
+
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
   Object deleteAutoResponse1(@PathVariable("type") String type) {
@@ -425,6 +442,17 @@ class OpsmxAutopilotController {
 
     return opsmxAutopilotService.deleteAutoResponse6(type, source, source1, source2, source3, source4)
   }
+
+  @ApiOperation(value = "Endpoint for autopilot rest services")
+  @RequestMapping(value = "/api/v5/global/templates", method = RequestMethod.DELETE)
+  Object deleteAutoResponse7(@RequestParam(value = "templateType") String templateType,
+                             @RequestParam(value = "templateName") String templateName,
+                             @RequestParam(value = "versionNo", required = false) String versionNo) {
+
+    return opsmxAutopilotService.deleteAutoResponse7( templateType, templateName, versionNo)
+  }
+
+
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/{type}", method = RequestMethod.POST)

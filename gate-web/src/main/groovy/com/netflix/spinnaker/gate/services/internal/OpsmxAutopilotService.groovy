@@ -187,6 +187,17 @@ interface OpsmxAutopilotService {
                            @Query("canaryIds") String canaryIds,
                            @Query("gateIds") String gateIds)
 
+
+  @GET("/autopilot/api/v5/global/template")
+  Object getAutoResponse11(@Query("templateType") String templateType,
+                           @Query("templateName") String templateName,
+                           @Query("versionNo") String versionNo)
+
+
+  @GET("/autopilot/api/v5/global/templates")
+  Object getAutoResponse12(@Query("templateType") String templateType,
+                           @Query("isFindAllVersions") String isFindAllVersions)
+
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
 
@@ -229,6 +240,12 @@ interface OpsmxAutopilotService {
                              @Path('source2') String source2,
                              @Path('source3') String source3,
                              @Path('source4') String source4)
+
+
+  @DELETE("/autopilot/api/v5/global/templates")
+  Object deleteAutoResponse7(@Query("templateType") String templateType,
+                            @Query("templateName") String templateName,
+                            @Query("versionNo") String versionNo)
 
   @POST("/autopilot/{type}")
   Object postAutoResponse(@Path('type') String type,
