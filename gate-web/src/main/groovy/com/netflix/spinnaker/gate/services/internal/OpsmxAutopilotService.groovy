@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.*
 
@@ -196,7 +197,13 @@ interface OpsmxAutopilotService {
 
   @GET("/autopilot/api/v5/global/templates")
   Object getAutoResponse12(@Query("templateType") String templateType,
-                           @Query("isFindAllVersions") String isFindAllVersions)
+                           @Query("isFindAllVersions") String isFindAllVersions,
+                           @Query( "search") String search,
+                           @Query( "sort") String sort,
+                           @Query( "size")Integer size,
+                           @Query( "sortBy") String sortBy,
+                           @Query( "noOfDays") String days,
+                           @Query( "pageNo") Integer page)
 
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
