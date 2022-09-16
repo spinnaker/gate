@@ -361,8 +361,8 @@ class OpsmxPlatformController {
 
   @ApiOperation(value = "download metric analysis sample template")
   @GetMapping(value = "/{version}/argo/sampleTemplate", produces = "application/octet-stream")
-  @ResponseBody Object downloadSampleTemplate(@RequestParam(value = "file") String file) {
-    Response response = opsmxPlatformService.downloadSampleTemplate(file)
+  @ResponseBody Object downloadSampleTemplate(@PathVariable("version") String version) {
+    Response response = opsmxPlatformService.downloadSampleTemplate(version)
     InputStream inputStream = response.getBody().in()
     try {
       byte[] manifestFile = IOUtils.toByteArray(inputStream)
