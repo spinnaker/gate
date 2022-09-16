@@ -358,4 +358,21 @@ class OpsmxPlatformController {
 
     return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, featureType,data)
   }
+
+  @ApiOperation(value = "download metric analysis sample template")
+  @GetMapping(value = "/{version}/argo/sampleTemplate", produces = "application/octet-stream")
+  @ResponseBody Object downloadSampleTemplate(@RequestParam(value = "file") String file) {
+    Response response = opsmxPlatformService.downloadSampleTemplate(file)
+    InputStream inputStream = response.getBody().in()
+    try {
+      byte[] manifestFile = IOUtils.toByteArray(inputStream)
+      HttpHeaders headers = new HttpHeaders()
+      headers.add("Content-Disposition", response.getHeaders().stream().filter({ header -> header.getName().trim().equalsIgnoreCase("Content-Disposition") }).collect(Collectors.toList()).get(0).value)
+      return ResponseEntity.ok().headers(headers).body(manifestFile)
+    } finally {
+      if (inputStream != null) {
+        inputStream.close()
+      }
+    }
+  }
 }
