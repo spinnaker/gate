@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
-
 import retrofit.client.Response
 import retrofit.http.*
 
@@ -203,6 +202,10 @@ interface OpsmxPlatformService {
                                  @Path('source4') String source4,
                                  @Query("featureType") String featureType,
                                  @Body Object data)
+
+  @GET("/platformservice/{version}/argo/sampleTemplate")
+  Response downloadSampleTemplate(@Path('version') String version,
+                                  @Query(value = "file") String file)
 
 
 
