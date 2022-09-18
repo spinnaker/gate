@@ -200,7 +200,7 @@ interface OpsmxAutopilotService {
                            @Query("isFindAllVersions") String isFindAllVersions,
                            @Query( "search") String search,
                            @Query( "sort") String sort,
-                           @Query( "size")Integer size,
+                           @Query( "pageLimit")Integer pageLimit,
                            @Query( "sortBy") String sortBy,
                            @Query( "noOfDays") String days,
                            @Query( "pageNo") Integer page)
