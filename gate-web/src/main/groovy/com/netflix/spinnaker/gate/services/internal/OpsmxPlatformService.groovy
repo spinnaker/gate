@@ -54,6 +54,8 @@ interface OpsmxPlatformService {
                               @Path('type') String type,
                               @Path('source') String source,
                               @Path('source1') String source1,
+                              @Query("agentName") String agentName,
+                              @Query("cdName") String cdName,
                               @Query("datasourceType") String datasourceType,
                               @Query("permissionId") String permissionId)
 
