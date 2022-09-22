@@ -117,5 +117,6 @@ interface OpsmxAuditClientService {
                                          @Query('days') Integer days,
                                          @Query('argoName') String argoName,
                                          @Query('search') String search,
-                                         @Query("noOfDays") String noOfDays)
+                                         @Query("noOfDays") String noOfDays,
+                                         @Query('limit') Integer limit)
 }
