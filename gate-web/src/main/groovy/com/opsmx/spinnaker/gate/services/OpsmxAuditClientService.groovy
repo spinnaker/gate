@@ -116,5 +116,6 @@ interface OpsmxAuditClientService {
                                          @Query('endTime') Long endTime,
                                          @Query('days') Integer days,
                                          @Query('argoName') String argoName,
-                                         @Query('search') String search)
+                                         @Query('search') String search,
+                                         @Query("noOfDays") String noOfDays)
 }

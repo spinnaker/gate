@@ -179,8 +179,9 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "endTime", required = false) Long endTime,
                                      @RequestParam(value = "days", required = false) Integer days,
                                      @RequestParam(value = "argoName", required = false) String argoName,
-                                 @RequestParam(value = "search", required = false) String search) {
-    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days,argoName,search)
+                                     @RequestParam(value = "search", required = false) String search,
+                                     @RequestParam(value = "noOfDays", required = false) String noOfDays) {
+    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days,argoName,search,noOfDays)
     log.info("response for the delivery insights endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()
