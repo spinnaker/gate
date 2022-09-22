@@ -70,9 +70,10 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "sort", required = false) String sort,
                                  @RequestParam(value = "pageNo", required = false) Integer page,
                                  @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
-                                 @RequestParam(value = "sortBy", required = false) String sortBy) {
+                                 @RequestParam(value = "sortBy", required = false) String sortBy,
+                                 @RequestParam(value = "limit", required = false) Integer limit) {
     return opsmxAuditClientService.getDeliveryInsightCharts(version, type, source, chartId, startTime, endTime, days,
-      noOfDays, argoName, search, sort, page, pageLimit, sortBy)
+      noOfDays, argoName, search, sort, page, pageLimit, sortBy,limit)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
