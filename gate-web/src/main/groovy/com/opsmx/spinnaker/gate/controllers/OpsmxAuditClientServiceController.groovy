@@ -70,9 +70,10 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "sort", required = false) String sort,
                                  @RequestParam(value = "pageNo", required = false) Integer page,
                                  @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
-                                 @RequestParam(value = "sortBy", required = false) String sortBy) {
+                                 @RequestParam(value = "sortBy", required = false) String sortBy,
+                                 @RequestParam(value = "limit", required = false) Integer limit) {
     return opsmxAuditClientService.getDeliveryInsightCharts(version, type, source, chartId, startTime, endTime, days,
-      noOfDays, argoName, search, sort, page, pageLimit, sortBy)
+      noOfDays, argoName, search, sort, page, pageLimit, sortBy,limit)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -180,8 +181,9 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "days", required = false) Integer days,
                                      @RequestParam(value = "argoName", required = false) String argoName,
                                      @RequestParam(value = "search", required = false) String search,
-                                     @RequestParam(value = "noOfDays", required = false) String noOfDays) {
-    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days,argoName,search,noOfDays)
+                                     @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                     @RequestParam(value = "limit", required = false) Integer limit) {
+    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days,argoName,search,noOfDays,limit)
     log.info("response for the delivery insights endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()
