@@ -250,7 +250,7 @@ interface OpsmxAutopilotService {
 
 
   @DELETE("/autopilot/api/{version}/global/template")
-  Object deleteAutoResponse7(@PathVariable("version") String version,
+  Object deleteAutoResponse7(@Path("version") String version,
                              @Query("templateType") String templateType,
                              @Query("templateName") String templateName)
 
