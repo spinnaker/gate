@@ -249,10 +249,9 @@ interface OpsmxAutopilotService {
                              @Path('source4') String source4)
 
 
-  @DELETE("/autopilot/api/v5/global/templates")
+  @DELETE("/autopilot/api/v5/global/template")
   Object deleteAutoResponse7(@Query("templateType") String templateType,
-                            @Query("templateName") String templateName,
-                            @Query("versionNo") String versionNo)
+                            @Query("templateName") String templateName)
 
   @POST("/autopilot/{type}")
   Object postAutoResponse(@Path('type') String type,
