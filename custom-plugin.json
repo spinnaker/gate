@@ -1,0 +1,58 @@
+[
+  {
+    "id": "Opsmx.VerificationGatePlugin",
+    "description": "An example of a PF4J-based plugin that provides a custom pipeline stage.",
+    "releases": [
+      {
+        "version": "1.0.1",
+        "date": "2021-06-24T16:20:59.469168Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "VERIFICATION_SHASUM",
+        "state": "",
+        "url": "file:///opt/spinnaker/plugins/VerificationPlugin-v1.0.1-SNAPSHOT.zip"
+      }
+    ]
+  },
+  {
+    "id": "Opsmx.TestVerificationGatePlugin",
+    "description": "An example of a PF4J-based plugin that provides a custom pipeline stage.",
+    "releases": [
+      {
+        "version": "1.0.1",
+        "date": "2021-07-25T16:20:59.469168Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "TESTVERIFICATION_SHASUM",
+        "state": "",
+        "url": "file:///opt/spinnaker/plugins/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip"
+      }
+    ]
+  },
+  {
+    "id": "Opsmx.VisibilityApprovalPlugin",
+    "description": "An example of a PF4J-based plugin that provides a custom policy stage.",
+    "releases": [
+      {
+        "version": "1.0.1",
+        "date": "2021-07-20T16:20:59.469168Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "APPROVAL_SHASUM",
+        "state": "",
+        "url": "file:///opt/spinnaker/plugins/ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip"
+      }
+    ]
+  },
+  {
+    "id": "Opsmx.PolicyGatePlugin",
+    "description": "An example of a PF4J-based plugin that provides a custom policy stage.",
+    "releases": [
+      {
+        "version": "1.0.1",
+        "date": "2021-07-25T16:20:59.469168Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "POLICY_SHASUM",
+        "state": "",
+        "url": "file:///opt/spinnaker/plugins/policyPlugin-v1.0.1-SNAPSHOT.zip"
+      }
+    ]
+  }
+]

@@ -149,9 +149,11 @@ class OpsmxPlatformController {
                               @PathVariable("source") String source,
                               @PathVariable("source1") String source1,
                               @PathVariable("source2") String source2,
-                              @PathVariable("source3") String source3) {
+                              @PathVariable("source3") String source3,
+                              @RequestParam(value = "agentName") String agentName,
+                              @RequestParam(value = "sourceType") String sourceType) {
 
-    return opsmxPlatformService.getPlatformResponse6(version, type, source, source1, source2, source3)
+    return opsmxPlatformService.getPlatformResponse6(version, type, source, source1, source2, source3, agentName, sourceType)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
@@ -247,6 +249,18 @@ class OpsmxPlatformController {
   ) {
 
     return opsmxPlatformService.deletePlatformResponse5(version, type, source, source1,source2,featureType)
+  }
+
+  @ApiOperation(value = "Endpoint for platform rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.DELETE)
+  Object deletePlatformResponse6(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source2") String source3) {
+
+    return opsmxPlatformService.deletePlatformResponse6(version, type, source, source1,source2,source3)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
