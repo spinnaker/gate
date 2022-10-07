@@ -115,7 +115,15 @@ interface OpsmxAutopilotService {
                           @Query("noOfDays") Integer noOfDays,
                           @Query("patternId") String patternId,
                           @Query("search") String search,
-                          @Query("verificationType") String verificationType
+                          @Query("verificationType") String verificationType,
+                          @Query("applicationName") String applicationName,
+                          @Query("serviceName") String serviceName,
+                          @Query("accountName") String accountName,
+                          @Query("sourceType") String sourceType,
+                          @Query("templateName") String templateName,
+                          @Query("metricType") String metricType,
+                          @Query("templateVersion") String templateVersion,
+                          @Query("serviceList") List<String> serviceList
   )
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")

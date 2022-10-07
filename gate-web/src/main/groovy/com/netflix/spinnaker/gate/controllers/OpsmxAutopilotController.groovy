@@ -32,6 +32,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.apache.commons.io.IOUtils
+import org.bouncycastle.cert.ocsp.Req
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.http.HttpHeaders
@@ -262,9 +263,20 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
                           @RequestParam(value = "patternId", required = false) String patternId,
                           @RequestParam(value = "search", required = false) String search,
-                          @RequestParam(value = "verificationType", required = false) String verificationType) {
+                          @RequestParam(value = "verificationType", required = false) String verificationType,
+                          @RequestParam(value = "applicationName", required = false) String applicationName,
+                          @RequestParam(value = "serviceName", required = false) String serviceName,
+                          @RequestParam(value = "accountName", required = false) String accountName,
+                          @RequestParam(value = "sourceType", required = false) String sourceType,
+                          @RequestParam(value = "templateName", required = false) String templateName,
+                          @RequestParam(value = "metricType", required = false) String metricType,
+                          @RequestParam(value = "templateVersion", required = false) String templateVersion,
+                          @RequestParam(value = "serviceList", required = false) List<String> serviceList) {
 
-    return opsmxAutopilotService.getAutoResponse4(type, source, source1, applicationsIds, datasourceType, canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search,verificationType)
+    return opsmxAutopilotService
+      .getAutoResponse4(type, source, source1, applicationsIds, datasourceType,
+        canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search,verificationType, applicationName, serviceName, accountName, sourceType, templateName, metricType,
+      templateVersion, serviceList)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
