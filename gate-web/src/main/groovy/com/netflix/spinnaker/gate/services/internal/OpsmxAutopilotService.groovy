@@ -214,6 +214,13 @@ interface OpsmxAutopilotService {
                            @Query( "noOfDays") String days,
                            @Query( "pageNo") Integer page)
 
+  @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
+  Object getAutoResponse13(@Path('type') String type,
+                           @Path('source') String source,
+                           @Path('source1') Integer source1,
+                           @Path('source2') Integer source2,
+                           @Path('source3') String source3)
+
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
 
