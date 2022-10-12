@@ -271,12 +271,14 @@ class OpsmxAutopilotController {
                           @RequestParam(value = "templateName", required = false) String templateName,
                           @RequestParam(value = "metricType", required = false) String metricType,
                           @RequestParam(value = "templateVersion", required = false) String templateVersion,
-                          @RequestParam(value = "serviceList", required = false) List<String> serviceList) {
+                          @RequestParam(value = "serviceList", required = false) List<String> serviceList,
+                          @RequestParam(value = "id", required = false) Integer id,
+                          @RequestParam(value = "referer", required = false) String referer) {
 
     return opsmxAutopilotService
       .getAutoResponse4(type, source, source1, applicationsIds, datasourceType,
         canaryId, serviceId, pageNo, pageLimit, sortBy, sortOrder, applicationId, noOfDays, patternId, search,verificationType, applicationName, serviceName, accountName, sourceType, templateName, metricType,
-      templateVersion, serviceList)
+      templateVersion, serviceList, id, referer)
   }
 
   @ApiOperation(value = "Endpoint for autopilot rest services")
