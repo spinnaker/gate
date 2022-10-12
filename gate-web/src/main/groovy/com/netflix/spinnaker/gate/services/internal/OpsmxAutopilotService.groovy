@@ -123,8 +123,9 @@ interface OpsmxAutopilotService {
                           @Query("templateName") String templateName,
                           @Query("metricType") String metricType,
                           @Query("templateVersion") String templateVersion,
-                          @Query("serviceList") List<String> serviceList
-  )
+                          @Query("serviceList") List<String> serviceList,
+                          @Query("id") Integer id,
+                          @Query("referer") String referer)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
   Object getAutoResponse5(@Path('type') String type,
