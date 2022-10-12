@@ -314,7 +314,7 @@ class OpsmxAutopilotController {
   @RequestMapping(value = "/{type}/{source}/{source1}/{source2}/tags", method = RequestMethod.GET)
   Object getAutoResponse13(@PathVariable("type") String type,
                            @PathVariable("source") String source,
-                           @PathVariable("source1") Integer source1,
+                           @PathVariable("source1") String source1,
                            @PathVariable("source2") Integer source2) {
     return opsmxAutopilotService.getAutoResponse13(type, source, source1, source2)
   }
