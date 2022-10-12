@@ -115,7 +115,15 @@ interface OpsmxAutopilotService {
                           @Query("noOfDays") Integer noOfDays,
                           @Query("patternId") String patternId,
                           @Query("search") String search,
-                          @Query("verificationType") String verificationType
+                          @Query("verificationType") String verificationType,
+                          @Query("applicationName") String applicationName,
+                          @Query("serviceName") String serviceName,
+                          @Query("accountName") String accountName,
+                          @Query("sourceType") String sourceType,
+                          @Query("templateName") String templateName,
+                          @Query("metricType") String metricType,
+                          @Query("templateVersion") String templateVersion,
+                          @Query("serviceList") List<String> serviceList
   )
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}")
@@ -130,7 +138,7 @@ interface OpsmxAutopilotService {
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAutoResponse6(@Path('type') String type,
                           @Path('source') String source,
-                          @Path('source1') String source1,
+                          @Path('source1') Integer source1,
                           @Path('source2') String source2,
                           @Path('source3') String source3,
                           @Query("pageNo") Integer pageNo,
@@ -250,7 +258,7 @@ interface OpsmxAutopilotService {
 
 
   @DELETE("/autopilot/api/{version}/global/template")
-  Object deleteAutoResponse7(@PathVariable("version") String version,
+  Object deleteAutoResponse7(@Path("version") String version,
                              @Query("templateType") String templateType,
                              @Query("templateName") String templateName)
 

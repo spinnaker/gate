@@ -67,7 +67,8 @@ interface OpsmxPlatformService {
                               @Path('source2') String source2,
                               @Query("permissionId") String permissionId,
                               @Query("resourceType") String resourceType,
-                              @Query("featureType") String featureType)
+                              @Query("featureType") String featureType,
+                              @Query("sourceName") String sourceName)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getPlatformResponse6(@Path('version') String version,
@@ -75,7 +76,9 @@ interface OpsmxPlatformService {
                               @Path('source') String source,
                               @Path('source1') String source1,
                               @Path('source2') String source2,
-                              @Path('source3') String source3)
+                              @Path('source3') String source3,
+                              @Query('agentName') String agentName,
+                              @Query('sourceType') String sourceType)
 
   @GET("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getPlatformResponse7(@Path('version') String version,
@@ -132,6 +135,14 @@ interface OpsmxPlatformService {
                                  @Path('source2') String source2,
                                  @Query("featureType") String featureType
   )
+
+  @DELETE("/platformservice/{version}/{type}/{source}/{source1}/{source2}")
+  Object deletePlatformResponse6(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Path("source3") String source3)
 
   @POST("/platformservice/{version}/{type}")
   Object postPlatformResponse(@Path('version') String version,
@@ -192,6 +203,7 @@ interface OpsmxPlatformService {
                                  @Path('source') String source,
                                  @Path('source1') String source1,
                                  @Path('source2') String source2,
+                                 @Query("sourceName") String sourceName,
                                  @Body Object data)
 
   @PUT("/platformservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
