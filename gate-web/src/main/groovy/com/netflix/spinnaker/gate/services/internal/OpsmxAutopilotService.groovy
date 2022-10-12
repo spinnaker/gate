@@ -218,8 +218,7 @@ interface OpsmxAutopilotService {
   Object getAutoResponse13(@Path('type') String type,
                            @Path('source') String source,
                            @Path('source1') Integer source1,
-                           @Path('source2') Integer source2,
-                           @Path('source3') String source3)
+                           @Path('source2') Integer source2)
 
   @DELETE("/autopilot/{type}")
   Object deleteAutoResponse1(@Path('type') String type)
