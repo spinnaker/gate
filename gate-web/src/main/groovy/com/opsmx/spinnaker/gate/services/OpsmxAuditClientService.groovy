@@ -98,7 +98,8 @@ interface OpsmxAuditClientService {
                            @Query("isTreeView") Boolean isTreeView,
                            @Query("isLatest") Boolean isLatest,
                            @Query("pageNo") Integer pageNo,
-                           @Query("size") Integer size)
+                           @Query("size") Integer size,
+                           @Query("noOfDays") String noOfDays)
 
   @GET("/auditclientservice/{version}/{type}/{source}/download")
   Response downloadDeliveryInsightsCSVFile(@Path('version') String version,
