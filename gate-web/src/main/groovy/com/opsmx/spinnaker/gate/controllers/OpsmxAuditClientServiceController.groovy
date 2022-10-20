@@ -150,8 +150,9 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "isTreeView", required = false) Boolean isTreeView,
                                      @RequestParam(value = "isLatest", required = false) Boolean isLatest,
                                      @RequestParam(value = "pageNo", required = false) Integer pageNo,
-                                     @RequestParam(value = "size", required = false) Integer size) {
-    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size)
+                                     @RequestParam(value = "size", required = false) Integer size,
+                                     @RequestParam(value = "noOfDays", required = false) String noOfDays) {
+    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size, noOfDays)
     log.info("response for the insgiths endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()
