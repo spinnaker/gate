@@ -134,7 +134,10 @@ interface OpsmxAutopilotService {
                           @Path('source2') String source2,
                           @Query("canaryId") Integer canaryId,
                           @Query("verificationType") String verificationType,
-                          @Query("permissionId") String permissionId)
+                          @Query("permissionId") String permissionId,
+                          @Query("templateName") String templateName,
+                          @Query("templateType") String templateType,
+                          @Query("sha1") String sha1)
 
   @GET("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAutoResponse6(@Path('type') String type,
@@ -293,11 +296,13 @@ interface OpsmxAutopilotService {
 
   @POST("/autopilot/{type}/{source}/{source1}/{source2}")
   Object postAutoResponse5(@Path('type') String type,
-                          @Path('source') String source,
-                          @Path('source1') String source1,
-                          @Path('source2') String source2,
+                           @Path('source') String source,
+                           @Path('source1') String source1,
+                           @Path('source2') String source2,
                            @Query("isEdit") Boolean isEdit,
-                          @Body Object data)
+                           @Query("sha1") String sha1,
+                           @Query("templateType") String templateType,
+                           @Body Object data)
 
   @POST("/autopilot/{type}/{source}/{source1}/{source2}/{source3}")
   Object postAutoResponse6(@Path('type') String type,
