@@ -142,9 +142,10 @@ class OpsmxDashboardController {
                                @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                                @RequestParam(value = "sortBy", required = false) String sortBy,
-                               @RequestParam(value = "sortOrder", required = false) String sortOrder) {
+                               @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                               @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
 
-    return opsmxDashboardService.getDashboardResponse5(version, type, source, source1, source2, pageNo, pageLimit, sortBy, sortOrder)
+    return opsmxDashboardService.getDashboardResponse5(version, type, source, source1, source2, pageNo, pageLimit, sortBy, sortOrder, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
