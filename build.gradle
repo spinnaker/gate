@@ -54,7 +54,7 @@ allprojects {
       exclude group: 'javax.servlet', module: 'javax.servlet-api'
       resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.apache.logging.log4j') {
-          details.useVersion '2.17.1'
+          details.useVersion '2.19.0'
         }
       }
     }
