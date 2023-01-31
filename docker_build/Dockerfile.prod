@@ -1,6 +1,13 @@
 FROM quay.io/opsmxpublic/ubi8-jre-11:v1
 MAINTAINER OpsMx
 
+# Add user opsmx and create logs and spinnaker config directory
+RUN adduser opsmx \
+    && usermod -aG wheel opsmx \
+    && mkdir -p /opsmx/workdir/logs \
+    && mkdir -p /opt/spinnaker/config \
+    && mkdir -p /opt/spinnaker/plugins 
+
 # Install procps(ps)
 RUN yum install -y wget
 
