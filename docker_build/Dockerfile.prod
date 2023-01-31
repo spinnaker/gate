@@ -10,7 +10,7 @@ COPY /docker_build/run.sh /usr/local/bin/run.sh
 RUN  chmod +x /usr/local/bin/run.sh
 COPY /docker_build/gate.yml /opt/spinnaker/config/
 COPY /docker_build/startup.sh /opsmx/workdir/
-COPY /docker_build/feature.yml /opt/spinnaker/config/
+# COPY /docker_build/feature.yml /opt/spinnaker/config/
 RUN  chmod +x /opsmx/workdir/startup.sh
 
 # === CUSTOM PLUGINS
