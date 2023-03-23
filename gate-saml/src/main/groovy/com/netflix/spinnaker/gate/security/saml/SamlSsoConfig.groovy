@@ -45,6 +45,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.extensions.saml2.config.SAMLConfigurer
 import org.springframework.security.saml.SAMLCredential
+import org.springframework.security.saml.storage.EmptyStorageFactory
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
 import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl
 import org.springframework.security.web.authentication.RememberMeServices
@@ -159,6 +160,7 @@ class SamlSsoConfig extends WebSecurityConfigurerAdapter {
           .and()
         .webSSOProfileConsumer(getWebSSOProfileConsumerImpl())
         .serviceProvider()
+          .storageFactory(new EmptyStorageFactory())
           .entityId(samlSecurityConfigProperties.issuerId)
           .protocol(samlSecurityConfigProperties.redirectProtocol)
           .hostname(samlSecurityConfigProperties.redirectHostname ?: serverProperties?.address?.hostName)
