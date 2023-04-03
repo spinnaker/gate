@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.config
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.netflix.spectator.api.Registry
@@ -160,6 +161,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .registerModule(new JavaTimeModule())
+      .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
     return new JsonHttpMessageConverter(objectMapper)
   }
@@ -340,6 +342,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .registerModule(new JavaTimeModule())
+      .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
 

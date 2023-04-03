@@ -1,6 +1,7 @@
 package com.netflix.spinnaker.gate.services.internal;
 
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
+import io.cloudevents.CloudEvent;
 import java.util.List;
 import java.util.Map;
 import retrofit.http.Body;
@@ -16,6 +17,17 @@ public interface EchoService {
   @Headers("Accept: application/json")
   @POST("/webhooks/{type}/{source}")
   Map webhooks(@Path("type") String type, @Path("source") String source, @Body Map event);
+
+  @Headers("Accept: application/json")
+  @POST("/webhooks/cdevents/{source}")
+  Map webhooks(
+      @Path("source") String source,
+      @Body CloudEvent cdevent,
+      @Header("Ce-Id") String cdId,
+      @Header("Ce-Specversion") String cdSpecVersion,
+      @Header("Ce-Type") String cdType,
+      @Header("Ce-Source") String cdSource,
+      @Header("Content-Type") String cdContentType);
 
   @Headers("Accept: application/json")
   @POST("/webhooks/{type}/{source}")
