@@ -243,13 +243,16 @@ class InvokePipelineConfigTest {
 
     // Some things to note about gate's response
     //
-    // 1. gate responds with 400 when front50 responds with 404.  This is actually OK in this case.
+    // 1. gate's 404 response in this case makes it difficult to distinguish between a 404 because
+    //    the endpoint itself doesn't exist and a "real" 404 -- one where all the requests are
+    //    correct, but front50 doesn't know about the pipeline.  This seems fairly minor.
+    //
     // 2. gate's response body doesn't include much, if any, of the information front50 returned.
     //    The "reason" includes front50's response code, but that's it.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isNotFound())
         .andExpect(status().reason("404 Not Found"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
@@ -349,15 +352,13 @@ class InvokePipelineConfigTest {
     String front50ResponseJson = objectMapper.writeValueAsString(front50Response);
     simulateFront50HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, front50ResponseJson);
 
-    // Some things to note about gate's response
-    //
-    // 1. gate responds with 400 when front50 responds with 404
-    // 2. gate's response body doesn't include much, if any, of the information front50 returned.
-    //    The "reason" includes front50's response code, but that's it.
+    // Note that gate's response body doesn't include much, if any, of the information front50
+    // returned.
+    // The "reason" includes front50's response code, but that's it.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isInternalServerError())
         .andExpect(status().reason("500 Server Error"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
@@ -369,11 +370,10 @@ class InvokePipelineConfigTest {
   void invokePipelineConfigFront50NetworkError() throws Exception {
     simulateFront50Response(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER));
 
-    // Note that gate responds with 400 in this case.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isInternalServerError())
         .andExpect(status().reason("Connection reset"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
@@ -385,11 +385,13 @@ class InvokePipelineConfigTest {
   void invokePipelineConfigFront50NonJsonRespone() throws Exception {
     simulateFront50HttpResponse(HttpStatus.OK, "this is not json");
 
-    // Note that gate responds with 400 in this case.
+    // Note that gate responds with 200 in this case because
+    // GenericExceptionHandlers.handleRetrofitError passes along front50's
+    // response code.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isOk())
         .andExpect(
             status()
                 .reason(
@@ -437,15 +439,13 @@ class InvokePipelineConfigTest {
     String orcaResponseJson = objectMapper.writeValueAsString(orcaResponse);
     simulateOrcaResponse(HttpStatus.INTERNAL_SERVER_ERROR, orcaResponseJson);
 
-    // Some things to note about gate's response
-    //
-    // 1. gate responds with 400 when orca responds with 500
-    // 2. gate's response body doesn't include much, if any, of the information orca returned.
-    //    The "reason" includes orca's response code, but that's it.
+    // Note that gate's response body doesn't include much, if any, of the information orca
+    // returned.
+    // The "reason" includes orca's response code, but that's it.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isInternalServerError())
         .andExpect(status().reason("500 Server Error"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
@@ -472,10 +472,9 @@ class InvokePipelineConfigTest {
     String orcaResponseJson = objectMapper.writeValueAsString(orcaResponse);
     simulateOrcaResponse(HttpStatus.BAD_REQUEST, orcaResponseJson);
 
-    // Some things to note about gate's response
-    //
-    // 2. gate's response body doesn't include much, if any, of the information orca returned.
-    //    The "reason" includes orca's response code, but that's it.
+    // Note that gate's response body doesn't include much, if any, of the information orca
+    // returned.
+    // The "reason" includes orca's response code, but that's it.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())

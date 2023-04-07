@@ -105,11 +105,10 @@ class PipelineControllerTest {
     RuntimeException exception = new RuntimeException("arbitrary message");
     when(pipelineService.trigger(anyString(), anyString(), anyMap())).thenThrow(exception);
 
-    // Note that gate responds with 400 even though there was a runtime exception
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isInternalServerError())
         .andExpect(status().reason(exception.getMessage()))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
   }
