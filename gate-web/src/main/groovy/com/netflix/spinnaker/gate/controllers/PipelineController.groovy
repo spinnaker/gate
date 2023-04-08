@@ -23,6 +23,7 @@ import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerRetrofitErrorHandler
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
@@ -56,6 +57,25 @@ class PipelineController {
   final ObjectMapper objectMapper
   final PipelineControllerConfigProperties pipelineControllerConfigProperties
 
+  /**
+   * Adjusting the front50Service and other retrofit objects for communicating
+   * with downstream services means changing RetrofitServiceFactory in kork and
+   * so it affects more than gate.  Front50 uses that code to communicate with
+   * echo.  Front50 doesn't currently do any special exception handling when it
+   * calls echo.  Gate does a ton though, and so it would be a big change to
+   * adjust all the catching of RetrofitError into catching
+   * SpinnakerHttpException, etc. as appropriate.
+   *
+   * Even if RetrofitServiceFactory were configurable by service type, so only
+   * gate's Front50Service and OrcaService used SpinnakerRetrofitErrorHandler,
+   * it would still be a big change, affecting gate-iap and gate-oauth2 where
+   * there's code that uses front50Service but checks for RetrofitError.
+   *
+   * To limit the scope of the change to invokePipelineConfig, construct a
+   * spinnakerRetrofitErrorHandler and use it directly.
+   */
+  final SpinnakerRetrofitErrorHandler spinnakerRetrofitErrorHandler
+
   @Autowired
   PipelineController(PipelineService pipelineService,
                      TaskService taskService,
@@ -67,6 +87,7 @@ class PipelineController {
     this.front50Service = front50Service
     this.objectMapper = objectMapper
     this.pipelineControllerConfigProperties = pipelineControllerConfigProperties
+    this.spinnakerRetrofitErrorHandler = SpinnakerRetrofitErrorHandler.newInstance()
   }
 
   @CompileDynamic
@@ -305,6 +326,8 @@ class PipelineController {
       pipelineService.trigger(application, pipelineNameOrId, trigger)
     } catch (NotFoundException e) {
       throw e
+    } catch (RetrofitError e) {
+      throw spinnakerRetrofitErrorHandler.handleError(e)
     } catch (e) {
       log.error("Unable to trigger pipeline (application: {}, pipelineId: {})",
         value("application", application), value("pipelineId", pipelineNameOrId), e)
