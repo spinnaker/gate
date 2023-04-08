@@ -50,20 +50,24 @@ import static net.logstash.logback.argument.StructuredArguments.value
 @RestController
 @RequestMapping("/pipelines")
 class PipelineController {
-  @Autowired
-  PipelineService pipelineService
+  final PipelineService pipelineService
+  final TaskService taskService
+  final Front50Service front50Service
+  final ObjectMapper objectMapper
+  final PipelineControllerConfigProperties pipelineControllerConfigProperties
 
   @Autowired
-  TaskService taskService
-
-  @Autowired
-  Front50Service front50Service
-
-  @Autowired
-  ObjectMapper objectMapper
-
-  @Autowired
-  PipelineControllerConfigProperties pipelineControllerConfigProperties
+  PipelineController(PipelineService pipelineService,
+                     TaskService taskService,
+                     Front50Service front50Service,
+                     ObjectMapper objectMapper,
+                     PipelineControllerConfigProperties pipelineControllerConfigProperties) {
+    this.pipelineService = pipelineService
+    this.taskService = taskService
+    this.front50Service = front50Service
+    this.objectMapper = objectMapper
+    this.pipelineControllerConfigProperties = pipelineControllerConfigProperties
+  }
 
   @CompileDynamic
   @ApiOperation(value = "Delete a pipeline definition")
