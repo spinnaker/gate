@@ -23,6 +23,8 @@ import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
+import com.netflix.spinnaker.kork.exceptions.SpinnakerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
 import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerRetrofitErrorHandler
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
@@ -324,15 +326,28 @@ class PipelineController {
     AuthenticatedRequest.setApplication(application)
     try {
       pipelineService.trigger(application, pipelineNameOrId, trigger)
-    } catch (NotFoundException e) {
-      throw e
     } catch (RetrofitError e) {
-      throw spinnakerRetrofitErrorHandler.handleError(e)
-    } catch (e) {
-      log.error("Unable to trigger pipeline (application: {}, pipelineId: {})",
-        value("application", application), value("pipelineId", pipelineNameOrId), e)
-      throw e
+      // If spinnakerRetrofitErrorHandler were registered as a "real" error handler, the code here would look something like
+      //
+      // } catch (SpinnakerHttpException e) {
+      //   throw new SpinnakerHttpException(triggerFailureMessage(application, pipelineNameOrId, e), e)
+      // } catch (SpinnakerException e) {
+      //   throw new SpinnakerException(triggerFailureMessage(application, pipelineNameOrId, e), e)
+      // }
+      Throwable throwable = spinnakerRetrofitErrorHandler.handleError(e)
+      if (throwable instanceof SpinnakerHttpException) {
+        throw new SpinnakerHttpException(triggerFailureMessage(application, pipelineNameOrId, throwable), throwable)
+      }
+      if (throwable instanceof SpinnakerException) {
+        throw new SpinnakerException(triggerFailureMessage(application, pipelineNameOrId, throwable), throwable)
+      }
+      throw throwable
     }
+  }
+
+  private String triggerFailureMessage(String application, String pipelineNameOrId, Throwable e) {
+    String.format("Unable to trigger pipeline (application: %s, pipelineId: %s). Error: %s",
+        value("application", application), value("pipelineId", pipelineNameOrId), e.getMessage())
   }
 
   @ApiOperation(value = "Trigger a pipeline execution", response = Map.class)

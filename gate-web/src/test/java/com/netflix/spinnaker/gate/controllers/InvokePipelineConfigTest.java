@@ -241,9 +241,11 @@ class InvokePipelineConfigTest {
     String front50ResponseJson = objectMapper.writeValueAsString(front50Response);
     simulateFront50HttpResponse(HttpStatus.NOT_FOUND, front50ResponseJson);
 
-    // gate's 404 response in this case makes it difficult to distinguish between a 404 because
-    // the endpoint itself doesn't exist and a "real" 404 -- one where all the requests are
-    // correct, but front50 doesn't know about the pipeline.  This seems fairly minor.
+    // gate's 404 response in this case makes it difficult to distinguish
+    // between a 404 because the endpoint itself doesn't exist and a "real" 404
+    // -- one where all the requests are correct, but front50 doesn't know about
+    // the pipeline.  This seems fairly minor, and callers who want to
+    // distinguish can look at more of the resposne than the status code.
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
@@ -251,7 +253,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Status: 404, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 404, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -308,7 +310,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Status: 400, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 400, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -361,7 +363,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Status: 500, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 500, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: jOOQ; message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -447,7 +449,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Status: 500, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 500, URL: "
                         + wmOrca.baseUrl()
                         + "/orchestrate?user=some+user, Message: message from orca"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -482,7 +484,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Status: 400, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 400, URL: "
                         + wmOrca.baseUrl()
                         + "/orchestrate?user=some+user, Message: message from orca"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
