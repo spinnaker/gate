@@ -91,4 +91,16 @@ class WebhooksControllerSpec extends Specification {
     NestedServletException ex = thrown()
     ex.message.startsWith("Request processing failed; nested exception is retrofit.RetrofitError: Failed to connect to localhost")
   }
+
+  void 'handles CDEvents API with BAD_REQUEST'() {
+    given:
+
+    when:
+    MockHttpServletResponse response = mockMvc.perform(post("/webhooks/cdevents/artifactPackaged")
+      .accept(MediaType.APPLICATION_JSON))
+      .andReturn().response
+
+    then:
+    response.status == 400
+  }
 }
