@@ -380,7 +380,10 @@ class InvokePipelineConfigTest {
         .perform(invokePipelineConfigRequest())
         .andDo(print())
         .andExpect(status().isInternalServerError())
-        .andExpect(status().reason("Connection reset"))
+        .andExpect(
+            status()
+                .reason(
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Connection reset"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
     verifyFront50PipelinesRequest();
@@ -398,7 +401,8 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (retrofit.ExceptionCatchingTypedInput$ExceptionCatchingInputStream); line: 1, column: 6]"))
+                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
+                        + " at [Source: (retrofit.ExceptionCatchingTypedInput$ExceptionCatchingInputStream); line: 1, column: 6]"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
     verifyFront50PipelinesRequest();

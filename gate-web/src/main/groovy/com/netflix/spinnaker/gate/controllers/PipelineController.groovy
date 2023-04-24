@@ -23,8 +23,6 @@ import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
-import com.netflix.spinnaker.kork.exceptions.SpinnakerException
-import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
 import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerRetrofitErrorHandler
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
@@ -329,19 +327,11 @@ class PipelineController {
     } catch (RetrofitError e) {
       // If spinnakerRetrofitErrorHandler were registered as a "real" error handler, the code here would look something like
       //
-      // } catch (SpinnakerHttpException e) {
-      //   throw new SpinnakerHttpException(triggerFailureMessage(application, pipelineNameOrId, e), e)
       // } catch (SpinnakerException e) {
-      //   throw new SpinnakerException(triggerFailureMessage(application, pipelineNameOrId, e), e)
+      //   throw new e.newInstance(triggerFailureMessage(application, pipelineNameOrId, e));
       // }
-      Throwable throwable = spinnakerRetrofitErrorHandler.handleError(e)
-      if (throwable instanceof SpinnakerHttpException) {
-        throw new SpinnakerHttpException(triggerFailureMessage(application, pipelineNameOrId, throwable), throwable)
-      }
-      if (throwable instanceof SpinnakerException) {
-        throw new SpinnakerException(triggerFailureMessage(application, pipelineNameOrId, throwable), throwable)
-      }
-      throw throwable
+      throw spinnakerRetrofitErrorHandler.handleError(e, {
+        exception -> triggerFailureMessage(application, pipelineNameOrId, exception) });
     }
   }
 
