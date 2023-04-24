@@ -28,6 +28,7 @@ import com.netflix.spinnaker.security.AuthenticatedRequest
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.internal.http.HttpMethod
+import okhttp3.MediaType.Companion.toMediaType
 import java.net.SocketException
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletRequest
@@ -120,7 +121,7 @@ class ProxyController(
       .toString()
       .substringAfter("/proxies/$proxyId")
 
-    val proxiedUrlBuilder = Request.Builder().url(proxyConfig.uri + proxyPath).build().url().newBuilder()
+    val proxiedUrlBuilder = Request.Builder().url(proxyConfig.uri + proxyPath).build().url.newBuilder()
     for ((key, value) in requestParams) {
       proxiedUrlBuilder.addQueryParameter(key, value)
     }
@@ -135,7 +136,7 @@ class ProxyController(
 
       val body = if (HttpMethod.permitsRequestBody(method) && request.contentType != null) {
         RequestBody.create(
-          okhttp3.MediaType.parse(request.contentType),
+          request.contentType.toMediaType(),
           request.reader.lines().collect(Collectors.joining(System.lineSeparator()))
         )
       } else {
@@ -145,9 +146,9 @@ class ProxyController(
       val response = proxy.okHttpClient.newCall(
         Request.Builder().url(proxiedUrl).method(method, body).build()
       ).execute()
-      statusCode = response.code()
+      statusCode = response.code
       contentType = response.header("Content-Type") ?: contentType
-      responseBody = response.body()?.string() ?: ""
+      responseBody = response.body?.string() ?: ""
     } catch (e: SocketException) {
       log.error("Exception processing proxy request", e)
       statusCode = HttpStatus.GATEWAY_TIMEOUT.value()
