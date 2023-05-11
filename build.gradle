@@ -59,6 +59,11 @@ allprojects {
     }
   }
 
+  // both Jar (e.g. sourceJar) and ProcessResources tasks inherit from AbstractCopyTask
+  tasks.withType(AbstractCopyTask).all {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+  }
+
   test {
     testLogging {
       exceptionFormat = 'full'
