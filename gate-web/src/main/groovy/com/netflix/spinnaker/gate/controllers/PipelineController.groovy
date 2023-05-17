@@ -336,7 +336,7 @@ class PipelineController {
   }
 
   private String triggerFailureMessage(String application, String pipelineNameOrId, Throwable e) {
-    String.format("Unable to trigger pipeline (application: %s, pipelineId: %s). Error: %s",
+    String.format("Unable to trigger pipeline (application: %s, pipelineNameOrId: %s). Error: %s",
         value("application", application), value("pipelineId", pipelineNameOrId), e.getMessage())
   }
 

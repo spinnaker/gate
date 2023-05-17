@@ -123,6 +123,7 @@ class InvokePipelineConfigTest {
 
   private static final String APPLICATION = "my-application";
   private static final String PIPELINE_ID = "my-pipeline-id";
+  private static final String PIPELINE_NAME = "my-pipeline-name";
   private static final String USERNAME = "some user";
   private static final String ACCOUNT = "my-account";
   private static final String SUBMITTED_REQUEST_ID = "submitted-request-id";
@@ -195,13 +196,13 @@ class InvokePipelineConfigTest {
 
     // If front50 doesn't return a configuration for the test pipeline id, don't
     // expect a call to orca, so there's no mock to set up for orca.
-    simulateFront50SuccessWithoutPipelineConfig();
+    simulateFront50ResponseWithoutPipelineConfig();
 
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
         .andExpect(status().isNotFound())
-        .andExpect(status().reason("Pipeline configuration not found (id: " + PIPELINE_ID + ")"))
+        .andExpect(status().reason("Pipeline configuration not found (id: " + PIPELINE_NAME + ")"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
     verifyFront50PipelinesRequest();
@@ -253,7 +254,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 404, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Status: 404, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -310,7 +311,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 400, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Status: 400, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -363,7 +364,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 500, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Status: 500, URL: "
                         + wmFront50.baseUrl()
                         + "/pipelines/my-application?refresh=true, Message: jOOQ; message from front50"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -383,7 +384,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Connection reset"))
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Connection reset"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
     verifyFront50PipelinesRequest();
@@ -401,7 +402,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
                         + " at [Source: (retrofit.ExceptionCatchingTypedInput$ExceptionCatchingInputStream); line: 1, column: 6]"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
@@ -453,7 +454,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 500, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Status: 500, URL: "
                         + wmOrca.baseUrl()
                         + "/orchestrate?user=some+user, Message: message from orca"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -488,7 +489,7 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineId: my-pipeline-id). Error: Status: 400, URL: "
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Status: 400, URL: "
                         + wmOrca.baseUrl()
                         + "/orchestrate?user=some+user, Message: message from orca"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
@@ -503,16 +504,16 @@ class InvokePipelineConfigTest {
    * the pipeline we're triggering
    */
   private void simulateFront50Success() throws JsonProcessingException {
-    List<Map<String, Object>> pipelineConfigs = List.of(Map.of("id", PIPELINE_ID));
+    List<Map<String, Object>> pipelineConfigs =
+        List.of(Map.of("id", PIPELINE_ID, "name", PIPELINE_NAME));
     String pipelineConfigsJson = objectMapper.writeValueAsString(pipelineConfigs);
     simulateFront50HttpResponse(HttpStatus.OK, pipelineConfigsJson);
   }
 
   /**
-   * Simulate a successful response from front50, but one that doesn't contain a pipeline
-   * configuration for the test id
+   * Simulate a response from front50 that doesn't contain a pipeline configuration for the test id
    */
-  private void simulateFront50SuccessWithoutPipelineConfig() throws JsonProcessingException {
+  private void simulateFront50ResponseWithoutPipelineConfig() throws JsonProcessingException {
     List<Map<String, Object>> pipelineConfigs = Collections.emptyList();
     String pipelineConfigsJson = objectMapper.writeValueAsString(pipelineConfigs);
     simulateFront50HttpResponse(HttpStatus.OK, pipelineConfigsJson);
@@ -563,7 +564,7 @@ class InvokePipelineConfigTest {
 
   /** Generate a request to the endpoint that PipelineController.invokePipelineConfig serves */
   private RequestBuilder invokePipelineConfigRequest() throws JsonProcessingException {
-    return post("/pipelines/" + APPLICATION + "/" + PIPELINE_ID)
+    return post("/pipelines/" + APPLICATION + "/" + PIPELINE_NAME)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .characterEncoding(StandardCharsets.UTF_8.toString())
         .header(USER.getHeader(), USERNAME)
