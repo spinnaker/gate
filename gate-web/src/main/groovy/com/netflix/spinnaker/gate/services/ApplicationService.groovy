@@ -22,11 +22,15 @@ import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerRetrofitErrorHandler
+import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -53,6 +57,25 @@ class ApplicationService {
   private AtomicReference<List<Map>> allApplicationsCache
   private ApplicationConfigurationProperties applicationConfigurationProperties
 
+  /**
+   * Adjusting the front50Service and other retrofit objects for communicating
+   * with downstream services means changing RetrofitServiceFactory in kork and
+   * so it affects more than gate.  Front50 uses that code to communicate with
+   * echo.  Front50 doesn't currently do any special exception handling when it
+   * calls echo.  Gate does a ton though, and so it would be a big change to
+   * adjust all the catching of RetrofitError into catching
+   * SpinnakerHttpException, etc. as appropriate.
+   *
+   * Even if RetrofitServiceFactory were configurable by service type, so only
+   * gate's Front50Service used SpinnakerRetrofitErrorHandler, it would still be
+   * a big change, affecting gate-iap and gate-oauth2 where there's code that
+   * uses front50Service but checks for RetrofitError.
+   *
+   * To limit the scope of the change to getPipelineConfigForApplication, construct a
+   * spinnakerRetrofitErrorHandler and use it directly.
+   */
+  final SpinnakerRetrofitErrorHandler spinnakerRetrofitErrorHandler
+
   @Autowired
   ApplicationService(
     ServiceConfiguration serviceConfiguration,
@@ -66,6 +89,7 @@ class ApplicationService {
     this.applicationConfigurationProperties = applicationConfigurationProperties
     this.executorService = Executors.newCachedThreadPool()
     this.allApplicationsCache = new AtomicReference<>([])
+    this.spinnakerRetrofitErrorHandler = SpinnakerRetrofitErrorHandler.newInstance()
   }
 
   // used in tests
@@ -156,7 +180,7 @@ class ApplicationService {
    *
    * @param app the application of the pipeline
    * @param pipelineNameOrId the name or id of the pipeline
-   * @return the pipeline configuration, or null if not found
+   * @return the pipeline configuration, or throws an exception if not found
    */
   Map getPipelineConfigForApplication(String app, String pipelineNameOrId) {
     // Since the argument can be a pipeline name or id, handle both cases.
@@ -170,11 +194,23 @@ class ApplicationService {
       log.error("front50 query for a pipeline with name ${pipelineNameOrId} in application ${app} returned a pipeline named ${pipelineConfig.name}")
       // Tempting to return null here, but querying by id might work, so give it a shot.
     } catch (RetrofitError e) {
-      if ((e.getKind() == RetrofitError.Kind.HTTP) && (e.response.status == 404)) {
+      // If spinnakerRetrofitErrorHandler were registered as a "real" error handler, the code here would look something like
+      //
+      // } catch (SpinnakeHttpException e) {
+      //   if (e.getResponseCode() == HttpStatus.NOT_FOUND.value()) {
+      //     ...
+      //   }
+      // }
+      Throwable throwable = spinnakerRetrofitErrorHandler.handleError(e);
+      if (throwable instanceof SpinnakerHttpException && throwable.getResponseCode() == HttpStatus.NOT_FOUND.value()) {
         log.info("front50 returned no pipeline with name ${pipelineNameOrId} in application ${app}")
         // fall through to try querying by id
       } else {
-        throw e
+        // It's a pretty arbitrary choice whether to throw e or throwable here
+        // since PipelineController.invokePipelineConfig handles both.  May as
+        // well throw throwable to avoid converting the RetrofitError to a
+        // Spinnaker*Exception again.
+        throw throwable
       }
     }
 
@@ -187,15 +223,17 @@ class ApplicationService {
       }
       log.error("front50 query for a pipeline with id ${pipelineNameOrId} returned a pipeline with id ${pipelineConfig.id}")
     } catch (RetrofitError e) {
-      if ((e.getKind() == RetrofitError.Kind.HTTP) && (e.response.status == 404)) {
+      Throwable throwable = spinnakerRetrofitErrorHandler.handleError(e);
+      if (throwable instanceof SpinnakerHttpException && throwable.getResponseCode() == HttpStatus.NOT_FOUND.value()) {
         log.info("front50 returned no pipeline with id ${pipelineNameOrId}")
-      } else {
-        throw e
+        throw throwable.newInstance("Pipeline configuration not found (id: ${pipelineNameOrId}): " + throwable.getMessage())
       }
+      throw throwable
     }
 
-    // neither query by app + name nor id turned up a pipeline config
-    return null
+    // If we get here, the query by id returned a pipeline whose id didn't match
+    // what we asked for.
+    throw new NotFoundException("Pipeline configuration not found (id: ${pipelineNameOrId})")
   }
 
   List<Map> getStrategyConfigsForApplication(String app) {
