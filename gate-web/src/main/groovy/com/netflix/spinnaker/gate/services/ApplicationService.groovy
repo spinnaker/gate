@@ -151,9 +151,51 @@ class ApplicationService {
     return front50Service.getPipelineConfigsForApplication(app, true)
   }
 
+  /**
+   * Return the pipeline configuration from front50
+   *
+   * @param app the application of the pipeline
+   * @param pipelineNameOrId the name or id of the pipeline
+   * @return the pipeline configuration, or null if not found
+   */
   Map getPipelineConfigForApplication(String app, String pipelineNameOrId) {
-    return front50Service.getPipelineConfigsForApplication(app, true)
-      .find { it.name == pipelineNameOrId || it.id == pipelineNameOrId }
+    // Since the argument can be a pipeline name or id, handle both cases.
+    // Query by name first since that's more likely.
+    try {
+      Map pipelineConfig = front50Service.getPipelineConfigByApplicationAndName(app, pipelineNameOrId, true)
+      if (pipelineConfig.name == pipelineNameOrId) {
+        log.debug("front50 returned a pipeline with name ${pipelineNameOrId} in application ${app}")
+        return pipelineConfig
+      }
+      log.error("front50 query for a pipeline with name ${pipelineNameOrId} in application ${app} returned a pipeline named ${pipelineConfig.name}")
+      // Tempting to return null here, but querying by id might work, so give it a shot.
+    } catch (RetrofitError e) {
+      if ((e.getKind() == RetrofitError.Kind.HTTP) && (e.response.status == 404)) {
+        log.info("front50 returned no pipeline with name ${pipelineNameOrId} in application ${app}")
+        // fall through to try querying by id
+      } else {
+        throw e
+      }
+    }
+
+    // query by id
+    try {
+      Map pipelineConfig = front50Service.getPipelineConfigById(pipelineNameOrId)
+      if (pipelineConfig.id == pipelineNameOrId) {
+        log.debug("front50 returned a pipeline with id ${pipelineNameOrId}")
+        return pipelineConfig
+      }
+      log.error("front50 query for a pipeline with id ${pipelineNameOrId} returned a pipeline with id ${pipelineConfig.id}")
+    } catch (RetrofitError e) {
+      if ((e.getKind() == RetrofitError.Kind.HTTP) && (e.response.status == 404)) {
+        log.info("front50 returned no pipeline with id ${pipelineNameOrId}")
+      } else {
+        throw e
+      }
+    }
+
+    // neither query by app + name nor id turned up a pipeline config
+    return null
   }
 
   List<Map> getStrategyConfigsForApplication(String app) {

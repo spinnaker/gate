@@ -458,23 +458,83 @@ class ApplicationServiceSpec extends Specification {
     null        | null          || ""
   }
 
-  @Unroll
-  void "should return pipeline config based on name or id"() {
+  void "getPipelineConfigForApplication returns pipeline config based on name"() {
+    given:
+    def app = "theApp"
+    def nameOrId = "by-name"
+
+    when:
+    def service = applicationService()
+    def result = service.getPipelineConfigForApplication(app, nameOrId)
+
+    then:
+    result != null
+    1 * front50.getPipelineConfigByApplicationAndName(app, nameOrId, true) >> [ id: "by-id", name: "by-name" ]
+    0 * front50.getPipelineConfigById(_)
+  }
+
+  void "getPipelineConfigForApplication returns pipeline config based on id"() {
+    given:
+    def app = "theApp"
+    def nameOrId = "by-id"
+
     when:
     def service = applicationService()
     def result = service.getPipelineConfigForApplication(app, nameOrId) != null
 
     then:
-    result == expected
-    1 * front50.getPipelineConfigsForApplication(app, true) >> [ [ id: "by-id", name: "by-name" ] ]
+    result != null
+    1 * front50.getPipelineConfigByApplicationAndName(app, nameOrId, true) >> { throw retrofit404() }
+    1 * front50.getPipelineConfigById(nameOrId) >> [ id: "by-id", name: "by-name" ]
+  }
 
-    where:
-    app = "theApp"
+  void "getPipelineConfigForApplication returns no pipeline config when neither name nor id match"() {
+    given:
+    def app = "theApp"
+    def nameOrId = "not-id"
 
-    nameOrId  || expected
-    "by-id"   || true
-    "by-name" || true
-    "not-id"  || false
+    when:
+    def service = applicationService()
+    def result = service.getPipelineConfigForApplication(app, nameOrId)
+
+    then:
+    result == null
+    1 * front50.getPipelineConfigByApplicationAndName(app, nameOrId, true) >> { throw retrofit404() }
+    1 * front50.getPipelineConfigById(nameOrId) >> { throw retrofit404() }
+  }
+
+  void "getPipelineConfigForApplication queries by id when response to query by name doesn't match"() {
+    given:
+    def app = "theApp"
+    def nameOrId = "by-name"
+
+    when:
+    def service = applicationService()
+    def result = service.getPipelineConfigForApplication(app, nameOrId)
+
+    then:
+    result == null
+    1 * front50.getPipelineConfigByApplicationAndName(app, nameOrId, true) >> [ id: "arbitrary-id", name: "some-other-name" ]
+
+    // The key part of this test is that gate queries front50 by id.  The choice
+    // of id here needs to match the expectation for result (i.e. null or not),
+    // but is otherwise arbitrary.
+    1 * front50.getPipelineConfigById(nameOrId) >> [ id: "arbitrary-id", name: "arbitrary-name" ]
+  }
+
+  void "getPipelineConfigForApplication returns no config when response to query by id doesn't match"() {
+    given:
+    def app = "theApp"
+    def nameOrId = "by-id"
+
+    when:
+    def service = applicationService()
+    def result = service.getPipelineConfigForApplication(app, nameOrId)
+
+    then:
+    result == null
+    1 * front50.getPipelineConfigByApplicationAndName(app, nameOrId, true) >> { throw retrofit404() }
+    1 * front50.getPipelineConfigById(nameOrId) >> [ id: "some-other-id", name: "arbitrary-name" ]
   }
 
   void "should skip clouddriver call if expand set to false"() {
