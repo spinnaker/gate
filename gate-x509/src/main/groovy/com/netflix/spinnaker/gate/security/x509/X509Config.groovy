@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.web.context.NullSecurityContextRepository
@@ -64,11 +63,6 @@ class X509Config extends WebSecurityConfigurerAdapter {
     // any additional ports that get installed and removes the requestMatcher
     // installed by authConfig
     http.requestMatcher(AnyRequestMatcher.INSTANCE)
-  }
-
-  @Override
-  void configure(WebSecurity web) throws Exception {
-    authConfig.configure(web)
   }
 
   @Bean

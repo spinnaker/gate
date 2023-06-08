@@ -81,7 +81,7 @@ import static retrofit.Endpoints.newFixedEndpoint
 @CompileStatic
 @Configuration
 @Slf4j
-@EnableConfigurationProperties([FiatClientConfigurationProperties, DynamicRoutingConfigProperties])
+@EnableConfigurationProperties([DynamicRoutingConfigProperties])
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
 class GateConfig extends RedisHttpSessionConfiguration {
 
