@@ -16,7 +16,6 @@
 
 package com.netflix.spinnaker.gate.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.netflix.spectator.api.Registry
@@ -50,11 +49,9 @@ import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
@@ -64,7 +61,6 @@ import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
 import org.springframework.session.data.redis.config.ConfigureRedisAction
 import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
 import org.springframework.util.CollectionUtils
@@ -72,7 +68,6 @@ import org.springframework.web.client.RestTemplate
 import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
 
-import javax.servlet.Filter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -152,14 +147,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
   @Autowired
   Jackson2ObjectMapperBuilder objectMapperBuilder
-
-  @Bean
-  Jackson2ObjectMapperBuilderCustomizer readUnknownEnumValuesAsNull() {
-    // New role providers break deserialization if this is not enabled.
-    { Jackson2ObjectMapperBuilder builder ->
-      builder.featuresToEnable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-    }
-  }
 
   /**
    * This needs to be before the yaml converter in order for json to be the default
@@ -370,8 +357,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  FilterRegistrationBean resetAuthenticatedRequestFilter() {
-    def frb = new FilterRegistrationBean(new ResetAuthenticatedRequestFilter())
+  FilterRegistrationBean<ResetAuthenticatedRequestFilter> resetAuthenticatedRequestFilter() {
+    def frb = new FilterRegistrationBean<>(new ResetAuthenticatedRequestFilter())
     frb.order = Ordered.HIGHEST_PRECEDENCE
     return frb
   }
@@ -383,32 +370,18 @@ class GateConfig extends RedisHttpSessionConfiguration {
    * Additionally forwards request origin metadata (deck vs api).
    */
   @Bean
-  FilterRegistrationBean authenticatedRequestFilter() {
+  FilterRegistrationBean<AuthenticatedRequestFilter> authenticatedRequestFilter() {
     // no need to force the `AuthenticatedRequestFilter` to create a request id as that is
     // handled by the `RequestTimingFilter`.
-    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(true, true, false, false))
+    def frb = new FilterRegistrationBean<>(new AuthenticatedRequestFilter(true, true, false, false))
     frb.order = Ordered.LOWEST_PRECEDENCE - 1
-    return frb
-  }
-
-  /**
-   * This pulls the `springSecurityFilterChain` in front of the {@link AuthenticatedRequestFilter},
-   * because the user must be authenticated through the security filter chain before their username/credentials
-   * can be pulled and forwarded in the AuthenticatedRequestFilter.
-   */
-  @Bean
-  FilterRegistrationBean securityFilterChain(
-    @Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
-    def frb = new FilterRegistrationBean(securityFilter)
-    frb.order = 0
-    frb.name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME
     return frb
   }
 
   @Bean
   @ConditionalOnProperty("request-logging.enabled")
-  FilterRegistrationBean requestLoggingFilter() {
-    def frb = new FilterRegistrationBean(new RequestLoggingFilter())
+  FilterRegistrationBean<RequestLoggingFilter> requestLoggingFilter() {
+    def frb = new FilterRegistrationBean<>(new RequestLoggingFilter())
     // this filter should be placed very early in the request chain to ensure we track an accurate start time and
     // have a request id available to propagate across thread and service boundaries.
     frb.order = Ordered.HIGHEST_PRECEDENCE + 1
@@ -416,8 +389,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  FilterRegistrationBean requestSheddingFilter(DynamicConfigService dynamicConfigService) {
-    def frb = new FilterRegistrationBean(new RequestSheddingFilter(dynamicConfigService, registry))
+  FilterRegistrationBean<RequestSheddingFilter> requestSheddingFilter(DynamicConfigService dynamicConfigService) {
+    def frb = new FilterRegistrationBean<>(new RequestSheddingFilter(dynamicConfigService, registry))
 
     /*
      * This filter should:
