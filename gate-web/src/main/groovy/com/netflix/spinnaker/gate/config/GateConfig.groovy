@@ -18,13 +18,11 @@ package com.netflix.spinnaker.gate.config
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
 import com.netflix.spinnaker.config.PluginsAutoConfiguration
-import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
@@ -56,6 +54,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
@@ -64,6 +63,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
 import org.springframework.session.data.redis.config.ConfigureRedisAction
 import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
@@ -72,7 +72,7 @@ import org.springframework.web.client.RestTemplate
 import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
 
-import javax.servlet.*
+import javax.servlet.Filter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -150,23 +150,29 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Autowired
   ServiceConfiguration serviceConfiguration
 
+  @Autowired
+  Jackson2ObjectMapperBuilder objectMapperBuilder
+
+  @Bean
+  Jackson2ObjectMapperBuilderCustomizer readUnknownEnumValuesAsNull() {
+    // New role providers break deserialization if this is not enabled.
+    { Jackson2ObjectMapperBuilder builder ->
+      builder.featuresToEnable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+    }
+  }
+
   /**
    * This needs to be before the yaml converter in order for json to be the default
    * response type.
    */
   @Bean
   AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
-    ObjectMapper objectMapper = new ObjectMapper()
-      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-      .registerModule(new JavaTimeModule())
-
-    return new JsonHttpMessageConverter(objectMapper)
+    return new JsonHttpMessageConverter(objectMapperBuilder.build())
   }
 
   @Bean
   AbstractJackson2HttpMessageConverter yamlHttpMessageConverter() {
-    return new YamlHttpMessageConverter(new YAMLMapper())
+    return new YamlHttpMessageConverter(objectMapperBuilder.factory(new YAMLFactory()).build())
   }
 
   @Bean
@@ -208,12 +214,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   @Bean
   ClouddriverService clouddriverService() {
     createClient "clouddriver", ClouddriverService
-  }
-
-  @Bean
-  @ConditionalOnProperty("services.keel.enabled")
-  KeelService keelService(OkHttpClientProvider clientProvider) {
-    createClient "keel", KeelService
   }
 
   @Bean
@@ -335,11 +335,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
-    // New role providers break deserialization if this is not enabled.
-    ObjectMapper objectMapper = new ObjectMapper()
-      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-      .registerModule(new JavaTimeModule())
+    ObjectMapper objectMapper = objectMapperBuilder.build()
 
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
 
