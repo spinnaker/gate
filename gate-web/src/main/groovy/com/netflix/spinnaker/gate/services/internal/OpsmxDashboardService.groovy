@@ -183,6 +183,7 @@ interface OpsmxDashboardService {
                           @Path('source') String source,
                           @Path('source1') String source1,
                                 @Header('x-user-cookie') String cookie,
+                          @Header('x-spinnaker-user') String user,
                           @Body Object data)
 
   @POST("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}")
@@ -248,7 +249,8 @@ interface OpsmxDashboardService {
                                   @Path('source1') String source1,
                                   @Path('source2') String source2,
                                   @Body Object data,
-                                  @Header('x-user-cookie') String cookie)
+                                  @Header('x-user-cookie') String cookie,
+                                  @Header('x-spinnaker-user') String user)
 
   @PUT("/dashboardservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object updateDashboardResponse4(@Path('version') String version,

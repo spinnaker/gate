@@ -32,6 +32,7 @@ import retrofit.client.Response
 import org.apache.commons.io.IOUtils
 import org.springframework.http.HttpStatus
 
+import javax.servlet.http.HttpServletRequest
 import java.util.stream.Collectors
 
 @RequestMapping("/visibilityservice")
@@ -338,12 +339,15 @@ class OpsmxVisibilityController {
   @ApiOperation(value = "Endpoint for visibility rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.PUT)
   Object updateVisibilityResponse2(@PathVariable("version") String version,
-                                 @PathVariable("type") String type,
-                                 @PathVariable("source") String source,
-                                 @PathVariable("source1") String source1,
-                                 @RequestBody(required = false) Object data) {
+                                   @PathVariable("type") String type,
+                                   @PathVariable("source") String source,
+                                   @PathVariable("source1") String source1,
+                                   @RequestBody(required = false) Object data,
+                                   HttpServletRequest request) {
 
-    return opsmxVisibilityService.updateVisibilityResponse2(version, type, source, source1, data)
+    String user = request.getHeader("x-spinnaker-user")
+
+    return opsmxVisibilityService.updateVisibilityResponse2(version, type, source, source1, user,  data)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")

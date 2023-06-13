@@ -133,9 +133,13 @@ class OpsmxPlatformController {
                               @PathVariable("source2") String source2,
                               @RequestParam(value = "permissionId", required = false) String permissionId,
                               @RequestParam(value = "resourceType", required = false) String resourceType,
-                              @RequestParam(value = "featureType", required = false) String featureType) {
+                              @RequestParam(value = "featureType", required = false) String featureType,
+                              @RequestParam(value = "gateSearch", required = false) Boolean gateSearch,
+                              @RequestParam(value = "gateName", required = false) String gateName,
+                              @RequestParam(value = "refId", required = false) Integer refId,
+                              @RequestParam(value = "gateType", required = false) String gateType) {
 
-    return opsmxPlatformService.getPlatformResponse5(version, type, source, source1, source2, permissionId, resourceType,featureType)
+    return opsmxPlatformService.getPlatformResponse5(version, type, source, source1, source2, permissionId, resourceType,featureType, gateSearch, gateName, refId, gateType)
   }
 
   @ApiOperation(value = "Endpoint for platform rest services")
@@ -345,8 +349,10 @@ class OpsmxPlatformController {
                                  @PathVariable("source3") String source3,
                                  @PathVariable("source4") String source4,
                                  @RequestParam(value = "featureType", required = false) String featureType,
-                                 @RequestBody(required = false) Object data) {
+                                 @RequestBody(required = false) Object data, HttpServletRequest request) {
 
-    return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, featureType,data)
+    String user = request.getHeader("x-spinnaker-user")
+
+    return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, featureType,user, data)
   }
 }
