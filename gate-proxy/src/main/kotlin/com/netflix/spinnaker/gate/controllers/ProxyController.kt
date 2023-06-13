@@ -26,9 +26,9 @@ import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import com.netflix.spinnaker.kork.web.interceptors.Criticality
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.internal.http.HttpMethod
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.SocketException
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletRequest
@@ -135,10 +135,7 @@ class ProxyController(
       val method = request.method
 
       val body = if (HttpMethod.permitsRequestBody(method) && request.contentType != null) {
-        RequestBody.create(
-          request.contentType.toMediaType(),
-          request.reader.lines().collect(Collectors.joining(System.lineSeparator()))
-        )
+        request.reader.lines().collect(Collectors.joining(System.lineSeparator())).toRequestBody(request.contentType.toMediaType())
       } else {
         null
       }
