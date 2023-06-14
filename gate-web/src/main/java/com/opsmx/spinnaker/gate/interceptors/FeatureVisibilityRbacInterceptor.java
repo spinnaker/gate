@@ -17,11 +17,14 @@
 package com.opsmx.spinnaker.gate.interceptors;
 
 import com.opsmx.spinnaker.gate.rbac.ApplicationFeatureRbac;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -32,10 +35,22 @@ public class FeatureVisibilityRbacInterceptor implements HandlerInterceptor {
 
   @Autowired private ApplicationFeatureRbac applicationFeatureRbac;
 
+  private final List<String> customGatePlugins = new ArrayList<>();
+
+  {
+    customGatePlugins.add("OpsMxApprovalStagePlugin");
+    customGatePlugins.add("OpsMxPolicyStagePlugin");
+    customGatePlugins.add("OpsMxVerificationStagePlugin");
+  }
+
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
     log.info("request intercepted to authorize if the user is having feature visibility");
+    String origin = request.getHeader(HttpHeaders.ORIGIN);
+    if (origin != null && customGatePlugins.contains(origin)) {
+      return true;
+    }
     applicationFeatureRbac.authorizeUserForFeatureVisibility(request.getUserPrincipal().getName());
     return true;
   }
