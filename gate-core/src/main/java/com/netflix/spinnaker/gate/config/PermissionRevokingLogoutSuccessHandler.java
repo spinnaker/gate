@@ -47,10 +47,12 @@ public class PermissionRevokingLogoutSuccessHandler
   public void onLogoutSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException, ServletException {
-    var principal = authentication.getPrincipal();
-    if (principal instanceof UserDetails) {
-      var username = ((UserDetails) principal).getUsername();
-      permissionService.logout(username);
+    if (authentication != null) {
+      var principal = authentication.getPrincipal();
+      if (principal instanceof UserDetails) {
+        var username = ((UserDetails) principal).getUsername();
+        permissionService.logout(username);
+      }
     }
     delegate.onLogoutSuccess(request, response, authentication);
   }
