@@ -38,6 +38,10 @@ import org.springframework.util.StringUtils;
 @Configuration
 @SpinnakerAuthConfig
 @EnableWebSecurity
+// ensure this configures after a standard WebSecurityConfigurerAdapter (100) so
+// it becomes the fallthrough for a mixed mode of some SSO + x509 for API calls
+// and otherwise will just work(tm) if it is the only WebSecurityConfigurerAdapter
+// present as well
 @Order(2000)
 @RequiredArgsConstructor
 @NonnullByDefault

@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,7 +47,7 @@ import org.springframework.util.CollectionUtils;
 @Configuration
 @Log4j2
 @EnableWebSecurity
-@Order
+@Order(Ordered.LOWEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class AnonymousConfig extends WebSecurityConfigurerAdapter {
   private static final String key = "spinnaker-anonymous";
