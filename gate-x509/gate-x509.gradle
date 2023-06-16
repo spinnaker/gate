@@ -9,3 +9,14 @@ dependencies {
   implementation "io.spinnaker.fiat:fiat-core:$fiatVersion"
   testImplementation "org.bouncycastle:bcpkix-jdk15on"
 }
+
+sourceSets {
+  main {
+    java {
+      srcDirs = []
+    }
+    groovy {
+      srcDirs += ['src/main/java']
+    }
+  }
+}
