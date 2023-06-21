@@ -27,8 +27,7 @@ public interface EchoService {
       @Header("Ce-Id") String cdId,
       @Header("Ce-Specversion") String cdSpecVersion,
       @Header("Ce-Type") String cdType,
-      @Header("Ce-Source") String cdSource,
-      @Header("Content-Type") String cdContentType);
+      @Header("Ce-Source") String cdSource);
 
   @Headers("Accept: application/json")
   @POST("/webhooks/{type}/{source}")
