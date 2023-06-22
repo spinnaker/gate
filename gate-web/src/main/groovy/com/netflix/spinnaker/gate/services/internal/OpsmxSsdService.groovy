@@ -55,7 +55,13 @@ interface OpsmxSsdService {
                          @Path('source2') String source2,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
-                         @Query("appName") String appName)
+                         @Query("appName") String appName,
+                         @Query("pageNo") Integer pageNo,
+                         @Query("pageLimit") Integer pageLimit,
+                         @Query("sortBy") String sortBy,
+                         @Query("sortOrder") String sortOrder,
+                         @Query("search") String search,
+                         @Query("noOfDays") Integer noOfDays)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
