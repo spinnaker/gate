@@ -53,6 +53,7 @@ interface OpsmxSsdService {
                          @Path('source') String source,
                          @Path('source1') String source1,
                          @Path('source2') String source2,
+                         @Query("account") String account,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
                          @Query("appName") String appName,
