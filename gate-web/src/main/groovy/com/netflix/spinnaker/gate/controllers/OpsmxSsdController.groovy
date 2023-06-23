@@ -58,10 +58,17 @@ class OpsmxSsdController {
   Object getSsdResponse1(@PathVariable("version") String version,
                          @PathVariable("type") String type,
                          @PathVariable("source") String source,
+                         @RequestParam(value = "account", required = false) String account,
                          @RequestParam(value = "appId", required = false) Integer appId,
                          @RequestParam(value = "image", required = false) String image,
-                         @RequestParam(value = "appName", required = false) String appName) {
-    return opsMxSsdService.getSddResponse2(version, type, source, appId, image, appName)
+                         @RequestParam(value = "appName", required = false) String appName,
+                         @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                         @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                         @RequestParam(value = "sortBy", required = false) String sortBy,
+                         @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                         @RequestParam(value = "search", required = false) String search,
+                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
