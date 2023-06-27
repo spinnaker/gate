@@ -49,8 +49,9 @@ class OpsmxSsdController {
                         @PathVariable("type") String type,
                         @RequestParam(value = "appId", required = false) Integer appId,
                         @RequestParam(value = "image", required = false) String image,
-                        @RequestParam(value = "appName", required = false) String appName) {
-    return opsMxSsdService.getSddResponse1(version, type, appId, image, appName)
+                        @RequestParam(value = "appName", required = false) String appName,
+                        @RequestParam(value = "typeList", required = false) String typeList) {
+    return opsMxSsdService.getSddResponse1(version, type, appId, image, appName, typeList)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -70,8 +71,9 @@ class OpsmxSsdController {
                          @RequestParam(value = "sortBy", required = false) String sortBy,
                          @RequestParam(value = "sortOrder", required = false) String sortOrder,
                          @RequestParam(value = "search", required = false) String search,
-                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays) {
-    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays)
+                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                         @RequestParam(value = "alertName", required = false) String alertName) {
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
