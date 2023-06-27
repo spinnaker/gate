@@ -28,7 +28,8 @@ interface OpsmxSsdService {
                          @Path('type') String type,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
-                         @Query("appName") String appName)
+                         @Query("appName") String appName,
+                         @Query("typeList") String typeList)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
@@ -46,7 +47,8 @@ interface OpsmxSsdService {
                          @Query("sortBy") String sortBy,
                          @Query("sortOrder") String sortOrder,
                          @Query("search") String search,
-                         @Query("noOfDays") Integer noOfDays)
+                         @Query("noOfDays") Integer noOfDays,
+                         @Query("alertName") Integer alertName)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}")
   Object getSddResponse3(@Path('version') String version,
