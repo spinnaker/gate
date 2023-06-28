@@ -40,7 +40,8 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 @EnableConfigurationProperties({
   ServiceConfiguration.class,
   ServiceAccountFilterConfigProps.class,
-  FiatClientConfigurationProperties.class
+  FiatClientConfigurationProperties.class,
+  DynamicRoutingConfigProperties.class
 })
 @NonnullByDefault
 @RequiredArgsConstructor
