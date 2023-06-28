@@ -27,6 +27,7 @@ import lombok.SneakyThrows;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1String;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,10 @@ import org.springframework.util.StringUtils;
 public class OidRolesExtractor implements X509RolesExtractor {
   private static final Pattern ROLE_SEPARATOR = Pattern.compile("\\n");
 
-  @Setter(AccessLevel.PACKAGE)
-  @Value("${x509.role-oid:}")
+  @Setter(
+      value = AccessLevel.PACKAGE,
+      onMethod_ = {@Autowired},
+      onParam_ = {@Value("${x509.role-oid:}")})
   private String roleOid;
 
   @Override
