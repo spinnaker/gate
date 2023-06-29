@@ -26,7 +26,7 @@ interface OpsmxSsdService {
   @GET("/ssdservice/{version}/{type}")
   Object getSddResponse1(@Path('version') String version,
                          @Path('type') String type,
-                         @Query("account") Integer account,
+                         @Query("account") String account,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
                          @Query("imageTag") String imageTag,
