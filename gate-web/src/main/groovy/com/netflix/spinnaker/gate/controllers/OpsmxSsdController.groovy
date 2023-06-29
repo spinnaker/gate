@@ -47,11 +47,22 @@ class OpsmxSsdController {
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getSsdResponse(@PathVariable("version") String version,
                         @PathVariable("type") String type,
+                        @RequestParam(value = "account", required = false) String account,
                         @RequestParam(value = "appId", required = false) Integer appId,
                         @RequestParam(value = "image", required = false) String image,
+                        @RequestParam(value = "imageTag", required = false) String imageTag,
+                        @RequestParam(value = "stage", required = false) String stage,
+                        @RequestParam(value = "deployedAt", required = false) String deployedAt,
                         @RequestParam(value = "appName", required = false) String appName,
+                        @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                        @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                        @RequestParam(value = "sortBy", required = false) String sortBy,
+                        @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                        @RequestParam(value = "search", required = false) String search,
+                        @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                        @RequestParam(value = "policy", required = false) String policy,
                         @RequestParam(value = "typeList", required = false) String typeList) {
-    return opsMxSsdService.getSddResponse1(version, type, appId, image, appName, typeList)
+    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
