@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.services.internal
 
+import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
 import retrofit.http.GET
 import retrofit.http.Path
@@ -26,18 +27,18 @@ interface OpsmxSsdService {
   Object getSddResponse1(@Path('version') String version,
                          @Path('type') String type,
                          @Query("account") Integer account,
-                         @Query("appId") String appId,
+                         @Query("appId") Integer appId,
                          @Query("image") String image,
                          @Query("imageTag") String imageTag,
                          @Path('stage') String stage,
-                         @Query("deployedAt") Integer deployedAt,
+                         @Query("deployedAt") String deployedAt,
                          @Query("appName") String appName,
-                         @Query("pageNo") String pageNo,
-                         @Query("pageLimit") String pageLimit,
-                         @Query("sortBy") Integer sortBy,
+                         @Query("pageNo") Integer pageNo,
+                         @Query("pageLimit") Integer pageLimit,
+                         @Query("sortBy") String sortBy,
                          @Query("sortOrder") String sortOrder,
                          @Query("search") String search,
-                         @Query("noOfDays") String noOfDays,
+                         @Query("noOfDays") Integer noOfDays,
                          @Query("policy") String policy,
                          @Query("typeList") String typeList,
                          @Query("alertName") Integer alertName)
