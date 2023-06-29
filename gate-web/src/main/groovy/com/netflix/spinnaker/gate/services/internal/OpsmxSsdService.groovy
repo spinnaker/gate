@@ -22,13 +22,23 @@ import retrofit.http.Path
 import retrofit.http.Query
 
 interface OpsmxSsdService {
-
   @GET("/ssdservice/{version}/{type}")
   Object getSddResponse1(@Path('version') String version,
                          @Path('type') String type,
-                         @Query("appId") Integer appId,
+                         @Query("account") Integer account,
+                         @Query("appId") String appId,
                          @Query("image") String image,
+                         @Query("imageTag") String imageTag,
+                         @Path('stage') String stage,
+                         @Query("deployedAt") Integer deployedAt,
                          @Query("appName") String appName,
+                         @Query("pageNo") String pageNo,
+                         @Query("pageLimit") String pageLimit,
+                         @Query("sortBy") Integer sortBy,
+                         @Query("sortOrder") String sortOrder,
+                         @Query("search") String search,
+                         @Query("noOfDays") String noOfDays,
+                         @Query("policy") String policy,
                          @Query("typeList") String typeList)
 
   @GET("/ssdservice/{version}/{type}/{source}")
