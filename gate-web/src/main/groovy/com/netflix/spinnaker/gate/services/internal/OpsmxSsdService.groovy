@@ -30,7 +30,7 @@ interface OpsmxSsdService {
                          @Query("appId") Integer appId,
                          @Query("image") String image,
                          @Query("imageTag") String imageTag,
-                         @Path('stage') String stage,
+                         @Query('stage') String stage,
                          @Query("deployedAt") String deployedAt,
                          @Query("appName") String appName,
                          @Query("pageNo") Integer pageNo,
