@@ -61,8 +61,9 @@ class OpsmxSsdController {
                         @RequestParam(value = "search", required = false) String search,
                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
                         @RequestParam(value = "policy", required = false) String policy,
-                        @RequestParam(value = "typeList", required = false) String typeList) {
-    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList)
+                        @RequestParam(value = "typeList", required = false) String typeList,
+                        @RequestParam(value = "alertName", required = false) String alertName) {
+    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
