@@ -51,8 +51,9 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "pageNo",required = false) Integer page,
                                  @RequestParam(value = "size", required = false) Integer size,
                                  @RequestParam(value = "policyStatus",required = false) String policyStatus,
-                                 @RequestParam(value = "search", required = false) String search) {
-    return opsmxAuditClientService.getAuditClientResponse1(version, type,applicationName,noOfDays,page,size,policyStatus,search)
+                                 @RequestParam(value = "search", required = false) String search,
+                                 @RequestParam(value = "sortOrder", required = false) String sortOrder) {
+    return opsmxAuditClientService.getAuditClientResponse1(version, type,applicationName,noOfDays,page,size,policyStatus,search,sortOrder)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")

@@ -70,7 +70,8 @@ interface OpsmxVisibilityService {
                                 @Query("pageNo") Integer pageNo,
                                 @Query("pageLimit") Integer pageLimit,
                                 @Query("search") String search,
-                                @Query("status") String status)
+                                @Query("status") String status,
+                                @Query("sortOrder") String sortOrder)
 
   @GET("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getVisibilityResponse6(@Path('version') String version,
