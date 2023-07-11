@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -42,6 +43,17 @@ class OpsmxSsdController {
 
   @Autowired
   OpsmxSsdService opsMxSsdService
+
+  @ApiOperation(value = "Endpoint for ssd rest services")
+  @RequestMapping(value = "/{version}/{type}", method = RequestMethod.POST)
+  Object postSsdServiceResponse(@PathVariable("version") String version,
+                                @PathVariable("type") String type,
+                                @RequestParam(value = "stage", required = false) String stage,
+                                @RequestParam(value = "policy", required = false) String policy,
+                                @RequestBody(required = false) Object data) {
+
+    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, data)
+  }
 
   @ApiOperation(value = "Endpoint for ssd services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)

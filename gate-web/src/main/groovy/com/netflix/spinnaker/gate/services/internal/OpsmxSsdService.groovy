@@ -18,7 +18,9 @@ package com.netflix.spinnaker.gate.services.internal
 
 import org.springframework.web.bind.annotation.RequestParam
 import retrofit.client.Response
+import retrofit.http.Body
 import retrofit.http.GET
+import retrofit.http.POST
 import retrofit.http.Path
 import retrofit.http.Query
 
@@ -135,5 +137,14 @@ interface OpsmxSsdService {
                            @Query("appId") Integer appId,
                            @Query("image") String image,
                            @Query("appName") String appName)
+
+
+  @POST("/ssdservice/{version}/{type}")
+  Object postSsdServiceResponse(@Path('version') String version,
+                                @Path('type') String type,
+                                @Query("stage") String stage,
+                                @Query("policy") String policy,
+                                @Body Object data)
+
 
 }
