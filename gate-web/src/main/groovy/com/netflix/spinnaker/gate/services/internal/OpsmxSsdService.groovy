@@ -151,5 +151,12 @@ interface OpsmxSsdService {
                                 @Query("policyId") Integer policyId,
                                 @Body Object data)
 
+  @POST("/ssdservice/{version}/{type}/{source}")
+  Object postSsdServiceResponse3(@Path('version') String version,
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Query("id") String id,
+                                 @Body Object data)
+
 
 }
