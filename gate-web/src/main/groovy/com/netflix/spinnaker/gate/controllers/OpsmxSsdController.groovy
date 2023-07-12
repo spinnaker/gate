@@ -50,9 +50,10 @@ class OpsmxSsdController {
                                 @PathVariable("type") String type,
                                 @RequestParam(value = "stage", required = false) String stage,
                                 @RequestParam(value = "policy", required = false) String policy,
+                                @RequestParam(value = "policyId", required = false) Integer policyId,
                                 @RequestBody(required = false) Object data) {
 
-    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, data)
+    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,data)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
