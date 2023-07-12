@@ -56,6 +56,16 @@ class OpsmxSsdController {
     return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,data)
   }
 
+  @ApiOperation(value = "Endpoint for ssd rest services")
+  @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.POST)
+  Object postSsdServiceResponse3(@PathVariable("version") String version,
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @RequestParam(value = "id", required = false) String id,
+                                 @RequestBody(required = false) Object data) {
+    return opsMxSsdService.postSsdServiceResponse3(version, type, source, id, data)
+  }
+
   @ApiOperation(value = "Endpoint for ssd services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.GET)
   Object getSsdResponse(@PathVariable("version") String version,
