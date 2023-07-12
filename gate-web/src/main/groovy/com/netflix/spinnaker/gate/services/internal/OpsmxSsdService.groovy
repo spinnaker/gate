@@ -43,7 +43,8 @@ interface OpsmxSsdService {
                          @Query("noOfDays") Integer noOfDays,
                          @Query("policy") String policy,
                          @Query("typeList") String typeList,
-                         @Query("alertName") String alertName)
+                         @Query("alertName") String alertName,
+                         @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
@@ -63,7 +64,8 @@ interface OpsmxSsdService {
                          @Query("search") String search,
                          @Query("noOfDays") Integer noOfDays,
                          @Query("alertName") String alertName,
-                         @Query("riskStatus") String riskStatus)
+                         @Query("riskStatus") String riskStatus,
+                         @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}")
   Object getSddResponse3(@Path('version') String version,
@@ -72,7 +74,8 @@ interface OpsmxSsdService {
                          @Path('source1') String source1,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
-                         @Query("appName") String appName)
+                         @Query("appName") String appName,
+                         @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getSddResponse4(@Path('version') String version,
@@ -92,7 +95,8 @@ interface OpsmxSsdService {
                          @Query("sortBy") String sortBy,
                          @Query("sortOrder") String sortOrder,
                          @Query("search") String search,
-                         @Query("noOfDays") Integer noOfDays)
+                         @Query("noOfDays") Integer noOfDays,
+                         @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
