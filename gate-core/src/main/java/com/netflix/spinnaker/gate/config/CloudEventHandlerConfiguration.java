@@ -27,7 +27,7 @@ public class CloudEventHandlerConfiguration implements WebMvcConfigurer {
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(cloudEventHttpMessageConverter());
+    converters.add(0, cloudEventHttpMessageConverter());
   }
 
   @Bean
