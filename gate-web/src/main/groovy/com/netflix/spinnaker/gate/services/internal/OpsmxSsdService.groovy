@@ -149,6 +149,7 @@ interface OpsmxSsdService {
                                 @Query("stage") String stage,
                                 @Query("policy") String policy,
                                 @Query("policyId") Integer policyId,
+                                @Query("id") Integer id,
                                 @Body Object data)
 
   @POST("/ssdservice/{version}/{type}/{source}")
