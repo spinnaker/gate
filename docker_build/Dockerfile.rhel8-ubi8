@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi:latest
 MAINTAINER OpsMx
 
-# Disable old version and uninstalling 
+# Disable old version and uninstalling
 RUN dnf module disable nginx php -y
 RUN dnf remove nginx* -y
 
@@ -13,12 +13,12 @@ RUN adduser opsmx \
     && usermod -aG wheel opsmx \
     && mkdir -p /opsmx/workdir/logs \
     && mkdir -p /opt/spinnaker/config \
-    && mkdir -p /opt/spinnaker/plugins 
+    && mkdir -p /opt/spinnaker/plugins
 
 # Install procps(ps)
 RUN yum install -y procps nginx net-tools wget
-# Install java 11 
-RUN yum -y install java-11-openjdk-headless.x86_64
+# Install java 11
+RUN yum -y install tzdata-java java-11-openjdk-headless.x86_64
 # Install ping
 RUN yum install -y iputils
 
@@ -44,7 +44,7 @@ RUN wget -O VerificationPlugin-v1.0.1-SNAPSHOT.zip -c https://github.com/OpsMx/C
 RUN mv VerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
     && mv TestVerificationPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
     && mv policyPlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ \
-    && mv ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/ 
+    && mv ApprovalStagePlugin-v1.0.1-SNAPSHOT.zip /opt/spinnaker/plugins/
 
 RUN sed -i 's/"VERIFICATION_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/VerificationPlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json \
     && sed -i 's/"TESTVERIFICATION_SHASUM"/'\""$(sha512sum /opt/spinnaker/plugins/TestVerificationPlugin-v1.0.1-SNAPSHOT.zip | awk '{print $1}')"\"'/g' /opt/spinnaker/plugins/plugins.json \
