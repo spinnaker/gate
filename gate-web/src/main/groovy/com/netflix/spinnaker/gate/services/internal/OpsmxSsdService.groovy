@@ -96,7 +96,13 @@ interface OpsmxSsdService {
                          @Query("sortOrder") String sortOrder,
                          @Query("search") String search,
                          @Query("noOfDays") Integer noOfDays,
-                         @Query("id") String id)
+                         @Query("id") String id,
+                         @Query("fromImage") String fromImage,
+                         @Query("toImage") String toImage,
+                         @Query("fromImageTag") String fromImageTag,
+                         @Query("toImageTag") String toImageTag,
+                         @Query("fromAccount") String fromAccount,
+                         @Query("toAccount") String toAccount)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
