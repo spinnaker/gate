@@ -99,7 +99,7 @@ class OpsmxSsdController {
                          @PathVariable("type") String type,
                          @PathVariable("source") String source,
                          @RequestParam(value = "account", required = false) String account,
-                         @RequestParam(value = "appId", required = false) Integer appId,
+                         @RequestParam(value = "appId", required = false) String appId,
                          @RequestParam(value = "image", required = false) String image,
                          @RequestParam(value = "imageTag", required = false) String imageTag,
                          @RequestParam(value = "stage", required = false) String stage,
