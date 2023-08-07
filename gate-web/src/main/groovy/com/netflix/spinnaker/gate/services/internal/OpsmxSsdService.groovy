@@ -44,7 +44,9 @@ interface OpsmxSsdService {
                          @Query("policy") String policy,
                          @Query("typeList") String typeList,
                          @Query("alertName") String alertName,
-                         @Query("id") String id)
+                         @Query("id") String id,
+                         @Query("startTime") String startTime,
+                         @Query("endTime") String endTime)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
