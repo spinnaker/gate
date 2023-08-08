@@ -46,7 +46,8 @@ interface OpsmxSsdService {
                          @Query("alertName") String alertName,
                          @Query("id") String id,
                          @Query("startTime") String startTime,
-                         @Query("endTime") String endTime)
+                         @Query("endTime") String endTime,
+                         @Query("severity") String severity)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
