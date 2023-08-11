@@ -19,8 +19,8 @@ package com.netflix.spinnaker.gate.config
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.gate.filters.ContentCachingFilter
 import com.netflix.spinnaker.gate.interceptors.RequestContextInterceptor
-import com.netflix.spinnaker.gate.interceptors.RequestIdInterceptor
-
+import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptor
+import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptorConfigurationProperties
 import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
@@ -37,6 +37,7 @@ import com.opsmx.spinnaker.gate.interceptors.ServiceIdRbacInterceptor
 import com.opsmx.spinnaker.gate.rbac.ApplicationFeatureRbac
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -57,6 +58,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Configuration
 @ComponentScan
+@EnableConfigurationProperties(ResponseHeaderInterceptorConfigurationProperties.class)
 public class GateWebConfig implements WebMvcConfigurer {
   @Autowired
   Registry registry
@@ -69,6 +71,9 @@ public class GateWebConfig implements WebMvcConfigurer {
 
   @Value('${rate-limit.learning:true}')
   Boolean rateLimitLearningMode
+
+  @Autowired
+  ResponseHeaderInterceptorConfigurationProperties responseHeaderInterceptorConfigurationProperties
 
   @Value('${rbac.feature.application.enabled:true}')
   Boolean isRbacEnabled
@@ -109,6 +114,7 @@ public class GateWebConfig implements WebMvcConfigurer {
     )
 
     registry.addInterceptor(new RequestIdInterceptor())
+    registry.addInterceptor(new ResponseHeaderInterceptor(responseHeaderInterceptorConfigurationProperties))
     registry.addInterceptor(new RequestContextInterceptor())
 
     List<String> oesServicePathPatterns = new ArrayList<>()

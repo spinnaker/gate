@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Netflix, Inc.
+ * Copyright 2022 Salesforce, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.config;
+package com.netflix.spinnaker.gate.interceptors;
 
+import com.netflix.spinnaker.kork.common.Header;
+import java.util.List;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ConfigurationProperties("task-service")
 @Data
-public class TaskServiceProperties {
-  private int maxNumberOfPolls = 1200;
-  private int defaultIntervalBetweenPolls = 1000;
+@ConfigurationProperties(prefix = "interceptors.response-header")
+public class ResponseHeaderInterceptorConfigurationProperties {
+  // default to having request id in response header, the original behavior
+  // before other fields are added
+  private List<String> fields = List.of(Header.REQUEST_ID.getHeader());
 }
