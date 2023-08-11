@@ -113,7 +113,6 @@ public class GateWebConfig implements WebMvcConfigurer {
       )
     )
 
-    registry.addInterceptor(new RequestIdInterceptor())
     registry.addInterceptor(new ResponseHeaderInterceptor(responseHeaderInterceptorConfigurationProperties))
     registry.addInterceptor(new RequestContextInterceptor())
 
