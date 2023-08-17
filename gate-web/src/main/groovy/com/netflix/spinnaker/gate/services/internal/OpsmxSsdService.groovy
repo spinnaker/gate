@@ -168,5 +168,13 @@ interface OpsmxSsdService {
                                  @Query("id") String id,
                                  @Body Object data)
 
+  @GET("/ssdservice/{version}/{type}/{source}/download/json")
+  Response downloadJsonFile(@Path('version') String version,
+                            @Path('type') String type,
+                            @Path('source') String source,
+                            @Query("appId") Integer appId,
+                            @Query("image") String image,
+                            @Query("appName") String appName)
+
 
 }
