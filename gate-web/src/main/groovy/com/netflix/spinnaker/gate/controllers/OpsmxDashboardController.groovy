@@ -339,8 +339,7 @@ class OpsmxDashboardController {
       || !request.getHeader("Origin").equalsIgnoreCase("OpsMxPolicyStagePlugin"))){
       cookie = request.getHeader("Cookie")
     }
-    String user = request.getHeader("x-spinnaker-user")
-    return opsmxDashboardService.postDashboardResponse4(version, type, source, source1, cookie, user, data)
+    return opsmxDashboardService.postDashboardResponse4(version, type, source, source1, cookie, data)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")
@@ -444,9 +443,8 @@ class OpsmxDashboardController {
       || !request.getHeader("Origin").equalsIgnoreCase("OpsMxPolicyStagePlugin"))){
       cookie = request.getHeader("Cookie")
     }
-    String user = request.getHeader("x-spinnaker-user")
 
-    return opsmxDashboardService.updateDashboardResponse3(version, type, source, source1, source2, data, cookie, user)
+    return opsmxDashboardService.updateDashboardResponse3(version, type, source, source1, source2, data, cookie)
   }
 
   @ApiOperation(value = "Endpoint for dashboard rest services")

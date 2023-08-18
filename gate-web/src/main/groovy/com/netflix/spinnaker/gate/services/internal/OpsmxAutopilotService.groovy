@@ -37,7 +37,7 @@ interface OpsmxAutopilotService {
                                @Query("testCaseId") Integer testCaseId)
 
   @POST("/autopilot/api/{version}/registerCanary")
-  Response triggerRegisterCanary(@Path('version') String version, @Body Object data,@Header('x-spinnaker-user') String xSpinnakerUser)
+  Response triggerRegisterCanary(@Path('version') String version, @Body Object data)
 
   @GET("/autopilot/{type}/{source}")
   Object getAutoResponse(@Path('type') String type,

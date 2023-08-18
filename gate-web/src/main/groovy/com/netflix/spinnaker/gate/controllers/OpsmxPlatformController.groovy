@@ -351,8 +351,6 @@ class OpsmxPlatformController {
                                  @RequestParam(value = "featureType", required = false) String featureType,
                                  @RequestBody(required = false) Object data, HttpServletRequest request) {
 
-    String user = request.getHeader("x-spinnaker-user")
-
-    return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, featureType,user, data)
+    return opsmxPlatformService.updatePlatformResponse4(version, type, source, source1, source2, source3, source4, featureType, data)
   }
 }

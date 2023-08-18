@@ -65,10 +65,8 @@ class OpsmxVisibilityController {
   @RequestMapping(value = "/{version}/approvalGates/{id}/trigger", method = RequestMethod.POST)
   @ResponseBody Object triggerApprovalGate(@PathVariable("version") String version,
                                            @PathVariable("id") Integer id,
-                                             @RequestBody(required = false) Object data,
-                                           @RequestHeader(value = "x-spinnaker-user",required = false) String xSpinnakerUser) throws Exception {
-
-    Response response = opsmxVisibilityService.triggerApprovalGate(version, id, data,xSpinnakerUser)
+                                           @RequestBody(required = false) Object data) throws Exception {
+    Response response = opsmxVisibilityService.triggerApprovalGate(version, id, data)
     InputStream inputStream = null
 
     try {
@@ -343,12 +341,9 @@ class OpsmxVisibilityController {
                                    @PathVariable("type") String type,
                                    @PathVariable("source") String source,
                                    @PathVariable("source1") String source1,
-                                   @RequestBody(required = false) Object data,
-                                   HttpServletRequest request) {
+                                   @RequestBody(required = false) Object data) {
 
-    String user = request.getHeader("x-spinnaker-user")
-
-    return opsmxVisibilityService.updateVisibilityResponse2(version, type, source, source1, user,  data)
+    return opsmxVisibilityService.updateVisibilityResponse2(version, type, source, source1, data)
   }
 
   @ApiOperation(value = "Endpoint for visibility rest services")
@@ -409,9 +404,8 @@ class OpsmxVisibilityController {
   @RequestMapping(value = "/{version}/approvalGateInstances/{id}/spinnakerReview", method = RequestMethod.PUT)
   Object updateVisibilityResponse7(@PathVariable("version") String version,
                                    @PathVariable("id") Integer id,
-                                   @RequestHeader(value = "x-spinnaker-user",required = false) String xSpinnakerUser,
                                    @RequestBody(required = false) Object data) {
 
-    return opsmxVisibilityService.updateVisibilityResponse7(version, id, xSpinnakerUser, data)
+    return opsmxVisibilityService.updateVisibilityResponse7(version, id, data)
   }
 }

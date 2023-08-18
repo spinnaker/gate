@@ -148,13 +148,13 @@ class OpsmxAutopilotController {
   @ApiOperation(value = "Endpoint for autopilot rest services")
   @RequestMapping(value = "/api/{version}/registerCanary", method = RequestMethod.POST)
   Object triggerRegisterCanary(@PathVariable("version") String version, @RequestBody(required = false) Object data,
-                               @RequestHeader(value = "x-spinnaker-user",required = false) String xSpinnakerUser, HttpServletRequest request) throws Exception {
+                               HttpServletRequest request) throws Exception {
 
     if (applicationFeatureRbac!=null){
       applicationFeatureRbac.authorizeUserForVerificationAndTestVerificationGateTrigger(request, data)
     }
 
-    Response response = opsmxAutopilotService.triggerRegisterCanary(version, data,xSpinnakerUser)
+    Response response = opsmxAutopilotService.triggerRegisterCanary(version, data)
     InputStream inputStream = null
 
     try {

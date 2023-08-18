@@ -25,8 +25,7 @@ interface OpsmxVisibilityService {
   @POST("/visibilityservice/{version}/approvalGates/{id}/trigger")
   Response triggerApprovalGate(@Path('version') String version,
                                @Path('id') Integer id,
-                               @Body Object data,
-                               @Header('x-spinnaker-user') String xSpinnakerUser)
+                               @Body Object data)
 
   @GET("/visibilityservice/{version}/{type}")
   Object getVisibilityResponse1(@Path('version') String version,
@@ -204,7 +203,6 @@ interface OpsmxVisibilityService {
                                  @Path('type') String type,
                                  @Path('source') String source,
                                  @Path('source1') String source1,
-                                   @Header('x-spinnaker-user') String user,
                                  @Body Object data)
 
   @PUT("/visibilityservice/{version}/{type}/{source}/{source1}/{source2}")
@@ -248,7 +246,6 @@ interface OpsmxVisibilityService {
   @PUT("/visibilityservice/{version}/approvalGateInstances/{id}/spinnakerReview")
   Object updateVisibilityResponse7(@Path('version') String version,
                                    @Path('id') Integer id,
-                                   @Header('x-spinnaker-user') String xSpinnakerUser,
                                     @Body Object data)
 
 }

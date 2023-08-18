@@ -200,7 +200,6 @@ interface OpsmxPlatformService {
                                  @Path('source3') String source3,
                                  @Path('source4') String source4,
                                  @Query("featureType") String featureType,
-                                 @Header('x-spinnaker-user') String user,
                                  @Body Object data)
 
 
