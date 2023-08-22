@@ -52,9 +52,11 @@ class OpsmxSsdController {
                                 @RequestParam(value = "policy", required = false) String policy,
                                 @RequestParam(value = "policyId", required = false) Integer policyId,
                                 @RequestParam(value = "id", required = false) Integer id,
+                                @RequestParam(value = "scope", required = false) String scope,
+                                @RequestParam(value = "appId", required = false) String appId,
                                 @RequestBody(required = false) Object data) {
 
-    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,id,data)
+    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,id,scope,appId,data)
   }
 
   @ApiOperation(value = "Endpoint for ssd rest services")
@@ -72,7 +74,7 @@ class OpsmxSsdController {
   Object getSsdResponse(@PathVariable("version") String version,
                         @PathVariable("type") String type,
                         @RequestParam(value = "account", required = false) String account,
-                        @RequestParam(value = "appId", required = false) Integer appId,
+                        @RequestParam(value = "appId", required = false) String appId,
                         @RequestParam(value = "image", required = false) String image,
                         @RequestParam(value = "imageTag", required = false) String imageTag,
                         @RequestParam(value = "stage", required = false) String stage,
@@ -90,8 +92,9 @@ class OpsmxSsdController {
                         @RequestParam(value = "id", required = false) String id,
                         @RequestParam(value = "startTime", required = false) String startTime,
                         @RequestParam(value = "endTime", required = false) String endTime,
-                        @RequestParam(value = "severity", required = false) String severity) {
-    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName, id, startTime, endTime, severity)
+                        @RequestParam(value = "severity", required = false) String severity,
+                        @RequestParam(value = "scope", required = false) String scope) {
+    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName, id, startTime, endTime, severity,scope)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -114,8 +117,9 @@ class OpsmxSsdController {
                          @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
                          @RequestParam(value = "alertName", required = false) String alertName,
                          @RequestParam(value = "riskStatus", required = false) String riskStatus,
-                         @RequestParam(value = "id", required = false) String id) {
-    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id)
+                         @RequestParam(value = "id", required = false) String id,
+                         @RequestParam(value = "scope", required = false) String scope) {
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id,scope)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")

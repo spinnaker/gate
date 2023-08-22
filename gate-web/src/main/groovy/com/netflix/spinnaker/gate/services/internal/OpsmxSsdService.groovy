@@ -29,7 +29,7 @@ interface OpsmxSsdService {
   Object getSddResponse1(@Path('version') String version,
                          @Path('type') String type,
                          @Query("account") String account,
-                         @Query("appId") Integer appId,
+                         @Query("appId") String appId,
                          @Query("image") String image,
                          @Query("imageTag") String imageTag,
                          @Query('stage') String stage,
@@ -47,7 +47,8 @@ interface OpsmxSsdService {
                          @Query("id") String id,
                          @Query("startTime") String startTime,
                          @Query("endTime") String endTime,
-                         @Query("severity") String severity)
+                         @Query("severity") String severity,
+                         @Query("scope") String scope)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
@@ -68,7 +69,8 @@ interface OpsmxSsdService {
                          @Query("noOfDays") Integer noOfDays,
                          @Query("alertName") String alertName,
                          @Query("riskStatus") String riskStatus,
-                         @Query("id") String id)
+                         @Query("id") String id,
+                         @Query("scope") String scope)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}")
   Object getSddResponse3(@Path('version') String version,
@@ -159,6 +161,8 @@ interface OpsmxSsdService {
                                 @Query("policy") String policy,
                                 @Query("policyId") Integer policyId,
                                 @Query("id") Integer id,
+                                @Query("scope") String scope,
+                                @Query("appId") String appId,
                                 @Body Object data)
 
   @POST("/ssdservice/{version}/{type}/{source}")
