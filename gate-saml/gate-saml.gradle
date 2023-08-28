@@ -8,6 +8,6 @@ dependencies{
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
-  implementation "org.springframework.security.extensions:spring-security-saml2-core"
+  implementation "org.springframework.security.extensions:spring-security-saml2-core:1.0.10.RELEASE"
   implementation "org.springframework.security.extensions:spring-security-saml-dsl-core"
 }
