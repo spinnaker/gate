@@ -10,4 +10,8 @@ dependencies{
 
   implementation "org.springframework.security.extensions:spring-security-saml2-core"
   implementation "org.springframework.security.extensions:spring-security-saml-dsl-core"
+
+  constraints {
+    api("org.owasp.esapi:esapi:2.2.1.0")
+  }
 }
