@@ -23,6 +23,7 @@ import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptor
 import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptorConfigurationProperties
 import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
