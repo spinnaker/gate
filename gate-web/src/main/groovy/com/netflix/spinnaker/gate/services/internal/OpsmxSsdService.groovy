@@ -48,7 +48,8 @@ interface OpsmxSsdService {
                          @Query("startTime") String startTime,
                          @Query("endTime") String endTime,
                          @Query("severity") String severity,
-                         @Query("scope") String scope)
+                         @Query("scope") String scope,
+                         @Query("current") String current)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
@@ -77,9 +78,14 @@ interface OpsmxSsdService {
                          @Path('type') String type,
                          @Path('source') String source,
                          @Path('source1') String source1,
+                         @Query("account") String account,
                          @Query("appId") Integer appId,
                          @Query("image") String image,
                          @Query("appName") String appName,
+                         @Query("noOfDays") Integer noOfDays,
+                         @Query("pageNo") Integer pageNo,
+                         @Query("pageLimit") Integer pageLimit,
+                         @Query("kind") String kind,
                          @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}")

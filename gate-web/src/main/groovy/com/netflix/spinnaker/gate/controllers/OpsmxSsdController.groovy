@@ -93,8 +93,9 @@ class OpsmxSsdController {
                         @RequestParam(value = "startTime", required = false) String startTime,
                         @RequestParam(value = "endTime", required = false) String endTime,
                         @RequestParam(value = "severity", required = false) String severity,
-                        @RequestParam(value = "scope", required = false) String scope) {
-    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName, id, startTime, endTime, severity,scope)
+                        @RequestParam(value = "scope", required = false) String scope,
+                        @RequestParam(value = "current", required = false) String current){
+    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName, id, startTime, endTime, severity,scope, current)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -128,11 +129,16 @@ class OpsmxSsdController {
                          @PathVariable("type") String type,
                          @PathVariable("source") String source,
                          @PathVariable("source1") String source1,
+                         @RequestParam(value = "account", required = false) String account,
                          @RequestParam(value = "appId", required = false) Integer appId,
                          @RequestParam(value = "image", required = false) String image,
                          @RequestParam(value = "appName", required = false) String appName,
+                         @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                         @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                         @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                         @RequestParam(value = "kind", required = false) String kind,
                          @RequestParam(value = "id", required = false) String id) {
-    return opsMxSsdService.getSddResponse3(version, type, source, source1, appId, image, appName, id)
+    return opsMxSsdService.getSddResponse3(version, type, source, source1,account , appId, image, appName, noOfDays,pageNo,pageLimit,kind,id)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
