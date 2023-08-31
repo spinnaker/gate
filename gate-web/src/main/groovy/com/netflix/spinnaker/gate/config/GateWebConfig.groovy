@@ -80,7 +80,10 @@ public class GateWebConfig implements WebMvcConfigurer {
     return new HandlerMappingIntrospector(context)
   }
 
+
+  // Add the ability to disable as this breaks numerous integration patterns
   @Bean
+  @ConditionalOnProperty(value = "content.cachingFilter.enabled", matchIfMissing = true)
   Filter contentCachingFilter() {
     // This filter simply buffers the response so that Content-Length header can be set
     return new ContentCachingFilter()
