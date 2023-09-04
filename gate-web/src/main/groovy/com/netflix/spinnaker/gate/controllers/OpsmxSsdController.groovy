@@ -221,10 +221,11 @@ class OpsmxSsdController {
   Object downloadCSVFileAuditService(@PathVariable("version") String version,
                                      @PathVariable("type") String type,
                                      @PathVariable("source") String source,
-                                     @RequestParam(value = "appId", required = false) Integer appId,
+                                     @RequestParam(value = "appId", required = false) String appId,
                                      @RequestParam(value = "image", required = false) String image,
-                                     @RequestParam(value = "appName", required = false) String appName) {
-    Response response = opsMxSsdService.downloadCSVFile(version, type, source, appId, image, appName)
+                                     @RequestParam(value = "appName", required = false) String appName,
+                                     @RequestParam(value = "account", required = false) String account) {
+    Response response = opsMxSsdService.downloadCSVFile(version, type, source, appId, image, appName, account)
     log.info("response for the download csv endpoint:" + response.getHeaders())
     if (response.getBody() != null) {
       InputStream inputStream = response.getBody().in()
@@ -248,10 +249,12 @@ class OpsmxSsdController {
   Object downloadJsonFileSsdService(@PathVariable("version") String version,
                                     @PathVariable("type") String type,
                                     @PathVariable("source") String source,
-                                    @RequestParam(value = "appId", required = false) Integer appId,
+                                    @RequestParam(value = "appId", required = false) String appId,
                                     @RequestParam(value = "image", required = false) String image,
-                                    @RequestParam(value = "appName", required = false) String appName) {
-    Response response = opsMxSsdService.downloadJsonFile(version, type, source, appId, image, appName)
+                                    @RequestParam(value = "appName", required = false) String appName,
+                                    @RequestParam(value = "account", required = false) String account,
+                                    @RequestParam(value = "scoreCardName", required = false) String scoreCardName){
+    Response response = opsMxSsdService.downloadJsonFile(version, type, source, appId, image, appName, account, scoreCardName)
     log.info("response for the download json endpoint:" + response.getHeaders())
     if (response.getBody() != null) {
       InputStream inputStream = response.getBody().in()
