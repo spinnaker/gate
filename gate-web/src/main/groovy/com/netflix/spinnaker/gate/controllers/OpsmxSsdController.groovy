@@ -167,8 +167,10 @@ class OpsmxSsdController {
                          @RequestParam(value = "fromImageTag", required = false) String fromImageTag,
                          @RequestParam(value = "toImageTag", required = false) String toImageTag,
                          @RequestParam(value = "fromAccount", required = false) String fromAccount,
-                         @RequestParam(value = "toAccount", required = false) String toAccount) {
-    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount)
+                         @RequestParam(value = "toAccount", required = false) String toAccount,
+                         @RequestParam(value = "kind", required = false) String kind,
+                         @RequestParam(value = "active", required = false) String active) {
+    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount,kind,active)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")

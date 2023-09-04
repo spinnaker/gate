@@ -113,7 +113,9 @@ interface OpsmxSsdService {
                          @Query("fromImageTag") String fromImageTag,
                          @Query("toImageTag") String toImageTag,
                          @Query("fromAccount") String fromAccount,
-                         @Query("toAccount") String toAccount)
+                         @Query("toAccount") String toAccount,
+                         @Query("kind") String kind,
+                         @Query("active") String active)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
