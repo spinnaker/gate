@@ -71,6 +71,11 @@ interface OpsmxSsdService {
                          @Query("alertName") String alertName,
                          @Query("riskStatus") String riskStatus,
                          @Query("id") String id,
+                         @Query("Vulnerability") String Vulnerability,
+                         @Query("Component") String Component,
+                         @Query("ComponentVersion") String ComponentVersion,
+                         @Query("Image") String Image,
+                         @Query("ImageVersion") String ImageVersion,
                          @Query("scope") String scope)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}")
@@ -115,7 +120,10 @@ interface OpsmxSsdService {
                          @Query("fromAccount") String fromAccount,
                          @Query("toAccount") String toAccount,
                          @Query("kind") String kind,
-                         @Query("active") String active)
+                         @Query("active") String active,
+                         @Query("Vulnerability") String Vulnerability,
+                         @Query("Component") String Component,
+                         @Query("ComponentVersion") String ComponentVersion)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,

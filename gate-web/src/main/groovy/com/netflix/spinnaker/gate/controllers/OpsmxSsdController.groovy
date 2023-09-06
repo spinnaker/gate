@@ -119,8 +119,13 @@ class OpsmxSsdController {
                          @RequestParam(value = "alertName", required = false) String alertName,
                          @RequestParam(value = "riskStatus", required = false) String riskStatus,
                          @RequestParam(value = "id", required = false) String id,
+                         @RequestParam(value = "Vulnerability", required = false) String Vulnerability,
+                         @RequestParam(value = "Component", required = false) String Component,
+                         @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion,
+                         @RequestParam(value = "Image", required = false) String Image,
+                         @RequestParam(value = "ImageVersion", required = false) String ImageVersion,
                          @RequestParam(value = "scope", required = false) String scope) {
-    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id,scope)
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion, scope)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -169,8 +174,11 @@ class OpsmxSsdController {
                          @RequestParam(value = "fromAccount", required = false) String fromAccount,
                          @RequestParam(value = "toAccount", required = false) String toAccount,
                          @RequestParam(value = "kind", required = false) String kind,
-                         @RequestParam(value = "active", required = false) String active) {
-    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount,kind,active)
+                         @RequestParam(value = "active", required = false) String active,
+                         @RequestParam(value = "Vulnerability", required = false) String Vulnerability,
+                         @RequestParam(value = "Component", required = false) String Component,
+                         @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion) {
+    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount, kind, active, Vulnerability, Component, ComponentVersion)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
