@@ -91,6 +91,7 @@ interface OpsmxSsdService {
                          @Query("pageNo") Integer pageNo,
                          @Query("pageLimit") Integer pageLimit,
                          @Query("kind") String kind,
+                         @Query("search") String search,
                          @Query("id") String id)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}")
