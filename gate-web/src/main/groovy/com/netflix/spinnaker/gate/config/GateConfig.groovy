@@ -279,6 +279,13 @@ class GateConfig extends RedisHttpSessionConfiguration {
     createClient "ssdservice", OpsmxSsdService, okHttpClient
   }
 
+
+  @Bean
+  @ConditionalOnProperty("services.ssdopsmxservice.enabled")
+  OpsmxSsdOpaService  ssdOpa(OkHttpClient okHttpClient) {
+    createClient "ssdopaservice", OpsmxSsdOpaService , okHttpClient
+  }
+
   @Bean
   @ConditionalOnProperty("services.keel.enabled")
   KeelService keelService(OkHttpClientProvider clientProvider, OkHttpClient okHttpClient) {

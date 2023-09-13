@@ -24,6 +24,9 @@ services:
   ssdservice:
     baseUrl: http://localhost:8099
     enabled: true
+  ssdopaservice:
+    baseUrl: http://localhost:8200
+    enabled: false
   oesui:
     externalUrl: http://150.238.22.102
 
