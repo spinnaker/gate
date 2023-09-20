@@ -124,8 +124,9 @@ interface OpsmxSsdService {
                          @Query("active") String active,
                          @Query("Vulnerability") String Vulnerability,
                          @Query("Component") String Component,
-                         @Query("ComponentVersion") String ComponentVersion)
-
+                         @Query("ComponentVersion") String ComponentVersion,
+                         @Query("fromApp") String fromApp,
+                         @Query("toApp") String toApp)
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
                          @Path('type') String type,
