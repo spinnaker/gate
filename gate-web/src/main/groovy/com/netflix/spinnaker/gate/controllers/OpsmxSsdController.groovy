@@ -54,9 +54,10 @@ class OpsmxSsdController {
                                 @RequestParam(value = "id", required = false) Integer id,
                                 @RequestParam(value = "scope", required = false) String scope,
                                 @RequestParam(value = "appId", required = false) String appId,
+                                @RequestParam(value = "vulnAlert", required = false) boolean vulnAlert,
                                 @RequestBody(required = false) Object data) {
 
-    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,id,scope,appId,data)
+    return opsMxSsdService.postSsdServiceResponse(version, type, stage, policy, policyId,id,scope,appId, vulnAlert,data)
   }
 
   @ApiOperation(value = "Endpoint for ssd rest services")
@@ -124,8 +125,9 @@ class OpsmxSsdController {
                          @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion,
                          @RequestParam(value = "Image", required = false) String Image,
                          @RequestParam(value = "ImageVersion", required = false) String ImageVersion,
+                         @RequestParam(value = "service", required = false) String service,
                          @RequestParam(value = "scope", required = false) String scope) {
-    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion, scope)
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion,service, scope)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -143,8 +145,9 @@ class OpsmxSsdController {
                          @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
                          @RequestParam(value = "kind", required = false) String kind,
                          @RequestParam(value = "search", required = false) String search,
+                         @RequestParam(value = "service", required = false) String service,
                          @RequestParam(value = "id", required = false) String id) {
-    return opsMxSsdService.getSddResponse3(version, type, source, source1,account , appId, image, appName, noOfDays, pageNo, pageLimit, kind, search, id)
+    return opsMxSsdService.getSddResponse3(version, type, source, source1,account , appId, image, appName, noOfDays, pageNo, pageLimit, kind, search, service, id)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -180,8 +183,9 @@ class OpsmxSsdController {
                          @RequestParam(value = "Component", required = false) String Component,
                          @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion,
                          @RequestParam(value = "fromApp", required = false) String fromApp,
+                         @RequestParam(value = "service", required = false) String service,
                          @RequestParam(value = "toApp", required = false) String toApp) {
-    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount, kind, active, Vulnerability, Component, ComponentVersion,fromApp,toApp)
+    return opsMxSsdService.getSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount, kind, active, Vulnerability, Component, ComponentVersion,fromApp,service,toApp)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
