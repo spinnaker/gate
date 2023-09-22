@@ -129,7 +129,9 @@ interface OpsmxSsdService {
                          @Query("ComponentVersion") String ComponentVersion,
                          @Query("fromApp") String fromApp,
                          @Query("service") String service,
-                         @Query("toApp") String toApp)
+                         @Query("toApp") String toApp,
+                         @Query("dbomType") String dbomType)
+
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getSddResponse5(@Path('version') String version,
                          @Path('type') String type,
