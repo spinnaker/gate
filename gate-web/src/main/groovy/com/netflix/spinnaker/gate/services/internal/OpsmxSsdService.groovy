@@ -94,7 +94,8 @@ interface OpsmxSsdService {
                          @Query("kind") String kind,
                          @Query("search") String search,
                          @Query("service") String service,
-                         @Query("id") String id)
+                         @Query("id") String id,
+                         @Query("dbomType") String dbomType)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getSddResponse4(@Path('version') String version,
