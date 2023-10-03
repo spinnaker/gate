@@ -272,8 +272,9 @@ class OpsmxSsdController {
                                     @RequestParam(value = "image", required = false) String image,
                                     @RequestParam(value = "appName", required = false) String appName,
                                     @RequestParam(value = "account", required = false) String account,
-                                    @RequestParam(value = "scoreCardName", required = false) String scoreCardName){
-    Response response = opsMxSsdService.downloadJsonFile(version, type, source, appId, image, appName, account, scoreCardName)
+                                    @RequestParam(value = "scoreCardName", required = false) String scoreCardName,
+                                    @RequestParam(value = "semgrep", required = false) String semgrep){
+    Response response = opsMxSsdService.downloadJsonFile(version, type, source, appId, image, appName, account, scoreCardName, semgrep)
     log.info("response for the download json endpoint:" + response.getHeaders())
     if (response.getBody() != null) {
       InputStream inputStream = response.getBody().in()

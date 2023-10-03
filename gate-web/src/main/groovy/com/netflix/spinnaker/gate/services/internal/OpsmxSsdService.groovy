@@ -206,7 +206,6 @@ interface OpsmxSsdService {
                             @Query("image") String image,
                             @Query("appName") String appName,
                             @Query("account") String account,
-                            @Query("scoreCardName") String scoreCardName)
-
-
+                            @Query("scoreCardName") String scoreCardName,
+                            @Query("semgrep") String semgrep)
 }
