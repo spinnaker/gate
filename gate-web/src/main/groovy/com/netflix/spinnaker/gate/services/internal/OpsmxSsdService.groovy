@@ -94,6 +94,8 @@ interface OpsmxSsdService {
                          @Query("kind") String kind,
                          @Query("search") String search,
                          @Query("service") String service,
+                         @Query("sortBy") String sortBy,
+                         @Query("sortOrder") String sortOrder,
                          @Query("id") String id,
                          @Query("dbomType") String dbomType)
 
