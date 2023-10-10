@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
@@ -35,7 +36,6 @@ import com.netflix.spinnaker.gate.filters.RequestSheddingFilter
 import com.netflix.spinnaker.gate.filters.ResetAuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
-import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
@@ -136,9 +136,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
   @Autowired
   Registry registry
-
-  @Autowired
-  EurekaLookupService eurekaLookupService
 
   @Autowired
   ServiceConfiguration serviceConfiguration
@@ -321,9 +318,10 @@ class GateConfig extends RedisHttpSessionConfiguration {
 
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
     ObjectMapper objectMapper = objectMapperBuilder.build()
-
+    if(serviceName.equals("echo")) {
+      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
-
   }
 
   private <T> SelectableService createClientSelector(String serviceName, Class<T> type) {

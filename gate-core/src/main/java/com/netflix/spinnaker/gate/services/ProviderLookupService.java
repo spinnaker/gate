@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Netflix, Inc.
+ * Copyright 2016 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.gate.model.manageddelivery;
+package com.netflix.spinnaker.gate.services;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import lombok.Data;
-
-@Data
-public class Environment {
-  String name;
-  Collection<Resource> resources;
-  Collection<Map<String, Object>> constraints;
-  Collection<Notification> notifications;
-  Map<String, Object> locations;
-  List<Map<String, Object>> verifyWith;
+public interface ProviderLookupService {
+  String providerForAccount(String account);
 }

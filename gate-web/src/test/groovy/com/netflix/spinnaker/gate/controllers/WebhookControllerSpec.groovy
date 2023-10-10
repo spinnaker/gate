@@ -16,22 +16,25 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.gate.services.WebhookService
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
-import com.netflix.spinnaker.gate.services.WebhookService
 import com.squareup.okhttp.mockwebserver.MockWebServer
-import org.mockito.MockitoAnnotations;
+import io.cloudevents.spring.mvc.CloudEventHttpMessageConverter
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.util.NestedServletException
 import retrofit.RestAdapter
+import retrofit.client.OkClient
+import retrofit.converter.JacksonConverter
+import spock.lang.Specification
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import retrofit.client.OkClient
-import retrofit.http.*
-import spock.lang.Specification
 
 class WebhooksControllerSpec extends Specification {
 
@@ -52,6 +55,7 @@ class WebhooksControllerSpec extends Specification {
     EchoService echoService = new RestAdapter.Builder()
       .setEndpoint("http://localhost:${localPort}")
       .setClient(new OkClient())
+      .setConverter(new JacksonConverter())
       .build()
       .create(EchoService)
 
@@ -59,7 +63,9 @@ class WebhooksControllerSpec extends Specification {
     webhookService = new WebhookService(echoService: echoService, orcaServiceSelector: orcaServiceSelector)
 
     server.start()
-    mockMvc = MockMvcBuilders.standaloneSetup(new WebhookController(webhookService: webhookService)).build()
+    mockMvc = MockMvcBuilders.standaloneSetup(new WebhookController(webhookService: webhookService))
+      .setMessageConverters(new CloudEventHttpMessageConverter())
+      .build()
   }
 
   void 'handles null Maps'() {
@@ -86,6 +92,46 @@ class WebhooksControllerSpec extends Specification {
     mockMvc.perform(post("/webhooks/git/bitbucket")
       .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk()).andReturn()
+
+    then:
+    NestedServletException ex = thrown()
+    ex.message.startsWith("Request processing failed; nested exception is retrofit.RetrofitError: Failed to connect to localhost")
+  }
+
+  void 'handles CDEvents API with BAD_REQUEST'() {
+    given:
+
+    when:
+    MockHttpServletResponse response = mockMvc.perform(post("/webhooks/cdevents/artifactPackaged")
+      .accept(MediaType.APPLICATION_JSON))
+      .andReturn().response
+
+    then:
+    response.status == 400
+  }
+
+  void 'handles CDEvents API server Ping'() {
+    given:
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Ce-Id", "1234")
+    headers.add("Ce-Specversion", "1.0")
+    headers.add("Ce-Type", "dev.cdevents.artifact.packaged")
+    headers.add("Ce-Source", "spinnaker.test.io")
+    headers.add("Content-Type", "application/cloudevents+json")
+    String payload = "{\"id\": \"1234\", \"subject\": \"event\"}"
+    Map<String, Object> cdEvent = [
+      specversion: "1.0",
+      type: "dev.cdevents.artifact.packaged",
+      source: "/spinnaker.test.io",
+      id: "12345",
+      data: payload
+    ]
+
+    when:
+    mockMvc.perform(post("/webhooks/cdevents/artifactPackaged")
+      .headers(headers)
+      .content(new ObjectMapper().writeValueAsString(cdEvent)))
+      .andExpect(status().isOk()).andReturn()
 
     then:
     NestedServletException ex = thrown()

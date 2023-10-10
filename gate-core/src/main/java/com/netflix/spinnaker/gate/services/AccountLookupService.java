@@ -1,7 +1,7 @@
 /*
- * Copyright 2018 Netflix, Inc.
+ * Copyright 2016 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License")
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,17 +16,9 @@
 
 package com.netflix.spinnaker.gate.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
 import java.util.List;
-import java.util.Map;
 
-public class NoopOidcConfigService implements OidcConfigService {
-  public List getOidcConfigs(String app) {
-    return new ArrayList<>();
-  }
-
-  public Map getOidcConfig(String id) {
-    return new HashMap<>();
-  }
+public interface AccountLookupService {
+  List<ClouddriverService.AccountDetails> getAccounts();
 }
