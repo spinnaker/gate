@@ -56,7 +56,9 @@ dependencies {
 
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.4.RELEASE'
-
+  implementation 'org.apache.camel:camel-core:3.14.1'
+  implementation 'org.apache.camel:camel-rabbitmq:3.14.1'
+  implementation 'org.apache.camel:camel-jackson:3.14.1'
 
   runtimeOnly "io.spinnaker.kork:kork-runtime"
   runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"

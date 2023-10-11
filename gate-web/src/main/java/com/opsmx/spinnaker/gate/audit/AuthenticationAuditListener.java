@@ -16,15 +16,18 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
+import com.google.gson.Gson;
+import com.opsmx.spinnaker.gate.constant.CamelEndpointConstant;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
 import com.opsmx.spinnaker.gate.model.AuditData;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.opsmx.spinnaker.gate.model.OesAuditModel;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.security.AbstractAuthenticationAuditListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -38,6 +41,9 @@ import org.springframework.stereotype.Component;
 public class AuthenticationAuditListener extends AbstractAuthenticationAuditListener {
 
   @Autowired private AuditHandler auditHandler;
+  @Autowired @Lazy private ProducerTemplate template;
+
+  Gson gson = new Gson();
 
   @Async
   @Override
@@ -56,11 +62,15 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
       if (event.getAuthentication().isAuthenticated()
           && event instanceof AuthenticationSuccessEvent) {
         log.debug("publishEvent AuthenticationSuccessEvent");
-        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event);
+        template.asyncSendBody(
+            CamelEndpointConstant.directUserActivity,
+            auditHandler.publishEvent(AuditEventType.AUTHENTICATION_SUCCESSFUL_AUDIT, event));
       } else if (!event.getAuthentication().isAuthenticated()
           && event instanceof AbstractAuthenticationFailureEvent) {
         log.debug("publishEvent AbstractAuthenticationFailureEvent");
-        auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event);
+        template.asyncSendBody(
+            CamelEndpointConstant.directUserActivity,
+            auditHandler.publishEvent(AuditEventType.AUTHENTICATION_FAILURE_AUDIT, event));
       } else if (event instanceof LogoutSuccessEvent) {
         if (event
             .getAuthentication()
@@ -73,10 +83,16 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
         }
         log.debug("publishEvent LogoutSuccessEvent");
         auditHandler.publishEvent(AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT, event);
+        AbstractAuthenticationToken auth = (AbstractAuthenticationToken) event.getAuthentication();
+        String name = auth.getName();
+        template.asyncSendBody(
+            CamelEndpointConstant.directUserActivity,
+            getOesAuditModel(
+                name, event.getTimestamp(), AuditEventType.SUCCESSFUL_USER_LOGOUT_AUDIT));
       }
 
     } catch (Exception e) {
-      log.error("Exception occured while capturing audit events : {}", e);
+      log.error("Exception occurred while capturing audit events : {}", e);
     }
   }
 
@@ -88,7 +104,23 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
         Optional.ofNullable(auth.getAuthorities()).orElse(new ArrayList<>()).stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList());
-    AuditData data = new AuditData(name, roles);
+    AuditData data = new AuditData(name, roles, event.getTimestamp());
     auditHandler.publishEvent(eventType, data);
+    template.asyncSendBody(
+        CamelEndpointConstant.directUserActivity,
+        getOesAuditModel(name, event.getTimestamp(), eventType));
+  }
+
+  private String getOesAuditModel(String name, Long timestamp, AuditEventType eventType) {
+    OesAuditModel oesAuditModel = new OesAuditModel();
+    Map<String, Object> date = new HashMap<>();
+    date.put("userName", name);
+    date.put("timestamp", timestamp);
+    oesAuditModel.setEventId(UUID.randomUUID().toString());
+    oesAuditModel.setAuditData(date);
+    oesAuditModel.setEventType(eventType);
+    String model = gson.toJson(oesAuditModel, OesAuditModel.class);
+    log.debug("model: {}", model);
+    return model;
   }
 }

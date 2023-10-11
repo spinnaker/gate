@@ -23,18 +23,20 @@ import lombok.Data;
 public class AuditData {
   private Source source;
 
-  public AuditData(String name, List<String> roles) {
-    this.source = new Source(name, roles);
+  public AuditData(String name, List<String> roles, long timestamp) {
+    this.source = new Source(name, roles, timestamp);
   }
 
   @Data
   public class Source {
     private String name;
     private Principal principal;
+    private Long timestamp;
 
-    public Source(String name, List<String> roles) {
+    public Source(String name, List<String> roles, long timestamp) {
       this.name = name;
       this.principal = new Principal(roles);
+      this.timestamp = timestamp;
     }
   }
 

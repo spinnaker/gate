@@ -64,8 +64,14 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "chartId", required = false) Integer chartId,
                                  @RequestParam(value = "startTime", required = false) Long startTime,
                                  @RequestParam(value = "endTime", required = false) Long endTime,
-                                 @RequestParam(value = "days", required = false) Integer days) {
-    return opsmxAuditClientService.getDeliveryInsightCharts(version, type, source, chartId, startTime, endTime, days)
+                                 @RequestParam(value = "days", required = false) Integer days,
+                                  @RequestParam(value = "pageNo",required = false) Integer pageNo,
+                                  @RequestParam(value = "pageLimit",required = false) Integer pageLimit,
+                                  @RequestParam(value = "search", required = false) String search,
+                                  @RequestParam(value = "sortBy",required = false) String sortBy,
+                                  @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                                  @RequestParam(value = "filterBy", required = false) String filterBy) {
+    return opsmxAuditClientService.getDeliveryInsightCharts(version, type, source, chartId, startTime, endTime, days, pageNo, pageLimit, search, sortBy, sortOrder, filterBy)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -175,8 +181,9 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "chartId", required = false) Integer chartId,
                                      @RequestParam(value = "startTime", required = false) Long startTime,
                                      @RequestParam(value = "endTime", required = false) Long endTime,
-                                     @RequestParam(value = "days", required = false) Integer days) {
-    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days)
+                                     @RequestParam(value = "days", required = false) Integer days,
+                                     @RequestParam(value = "filterBy", required = false) String filterBy) {
+    Response response = opsmxAuditClientService.downloadDeliveryInsightsCSVFile(version, type, source, chartId, startTime, endTime, days, filterBy)
     log.info("response for the delivery insights endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()

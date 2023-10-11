@@ -16,10 +16,12 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
+import com.google.gson.Gson;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
 import com.opsmx.spinnaker.gate.feignclient.AuditService;
 import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -28,16 +30,21 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableFeignClients(basePackageClasses = AuditService.class)
 @ConditionalOnExpression("${services.auditservice.enabled:true}")
+@Slf4j
 public class AuditRestApiHandler implements AuditHandler {
 
   @Autowired private AuditService auditService;
+  Gson gson = new Gson();
 
   @Override
-  public void publishEvent(AuditEventType auditEventType, Object auditData) {
+  public String publishEvent(AuditEventType auditEventType, Object auditData) {
     OesAuditModel oesAuditModel = new OesAuditModel();
     oesAuditModel.setEventId(UUID.randomUUID().toString());
     oesAuditModel.setAuditData(auditData);
     oesAuditModel.setEventType(auditEventType);
     auditService.publishAuditData(oesAuditModel, "OES");
+    String model = gson.toJson(oesAuditModel, OesAuditModel.class);
+    log.debug("model: {}", model);
+    return model;
   }
 }

@@ -16,11 +16,16 @@
 
 package com.opsmx.spinnaker.gate.audit;
 
+import com.google.gson.Gson;
+import com.opsmx.spinnaker.gate.constant.CamelEndpointConstant;
 import com.opsmx.spinnaker.gate.enums.AuditEventType;
 import com.opsmx.spinnaker.gate.enums.OesServices;
+import com.opsmx.spinnaker.gate.model.OesAuditModel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -35,9 +40,11 @@ import org.springframework.web.context.support.ServletRequestHandledEvent;
 @EnableAsync
 public class UserActivityAuditListener implements ApplicationListener {
 
-  // @Autowired private AuditHandler auditHandler;
-
   private AuditHandler auditHandler;
+
+  @Autowired @Lazy private ProducerTemplate template;
+
+  Gson gson = new Gson();
 
   @Autowired
   public UserActivityAuditListener(@Lazy AuditHandler auditHandler) {
@@ -56,16 +63,31 @@ public class UserActivityAuditListener implements ApplicationListener {
           log.debug("request is authenticated");
           String baseUrl = getBaseUrl(servletRequestHandledEvent.getRequestUrl());
           log.debug("base url : {}", baseUrl);
+          Map<String, Object> auditData = populateAuditData(servletRequestHandledEvent);
           if (isOesActivity(baseUrl)) {
-            Map<String, Object> auditData = populateAuditData(servletRequestHandledEvent);
             log.debug("publishing the event to audit service : {}", auditData);
             auditHandler.publishEvent(AuditEventType.USER_ACTIVITY_AUDIT, auditData);
           }
+          template.asyncSendBody(
+              CamelEndpointConstant.directUserActivity, getOesAuditModel(auditData));
         }
       }
     } catch (Exception e) {
-      log.error("Excepion occured : {}", e);
+      log.error("Exception occurred : {}", e);
     }
+  }
+
+  private String getOesAuditModel(Map<String, Object> auditData) {
+    OesAuditModel oesAuditModel = new OesAuditModel();
+    Map<String, Object> date = new HashMap<>();
+    date.put("userName", auditData.get("userName"));
+    date.put("timestamp", auditData.get("timestamp"));
+    oesAuditModel.setEventId(UUID.randomUUID().toString());
+    oesAuditModel.setAuditData(date);
+    oesAuditModel.setEventType(AuditEventType.USER_ACTIVITY_AUDIT);
+    String model = gson.toJson(oesAuditModel, OesAuditModel.class);
+    log.debug("model: {}", model);
+    return model;
   }
 
   private boolean isOesActivity(String baseUrl) {
