@@ -126,8 +126,11 @@ class OpsmxSsdController {
                          @RequestParam(value = "Image", required = false) String Image,
                          @RequestParam(value = "ImageVersion", required = false) String ImageVersion,
                          @RequestParam(value = "service", required = false) String service,
-                         @RequestParam(value = "scope", required = false) String scope) {
-    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion,service, scope)
+                         @RequestParam(value = "scope", required = false) String scope,
+                         @RequestParam(value = "name", required = false) String name,
+                         @RequestParam(value = "value", required = false) String value
+  ) {
+    return opsMxSsdService.getSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion,service, scope,name,value)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
