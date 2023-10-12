@@ -18,11 +18,12 @@ package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.security.SpinnakerUser
 import com.netflix.spinnaker.gate.services.PermissionService
+import com.netflix.spinnaker.gate.services.UserInfoService
+import com.netflix.spinnaker.gate.services.internal.OpsmxOesService
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
-import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
@@ -57,6 +58,12 @@ class AuthController {
 
   @Autowired
   PermissionService permissionService
+
+  @Autowired
+  UserInfoService userInfoService
+
+  @Autowired
+  OpsmxOesService opsmxOesService
 
   @Autowired
   AuthController(@Value('${services.deck.base-url:}') URL deckBaseUrl,
@@ -159,5 +166,20 @@ class AuthController {
     return permissionService.isAdmin(
         AuthenticatedRequest.getSpinnakerUser().orElse("anonymous")
     )
+  }
+
+  @ApiOperation(value = "Get user Details with cloudAccounts")
+  @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
+  Object userInfo(@ApiIgnore @SpinnakerUser User user) {
+    if (!user) {
+      throw new Exception("UnAuthorized User")
+    }
+    def fiatRoles = permissionService.getRoles(user.username)?.collect{ it.name }
+    if (fiatRoles) {
+      user.roles = fiatRoles
+    }
+    def response = opsmxOesService.getOesResponse5(
+      "accountsConfig", "v3", "spinnaker", "cloudProviderAccount", false, false)
+    return userInfoService.getAllInfoOfUser(user, response)
   }
 }

@@ -1,6 +1,6 @@
 services:
   opsmx:
-    baseUrl: http://oes-api:8085
+    baseUrl: http://localhost:8085
     enabled: true
   autopilot:
     baseUrl: http://localhost:8090
