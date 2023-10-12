@@ -95,8 +95,9 @@ class OpsmxSsdController {
                         @RequestParam(value = "endTime", required = false) String endTime,
                         @RequestParam(value = "severity", required = false) String severity,
                         @RequestParam(value = "scope", required = false) String scope,
-                        @RequestParam(value = "current", required = false) String current){
-    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy,typeList, alertName, id, startTime, endTime, severity,scope, current)
+                        @RequestParam(value = "current", required = false) String current,
+                        @RequestParam(value = "tag", required = false) String tag) {
+    return opsMxSsdService.getSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy, typeList, alertName, id, startTime, endTime, severity, scope, current, tag)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
