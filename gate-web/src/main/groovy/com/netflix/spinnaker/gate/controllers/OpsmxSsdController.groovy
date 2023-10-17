@@ -299,4 +299,175 @@ class OpsmxSsdController {
     }
     return ResponseEntity.status(response.getStatus()).build()
   }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse(@PathVariable("version") String version,
+                           @PathVariable("type") String type,
+                           @RequestParam(value = "account", required = false) String account,
+                           @RequestParam(value = "appId", required = false) String appId,
+                           @RequestParam(value = "image", required = false) String image,
+                           @RequestParam(value = "imageTag", required = false) String imageTag,
+                           @RequestParam(value = "stage", required = false) String stage,
+                           @RequestParam(value = "deployedAt", required = false) String deployedAt,
+                           @RequestParam(value = "appName", required = false) String appName,
+                           @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                           @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                           @RequestParam(value = "sortBy", required = false) String sortBy,
+                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                           @RequestParam(value = "search", required = false) String search,
+                           @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                           @RequestParam(value = "policy", required = false) String policy,
+                           @RequestParam(value = "typeList", required = false) String typeList,
+                           @RequestParam(value = "alertName", required = false) String alertName,
+                           @RequestParam(value = "id", required = false) String id,
+                           @RequestParam(value = "startTime", required = false) String startTime,
+                           @RequestParam(value = "endTime", required = false) String endTime,
+                           @RequestParam(value = "severity", required = false) String severity,
+                           @RequestParam(value = "scope", required = false) String scope,
+                           @RequestParam(value = "current", required = false) String current,
+                           @RequestParam(value = "tag", required = false) String tag) {
+    return opsMxSsdService.deleteSddResponse1(version, type, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, policy, typeList, alertName, id, startTime, endTime, severity, scope, current, tag)
+  }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse1(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @RequestParam(value = "account", required = false) String account,
+                            @RequestParam(value = "appId", required = false) String appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "imageTag", required = false) String imageTag,
+                            @RequestParam(value = "stage", required = false) String stage,
+                            @RequestParam(value = "deployedAt", required = false) String deployedAt,
+                            @RequestParam(value = "appName", required = false) String appName,
+                            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                            @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                            @RequestParam(value = "sortBy", required = false) String sortBy,
+                            @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                            @RequestParam(value = "search", required = false) String search,
+                            @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                            @RequestParam(value = "alertName", required = false) String alertName,
+                            @RequestParam(value = "riskStatus", required = false) String riskStatus,
+                            @RequestParam(value = "id", required = false) String id,
+                            @RequestParam(value = "Vulnerability", required = false) String Vulnerability,
+                            @RequestParam(value = "Component", required = false) String Component,
+                            @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion,
+                            @RequestParam(value = "Image", required = false) String Image,
+                            @RequestParam(value = "ImageVersion", required = false) String ImageVersion,
+                            @RequestParam(value = "service", required = false) String service,
+                            @RequestParam(value = "scope", required = false) String scope,
+                            @RequestParam(value = "name", required = false) String name,
+                            @RequestParam(value = "value", required = false) String value
+  ) {
+    return opsMxSsdService.deleteSddResponse2(version, type, source, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, alertName, riskStatus, id, Vulnerability, Component, ComponentVersion, Image, ImageVersion, service, scope, name, value)
+  }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse2(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @RequestParam(value = "account", required = false) String account,
+                            @RequestParam(value = "appId", required = false) Integer appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "appName", required = false) String appName,
+                            @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                            @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                            @RequestParam(value = "kind", required = false) String kind,
+                            @RequestParam(value = "search", required = false) String search,
+                            @RequestParam(value = "service", required = false) String service,
+                            @RequestParam(value = "sortBy", required = false) String sortBy,
+                            @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                            @RequestParam(value = "id", required = false) String id,
+                            @RequestParam(value = "dbomType", required = false) String dbomType) {
+    return opsMxSsdService.deleteSddResponse3(version, type, source, source1, account, appId, image, appName, noOfDays, pageNo, pageLimit, kind, search, service, sortBy, sortOrder, id, dbomType)
+  }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse3(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @RequestParam(value = "account", required = false) String account,
+                            @RequestParam(value = "appId", required = false) Integer appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "imageTag", required = false) String imageTag,
+                            @RequestParam(value = "stage", required = false) String stage,
+                            @RequestParam(value = "deployedAt", required = false) String deployedAt,
+                            @RequestParam(value = "appName", required = false) String appName,
+                            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                            @RequestParam(value = "pageLimit", required = false) Integer pageLimit,
+                            @RequestParam(value = "sortBy", required = false) String sortBy,
+                            @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                            @RequestParam(value = "search", required = false) String search,
+                            @RequestParam(value = "noOfDays", required = false) Integer noOfDays,
+                            @RequestParam(value = "id", required = false) String id,
+                            @RequestParam(value = "fromImage", required = false) String fromImage,
+                            @RequestParam(value = "toImage", required = false) String toImage,
+                            @RequestParam(value = "fromImageTag", required = false) String fromImageTag,
+                            @RequestParam(value = "toImageTag", required = false) String toImageTag,
+                            @RequestParam(value = "fromAccount", required = false) String fromAccount,
+                            @RequestParam(value = "toAccount", required = false) String toAccount,
+                            @RequestParam(value = "kind", required = false) String kind,
+                            @RequestParam(value = "active", required = false) String active,
+                            @RequestParam(value = "Vulnerability", required = false) String Vulnerability,
+                            @RequestParam(value = "Component", required = false) String Component,
+                            @RequestParam(value = "ComponentVersion", required = false) String ComponentVersion,
+                            @RequestParam(value = "fromApp", required = false) String fromApp,
+                            @RequestParam(value = "service", required = false) String service,
+                            @RequestParam(value = "toApp", required = false) String toApp,
+                            @RequestParam(value = "dbomType", required = false) String dbomType) {
+    return opsMxSsdService.deleteSddResponse4(version, type, source, source1, source2, account, appId, image, imageTag, stage, deployedAt, appName, pageNo, pageLimit, sortBy, sortOrder, search, noOfDays, id, fromImage, toImage, fromImageTag, toImageTag, fromAccount, toAccount, kind, active, Vulnerability, Component, ComponentVersion, fromApp, service, toApp, dbomType)
+  }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse4(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @PathVariable("source3") String source3,
+                            @RequestParam(value = "appId", required = false) Integer appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "appName", required = false) String appName) {
+    return opsMxSsdService.deleteSddResponse5(version, type, source, source1, source2, source3, appId, image, appName)
+  }
+
+  @ApiOperation(value = "Delete Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse5(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @PathVariable("source3") String source3,
+                            @PathVariable("source4") String source4,
+                            @RequestParam(value = "appId", required = false) Integer appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "appName", required = false) String appName) {
+    return opsMxSsdService.deleteSddResponse6(version, type, source, source1, source2, source3, source4, appId, image, appName)
+  }
+
+  @ApiOperation(value = "Endpoint for ssd services")
+  @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}/{source5}", method = RequestMethod.DELETE)
+  Object deleteSsdResponse6(@PathVariable("version") String version,
+                            @PathVariable("type") String type,
+                            @PathVariable("source") String source,
+                            @PathVariable("source1") String source1,
+                            @PathVariable("source2") String source2,
+                            @PathVariable("source3") String source3,
+                            @PathVariable("source4") String source4,
+                            @PathVariable("source5") String source5,
+                            @RequestParam(value = "appId", required = false) Integer appId,
+                            @RequestParam(value = "image", required = false) String image,
+                            @RequestParam(value = "appName", required = false) String appName) {
+    return opsMxSsdService.deleteSddResponse7(version, type, source, source1, source2, source3, source4, source5, appId, image, appName)
+  }
 }
