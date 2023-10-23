@@ -14,6 +14,8 @@ import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.gate.services.NotificationService;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.UpstreamBadRequest;
 import com.netflix.spinnaker.kork.web.interceptors.Criticality;
 import groovy.util.logging.Slf4j;
 import io.github.resilience4j.retry.RetryConfig;
@@ -45,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
 
@@ -91,7 +92,7 @@ public class ManagedController {
         RetryConfig.custom()
             .maxAttempts(5)
             .waitDuration(Duration.ofSeconds(30))
-            .retryExceptions(RetrofitError.class)
+            .retryExceptions(SpinnakerServerException.class)
             .build());
   }
 
@@ -217,21 +218,18 @@ public class ManagedController {
       path = "/delivery-configs/validate",
       consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
       produces = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE})
-  ResponseEntity<Map> validateManifest(@RequestBody DeliveryConfig manifest) {
+  ResponseEntity<Object> validateManifest(@RequestBody DeliveryConfig manifest) {
     try {
       return ResponseEntity.ok(keelService.validateManifest(manifest));
-    } catch (RetrofitError e) {
-      if (e.getResponse().getStatus() == 400) {
-        try {
-          return ResponseEntity.badRequest()
-              .body(objectMapper.readValue(e.getResponse().getBody().in(), Map.class));
-        } catch (Exception ex) {
-          log.error("Error parsing error response from keel", ex);
-          return ResponseEntity.badRequest().body(Collections.emptyMap());
+    } catch (SpinnakerServerException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof UpstreamBadRequest) {
+        UpstreamBadRequest upstreamBadRequest = (UpstreamBadRequest) cause;
+        if (upstreamBadRequest.getStatus() == 400) {
+          return ResponseEntity.badRequest().body(upstreamBadRequest.getError());
         }
-      } else {
-        throw e;
       }
+      throw e;
     }
   }
 

@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.netflix.spinnaker.gate.services.BakeService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -57,7 +58,13 @@ class BakeController {
   @ExceptionHandler
   @ResponseStatus(HttpStatus.NOT_FOUND)
   Map handleBakeOptionsException(Exception e) {
-    def errorMsg = e instanceof RetrofitError && e.getUrl().contains("/logs/") ? "logs.not.found" : "bake.options.not.found"
+    def errorMsg = "bake.options.not.found"
+    if (e instanceof SpinnakerServerException) {
+      RetrofitError re = e.getRetrofitError();
+      if (re != null && re.getUrl().concat("/logs/")) {
+        errorMsg = "logs.not.found"
+      }
+    }
 
     return [error: errorMsg, status: HttpStatus.NOT_FOUND, message: e.message]
   }

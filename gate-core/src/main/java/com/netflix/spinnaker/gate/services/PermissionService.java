@@ -17,18 +17,20 @@
 
 package com.netflix.spinnaker.gate.services;
 
+
 import com.netflix.spinnaker.fiat.model.UserPermission;
 import com.netflix.spinnaker.fiat.model.resources.Role;
 import com.netflix.spinnaker.fiat.model.resources.ServiceAccount;
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator;
 import com.netflix.spinnaker.fiat.shared.FiatService;
 import com.netflix.spinnaker.fiat.shared.FiatStatus;
-import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest;
 import com.netflix.spinnaker.gate.security.SpinnakerUser;
 import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService;
 import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import com.netflix.spinnaker.kork.exceptions.SystemException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.UpstreamBadRequest;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import com.netflix.spinnaker.security.User;
 import java.time.Duration;
@@ -81,7 +83,7 @@ public class PermissionService {
               permissionEvaluator.invalidatePermission(userId);
               return null;
             });
-      } catch (RetrofitError e) {
+      } catch (SpinnakerServerException e) {
         throw UpstreamBadRequest.classifyError(e);
       }
     }
@@ -96,7 +98,7 @@ public class PermissionService {
               permissionEvaluator.invalidatePermission(userId);
               return null;
             });
-      } catch (RetrofitError e) {
+      } catch (SpinnakerServerException e) {
         throw UpstreamBadRequest.classifyError(e);
       }
     }
@@ -107,7 +109,7 @@ public class PermissionService {
       try {
         getFiatServiceForLogin().logoutUser(userId);
         permissionEvaluator.invalidatePermission(userId);
-      } catch (RetrofitError e) {
+      } catch (SpinnakerServerException e) {
         throw UpstreamBadRequest.classifyError(e);
       }
     }
@@ -117,7 +119,7 @@ public class PermissionService {
     if (fiatStatus.isEnabled()) {
       try {
         getFiatServiceForLogin().sync(List.of());
-      } catch (RetrofitError e) {
+      } catch (SpinnakerServerException e) {
         throw UpstreamBadRequest.classifyError(e);
       }
     }
@@ -131,7 +133,7 @@ public class PermissionService {
       var permission = permissionEvaluator.getPermission(userId);
       var roles = permission != null ? permission.getRoles() : null;
       return roles != null ? roles : Set.of();
-    } catch (RetrofitError e) {
+    } catch (SpinnakerServerException e) {
       throw UpstreamBadRequest.classifyError(e);
     }
   }
@@ -139,13 +141,19 @@ public class PermissionService {
   List<UserPermission.View> lookupServiceAccounts(String userId) {
     try {
       return extendedFiatService.getUserServiceAccounts(userId);
-    } catch (RetrofitError re) {
-      var response = re.getResponse();
-      if (response != null && response.getStatus() == HttpStatus.NOT_FOUND.value()) {
-        return List.of();
+    } catch (SpinnakerServerException e) {
+      RetrofitError re = e.getRetrofitError();
+      boolean shouldRetry = false;
+
+      if (re != null) {
+        var response = re.getResponse();
+        if (response != null && response.getStatus() == HttpStatus.NOT_FOUND.value()) {
+          return List.of();
+        }
+        shouldRetry =
+            response == null || HttpStatus.valueOf(response.getStatus()).is5xxServerError();
       }
-      boolean shouldRetry =
-          response == null || HttpStatus.valueOf(response.getStatus()).is5xxServerError();
+
       throw new SystemException("getUserServiceAccounts failed", re).setRetryable(shouldRetry);
     }
   }
@@ -215,8 +223,8 @@ public class PermissionService {
       return permission.getServiceAccounts().stream()
           .map(ServiceAccount.View::getName)
           .collect(Collectors.toList());
-    } catch (RetrofitError re) {
-      throw UpstreamBadRequest.classifyError(re);
+    } catch (SpinnakerServerException e) {
+      throw UpstreamBadRequest.classifyError(e);
     }
   }
 

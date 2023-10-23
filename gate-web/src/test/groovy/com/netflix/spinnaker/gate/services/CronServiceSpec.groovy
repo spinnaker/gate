@@ -19,6 +19,7 @@ package com.netflix.spinnaker.gate.services
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import com.netflix.spinnaker.gate.services.internal.EchoService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import retrofit.RetrofitError
 import retrofit.client.Response
 import retrofit.converter.GsonConverter
@@ -33,7 +34,7 @@ class CronServiceSpec extends Specification {
   void "should return validation message when scheduler service fails with 400 status"() {
     given:
     def body = new TypedByteArray(null, OBJECT_MAPPER.writeValueAsBytes([message: "Invalid Cron expression!!!"]))
-    def error = RetrofitError.httpError("", new Response("", 400, "", [], body), new GsonConverter(new Gson()), Map)
+    def error = new SpinnakerServerException(RetrofitError.httpError("", new Response("", 400, "", [], body), new GsonConverter(new Gson()), Map))
     def service = new CronService(
         echoService: Mock(EchoService) {
           1 * validateCronExpression("blah") >> { throw error }
@@ -48,7 +49,7 @@ class CronServiceSpec extends Specification {
   void "should propagate Retrofit error when status code is #code"() {
     given:
     def body = new TypedByteArray(null, OBJECT_MAPPER.writeValueAsBytes([message: "Invalid Cron expression!!!"]))
-    def error = RetrofitError.httpError("", new Response("", code, "", [], body), new GsonConverter(new Gson()), Map)
+    def error = new SpinnakerServerException(RetrofitError.httpError("", new Response("", code, "", [], body), new GsonConverter(new Gson()), Map))
     def service = new CronService(
         echoService: Mock(EchoService) {
           1 * validateCronExpression("blah") >> { throw error }
@@ -59,7 +60,7 @@ class CronServiceSpec extends Specification {
     service.validateCronExpression("blah")
 
     then:
-    thrown RetrofitError
+    thrown SpinnakerServerException
 
     where:
     code << [401, 402, 403, 404, 500]

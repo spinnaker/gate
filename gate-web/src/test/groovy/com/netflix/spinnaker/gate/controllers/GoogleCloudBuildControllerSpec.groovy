@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.gate.services.BuildService
 import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger
 import com.netflix.spinnaker.gate.services.internal.IgorService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
@@ -89,7 +90,9 @@ class GoogleCloudBuildControllerSpec extends Specification {
     def downstreamResponse = new Response("blah", 404, "Not found", [], null)
     given:
     1 * igorService.getGoogleCloudBuildTriggers(ACCOUNT) >> {String account ->
-      throw RetrofitError.httpError("blah", downstreamResponse, null, null)
+      // retrofit errors are no longer thrown since the introduction of the
+      // exception handler for http clients
+      throw new SpinnakerServerException(RetrofitError.httpError("blah", downstreamResponse, null, null))
     }
 
     when:

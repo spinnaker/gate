@@ -22,6 +22,7 @@ import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
@@ -136,8 +137,8 @@ class PipelineController {
   Map getPipeline(@PathVariable("id") String id) {
     try {
       pipelineService.getPipeline(id)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -287,8 +288,8 @@ class PipelineController {
                                      @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -300,8 +301,8 @@ class PipelineController {
                                             @RequestBody String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -314,8 +315,8 @@ class PipelineController {
                                             @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecutionAtStage(id, stageId, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})", e)
       }
     }
@@ -350,8 +351,8 @@ class PipelineController {
                         @RequestBody List<Map<String, String>> expressions) {
     try {
       return pipelineService.evaluateVariables(executionId, requisiteStageRefIds, spelVersionOverride, expressions)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         throw new NotFoundException("Pipeline not found (id: ${executionId})")
       }
     }
@@ -361,12 +362,12 @@ class PipelineController {
     try {
       def body = call()
       new ResponseEntity(body, HttpStatus.OK)
-    } catch (RetrofitError re) {
-      if (re.response?.status == HttpStatus.BAD_REQUEST.value() && requestBody.type == "templatedPipeline") {
+    } catch (SpinnakerServerException e) {
+      RetrofitError re = e.getRetrofitError()
+      if (re?.response?.status == HttpStatus.BAD_REQUEST.value() && requestBody.type == "templatedPipeline") {
         throw new PipelineException((HashMap<String, Object>) re.getBodyAs(HashMap.class))
-      } else {
-        throw re
       }
+      throw e
     }
   }
 
