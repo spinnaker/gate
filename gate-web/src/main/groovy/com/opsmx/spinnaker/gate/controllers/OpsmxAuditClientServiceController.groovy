@@ -87,34 +87,40 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "noOfDays", required = false) String noOfDays,
                                  @RequestParam(value = "search", required = false) String search,
                                  @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                                 @RequestParam(value = "sortBy", required = false) String sortBy) {
-    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, pageLimit, noOfDays, search, sortOrder, sortBy)
+                                 @RequestParam(value = "sortBy", required = false) String sortBy,
+                                 @RequestParam(value = "startDate", required = false) Long startDate,
+                                 @RequestParam(value = "endDate", required = false) Long endDate) {
+    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, pageLimit, noOfDays, search, sortOrder, sortBy, startDate, endDate)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}", method = RequestMethod.GET)
   Object getAuditClientResponse4(@PathVariable("version") String version,
-                              @PathVariable("type") String type,
-                              @PathVariable("source") String source,
-                              @PathVariable("source1") String source1,
-                              @PathVariable("source2") String source2,
-                              @RequestParam(value = "noOfDays", required = false) String noOfDays,
-                              @RequestParam(value = "updatedTimestamp", required = false) Long updatedTimestamp,
-                              @RequestParam(value = "size", required = false) Integer size) {
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                 @RequestParam(value = "updatedTimestamp", required = false) Long updatedTimestamp,
+                                 @RequestParam(value = "size", required = false) Integer size,
+                                 @RequestParam(value = "startDate", required = false) Long startDate,
+                                 @RequestParam(value = "endDate", required = false) Long endDate) {
 
-    return opsmxAuditClientService.getAuditClientResponse4(version, type, source, source1, source2, noOfDays, updatedTimestamp, size)
+    return opsmxAuditClientService.getAuditClientResponse4(version, type, source, source1, source2, noOfDays, updatedTimestamp, size, startDate, endDate)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
   @RequestMapping(value = "/{version}/{type}/{source}/{source1}/{source2}/{source3}", method = RequestMethod.GET)
   Object getAuditClientResponse5(@PathVariable("version") String version,
-                              @PathVariable("type") String type,
-                              @PathVariable("source") String source,
-                              @PathVariable("source1") String source1,
-                              @PathVariable("source2") String source2,
-                              @PathVariable("source3") String source3,
-                              @RequestParam(value = "noOfDays", required = false) String noOfDays) {
-    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3,noOfDays)
+                                 @PathVariable("type") String type,
+                                 @PathVariable("source") String source,
+                                 @PathVariable("source1") String source1,
+                                 @PathVariable("source2") String source2,
+                                 @PathVariable("source3") String source3,
+                                 @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                 @RequestParam(value = "startDate", required = false) Long startDate,
+                                 @RequestParam(value = "endDate", required = false) Long endDate) {
+    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3, noOfDays, startDate, endDate)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -153,8 +159,10 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "isLatest", required = false) Boolean isLatest,
                                      @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                      @RequestParam(value = "size", required = false) Integer size,
-                                     @RequestParam(value = "noOfDays", required = false) String noOfDays) {
-    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size, noOfDays)
+                                     @RequestParam(value = "noOfDays", required = false) String noOfDays,
+                                     @RequestParam(value = "startDate", required = false) Long startDate,
+                                     @RequestParam(value = "endDate", required = false) Long endDate) {
+    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size, noOfDays, startDate, endDate)
     log.info("response for the insgiths endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()

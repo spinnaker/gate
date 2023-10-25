@@ -62,26 +62,32 @@ interface OpsmxAuditClientService {
                                  @Query("noOfDays") String noOfDays,
                                  @Query("search") String search,
                                  @Query("sortOrder") String sortOrder,
-                                 @Query("sortBy") String sortBy)
+                                 @Query("sortBy") String sortBy,
+                                 @Query("startDate") Long startDate,
+                                 @Query("endDate") Long endDate)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getAuditClientResponse4(@Path('version') String version,
-                              @Path('type') String type,
-                              @Path('source') String source,
-                              @Path('source1') String source1,
-                              @Path('source2') String source2,
-                              @Query("noOfDays") String noOfDays,
-                              @Query("updatedTimestamp") Long updatedTimestamp,
-                              @Query("size") Integer size)
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Query("noOfDays") String noOfDays,
+                                 @Query("updatedTimestamp") Long updatedTimestamp,
+                                 @Query("size") Integer size,
+                                 @Query("startDate") Long startDate,
+                                 @Query("endDate") Long endDate)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAuditClientResponse5(@Path('version') String version,
-                              @Path('type') String type,
-                              @Path('source') String source,
-                              @Path('source1') String source1,
-                              @Path('source2') String source2,
-                              @Path('source3') String source3,
-                              @Query("noOfDays") String noOfDays)
+                                 @Path('type') String type,
+                                 @Path('source') String source,
+                                 @Path('source1') String source1,
+                                 @Path('source2') String source2,
+                                 @Path('source3') String source3,
+                                 @Query("noOfDays") String noOfDays,
+                                 @Query("startDate") Long startDate,
+                                 @Query("endDate") Long endDate)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getAuditClientResponse6(@Path('version') String version,
@@ -110,7 +116,9 @@ interface OpsmxAuditClientService {
                            @Query("isLatest") Boolean isLatest,
                            @Query("pageNo") Integer pageNo,
                            @Query("size") Integer size,
-                           @Query("noOfDays") String noOfDays)
+                           @Query("noOfDays") String noOfDays,
+                           @Query("startDate") Long startDate,
+                           @Query("endDate") Long endDate)
 
   @GET("/auditclientservice/{version}/{type}/{source}/download")
   Response downloadDeliveryInsightsCSVFile(@Path('version') String version,
