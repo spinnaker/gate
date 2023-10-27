@@ -16,9 +16,20 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.netflix.spinnaker.gate.config.ServiceConfiguration
+import com.netflix.spinnaker.gate.exceptions.OesRequestException
 import com.netflix.spinnaker.gate.services.internal.OpsmxSsdService
+import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.util.logging.Slf4j
 import io.swagger.annotations.ApiOperation
+import okhttp3.Headers
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okio.Buffer
+import okio.BufferedSink
+import okio.Okio
+import okio.Source
 import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -31,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import retrofit.client.Response
 
 import java.util.stream.Collectors
@@ -43,6 +55,12 @@ class OpsmxSsdController {
 
   @Autowired
   OpsmxSsdService opsMxSsdService
+
+  @Autowired
+  ServiceConfiguration serviceConfiguration
+
+  @Autowired
+  OkHttpClient okHttpClient
 
   @ApiOperation(value = "Endpoint for ssd rest services")
   @RequestMapping(value = "/{version}/{type}", method = RequestMethod.POST)
@@ -68,6 +86,23 @@ class OpsmxSsdController {
                                  @RequestParam(value = "id", required = false) String id,
                                  @RequestBody(required = false) Object data) {
     return opsMxSsdService.postSsdServiceResponse3(version, type, source, id, data)
+  }
+
+  @ApiOperation(value = "Add cluster details in ssd rest service")
+  @RequestMapping(value = "/{version}/cluster", method = RequestMethod.POST)
+  Object addClusterInSsd(@PathVariable("version") String version,
+                         @RequestParam(value = "name", required = false) String name,
+                         @RequestParam MultipartFile file) {
+    return addCluster(file, name, version)
+  }
+
+  @ApiOperation(value = "Update cluster details in ssd rest service")
+  @RequestMapping(value = "/{version}/cluster/{id}", method = RequestMethod.PUT)
+  Object updateClusterInSsd(@PathVariable("version") String version,
+                            @PathVariable("id") String id,
+                            @RequestParam(value = "name", required = false) String name,
+                            @RequestParam MultipartFile file) {
+    return updateCluster(file, name, version, id)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -470,4 +505,99 @@ class OpsmxSsdController {
                             @RequestParam(value = "appName", required = false) String appName) {
     return opsMxSsdService.deleteSddResponse7(version, type, source, source1, source2, source3, source4, source5, appId, image, appName)
   }
+  
+  private Object addCluster(MultipartFile files, String data, String version) {
+    Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+    String ssdUrl = "/ssdservice/version/cluster".replace("version", version);
+    Map headersMap = new HashMap()
+    authenticationHeaders.each { key, val ->
+      if (val.isPresent())
+        headersMap.putAt(key, val.get())
+      else
+        headersMap.putAt(key, "")
+    }
+    def obj = AuthenticatedRequest.propagate {
+      def request = new Request.Builder()
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data)
+        .headers(Headers.of(headersMap))
+        .post(uploadFileOkHttp(data, files))
+        .build()
+
+      def response = okHttpClient.newCall(request).execute()
+      return response
+    }.call() as okhttp3.Response
+
+    if (!obj.isSuccessful()) {
+      def error = obj.body().string();
+      throw new OesRequestException(error)
+    } else {
+      return obj.body()?.string() as Object ?: "Unknown reason: " + obj.code() as Object
+    }
+  }
+
+  private Object updateCluster(MultipartFile files, String data, String version, String id) {
+    Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
+    String ssdUrl = "/ssdservice/version/cluster/id".replace("version", version).replace("id", id);
+    Map headersMap = new HashMap()
+    authenticationHeaders.each { key, val ->
+      if (val.isPresent())
+        headersMap.putAt(key, val.get())
+      else
+        headersMap.putAt(key, "")
+    }
+    def obj = AuthenticatedRequest.propagate {
+      def request = new Request.Builder()
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data)
+        .headers(Headers.of(headersMap))
+        .put(uploadFileOkHttp(data, files))
+        .build()
+
+      def response = okHttpClient.newCall(request).execute()
+      return response
+    }.call() as okhttp3.Response
+
+    if (!obj.isSuccessful()) {
+      def error = obj.body().string();
+      throw new OesRequestException(error)
+    } else {
+      return obj.body()?.string() as Object ?: "Unknown reason: " + obj.code() as Object
+    }
+  }
+
+  private okhttp3.RequestBody uploadFileOkHttp(String data, MultipartFile file) throws IOException {
+    String fileName = file.getOriginalFilename();
+    MultipartBody.Builder builder = new MultipartBody.Builder();
+    builder.setType(MultipartBody.FORM);
+    builder.addFormDataPart("file", fileName, new okhttp3.RequestBody() {
+      @Override
+      public okhttp3.MediaType contentType() {
+        return okhttp3.MediaType.parse("application/octet-stream");
+      }
+
+      @Override
+      public void writeTo(BufferedSink sink) throws IOException {
+        try {
+          Source source = Okio.source(file.getInputStream());
+          Buffer buf = new Buffer();
+
+          long totalRead = 0;
+          long totalSize = file.getSize();
+          long remaining = totalSize;
+
+          for (long readCount; (readCount = source.read(buf, 32000)) != -1;) {
+
+            totalRead += readCount;
+            remaining -= readCount;
+
+            sink.write(buf, readCount);
+            sink.flush();
+
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    builder.addFormDataPart("name", null, okhttp3.RequestBody.create(okhttp3.MediaType.parse("text/plain"), data));
+    return builder.build();
 }
