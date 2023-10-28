@@ -510,7 +510,7 @@ class OpsmxSsdController {
 
   private Object addCluster(MultipartFile files, String data, String account, String version) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
-    String ssdUrl = "/ssdservice/version/cluster?name=".replace("version", version).replace("xyz", data);
+    String ssdUrl = "/ssdservice/version/cluster?name=xyz".replace("version", version).replace("xyz", data);
     if (account != null) {
       ssdUrl = "/ssdservice/version/cluster?name=xyz&account=abc".replace("version", version).replace("xyz", data).replace("abc", account);
     }
