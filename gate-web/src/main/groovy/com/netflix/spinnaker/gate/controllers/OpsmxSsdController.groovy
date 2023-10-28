@@ -92,8 +92,9 @@ class OpsmxSsdController {
   @RequestMapping(value = "/{version}/cluster", method = RequestMethod.POST)
   Object addClusterInSsd(@PathVariable("version") String version,
                          @RequestParam(value = "name", required = false) String name,
+                         @RequestParam(value = "account", required = false) String account,
                          @RequestParam MultipartFile file) {
-    return addCluster(file, name, version)
+    return addCluster(file, name, account, version)
   }
 
   @ApiOperation(value = "Update cluster details in ssd rest service")
@@ -101,8 +102,9 @@ class OpsmxSsdController {
   Object updateClusterInSsd(@PathVariable("version") String version,
                             @PathVariable("id") String id,
                             @RequestParam(value = "name", required = false) String name,
+                            @RequestParam(value = "account", required = false) String account,
                             @RequestParam MultipartFile file) {
-    return updateCluster(file, name, version, id)
+    return updateCluster(file, name, account version, id)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
@@ -505,8 +507,8 @@ class OpsmxSsdController {
                             @RequestParam(value = "appName", required = false) String appName) {
     return opsMxSsdService.deleteSddResponse7(version, type, source, source1, source2, source3, source4, source5, appId, image, appName)
   }
-  
-  private Object addCluster(MultipartFile files, String data, String version) {
+
+  private Object addCluster(MultipartFile files, String data, String account, String version) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
     String ssdUrl = "/ssdservice/version/cluster".replace("version", version);
     Map headersMap = new HashMap()
@@ -518,7 +520,7 @@ class OpsmxSsdController {
     }
     def obj = AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data)
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data "&account=" + account)
         .headers(Headers.of(headersMap))
         .post(uploadFileOkHttp(data, files))
         .build()
@@ -535,7 +537,7 @@ class OpsmxSsdController {
     }
   }
 
-  private Object updateCluster(MultipartFile files, String data, String version, String id) {
+  private Object updateCluster(MultipartFile files, String data, String account, String version, String id) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
     String ssdUrl = "/ssdservice/version/cluster/id".replace("version", version).replace("id", id);
     Map headersMap = new HashMap()
@@ -547,7 +549,7 @@ class OpsmxSsdController {
     }
     def obj = AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data)
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data + "&account=" + account)
         .headers(Headers.of(headersMap))
         .put(uploadFileOkHttp(data, files))
         .build()
@@ -600,4 +602,5 @@ class OpsmxSsdController {
     });
     builder.addFormDataPart("name", null, okhttp3.RequestBody.create(okhttp3.MediaType.parse("text/plain"), data));
     return builder.build();
+  }
 }
