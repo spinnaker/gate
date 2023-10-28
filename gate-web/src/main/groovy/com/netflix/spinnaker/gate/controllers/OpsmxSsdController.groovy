@@ -510,7 +510,10 @@ class OpsmxSsdController {
 
   private Object addCluster(MultipartFile files, String data, String account, String version) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
-    String ssdUrl = "/ssdservice/version/cluster".replace("version", version);
+    String ssdUrl = "/ssdservice/version/cluster?name=".replace("version", version).replace("xyz", data);
+    if (account != null) {
+      ssdUrl = "/ssdservice/version/cluster?name=xyz&account=abc".replace("version", version).replace("xyz", data).replace("abc", account);
+    }
     Map headersMap = new HashMap()
     authenticationHeaders.each { key, val ->
       if (val.isPresent())
@@ -520,7 +523,7 @@ class OpsmxSsdController {
     }
     def obj = AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data + "&account=" + account)
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl)
         .headers(Headers.of(headersMap))
         .post(uploadFileOkHttp(data, files))
         .build()
@@ -539,7 +542,10 @@ class OpsmxSsdController {
 
   private Object updateCluster(MultipartFile files, String data, String account, String version, String id) {
     Map<String, Optional<String>> authenticationHeaders = AuthenticatedRequest.getAuthenticationHeaders();
-    String ssdUrl = "/ssdservice/version/cluster/id".replace("version", version).replace("id", id);
+    String ssdUrl = "/ssdservice/version/cluster/id?name=xyz".replace("version", version).replace("id", id).replace("xyz", data);
+    if (account != null) {
+      ssdUrl = "/ssdservice/version/cluster/id?name=xyz&account=abc".replace("version", version).replace("id", id).replace("xyz", data).replace("abc", account);
+    }
     Map headersMap = new HashMap()
     authenticationHeaders.each { key, val ->
       if (val.isPresent())
@@ -549,7 +555,7 @@ class OpsmxSsdController {
     }
     def obj = AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data + "&account=" + account)
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl)
         .headers(Headers.of(headersMap))
         .put(uploadFileOkHttp(data, files))
         .build()
