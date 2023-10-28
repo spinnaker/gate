@@ -520,7 +520,7 @@ class OpsmxSsdController {
     }
     def obj = AuthenticatedRequest.propagate {
       def request = new Request.Builder()
-        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data "&account=" + account)
+        .url(serviceConfiguration.getServiceEndpoint("ssdservice").url + ssdUrl + "?name=" + data + "&account=" + account)
         .headers(Headers.of(headersMap))
         .post(uploadFileOkHttp(data, files))
         .build()
