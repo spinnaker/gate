@@ -104,7 +104,7 @@ class OpsmxSsdController {
                             @RequestParam(value = "name", required = false) String name,
                             @RequestParam(value = "account", required = false) String account,
                             @RequestParam MultipartFile file) {
-    return updateCluster(file, name, account version, id)
+    return updateCluster(file, name, account, version, id)
   }
 
   @ApiOperation(value = "Endpoint for ssd services")
