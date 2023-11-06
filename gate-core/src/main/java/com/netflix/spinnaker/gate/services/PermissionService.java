@@ -77,7 +77,7 @@ public class PermissionService {
       try {
         AuthenticatedRequest.allowAnonymous(
             () -> {
-              getFiatServiceForLogin().loginUser(userId, null);
+              getFiatServiceForLogin().loginUser(userId, "");
               permissionEvaluator.invalidatePermission(userId);
               return null;
             });
