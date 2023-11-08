@@ -56,9 +56,9 @@ class WebhookService {
     })
   }
 
-  ResponseEntity<Void> webhooks(String source, CloudEvent cdevent, HttpHeaders headers) {
+  ResponseEntity<Void> webhooks(String source, CloudEvent cdevent, String ceDataJsonString,  HttpHeaders headers) {
     return AuthenticatedRequest.allowAnonymous( {
-      echoService.webhooks(source, cdevent, headers.get("Ce-Id").get(0), headers.get("Ce-Specversion").get(0), headers.get("Ce-Type").get(0), headers.get("Ce-Source").get(0))
+      echoService.webhooks(source, cdevent, ceDataJsonString, headers.get("Ce-Id").get(0), headers.get("Ce-Specversion").get(0), headers.get("Ce-Type").get(0), headers.get("Ce-Source").get(0))
     })
   }
 

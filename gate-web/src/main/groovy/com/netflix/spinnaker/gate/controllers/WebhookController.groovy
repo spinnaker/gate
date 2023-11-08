@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import io.cloudevents.CloudEvent
 
+import java.nio.charset.StandardCharsets
+
 @RestController
 @RequestMapping("/webhooks")
 class WebhookController {
@@ -57,7 +59,8 @@ class WebhookController {
                                 @RequestBody CloudEvent cdevent,
                                 @RequestHeader HttpHeaders headers)
   {
-    webhookService.webhooks(source, cdevent, headers)
+    String ceDataJsonString = new String(cdevent.getData().toBytes(), StandardCharsets.UTF_8);
+    webhookService.webhooks(source, cdevent, ceDataJsonString, headers)
   }
 
   @ApiOperation(value = "Retrieve a list of preconfigured webhooks in Orca")
