@@ -83,7 +83,8 @@ interface OpsmxSsdService {
                          @Query("service") String service,
                          @Query("scope") String scope,
                          @Query("name") String name,
-                         @Query("value") String value)
+                         @Query("value") String value,
+                         @Query("current") String current)
 
   @GET("/ssdservice/{version}/{type}/{source}/{source1}")
   Object getSddResponse3(@Path('version') String version,
