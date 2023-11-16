@@ -22,6 +22,7 @@ import retrofit.http.Body
 import retrofit.http.DELETE
 import retrofit.http.GET
 import retrofit.http.POST
+import retrofit.http.PUT
 import retrofit.http.Path
 import retrofit.http.Query
 
@@ -206,6 +207,18 @@ interface OpsmxSsdService {
                                  @Path('source') String source,
                                  @Query("id") String id,
                                  @Body Object data)
+
+  @PUT("/ssdservice/{version}/{type}")
+  Object updateSsdServiceResponse(@Path('version') String version,
+                                  @Path('type') String type,
+                                  @Query("stage") String stage,
+                                  @Query("policy") String policy,
+                                  @Query("policyId") Integer policyId,
+                                  @Query("id") Integer id,
+                                  @Query("scope") String scope,
+                                  @Query("appId") String appId,
+                                  @Query("vulnAlert") String vulnAlert,
+                                  @Body Object data)
 
   @GET("/ssdservice/{version}/{type}/{source}/download/json")
   Response downloadJsonFile(@Path('version') String version,

@@ -97,6 +97,21 @@ class OpsmxSsdController {
     return addCluster(file, name, account, version)
   }
 
+  @ApiOperation(value = "update endpoint for ssd rest services")
+  @RequestMapping(value = "/{version}/{type}", method = RequestMethod.PUT)
+  Object updateSsdService(@PathVariable("version") String version,
+                          @PathVariable("type") String type,
+                          @RequestParam(value = "stage", required = false) String stage,
+                          @RequestParam(value = "policy", required = false) String policy,
+                          @RequestParam(value = "policyId", required = false) Integer policyId,
+                          @RequestParam(value = "id", required = false) Integer id,
+                          @RequestParam(value = "scope", required = false) String scope,
+                          @RequestParam(value = "appId", required = false) String appId,
+                          @RequestParam(value = "vulnAlert", required = false) String vulnAlert,
+                          @RequestBody(required = false) Object data) {
+    return opsMxSsdService.updateSsdServiceResponse(version, type, stage, policy, policyId, id, scope, appId, vulnAlert, data)
+  }
+
   @ApiOperation(value = "Update cluster details in ssd rest service")
   @RequestMapping(value = "/{version}/cluster/{id}", method = RequestMethod.PUT)
   Object updateClusterInSsd(@PathVariable("version") String version,
