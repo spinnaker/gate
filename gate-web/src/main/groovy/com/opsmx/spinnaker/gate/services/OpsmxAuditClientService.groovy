@@ -64,7 +64,8 @@ interface OpsmxAuditClientService {
                                  @Query("sortOrder") String sortOrder,
                                  @Query("sortBy") String sortBy,
                                  @Query("startDate") Long startDate,
-                                 @Query("endDate") Long endDate)
+                                 @Query("endDate") Long endDate,
+                                 @Query("cdNames") List<String> cdNames)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}")
   Object getAuditClientResponse4(@Path('version') String version,
@@ -76,7 +77,8 @@ interface OpsmxAuditClientService {
                                  @Query("updatedTimestamp") Long updatedTimestamp,
                                  @Query("size") Integer size,
                                  @Query("startDate") Long startDate,
-                                 @Query("endDate") Long endDate)
+                                 @Query("endDate") Long endDate,
+                                 @Query("cdNames") List<String> cdNames)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}/{source3}")
   Object getAuditClientResponse5(@Path('version') String version,
@@ -87,7 +89,8 @@ interface OpsmxAuditClientService {
                                  @Path('source3') String source3,
                                  @Query("noOfDays") String noOfDays,
                                  @Query("startDate") Long startDate,
-                                 @Query("endDate") Long endDate)
+                                 @Query("endDate") Long endDate,
+                                 @Query("cdNames") List<String> cdNames)
 
   @GET("/auditclientservice/{version}/{type}/{source}/{source1}/{source2}/{source3}/{source4}")
   Object getAuditClientResponse6(@Path('version') String version,
@@ -118,7 +121,8 @@ interface OpsmxAuditClientService {
                            @Query("size") Integer size,
                            @Query("noOfDays") String noOfDays,
                            @Query("startDate") Long startDate,
-                           @Query("endDate") Long endDate)
+                           @Query("endDate") Long endDate,
+                           @Query("cdNames") List<String> cdNames)
 
   @GET("/auditclientservice/{version}/{type}/{source}/download")
   Response downloadDeliveryInsightsCSVFile(@Path('version') String version,

@@ -89,8 +89,9 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "sortOrder", required = false) String sortOrder,
                                  @RequestParam(value = "sortBy", required = false) String sortBy,
                                  @RequestParam(value = "startDate", required = false) Long startDate,
-                                 @RequestParam(value = "endDate", required = false) Long endDate) {
-    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, pageLimit, noOfDays, search, sortOrder, sortBy, startDate, endDate)
+                                 @RequestParam(value = "endDate", required = false) Long endDate,
+                                 @RequestParam(value = "cdName", required = false) List<String> cdNames) {
+    return opsmxAuditClientService.getAuditClientResponse3(version, type, source, source1, isTreeView, isLatest, pageNo, pageLimit, noOfDays, search, sortOrder, sortBy, startDate, endDate, cdNames)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -104,9 +105,10 @@ class OpsmxAuditClientServiceController {
                                  @RequestParam(value = "updatedTimestamp", required = false) Long updatedTimestamp,
                                  @RequestParam(value = "size", required = false) Integer size,
                                  @RequestParam(value = "startDate", required = false) Long startDate,
-                                 @RequestParam(value = "endDate", required = false) Long endDate) {
+                                 @RequestParam(value = "endDate", required = false) Long endDate,
+                                 @RequestParam(value = "cdName", required = false) List<String> cdNames) {
 
-    return opsmxAuditClientService.getAuditClientResponse4(version, type, source, source1, source2, noOfDays, updatedTimestamp, size, startDate, endDate)
+    return opsmxAuditClientService.getAuditClientResponse4(version, type, source, source1, source2, noOfDays, updatedTimestamp, size, startDate, endDate, cdNames)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -119,8 +121,9 @@ class OpsmxAuditClientServiceController {
                                  @PathVariable("source3") String source3,
                                  @RequestParam(value = "noOfDays", required = false) String noOfDays,
                                  @RequestParam(value = "startDate", required = false) Long startDate,
-                                 @RequestParam(value = "endDate", required = false) Long endDate) {
-    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3, noOfDays, startDate, endDate)
+                                 @RequestParam(value = "endDate", required = false) Long endDate,
+                                 @RequestParam(value = "cdName", required = false) List<String> cdNames) {
+    return opsmxAuditClientService.getAuditClientResponse5(version, type, source, source1, source2, source3, noOfDays, startDate, endDate, cdNames)
   }
 
   @ApiOperation(value = "Endpoint for audit-client rest services")
@@ -161,8 +164,9 @@ class OpsmxAuditClientServiceController {
                                      @RequestParam(value = "size", required = false) Integer size,
                                      @RequestParam(value = "noOfDays", required = false) String noOfDays,
                                      @RequestParam(value = "startDate", required = false) Long startDate,
-                                     @RequestParam(value = "endDate", required = false) Long endDate) {
-    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size, noOfDays, startDate, endDate)
+                                     @RequestParam(value = "endDate", required = false) Long endDate,
+                                     @RequestParam(value = "cdName", required = false) List<String> cdNames) {
+    Response response = opsmxAuditClientService.downloadCSVFile(version, username, source, isTreeView, isLatest, pageNo, size, noOfDays, startDate, endDate, cdNames)
     log.info("response for the insgiths endpoint:" + response.getHeaders())
     if (response.getBody()!=null) {
       InputStream inputStream = response.getBody().in()
