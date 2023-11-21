@@ -56,11 +56,10 @@ class WebhookController {
   @ApiOperation(value = "Endpoint for posting webhooks to Spinnaker's CDEvents webhook service")
   @RequestMapping(value = "/cdevents/{source}", method = RequestMethod.POST)
   ResponseEntity<Void> webhooks(@PathVariable String source,
-                                @RequestBody CloudEvent cdevent,
-                                @RequestHeader HttpHeaders headers)
+                                @RequestBody CloudEvent cdEvent)
   {
-    String ceDataJsonString = new String(cdevent.getData().toBytes(), StandardCharsets.UTF_8);
-    webhookService.webhooks(source, cdevent, ceDataJsonString, headers)
+    String ceDataJsonString = new String(cdEvent.getData().toBytes(), StandardCharsets.UTF_8);
+    webhookService.webhooks(source, cdEvent, ceDataJsonString)
   }
 
   @ApiOperation(value = "Retrieve a list of preconfigured webhooks in Orca")
