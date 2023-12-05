@@ -54,7 +54,8 @@ interface OpsmxSsdService {
                          @Query("current") String current,
                          @Query("tag") String tag,
                          @Query("tool") String tool,
-                         @Query("tags") String tags)
+                         @Query("tags") String tags,
+                         @Query("action") String action)
 
   @GET("/ssdservice/{version}/{type}/{source}")
   Object getSddResponse2(@Path('version') String version,
