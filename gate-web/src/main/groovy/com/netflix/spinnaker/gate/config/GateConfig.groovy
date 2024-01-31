@@ -16,10 +16,9 @@
 
 package com.netflix.spinnaker.gate.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
@@ -318,11 +317,10 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = objectMapperBuilder.build() as ObjectMapper
     if(serviceName.equals("echo")) {
-      objectMapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .registerModule(new JavaTimeModule())
+      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+      objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
     }
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
   }
