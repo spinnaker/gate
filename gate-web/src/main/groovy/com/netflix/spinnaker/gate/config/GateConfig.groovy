@@ -323,7 +323,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
     ObjectMapper objectMapper = objectMapperBuilder.build()
     if(serviceName.equals("echo")) {
-      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+      objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
     }
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
   }
