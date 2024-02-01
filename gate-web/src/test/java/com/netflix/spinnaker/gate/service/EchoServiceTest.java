@@ -24,6 +24,7 @@ import com.squareup.okhttp.mockwebserver.Dispatcher;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import groovy.util.logging.Slf4j;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +34,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+@ActiveProfiles("echo")
+@Slf4j
+@DirtiesContext
 @SpringBootTest(classes = {Main.class})
-@TestPropertySource(properties = {"spring.config.location=classpath:gate-echo.yml"})
+@TestPropertySource("/application-echo.properties")
 class EchoServiceTest {
 
   @Autowired EchoService echoService;
@@ -47,11 +53,9 @@ class EchoServiceTest {
 
   @BeforeAll
   static void setUp() throws IOException {
-    echoServer = new MockWebServer();
-    echoServer.start(8089);
-
     clouddriverServer = new MockWebServer();
     clouddriverServer.start(7002);
+
     Dispatcher clouddriverDispatcher =
         new Dispatcher() {
           @Override
@@ -71,6 +75,9 @@ class EchoServiceTest {
           }
         };
     front50Server.setDispatcher(front50Dispatcher);
+
+    echoServer = new MockWebServer();
+    echoServer.start(8089);
   }
 
   @AfterAll
