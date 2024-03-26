@@ -21,6 +21,7 @@ import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -245,8 +246,8 @@ class ApplicationService {
         AuthenticatedRequest.propagate({
           try {
             return AuthenticatedRequest.allowAnonymous { front50.getAllApplicationsUnrestricted() }
-          } catch (RetrofitError e) {
-            if (e.response?.status == 404) {
+          } catch (SpinnakerServerException e) {
+            if (e.retrofitError?.response?.status == 404) {
               return []
             } else {
               throw e
@@ -284,12 +285,12 @@ class ApplicationService {
             metadata ?: [:]
           } catch (ConversionException ignored) {
             return [:]
-          } catch (RetrofitError e) {
-            if ((e.cause instanceof ConversionException) || e.response.status == 404) {
+          } catch (SpinnakerServerException e) {
+            RetrofitError re = e.getRetrofitError()
+            if ((re.cause instanceof ConversionException) || re.response.status == 404) {
               return [:]
-            } else {
-              throw e
             }
+            throw e
           }
         }, false, principal).call() as Map
       } catch (Exception e) {
@@ -320,8 +321,8 @@ class ApplicationService {
         AuthenticatedRequest.propagate({
           try {
             return AuthenticatedRequest.allowAnonymous { clouddriver.getAllApplicationsUnrestricted(expandClusterNames) }
-          } catch (RetrofitError e) {
-            if (e.response?.status == 404) {
+          } catch (SpinnakerServerException e) {
+            if (e.retrofitError?.response?.status == 404) {
               return []
             } else {
               throw e
@@ -353,12 +354,11 @@ class ApplicationService {
         AuthenticatedRequest.propagate({
           try {
             return clouddriver.getApplication(name)
-          } catch (RetrofitError e) {
-            if (e.response?.status == 404) {
+          } catch (SpinnakerServerException e) {
+            if (e.retrofitError?.response?.status == 404) {
               return [:]
-            } else {
-              throw e
             }
+            throw e
           }
         }, false, principal).call() as Map
       } catch (Exception e) {

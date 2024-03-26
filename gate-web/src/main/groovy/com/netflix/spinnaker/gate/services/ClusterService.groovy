@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,8 +48,8 @@ class ClusterService {
   Map getCluster(String app, String account, String clusterName, String selectorKey) {
     try {
       clouddriverServiceSelector.select().getCluster(app, account, clusterName)?.getAt(0) as Map
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerServerException e) {
+      if (e.retrofitError?.response?.status == 404) {
         return [:]
       } else {
         throw e
@@ -67,11 +68,16 @@ class ClusterService {
   Map getTargetServerGroup(String app, String account, String clusterName, String cloudProviderType, String scope, String target, Boolean onlyEnabled, Boolean validateOldest, String selectorKey) {
     try {
       return clouddriverServiceSelector.select().getTargetServerGroup(app, account, clusterName, cloudProviderType, scope, target, onlyEnabled, validateOldest)
-    } catch (RetrofitError re) {
+    } catch (SpinnakerServerException e) {
+      RetrofitError re = e.getRetrofitError();
+      if (re == null) {
+        throw e;
+      }
+
       if (re.kind == RetrofitError.Kind.HTTP && re.response?.status == 404) {
         throw new ServerGroupNotFound("unable to find $target in $cloudProviderType/$account/$scope/$clusterName")
       }
-      throw re
+      throw e
     }
   }
 

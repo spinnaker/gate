@@ -17,11 +17,12 @@
 package com.netflix.spinnaker.gate.services
 
 import com.netflix.spinnaker.gate.services.internal.EchoService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.UpstreamBadRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import retrofit.RetrofitError
 
 @Component
 @CompileStatic
@@ -38,10 +39,15 @@ class CronService {
     try {
       Map validationResult = echoService.validateCronExpression(cronExpression)
       return [ valid: true, description: validationResult.description ]
-    } catch (RetrofitError e) {
-      if (e.response?.status == 400) {
-        Map responseBody = e.getBodyAs(Map) as Map
-        return [ valid: false, message: responseBody.message ]
+    } catch (SpinnakerServerException e) {
+      Throwable cause = e.getCause()
+      if (!(cause instanceof UpstreamBadRequest)) {
+        throw e
+      }
+
+      UpstreamBadRequest upstreamBadRequest = (UpstreamBadRequest) cause
+      if (upstreamBadRequest.status == 400 && upstreamBadRequest.error instanceof Map) {
+        return [ valid: false, message: ((Map)upstreamBadRequest.error).message ]
       }
       throw e
     }

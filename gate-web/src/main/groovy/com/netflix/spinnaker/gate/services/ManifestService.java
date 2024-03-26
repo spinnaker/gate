@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.services;
 
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,13 +39,15 @@ public class ManifestService {
   public Map getManifest(String account, String location, String name) {
     try {
       return clouddriverService.getManifest(account, location, name);
-    } catch (RetrofitError re) {
-      if (re.getKind() == RetrofitError.Kind.HTTP
+    } catch (SpinnakerServerException e) {
+      RetrofitError re = e.getRetrofitError();
+      if (re != null
+          && re.getKind() == RetrofitError.Kind.HTTP
           && re.getResponse() != null
           && re.getResponse().getStatus() == 404) {
         throw new ManifestNotFound("Unable to find " + name + " in " + account + "/" + location);
       }
-      throw re;
+      throw e;
     }
   }
 

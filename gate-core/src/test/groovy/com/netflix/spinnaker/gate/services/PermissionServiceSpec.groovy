@@ -25,6 +25,7 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import com.netflix.spinnaker.security.User
 import retrofit.RetrofitError
 import retrofit.client.Response
@@ -83,29 +84,30 @@ class PermissionServiceSpec extends Specification {
     unexpectedError()      || true
   }
 
-  private RetrofitError conversionError(int code) {
-    RetrofitError.conversionError(
+  private static SpinnakerServerException conversionError(int code) {
+    new SpinnakerServerException(RetrofitError.conversionError(
       'http://foo',
       new Response('http://foo', code, 'you are bad', [], null),
       null,
       null,
-      new ConversionException('boom'))
+      new ConversionException('boom')))
   }
 
-  private RetrofitError networkError() {
-    RetrofitError.networkError('http://foo', new IOException())
+  private static SpinnakerServerException networkError() {
+    new SpinnakerServerException(
+      RetrofitError.networkError('http://foo', new IOException()))
   }
 
-  private RetrofitError unexpectedError() {
-    RetrofitError.unexpectedError('http://foo', new Throwable())
+  private static SpinnakerServerException unexpectedError() {
+    new SpinnakerServerException(RetrofitError.unexpectedError('http://foo', new Throwable()))
   }
 
-  private RetrofitError httpRetrofitError(int code) {
-    RetrofitError.httpError(
+  private static SpinnakerServerException httpRetrofitError(int code) {
+    new SpinnakerServerException(RetrofitError.httpError(
       'http://foo',
       new Response('http://foo', code, 'you are bad', [], null),
       null,
-      null)
+      null))
   }
 
 

@@ -21,12 +21,13 @@ import com.netflix.spinnaker.gate.filters.ContentCachingFilter
 import com.netflix.spinnaker.gate.interceptors.RequestContextInterceptor
 import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptor
 import com.netflix.spinnaker.gate.interceptors.ResponseHeaderInterceptorConfigurationProperties
-import com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest
+import com.netflix.spinnaker.kork.retrofit.exceptions.UpstreamBadRequest
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.kork.web.interceptors.MetricsInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
@@ -40,7 +41,6 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector
-import retrofit.RetrofitError
 
 import javax.servlet.Filter
 import javax.servlet.http.HttpServletResponse
@@ -105,9 +105,9 @@ public class GateWebConfig implements WebMvcConfigurer {
 
       def message = exception.message
       def failureCause = exception.cause
-      if (failureCause instanceof RetrofitError) {
+      if (failureCause instanceof SpinnakerServerException) {
         try {
-          def retrofitBody = failureCause.getBodyAs(Map) as Map
+          def retrofitBody = failureCause.retrofitError.getBodyAs(Map) as Map
           message = retrofitBody.error ?: message
         } catch (Exception ignored) {
           // unable to extract error from response

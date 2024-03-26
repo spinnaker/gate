@@ -16,14 +16,15 @@
 
 package com.netflix.spinnaker.gate.services
 
-import static com.netflix.spinnaker.gate.retrofit.UpstreamBadRequest.classifyError
 
 import com.netflix.spinnaker.gate.services.internal.KayentaService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.UpstreamBadRequest
+
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.stereotype.Component
-import retrofit.RetrofitError
 
 @Component
 @CompileStatic
@@ -36,24 +37,24 @@ class V2CanaryService {
   List getCredentials() {
     try {
       return kayentaService.getCredentials()
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
   List listMetricsServiceMetadata(String filter, String metricsAccountName) {
     try {
       return kayentaService.listMetricsServiceMetadata(filter, metricsAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
   List listJudges() {
     try {
       return kayentaService.listJudges()
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
@@ -68,8 +69,8 @@ class V2CanaryService {
         parentPipelineExecutionId,
         metricsAccountName,
         storageAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
@@ -88,32 +89,32 @@ class V2CanaryService {
                                            metricsAccountName,
                                            storageAccountName,
                                            configurationAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
   Map getCanaryResults(String canaryExecutionId, String storageAccountName) {
     try {
       return kayentaService.getCanaryResult(canaryExecutionId, storageAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
   List getCanaryResultsByApplication(String application, int limit, int page, String statuses, String storageAccountName) {
     try {
       return kayentaService.getCanaryResultsByApplication(application, limit, page, statuses, storageAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 
   List getMetricSetPairList(String metricSetPairListId, String storageAccountName) {
     try {
       return kayentaService.getMetricSetPairList(metricSetPairListId, storageAccountName)
-    } catch (RetrofitError error) {
-      throw classifyError(error)
+    } catch (SpinnakerServerException error) {
+      throw UpstreamBadRequest.classifyError(error)
     }
   }
 }

@@ -22,6 +22,7 @@ import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -136,9 +137,10 @@ class NotificationService {
       HttpHeaders headers = new HttpHeaders()
       headers.putAll(response.headers().toMultimap())
       return new ResponseEntity(body, headers, HttpStatus.valueOf(response.code()))
-    } catch (RetrofitError error) {
+    } catch (SpinnakerServerException error) {
+      RetrofitError re = error.getRetrofitError();
       log.error("Error proxying notification callback to {}: $error", service)
-      if (error.getKind() == HTTP) {
+      if (re != null && re.getKind() == HTTP) {
         throw error
       } else {
         return new ResponseEntity(INTERNAL_SERVER_ERROR)
