@@ -107,6 +107,13 @@ public interface OrcaService {
       @Body Map restartDetails);
 
   @Headers("Accept: application/json")
+  @PUT("/pipelines/{executionId}/stages/{stageId}/ignoreFailure")
+  Map ignorePipelineStageFailure(
+      @Path("executionId") String executionId,
+      @Path("stageId") String stageId,
+      @Body Map ignoreFailureDetails);
+
+  @Headers("Accept: application/json")
   @POST("/orchestrate")
   Map startPipeline(@Body Map pipelineConfig, @Query("user") String user);
 
