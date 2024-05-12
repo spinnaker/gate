@@ -28,7 +28,6 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
-import com.netflix.spinnaker.gate.config.PostConnectionConfiguringJedisConnectionFactory.ConnectionPostProcessor
 import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
 import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
 import com.netflix.spinnaker.gate.filters.RequestLoggingFilter
@@ -60,11 +59,8 @@ import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
-import org.springframework.session.data.redis.config.ConfigureRedisAction
-import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
 import org.springframework.util.CollectionUtils
 import org.springframework.web.client.RestTemplate
-import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
 
 import java.util.concurrent.ExecutorService
@@ -76,57 +72,19 @@ import static retrofit.Endpoints.newFixedEndpoint
 @Configuration
 @Slf4j
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
-class GateConfig extends RedisHttpSessionConfiguration {
+class GateConfig {
 
   private ServiceClientProvider serviceClientProvider
-
-  @Value('${server.session.timeout-in-seconds:3600}')
-  void setSessionTimeout(int maxInactiveIntervalInSeconds) {
-    super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
-  }
 
   @Autowired
   void setServiceClientProvider(ServiceClientProvider serviceClientProvider) {
     this.serviceClientProvider = serviceClientProvider
   }
 
-  @Autowired
-  GateConfig(@Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
-    super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
-  }
-
-  /**
-   * This pool is used for the rate limit storage, as opposed to the JedisConnectionFactory, which
-   * is a separate pool used for Spring Boot's session management.
-   */
-  @Bean
-  JedisPool jedis(@Value('${redis.connection:redis://localhost:6379}') String connection,
-                  @Value('${redis.timeout:2000}') int timeout) {
-    return new JedisPool(new URI(connection), timeout)
-  }
-
   @Bean
   @ConditionalOnMissingBean(RestTemplate)
   RestTemplate restTemplate() {
     new RestTemplate()
-  }
-
-  /**
-   * Always disable the ConfigureRedisAction that Spring Boot uses internally. Instead we use one
-   * qualified with @ConnectionPostProcessor. See
-   * {@link PostConnectionConfiguringJedisConnectionFactory}.
-   * */
-  @Bean
-  @Primary
-  ConfigureRedisAction springBootConfigureRedisAction() {
-    return ConfigureRedisAction.NO_OP
-  }
-
-  @Bean
-  @ConnectionPostProcessor
-  @ConditionalOnProperty("redis.configuration.secure")
-  ConfigureRedisAction connectionPostProcessorConfigureRedisAction() {
-    return ConfigureRedisAction.NO_OP
   }
 
   @Bean
@@ -216,7 +174,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       //     priority: 2
       //     origin: deck
 
-      def defaultSelector = new DefaultServiceSelector(
+      ServiceSelector defaultSelector = new DefaultServiceSelector(
         defaultClouddriverService,
         1,
         null)
@@ -317,9 +275,10 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
-    ObjectMapper objectMapper = objectMapperBuilder.build()
+    ObjectMapper objectMapper = objectMapperBuilder.build() as ObjectMapper
     if(serviceName.equals("echo")) {
-      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+      objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
     }
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
   }
