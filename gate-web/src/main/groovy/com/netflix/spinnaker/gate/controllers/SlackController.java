@@ -20,6 +20,7 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.spinnaker.gate.config.SlackConfigProperties;
 import com.netflix.spinnaker.gate.services.SlackService;
 import com.netflix.spinnaker.kork.core.RetrySupport;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import io.swagger.annotations.ApiOperation;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -128,9 +129,10 @@ public class SlackController {
   }
 
   private Optional<Long> getRetryDelayMs(Exception e) {
-    if (e instanceof RetrofitError) {
-      RetrofitError re = (RetrofitError) e;
-      if (re.getKind() == RetrofitError.Kind.HTTP) {
+    if (e instanceof SpinnakerServerException) {
+      SpinnakerServerException se = (SpinnakerServerException) e;
+      RetrofitError re = se.getRetrofitError();
+      if (re != null && re.getKind() == RetrofitError.Kind.HTTP) {
         if (re.getResponse() != null && re.getResponse().getStatus() == 429) {
           return re.getResponse().getHeaders().stream()
               // slack rate limit responses may include a `Retry-After` header indicating the number

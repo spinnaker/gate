@@ -13,6 +13,7 @@ import com.netflix.spinnaker.gate.services.internal.SwabbieService
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginManager
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import io.swagger.annotations.ApiOperation
 import java.util.stream.Collectors
 import org.pf4j.PluginWrapper
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import retrofit.RetrofitError
 
 @RestController
 @RequestMapping("/plugins/installed")
@@ -122,8 +122,8 @@ class PluginsInstalledController(
   fun callService(call: () -> List<SpinnakerPluginDescriptor>): List<SpinnakerPluginDescriptor> {
     return try {
       call()
-    } catch (e: RetrofitError) {
-      log.warn("Unable to retrieve installed plugins from '${e.response?.url}' due to '${e.response?.status}'")
+    } catch (e: SpinnakerServerException) {
+      log.warn("Unable to retrieve installed plugins from '${e.retrofitError?.response?.url}' due to '${e.retrofitError?.response?.status}'")
       return emptyList()
     }
   }
