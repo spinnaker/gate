@@ -27,6 +27,8 @@ import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails
 import org.springframework.stereotype.Component
+import org.springframework.http.ResponseEntity
+import org.springframework.http.HttpHeaders
 
 @Slf4j
 @Component
@@ -39,7 +41,7 @@ class GithubProviderTokenServices implements SpinnakerProviderTokenServices {
   GithubRequirements requirements
 
   private String tokenType = DefaultOAuth2AccessToken.BEARER_TYPE
-  private OAuth2RestOperations restTemplate
+  OAuth2RestOperations restTemplate
 
   @Component
   @ConfigurationProperties("security.oauth2.provider-requirements")
@@ -71,8 +73,16 @@ class GithubProviderTokenServices implements SpinnakerProviderTokenServices {
         token.setTokenType(this.tokenType)
         restTemplate.getOAuth2ClientContext().setAccessToken(token)
       }
-      List<Map<String, String>> organizations = restTemplate.getForEntity(organizationsUrl, List.class).getBody()
-      return githubOrganizationMember(organization, organizations)
+      ResponseEntity<List<Map<String, String>>> response = restTemplate.getForEntity(organizationsUrl, List.class);
+      HttpHeaders headers = response.getHeaders();
+      boolean isMember = githubOrganizationMember(organization, response.getBody())
+      while (!isMember && hasNextPage(headers)) {
+        log.debug('Checking next page of user organizations')
+        response = restTemplate.getForEntity(nextPageUrl(nextLink(headers)), List.class)
+        isMember = githubOrganizationMember(organization, response.getBody())
+        headers = response.getHeaders();
+      }
+      return isMember
     }
     catch (Exception e) {
       log.warn("Could not fetch user organizations", e)
@@ -90,5 +100,19 @@ class GithubProviderTokenServices implements SpinnakerProviderTokenServices {
       }
     }
     return hasRequirements
+  }
+
+  private boolean hasNextPage(HttpHeaders headers) {
+    return headers.containsKey('link') ? nextLink(headers) != null : false
+  }
+
+  private String nextPageUrl(String nextLink) {
+    def urlPart = nextLink.split(';')[0]
+    return urlPart.substring(1, urlPart.length() - 1)
+  }
+
+  private String nextLink(HttpHeaders headers) {
+    String[] links = headers.getFirst('link').split(',')
+    return links.find { it.contains('rel="next"') }
   }
 }
