@@ -13,7 +13,8 @@ import com.netflix.spinnaker.gate.services.internal.SwabbieService
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginManager
 import com.netflix.spinnaker.kork.plugins.update.SpinnakerUpdateManager
-import io.swagger.annotations.ApiOperation
+import io.swagger.v3.oas.annotations.Operation
+
 import java.util.stream.Collectors
 import org.pf4j.PluginWrapper
 import org.slf4j.LoggerFactory
@@ -43,7 +44,7 @@ class PluginsInstalledController(
 
   private val log by lazy { LoggerFactory.getLogger(javaClass) }
 
-  @ApiOperation(value = "Get all installed Spinnaker plugins")
+  @Operation(summary = "Get all installed Spinnaker plugins")
   @RequestMapping(method = [RequestMethod.GET])
   fun getInstalledPlugins(@RequestParam(value = "service", required = false) service: String?): Map<String, List<SpinnakerPluginDescriptor>> {
     return when (service) {

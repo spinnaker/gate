@@ -3,10 +3,20 @@ plugins {
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
   id "org.jetbrains.dokka" version "0.10.1" apply false
+  id("org.openrewrite.rewrite") version("6.16.4")
+
+}
+rewrite {
+    activeRecipe("org.openrewrite.openapi.swagger.SwaggerToOpenAPI")
+}
+
+dependencies {
+  rewrite("org.openrewrite.recipe:rewrite-openapi:0.5.3")
 }
 
 allprojects {
   apply plugin: 'io.spinnaker.project'
+  apply plugin: 'org.openrewrite.rewrite'
 
   group = "io.spinnaker.gate"
 
@@ -21,11 +31,14 @@ allprojects {
     apply plugin: 'groovy'
 
     repositories {
+      mavenCentral()
+
       maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases/' }
       maven { url 'https://repository.mulesoft.org/releases/' }
     }
 
     dependencies {
+
       implementation enforcedPlatform("io.spinnaker.kork:kork-bom:$korkVersion")
       annotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
       annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

@@ -1,5 +1,9 @@
 dependencies {
+  implementation platform(project(":gate-bom"))
+
   implementation project(":gate-core")
+  implementation "io.swagger.core.v3:swagger-annotations"
+
   implementation "io.spinnaker.kork:kork-swagger"
   implementation "io.spinnaker.kork:kork-web"
   implementation "com.netflix.spectator:spectator-api"
