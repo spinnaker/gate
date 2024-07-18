@@ -19,7 +19,6 @@ allprojects {
   apply plugin: 'org.openrewrite.rewrite'
 
   group = "io.spinnaker.gate"
-
   if ([korkVersion, fiatVersion].find { it.endsWith('-SNAPSHOT') }) {
     repositories {
       mavenLocal()

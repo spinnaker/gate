@@ -1,6 +1,4 @@
 dependencies {
-  implementation platform(project(":gate-bom"))
-
   implementation project(":gate-core")
   implementation "io.swagger.core.v3:swagger-annotations"
 

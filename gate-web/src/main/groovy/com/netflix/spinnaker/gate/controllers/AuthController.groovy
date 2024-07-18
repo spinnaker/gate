@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import springfox.documentation.annotations.ApiIgnore
 
 import javax.servlet.http.HttpServletResponse
 import java.util.regex.Pattern
@@ -69,9 +68,9 @@ class AuthController {
     }
   }
 
-  @Operation(summary = "Get user")
+  @Operation(summary = "Get user", hidden=true)
   @RequestMapping(value = "/user", method = RequestMethod.GET)
-  User user(@ApiIgnore @SpinnakerUser User user) {
+  User user(@SpinnakerUser User user) {
     if (!user) {
       return user
     }
@@ -83,9 +82,9 @@ class AuthController {
     return user
   }
 
-  @Operation(summary = "Get service accounts")
+  @Operation(summary = "Get service accounts", hidden=true)
   @RequestMapping(value = "/user/serviceAccounts", method = RequestMethod.GET)
-  List<String> getServiceAccounts(@ApiIgnore @SpinnakerUser User user,
+  List<String> getServiceAccounts(@SpinnakerUser User user,
                                   @RequestParam(name = "application", required = false) String application) {
 
     String appName = Optional.ofNullable(application)

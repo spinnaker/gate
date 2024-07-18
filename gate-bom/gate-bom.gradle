@@ -28,9 +28,6 @@ dependencies {
     api("io.spinnaker.fiat:fiat-api:$fiatVersion")
     api("io.spinnaker.fiat:fiat-core:$fiatVersion")
 
-    api("io.swagger.core.v3:swagger-annotations:2.2.22")
-    api("io.swagger.core.v3:swagger-core:2.2.22")
-
 
     rootProject
       .subprojects
