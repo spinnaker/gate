@@ -21,7 +21,8 @@ import com.netflix.spinnaker.gate.services.PermissionService
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import com.netflix.spinnaker.security.User
 import groovy.util.logging.Slf4j
-import io.swagger.annotations.ApiOperation
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import springfox.documentation.annotations.ApiIgnore
 
 import javax.servlet.http.HttpServletResponse
 import java.util.regex.Pattern
@@ -68,9 +68,9 @@ class AuthController {
     }
   }
 
-  @ApiOperation(value = "Get user", response = User.class)
+  @Operation(summary = "Get user", hidden=true)
   @RequestMapping(value = "/user", method = RequestMethod.GET)
-  User user(@ApiIgnore @SpinnakerUser User user) {
+  User user(@SpinnakerUser User user) {
     if (!user) {
       return user
     }
@@ -82,9 +82,9 @@ class AuthController {
     return user
   }
 
-  @ApiOperation(value = "Get service accounts", response = List.class)
+  @Operation(summary = "Get service accounts", hidden=true)
   @RequestMapping(value = "/user/serviceAccounts", method = RequestMethod.GET)
-  List<String> getServiceAccounts(@ApiIgnore @SpinnakerUser User user,
+  List<String> getServiceAccounts(@SpinnakerUser User user,
                                   @RequestParam(name = "application", required = false) String application) {
 
     String appName = Optional.ofNullable(application)
@@ -100,7 +100,7 @@ class AuthController {
     return permissionService.getServiceAccountsForApplication(user, appName)
   }
 
-  @ApiOperation(value = "Get logged out message", response = String.class)
+  @Operation(summary = "Get logged out message")
   @RequestMapping(value = "/loggedOut", method = RequestMethod.GET)
   String loggedOut() {
     return LOGOUT_MESSAGES[r.nextInt(LOGOUT_MESSAGES.size())]
@@ -110,14 +110,14 @@ class AuthController {
    * On-demand endpoint to sync the user roles, in case
    * waiting for the periodic refresh won't work.
    */
-  @ApiOperation(value = "Sync user roles")
+  @Operation(summary = "Sync user roles")
   @RequestMapping(value = "/roles/sync", method = RequestMethod.POST)
   @PreAuthorize("@authController.isAdmin()")
   void sync() {
     permissionService.sync()
   }
 
-  @ApiOperation(value = "Redirect to Deck")
+  @Operation(summary = "Redirect to Deck")
   @RequestMapping(value = "/redirect", method = RequestMethod.GET)
   void redirect(HttpServletResponse response, @RequestParam String to) {
     validDeckRedirect(to) ?

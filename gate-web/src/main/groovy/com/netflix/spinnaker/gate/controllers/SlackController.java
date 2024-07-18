@@ -20,7 +20,7 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.spinnaker.gate.config.SlackConfigProperties;
 import com.netflix.spinnaker.gate.services.SlackService;
 import com.netflix.spinnaker.kork.core.RetrySupport;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,7 +64,7 @@ public class SlackController {
     this.registry = registry;
   }
 
-  @ApiOperation("Retrieve a list of public slack channels")
+  @Operation(summary = "Retrieve a list of public slack channels")
   @RequestMapping("/channels")
   public List<Map> getChannels() {
     return slackChannelsCache.get();
