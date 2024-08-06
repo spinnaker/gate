@@ -104,7 +104,7 @@ class MultiAuthSupportTest {
 
     assertThat(response).isNotNull();
 
-    // Validate that the response is json.  FIXME: The response is HTML when things aren't working.
+    // Validate that the response is json.
     JsonNode json = objectMapper.readTree(response);
     assertThat(json).isNotNull();
   }
