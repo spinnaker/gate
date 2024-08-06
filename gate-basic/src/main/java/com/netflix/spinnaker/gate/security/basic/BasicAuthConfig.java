@@ -39,12 +39,16 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
   private final BasicAuthProvider authProvider;
 
-  @Autowired DefaultCookieSerializer defaultCookieSerializer;
+  private final DefaultCookieSerializer defaultCookieSerializer;
 
   @Autowired
-  public BasicAuthConfig(AuthConfig authConfig, SecurityProperties securityProperties) {
+  public BasicAuthConfig(
+      AuthConfig authConfig,
+      SecurityProperties securityProperties,
+      DefaultCookieSerializer defaultCookieSerializer) {
     this.authConfig = authConfig;
     this.authProvider = new BasicAuthProvider(securityProperties);
+    this.defaultCookieSerializer = defaultCookieSerializer;
   }
 
   @Override
