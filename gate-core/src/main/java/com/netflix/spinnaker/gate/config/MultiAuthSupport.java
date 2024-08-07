@@ -44,8 +44,7 @@ public class MultiAuthSupport {
   @Bean
   public static BeanFactoryPostProcessor removeErrorSecurityFilter() {
     return beanFactory ->
-        ((DefaultListableBeanFactory) beanFactory)
-            .removeBeanDefinition("errorPageSecurityInterceptor");
+        ((DefaultListableBeanFactory) beanFactory).removeBeanDefinition("errorPageSecurityFilter");
   }
 
   @Bean
