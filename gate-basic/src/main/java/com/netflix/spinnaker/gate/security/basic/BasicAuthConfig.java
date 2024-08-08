@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.security.basic;
 
 import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.kork.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -35,11 +36,11 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @EnableWebSecurity
 public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
-  private final AuthConfig authConfig;
+  @VisibleForTesting protected final AuthConfig authConfig;
 
   private final BasicAuthProvider authProvider;
 
-  private final DefaultCookieSerializer defaultCookieSerializer;
+  @VisibleForTesting protected final DefaultCookieSerializer defaultCookieSerializer;
 
   @Autowired
   public BasicAuthConfig(
