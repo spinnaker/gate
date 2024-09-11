@@ -125,7 +125,7 @@ class ApplicationServiceSpec extends Specification {
     def app = service.getApplication(name, true)
 
     then:
-    1 * front50.getApplication(name) >> exception
+    1 * front50.getApplication(name) >> { throw exception }
 
     numberOfClouddriverInvocations * clouddriver.getApplication(name) >> clouddriverApp
 
@@ -159,7 +159,7 @@ class ApplicationServiceSpec extends Specification {
 
     then:
     1 * front50.getApplication(name) >> front50App
-    1 * clouddriver.getApplication(name) >> exception
+    1 * clouddriver.getApplication(name) >> { throw exception }
 
     assert app == [name: name, attributes:[name: name, email: email, owner: owner, accounts: account], clusters:[:]]
 
@@ -189,8 +189,8 @@ class ApplicationServiceSpec extends Specification {
     def app = service.getApplication(name, true)
 
     then:
-    1 * front50.getApplication(name) >> exception
-    numberOfClouddriverInvocations * clouddriver.getApplication(name) >> exception
+    1 * front50.getApplication(name) >> { throw exception }
+    numberOfClouddriverInvocations * clouddriver.getApplication(name) >> { throw exception }
 
     assert app == null
 
@@ -376,7 +376,7 @@ class ApplicationServiceSpec extends Specification {
     def apps = service.getAllApplications()
 
     then:
-    1 * front50.getAllApplicationsUnrestricted() >> exception
+    1 * front50.getAllApplicationsUnrestricted() >> { throw exception }
     1 * clouddriver.getAllApplicationsUnrestricted(true) >> [clouddriverApp1, clouddriverApp2]
 
     assert apps.size() == resultSize
@@ -404,7 +404,7 @@ class ApplicationServiceSpec extends Specification {
 
     then:
     1 * front50.getAllApplicationsUnrestricted() >> [front50App]
-    1 * clouddriver.getAllApplicationsUnrestricted(true) >> exception
+    1 * clouddriver.getAllApplicationsUnrestricted(true) >> { throw exception }
 
     assert apps.size() == 1
     assert apps == [[name: name, email: email, accounts: account]]
@@ -433,8 +433,8 @@ class ApplicationServiceSpec extends Specification {
     def apps = service.getAllApplications()
 
     then:
-    1 * front50.getAllApplicationsUnrestricted() >> exception
-    1 * clouddriver.getAllApplicationsUnrestricted(true) >> exception
+    1 * front50.getAllApplicationsUnrestricted() >> { throw exception }
+    1 * clouddriver.getAllApplicationsUnrestricted(true) >> { throw exception }
 
     assert apps.size() == 0
 
