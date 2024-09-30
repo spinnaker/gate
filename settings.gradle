@@ -22,8 +22,6 @@
   }
 }
 
-enableFeaturePreview("VERSION_ORDERING_V2")
-
 rootProject.name = "gate"
 
 include "gate-api",
@@ -34,6 +32,7 @@ include "gate-api",
   "gate-basic",
   "gate-bom",
   "gate-iap",
+  "gate-integration",
   "gate-ldap",
   "gate-oauth2",
   "gate-proxy",

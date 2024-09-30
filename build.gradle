@@ -34,7 +34,7 @@ allprojects {
       annotationProcessor "org.projectlombok:lombok"
       testAnnotationProcessor "org.projectlombok:lombok"
 
-      implementation "org.codehaus.groovy:groovy-all"
+      implementation "org.apache.groovy:groovy"
       implementation "net.logstash.logback:logstash-logback-encoder"
       implementation "org.jetbrains.kotlin:kotlin-reflect"
 
@@ -43,6 +43,7 @@ allprojects {
       testImplementation "org.springframework.boot:spring-boot-starter-test"
       testImplementation "org.hamcrest:hamcrest-core"
       testRuntimeOnly "cglib:cglib-nodep"
+      testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
       testRuntimeOnly "org.objenesis:objenesis"
     }
 
@@ -62,6 +63,8 @@ allprojects {
     testLogging {
       exceptionFormat = 'full'
     }
+    useJUnitPlatform()
+    maxHeapSize = "1g"
   }
 }
 

@@ -20,7 +20,10 @@ import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import io.cloudevents.CloudEvent
 
 @Component
 class WebhookService {
@@ -50,6 +53,12 @@ class WebhookService {
 
     return AuthenticatedRequest.allowAnonymous({
       echoService.webhooks(type, source, event, gitHubSignature, bitBucketEventType)
+    })
+  }
+
+  ResponseEntity<Void> webhooks(String source, CloudEvent cdEvent, String ceDataJsonString) {
+    return AuthenticatedRequest.allowAnonymous( {
+      echoService.webhooks(source, cdEvent, ceDataJsonString, cdEvent.getId(), cdEvent.getSpecVersion().V1.toString(), cdEvent.getType(), cdEvent.getSource().toString())
     })
   }
 

@@ -16,21 +16,19 @@
 
 package com.netflix.spinnaker.gate.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
 import com.netflix.spinnaker.config.PluginsAutoConfiguration
-import com.netflix.spinnaker.config.okhttp3.OkHttpClientProvider
 import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
-import com.netflix.spinnaker.gate.config.PostConnectionConfiguringJedisConnectionFactory.ConnectionPostProcessor
+import com.netflix.spinnaker.gate.config.controllers.PipelineControllerConfigProperties
 import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
 import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
 import com.netflix.spinnaker.gate.filters.RequestLoggingFilter
@@ -38,7 +36,6 @@ import com.netflix.spinnaker.gate.filters.RequestSheddingFilter
 import com.netflix.spinnaker.gate.filters.ResetAuthenticatedRequestFilter
 import com.netflix.spinnaker.gate.plugins.deck.DeckPluginConfiguration
 import com.netflix.spinnaker.gate.plugins.web.PluginWebConfiguration
-import com.netflix.spinnaker.gate.services.EurekaLookupService
 import com.netflix.spinnaker.gate.services.internal.*
 import com.netflix.spinnaker.kork.client.ServiceClientProvider
 import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
@@ -52,7 +49,6 @@ import com.netflix.spinnaker.okhttp.OkHttpClientConfigurationProperties
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -64,52 +60,25 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
-import org.springframework.session.data.redis.config.ConfigureRedisAction
-import org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.util.CollectionUtils
 import org.springframework.web.client.RestTemplate
-import redis.clients.jedis.JedisPool
 import retrofit.Endpoint
-
-import javax.servlet.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 import static retrofit.Endpoints.newFixedEndpoint
 
 @CompileStatic
 @Configuration
 @Slf4j
-@EnableConfigurationProperties([FiatClientConfigurationProperties, DynamicRoutingConfigProperties])
+@EnableConfigurationProperties([PipelineControllerConfigProperties, ApplicationConfigurationProperties])
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
-class GateConfig extends RedisHttpSessionConfiguration {
+class GateConfig {
 
   private ServiceClientProvider serviceClientProvider
-
-  @Value('${server.session.timeout-in-seconds:3600}')
-  void setSessionTimeout(int maxInactiveIntervalInSeconds) {
-    super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
-  }
 
   @Autowired
   void setServiceClientProvider(ServiceClientProvider serviceClientProvider) {
     this.serviceClientProvider = serviceClientProvider
-  }
-
-  @Autowired
-  GateConfig(@Value('${server.session.timeout-in-seconds:3600}') int maxInactiveIntervalInSeconds) {
-    super.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds)
-  }
-
-  /**
-   * This pool is used for the rate limit storage, as opposed to the JedisConnectionFactory, which
-   * is a separate pool used for Spring Boot's session management.
-   */
-  @Bean
-  JedisPool jedis(@Value('${redis.connection:redis://localhost:6379}') String connection,
-                  @Value('${redis.timeout:2000}') int timeout) {
-    return new JedisPool(new URI(connection), timeout)
   }
 
   @Bean
@@ -118,37 +87,14 @@ class GateConfig extends RedisHttpSessionConfiguration {
     new RestTemplate()
   }
 
-  /**
-   * Always disable the ConfigureRedisAction that Spring Boot uses internally. Instead we use one
-   * qualified with @ConnectionPostProcessor. See
-   * {@link PostConnectionConfiguringJedisConnectionFactory}.
-   * */
-  @Bean
-  @Primary
-  ConfigureRedisAction springBootConfigureRedisAction() {
-    return ConfigureRedisAction.NO_OP
-  }
-
-  @Bean
-  @ConnectionPostProcessor
-  @ConditionalOnProperty("redis.configuration.secure")
-  ConfigureRedisAction connectionPostProcessorConfigureRedisAction() {
-    return ConfigureRedisAction.NO_OP
-  }
-
-  @Bean
-  ExecutorService executorService() {
-    Executors.newCachedThreadPool()
-  }
-
   @Autowired
   Registry registry
 
   @Autowired
-  EurekaLookupService eurekaLookupService
+  ServiceConfiguration serviceConfiguration
 
   @Autowired
-  ServiceConfiguration serviceConfiguration
+  Jackson2ObjectMapperBuilder objectMapperBuilder
 
   /**
    * This needs to be before the yaml converter in order for json to be the default
@@ -156,17 +102,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
    */
   @Bean
   AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
-    ObjectMapper objectMapper = new ObjectMapper()
-      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-      .registerModule(new JavaTimeModule())
-
-    return new JsonHttpMessageConverter(objectMapper)
+    return new JsonHttpMessageConverter(objectMapperBuilder.build())
   }
 
   @Bean
   AbstractJackson2HttpMessageConverter yamlHttpMessageConverter() {
-    return new YamlHttpMessageConverter(new YAMLMapper())
+    return new YamlHttpMessageConverter(objectMapperBuilder.factory(new YAMLFactory()).build())
   }
 
   @Bean
@@ -211,12 +152,6 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  @ConditionalOnProperty("services.keel.enabled")
-  KeelService keelService(OkHttpClientProvider clientProvider) {
-    createClient "keel", KeelService
-  }
-
-  @Bean
   ClouddriverServiceSelector clouddriverServiceSelector(ClouddriverService defaultClouddriverService,
                                                         DynamicConfigService dynamicConfigService,
                                                         RequestContextProvider contextProvider
@@ -234,7 +169,7 @@ class GateConfig extends RedisHttpSessionConfiguration {
       //     priority: 2
       //     origin: deck
 
-      def defaultSelector = new DefaultServiceSelector(
+      ServiceSelector defaultSelector = new DefaultServiceSelector(
         defaultClouddriverService,
         1,
         null)
@@ -335,14 +270,12 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   private <T> T buildService(String serviceName, Class<T> type, Endpoint endpoint) {
-    // New role providers break deserialization if this is not enabled.
-    ObjectMapper objectMapper = new ObjectMapper()
-      .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-      .registerModule(new JavaTimeModule())
-
+    ObjectMapper objectMapper = objectMapperBuilder.build() as ObjectMapper
+    if(serviceName.equals("echo")) {
+      objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+      objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
+    }
     serviceClientProvider.getService(type, new DefaultServiceEndpoint(serviceName, endpoint.url), objectMapper)
-
   }
 
   private <T> SelectableService createClientSelector(String serviceName, Class<T> type) {
@@ -374,8 +307,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  FilterRegistrationBean resetAuthenticatedRequestFilter() {
-    def frb = new FilterRegistrationBean(new ResetAuthenticatedRequestFilter())
+  FilterRegistrationBean<ResetAuthenticatedRequestFilter> resetAuthenticatedRequestFilter() {
+    def frb = new FilterRegistrationBean<>(new ResetAuthenticatedRequestFilter())
     frb.order = Ordered.HIGHEST_PRECEDENCE
     return frb
   }
@@ -387,32 +320,18 @@ class GateConfig extends RedisHttpSessionConfiguration {
    * Additionally forwards request origin metadata (deck vs api).
    */
   @Bean
-  FilterRegistrationBean authenticatedRequestFilter() {
+  FilterRegistrationBean<AuthenticatedRequestFilter> authenticatedRequestFilter() {
     // no need to force the `AuthenticatedRequestFilter` to create a request id as that is
     // handled by the `RequestTimingFilter`.
-    def frb = new FilterRegistrationBean(new AuthenticatedRequestFilter(false, true, false, false))
+    def frb = new FilterRegistrationBean<>(new AuthenticatedRequestFilter(true, true, false, false))
     frb.order = Ordered.LOWEST_PRECEDENCE - 1
-    return frb
-  }
-
-  /**
-   * This pulls the `springSecurityFilterChain` in front of the {@link AuthenticatedRequestFilter},
-   * because the user must be authenticated through the security filter chain before their username/credentials
-   * can be pulled and forwarded in the AuthenticatedRequestFilter.
-   */
-  @Bean
-  FilterRegistrationBean securityFilterChain(
-    @Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
-    def frb = new FilterRegistrationBean(securityFilter)
-    frb.order = 0
-    frb.name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME
     return frb
   }
 
   @Bean
   @ConditionalOnProperty("request-logging.enabled")
-  FilterRegistrationBean requestLoggingFilter() {
-    def frb = new FilterRegistrationBean(new RequestLoggingFilter())
+  FilterRegistrationBean<RequestLoggingFilter> requestLoggingFilter() {
+    def frb = new FilterRegistrationBean<>(new RequestLoggingFilter())
     // this filter should be placed very early in the request chain to ensure we track an accurate start time and
     // have a request id available to propagate across thread and service boundaries.
     frb.order = Ordered.HIGHEST_PRECEDENCE + 1
@@ -420,8 +339,8 @@ class GateConfig extends RedisHttpSessionConfiguration {
   }
 
   @Bean
-  FilterRegistrationBean requestSheddingFilter(DynamicConfigService dynamicConfigService) {
-    def frb = new FilterRegistrationBean(new RequestSheddingFilter(dynamicConfigService, registry))
+  FilterRegistrationBean<RequestSheddingFilter> requestSheddingFilter(DynamicConfigService dynamicConfigService) {
+    def frb = new FilterRegistrationBean<>(new RequestSheddingFilter(dynamicConfigService, registry))
 
     /*
      * This filter should:
