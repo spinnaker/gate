@@ -16,7 +16,11 @@
 
 package com.netflix.spinnaker.gate.controllers
 
+import com.netflix.spinnaker.gate.config.ApplicationConfigurationProperties
+import com.netflix.spinnaker.gate.config.ServiceConfiguration
 import com.netflix.spinnaker.gate.services.ApplicationService
+import com.netflix.spinnaker.gate.services.internal.ClouddriverService
+import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.squareup.okhttp.mockwebserver.MockWebServer
 import groovy.json.JsonSlurper
@@ -43,7 +47,17 @@ class ApplicationControllerSpec extends Specification {
 
   void setup(){
     front50Service = Mock(Front50Service)
-    applicationService = new ApplicationService(front50Service: front50Service)
+    def clouddriver = Mock(ClouddriverService)
+    def clouddriverSelector = Mock(ClouddriverServiceSelector) {
+      select() >> clouddriver
+    }
+
+    applicationService = new ApplicationService(
+      new ServiceConfiguration(),
+      clouddriverSelector,
+      front50Service,
+      new ApplicationConfigurationProperties()
+    )
     server.start()
     mockMvc = MockMvcBuilders.standaloneSetup(new ApplicationController(applicationService: applicationService)).build()
   }

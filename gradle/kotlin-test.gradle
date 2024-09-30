@@ -30,15 +30,9 @@ dependencies {
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
 }
 
-test {
-  useJUnitPlatform {
-    includeEngines "junit-jupiter"
-  }
-}
-
 compileTestKotlin {
   kotlinOptions {
-    languageVersion = "1.4"
+    languageVersion = "1.6"
     jvmTarget = "11"
   }
 }

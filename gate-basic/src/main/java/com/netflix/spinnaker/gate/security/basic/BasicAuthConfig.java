@@ -18,13 +18,13 @@ package com.netflix.spinnaker.gate.security.basic;
 
 import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.kork.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -36,16 +36,20 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @EnableWebSecurity
 public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 
-  private final AuthConfig authConfig;
+  @VisibleForTesting protected final AuthConfig authConfig;
 
   private final BasicAuthProvider authProvider;
 
-  @Autowired DefaultCookieSerializer defaultCookieSerializer;
+  @VisibleForTesting protected final DefaultCookieSerializer defaultCookieSerializer;
 
   @Autowired
-  public BasicAuthConfig(AuthConfig authConfig, SecurityProperties securityProperties) {
+  public BasicAuthConfig(
+      AuthConfig authConfig,
+      SecurityProperties securityProperties,
+      DefaultCookieSerializer defaultCookieSerializer) {
     this.authConfig = authConfig;
     this.authProvider = new BasicAuthProvider(securityProperties);
+    this.defaultCookieSerializer = defaultCookieSerializer;
   }
 
   @Override
@@ -61,10 +65,5 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
         .httpBasic()
         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
     authConfig.configure(http);
-  }
-
-  @Override
-  public void configure(WebSecurity web) throws Exception {
-    authConfig.configure(web);
   }
 }
