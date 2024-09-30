@@ -49,10 +49,7 @@ class CredentialsControllerSpec extends Specification {
     }
 
     @Subject
-    CredentialsService credentialsService = new CredentialsService(
-      accountLookupService: accountLookupService,
-      fiatStatus: fiatStatus
-    )
+    CredentialsService credentialsService = new CredentialsService(accountLookupService, fiatStatus)
 
     FiatPermissionEvaluator fpe = Stub(FiatPermissionEvaluator)
     AllowedAccountsSupport allowedAccountsSupport = new AllowedAccountsSupport(fiatStatus, fpe, credentialsService)
@@ -61,7 +58,11 @@ class CredentialsControllerSpec extends Specification {
     contentNegotiationManagerFactoryBean.addMediaType("json", MediaType.APPLICATION_JSON)
     contentNegotiationManagerFactoryBean.favorPathExtension = false
     mockMvc = MockMvcBuilders
-      .standaloneSetup(new CredentialsController(accountLookupService:  accountLookupService, allowedAccountsSupport: allowedAccountsSupport))
+      .standaloneSetup(new CredentialsController(
+        accountLookupService:  accountLookupService,
+        allowedAccountsSupport: allowedAccountsSupport,
+        clouddriverService: clouddriverService
+      ))
       .setContentNegotiationManager(contentNegotiationManagerFactoryBean.build())
       .build()
   }
@@ -80,5 +81,40 @@ class CredentialsControllerSpec extends Specification {
     account    || expectedAccount
     "test"     || "test"
     "test.com" || "test.com"
+  }
+
+  @Unroll
+  void "listing credentials by type should succeed when optional arguments are not provided"() {
+    when:
+    MockHttpServletResponse response = mockMvc.perform(get("/credentials/type/${accountType}")
+      .accept(MediaType.APPLICATION_JSON)).andReturn().response
+
+    then:
+    response.status == 200
+    1 * clouddriverService.getAccountDefinitionsByType(accountType, _, _)
+
+    where:
+    accountType | _
+    "type1"     | _
+    "type2"     | _
+  }
+
+  @Unroll
+  void "listing credentials by type should succeed when optional arguments are provided"() {
+    when:
+    MockHttpServletResponse response = mockMvc.perform(
+      get("/credentials/type/${accountType}")
+      .param("limit", "${limit}")
+      .param("startingAccountName", startingAccountName)
+      .accept(MediaType.APPLICATION_JSON)).andReturn().response
+
+    then:
+    response.status == 200
+    1 * clouddriverService.getAccountDefinitionsByType(accountType, limit, startingAccountName)
+
+    where:
+    accountType | limit | startingAccountName
+    "type1"     | 2     | "account1"
+    "type2"     | 500   | "account2"
   }
 }

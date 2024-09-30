@@ -9,13 +9,8 @@ dependencies {
 
   testImplementation("io.spinnaker.kork:kork-plugins")
   testImplementation("io.spinnaker.kork:kork-plugins-tck")
+  testImplementation("io.spinnaker.kork:kork-jedis-test")
+  testImplementation("org.springframework.session:spring-session-data-redis")
 
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-}
-
-test {
-  useJUnitPlatform {
-    includeEngines("junit-jupiter", "junit-vintage")
-  }
 }
