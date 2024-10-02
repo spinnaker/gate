@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.security.oauth2.provider
 
+import com.netflix.spinnaker.kork.annotations.VisibleForTesting
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
@@ -41,6 +42,8 @@ class GithubProviderTokenServices implements SpinnakerProviderTokenServices {
   GithubRequirements requirements
 
   private String tokenType = DefaultOAuth2AccessToken.BEARER_TYPE
+
+  @VisibleForTesting
   OAuth2RestOperations restTemplate
 
   @Component
