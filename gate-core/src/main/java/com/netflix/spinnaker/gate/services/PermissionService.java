@@ -50,7 +50,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import retrofit.RetrofitError;
 
 @Log4j2
 @Component

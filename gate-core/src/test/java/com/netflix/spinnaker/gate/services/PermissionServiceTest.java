@@ -18,8 +18,8 @@ package com.netflix.spinnaker.gate.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -197,7 +197,7 @@ public class PermissionServiceTest {
     ExtendedFiatService extendedFiatService = mock(ExtendedFiatService.class);
 
     ServiceAccountFilterConfigProps cfgProps =
-        new ServiceAccountFilterConfigProps(params.enabled, params.auths );
+        new ServiceAccountFilterConfigProps(params.enabled, params.auths);
     User user = params.username == null ? null : mock(User.class);
     if (user != null) {
       when(user.getUsername()).thenReturn(params.username);
@@ -303,17 +303,17 @@ public class PermissionServiceTest {
     final String desc;
 
     TestParams(
-      boolean enabled,
-      String username,
-      String application,
-      boolean fiatEnabled,
-      boolean hasResult,
-      boolean expectLookup,
-      boolean expectFallback,
-      boolean lookupResultEmpty,
-      List<Authorization> auths,
-      List<String> lookupResult,
-      String desc) {
+        boolean enabled,
+        String username,
+        String application,
+        boolean fiatEnabled,
+        boolean hasResult,
+        boolean expectLookup,
+        boolean expectFallback,
+        boolean lookupResultEmpty,
+        List<Authorization> auths,
+        List<String> lookupResult,
+        String desc) {
       this.enabled = enabled;
       this.username = username;
       this.application = application;
