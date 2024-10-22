@@ -35,6 +35,10 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator;
 import com.netflix.spinnaker.fiat.shared.FiatStatus;
 import com.netflix.spinnaker.gate.services.internal.ExtendedFiatService;
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerConversionException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerNetworkException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import com.netflix.spinnaker.security.User;
 import java.io.IOException;
 import java.util.Collection;
@@ -55,7 +59,7 @@ public class PermissionServiceTest {
     ExtendedFiatService extendedFiatService = mock(ExtendedFiatService.class);
     String user = "foo@bar.com";
 
-    when(extendedFiatService.getUserServiceAccounts(user)).thenThrow(httpRetrofitError(404));
+    when(extendedFiatService.getUserServiceAccounts(user)).thenThrow(httpError(404));
 
     PermissionService subject = new PermissionService(null, extendedFiatService, null, null, null);
     var result = subject.lookupServiceAccounts(user);
@@ -66,13 +70,13 @@ public class PermissionServiceTest {
 
   private static Stream<TestCase> testCasesForRetryable() {
     return Stream.of(
-        new TestCase(httpRetrofitError(400), false),
+        new TestCase(httpError(400), false),
         new TestCase(conversionError(400), false),
         new TestCase(conversionError(200), false),
-        new TestCase(networkError(), true),
-        new TestCase(httpRetrofitError(500), true),
-        new TestCase(conversionError(500), true),
-        new TestCase(unexpectedError(), true));
+        new TestCase(networkError(), null),
+        new TestCase(httpError(500), true),
+        new TestCase(conversionError(500), false),
+        new TestCase(unexpectedError(), null));
   }
 
   @ParameterizedTest
@@ -243,32 +247,41 @@ public class PermissionServiceTest {
   }
 
   private static Throwable conversionError(int code) {
-    return RetrofitError.conversionError(
-        "http://foo",
-        new Response("http://foo", code, "you are bad", List.of(), null),
-        null,
-        null,
-        new ConversionException("boom"));
+    RetrofitError re =
+        RetrofitError.conversionError(
+            "http://foo",
+            new Response("http://foo", code, "you are bad", List.of(), null),
+            null,
+            null,
+            new ConversionException("boom"));
+    return new SpinnakerConversionException(re);
   }
 
-  private static RetrofitError networkError() {
-    return RetrofitError.networkError("http://foo", new IOException());
+  private static SpinnakerNetworkException networkError() {
+    return new SpinnakerNetworkException(
+        RetrofitError.networkError("http://foo", new IOException()));
   }
 
-  private static RetrofitError unexpectedError() {
-    return RetrofitError.unexpectedError("http://foo", new Throwable());
+  private static Throwable unexpectedError() {
+    return new SpinnakerServerException(
+        RetrofitError.unexpectedError("http://foo", new Throwable()));
   }
 
-  private static RetrofitError httpRetrofitError(int code) {
-    return RetrofitError.httpError(
-        "http://foo", new Response("http://foo", code, "you are bad", List.of(), null), null, null);
+  private static Throwable httpError(int code) {
+    RetrofitError re =
+        RetrofitError.httpError(
+            "http://foo",
+            new Response("http://foo", code, "you are bad", List.of(), null),
+            null,
+            null);
+    return new SpinnakerHttpException(re);
   }
 
   private static class TestCase {
     final Throwable theFailure;
-    final boolean expectedRetryable;
+    final Boolean expectedRetryable;
 
-    TestCase(Throwable theFailure, boolean expectedRetryable) {
+    TestCase(Throwable theFailure, Boolean expectedRetryable) {
       this.theFailure = theFailure;
       this.expectedRetryable = expectedRetryable;
     }
