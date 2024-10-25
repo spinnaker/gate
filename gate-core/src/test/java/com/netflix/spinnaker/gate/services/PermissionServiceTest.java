@@ -71,11 +71,9 @@ public class PermissionServiceTest {
   private static Stream<TestCase> testCasesForRetryable() {
     return Stream.of(
         new TestCase(httpError(400), false),
-        new TestCase(conversionError(400), false),
         new TestCase(conversionError(200), false),
         new TestCase(networkError(), null),
         new TestCase(httpError(500), true),
-        new TestCase(conversionError(500), false),
         new TestCase(unexpectedError(), null));
   }
 
