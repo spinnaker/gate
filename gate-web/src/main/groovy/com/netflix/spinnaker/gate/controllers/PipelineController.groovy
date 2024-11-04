@@ -187,8 +187,8 @@ class PipelineController {
   Map getPipeline(@PathVariable("id") String id) {
     try {
       pipelineService.getPipeline(id)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -339,8 +339,8 @@ class PipelineController {
                                      @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -352,8 +352,8 @@ class PipelineController {
                                             @RequestBody String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -366,8 +366,8 @@ class PipelineController {
                                             @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecutionAtStage(id, stageId, pipelineExpression)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})", e)
       }
     }
@@ -379,8 +379,8 @@ class PipelineController {
                                             @RequestBody Map pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, (String) pipelineExpression.expression)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -402,8 +402,8 @@ class PipelineController {
                         @RequestBody List<Map<String, String>> expressions) {
     try {
       return pipelineService.evaluateVariables(executionId, requisiteStageRefIds, spelVersionOverride, expressions)
-    } catch (SpinnakerServerException e) {
-      if (e instanceof SpinnakerHttpException && ((SpinnakerHttpException) e).responseCode == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${executionId})")
       }
     }

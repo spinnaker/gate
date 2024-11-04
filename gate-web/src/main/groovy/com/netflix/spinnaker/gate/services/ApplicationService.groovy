@@ -172,8 +172,9 @@ class ApplicationService {
       log.error("front50 query for a pipeline with name ${pipelineNameOrId} in application ${app} returned a pipeline named ${pipelineConfig.name}")
       // Tempting to return null here, but querying by id might work, so give it a shot.
     } catch (SpinnakerHttpException e) {
-      if(e.getResponseCode() == HttpStatus.NOT_FOUND.value()){
+      if (e.getResponseCode() == HttpStatus.NOT_FOUND.value()) {
         log.info("front50 returned no pipeline with name ${pipelineNameOrId} in application ${app}")
+        // fall through to try querying by id
       } else {
         throw e;
       }
