@@ -17,11 +17,10 @@
 package com.netflix.spinnaker.gate.retrofit;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static retrofit.RetrofitError.Kind.HTTP;
 
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
-import java.util.Collection;
-import retrofit.RetrofitError;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 
 public class UpstreamBadRequest extends SpinnakerException {
 
@@ -29,11 +28,12 @@ public class UpstreamBadRequest extends SpinnakerException {
   private final String url;
   private final Object error;
 
-  private UpstreamBadRequest(RetrofitError cause) {
+  private UpstreamBadRequest(SpinnakerHttpException cause) {
     super(cause.getMessage(), cause);
-    status = cause.getResponse().getStatus();
+    this.setRetryable(cause.getRetryable());
+    status = cause.getResponseCode();
     url = cause.getUrl();
-    error = cause.getBody();
+    error = cause.getResponseBody();
   }
 
   public int getStatus() {
@@ -48,20 +48,10 @@ public class UpstreamBadRequest extends SpinnakerException {
     return error;
   }
 
-  public static RuntimeException classifyError(RetrofitError error) {
-    if (error.getKind() == HTTP
-        && error.getResponse().getStatus() < INTERNAL_SERVER_ERROR.value()) {
-      return new UpstreamBadRequest(error);
-    } else {
-      return error;
-    }
-  }
-
-  public static RuntimeException classifyError(
-      RetrofitError error, Collection<Integer> supportedHttpStatuses) {
-    if (error.getKind() == HTTP
-        && supportedHttpStatuses.contains(error.getResponse().getStatus())) {
-      return new UpstreamBadRequest(error);
+  public static RuntimeException classifyError(SpinnakerServerException error) {
+    if (error instanceof SpinnakerHttpException
+        && ((SpinnakerHttpException) error).getResponseCode() < INTERNAL_SERVER_ERROR.value()) {
+      return new UpstreamBadRequest((SpinnakerHttpException) error);
     } else {
       return error;
     }

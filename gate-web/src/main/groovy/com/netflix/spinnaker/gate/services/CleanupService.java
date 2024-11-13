@@ -17,12 +17,12 @@
 package com.netflix.spinnaker.gate.services;
 
 import com.netflix.spinnaker.gate.services.internal.SwabbieService;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import retrofit.RetrofitError;
 
 @Component
 public class CleanupService {
@@ -33,34 +33,23 @@ public class CleanupService {
   public Map optOut(String namespace, String resourceId) {
     try {
       return swabbieService.optOut(namespace, resourceId, "");
-    } catch (RetrofitError e) {
-      if (e.getResponse().getStatus() == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.getResponseCode() == 404) {
         return Collections.emptyMap();
-      } else {
-        throw e;
       }
+      throw e;
     }
   }
 
   public Map get(String namespace, String resourceId) {
     try {
       return swabbieService.get(namespace, resourceId);
-    } catch (RetrofitError e) {
-      if (e.getResponse().getStatus() == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.getResponseCode() == 404) {
         return Collections.emptyMap();
-      } else {
-        throw e;
       }
+      throw e;
     }
-  }
-
-  public String restore(String namespace, String resourceId) {
-    try {
-      swabbieService.restore(namespace, resourceId, "");
-    } catch (RetrofitError e) {
-      return Integer.toString(e.getResponse().getStatus());
-    }
-    return "200";
   }
 
   public List getMarkedList() {
