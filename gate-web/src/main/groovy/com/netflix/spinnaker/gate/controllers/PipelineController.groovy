@@ -18,11 +18,14 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.spinnaker.gate.config.controllers.PipelineControllerConfigProperties
 import com.netflix.spinnaker.gate.services.PipelineService
 import com.netflix.spinnaker.gate.services.TaskService
 import com.netflix.spinnaker.gate.services.internal.Front50Service
 import com.netflix.spinnaker.kork.exceptions.HasAdditionalAttributes
-import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
+import com.netflix.spinnaker.kork.exceptions.SpinnakerException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.transform.CompileDynamic
@@ -39,7 +42,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import retrofit.RetrofitError
+
+import java.nio.charset.StandardCharsets
 
 import static net.logstash.logback.argument.StructuredArguments.value
 
@@ -48,23 +52,30 @@ import static net.logstash.logback.argument.StructuredArguments.value
 @RestController
 @RequestMapping("/pipelines")
 class PipelineController {
-  @Autowired
-  PipelineService pipelineService
+  final PipelineService pipelineService
+  final TaskService taskService
+  final Front50Service front50Service
+  final ObjectMapper objectMapper
+  final PipelineControllerConfigProperties pipelineControllerConfigProperties
 
   @Autowired
-  TaskService taskService
-
-  @Autowired
-  Front50Service front50Service
-
-  @Autowired
-  ObjectMapper objectMapper
+  PipelineController(PipelineService pipelineService,
+                     TaskService taskService,
+                     Front50Service front50Service,
+                     ObjectMapper objectMapper,
+                     PipelineControllerConfigProperties pipelineControllerConfigProperties) {
+    this.pipelineService = pipelineService
+    this.taskService = taskService
+    this.front50Service = front50Service
+    this.objectMapper = objectMapper
+    this.pipelineControllerConfigProperties = pipelineControllerConfigProperties
+  }
 
   @CompileDynamic
   @ApiOperation(value = "Delete a pipeline definition")
   @DeleteMapping("/{application}/{pipelineName:.+}")
   void deletePipeline(@PathVariable String application, @PathVariable String pipelineName) {
-    List<Map> pipelineConfigs = front50Service.getPipelineConfigsForApplication(application, true)
+    List<Map> pipelineConfigs = front50Service.getPipelineConfigsForApplication(application, null, true)
     if (pipelineConfigs!=null && !pipelineConfigs.isEmpty()){
       Optional<Map> filterResult = pipelineConfigs.stream().filter({ pipeline -> ((String) pipeline.get("name")) != null && ((String) pipeline.get("name")).trim().equalsIgnoreCase(pipelineName) }).findFirst()
       if (filterResult.isPresent()){
@@ -125,6 +136,46 @@ class PipelineController {
     }
   }
 
+  @CompileDynamic
+  @ApiOperation(value = "Save a list of pipelines")
+  @PostMapping('/bulksave')
+  Map bulksavePipeline(
+    @RequestParam(defaultValue = "bulk_save_placeholder_app")
+    @ApiParam(value = "Application in which to run the bulk save task",
+      defaultValue = "bulk_save_placeholder_app",
+      required = false) String application,
+    @RequestBody List<Map> pipelines) {
+    def operation = [
+      description: "Bulk save pipelines",
+      application: application,
+      job        : [
+        [
+          type                      : "savePipeline",
+          pipelines                 : Base64.encoder
+            .encodeToString(objectMapper.writeValueAsString(pipelines).getBytes(StandardCharsets.UTF_8)),
+          user                      : AuthenticatedRequest.spinnakerUser.orElse("anonymous"),
+          isBulkSavingPipelines : true
+        ]
+      ]
+    ]
+
+    def result = taskService.createAndWaitForCompletion(operation,
+      pipelineControllerConfigProperties.getBulksave().getMaxPollsForTaskCompletion(),
+      pipelineControllerConfigProperties.getBulksave().getTaskCompletionCheckIntervalMs())
+    String resultStatus = result.get("status")
+
+    if (!"SUCCEEDED".equalsIgnoreCase(resultStatus)) {
+      String exception = result.variables.find { it.key == "exception" }?.value?.details?.errors?.getAt(0)
+      throw new PipelineException(
+        exception ?: "Pipeline bulk save operation did not succeed: ${result.get("id", "unknown task id")} " +
+          "(status: ${resultStatus})"
+      )
+    } else {
+      def retVal = result.variables.find { it.key == "bulksave"}?.value
+      return retVal
+    }
+  }
+
   @ApiOperation(value = "Rename a pipeline definition")
   @PostMapping('move')
   void renamePipeline(@RequestBody Map renameCommand) {
@@ -136,8 +187,8 @@ class PipelineController {
   Map getPipeline(@PathVariable("id") String id) {
     try {
       pipelineService.getPipeline(id)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -169,7 +220,7 @@ class PipelineController {
       )
     }
 
-    return front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), true)?.find {
+    return front50Service.getPipelineConfigsForApplication((String) pipeline.get("application"), null, true)?.find {
       id == (String) it.get("id")
     }
   }
@@ -208,7 +259,7 @@ class PipelineController {
     String pipelineName = pipelineMap.get("name");
     String application = pipelineMap.get("application");
 
-    List<Map> pipelineConfigs = front50Service.getPipelineConfigsForApplication(application, true)
+    List<Map> pipelineConfigs = front50Service.getPipelineConfigsForApplication(application, null, true)
 
     if (pipelineConfigs!=null && !pipelineConfigs.isEmpty()){
       Optional<Map> filterResult = pipelineConfigs.stream()
@@ -254,13 +305,14 @@ class PipelineController {
     AuthenticatedRequest.setApplication(application)
     try {
       pipelineService.trigger(application, pipelineNameOrId, trigger)
-    } catch (NotFoundException e) {
-      throw e
-    } catch (e) {
-      log.error("Unable to trigger pipeline (application: {}, pipelineId: {})",
-        value("application", application), value("pipelineId", pipelineNameOrId), e)
-      throw new PipelineExecutionException(e.message)
+    } catch (SpinnakerException e) {
+      throw e.newInstance(triggerFailureMessage(application, pipelineNameOrId, e));
     }
+  }
+
+  private String triggerFailureMessage(String application, String pipelineNameOrId, Throwable e) {
+    String.format("Unable to trigger pipeline (application: %s, pipelineNameOrId: %s). Error: %s",
+        value("application", application), value("pipelineId", pipelineNameOrId), e.getMessage())
   }
 
   @ApiOperation(value = "Trigger a pipeline execution", response = Map.class)
@@ -287,8 +339,8 @@ class PipelineController {
                                      @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -300,8 +352,8 @@ class PipelineController {
                                             @RequestBody String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -314,8 +366,8 @@ class PipelineController {
                                             @RequestParam("expression") String pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecutionAtStage(id, stageId, pipelineExpression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})", e)
       }
     }
@@ -327,8 +379,8 @@ class PipelineController {
                                             @RequestBody Map pipelineExpression) {
     try {
       pipelineService.evaluateExpressionForExecution(id, (String) pipelineExpression.expression)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${id})")
       }
     }
@@ -350,8 +402,8 @@ class PipelineController {
                         @RequestBody List<Map<String, String>> expressions) {
     try {
       return pipelineService.evaluateVariables(executionId, requisiteStageRefIds, spelVersionOverride, expressions)
-    } catch (RetrofitError e) {
-      if (e.response?.status == 404) {
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == 404) {
         throw new NotFoundException("Pipeline not found (id: ${executionId})")
       }
     }
@@ -361,12 +413,11 @@ class PipelineController {
     try {
       def body = call()
       new ResponseEntity(body, HttpStatus.OK)
-    } catch (RetrofitError re) {
-      if (re.response?.status == HttpStatus.BAD_REQUEST.value() && requestBody.type == "templatedPipeline") {
-        throw new PipelineException((HashMap<String, Object>) re.getBodyAs(HashMap.class))
-      } else {
-        throw re
+    } catch (SpinnakerHttpException e) {
+      if (e.responseCode == HttpStatus.BAD_REQUEST.value() && requestBody.type == "templatedPipeline") {
+        throw new PipelineException(e.responseBody)
       }
+      throw e
     }
   }
 
@@ -381,14 +432,6 @@ class PipelineController {
 
     PipelineException(Map<String, Object> additionalAttributes) {
       this.additionalAttributes = additionalAttributes
-    }
-  }
-
-  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-  @InheritConstructors
-  class PipelineExecutionException extends InvalidRequestException {
-    PipelineExecutionException(String message) {
-      super(message)
     }
   }
 }

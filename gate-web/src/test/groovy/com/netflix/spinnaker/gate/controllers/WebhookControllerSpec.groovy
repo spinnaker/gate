@@ -17,11 +17,12 @@
 package com.netflix.spinnaker.gate.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.jakewharton.retrofit.Ok3Client
 import com.netflix.spinnaker.gate.services.WebhookService
 import com.netflix.spinnaker.gate.services.internal.EchoService
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector
-import com.squareup.okhttp.mockwebserver.MockWebServer
 import io.cloudevents.spring.mvc.CloudEventHttpMessageConverter
+import okhttp3.mockwebserver.MockWebServer
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
@@ -29,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.util.NestedServletException
 import retrofit.RestAdapter
-import retrofit.client.OkClient
 import retrofit.converter.JacksonConverter
 import spock.lang.Specification
 
@@ -54,7 +54,7 @@ class WebhooksControllerSpec extends Specification {
 
     EchoService echoService = new RestAdapter.Builder()
       .setEndpoint("http://localhost:${localPort}")
-      .setClient(new OkClient())
+      .setClient(new Ok3Client())
       .setConverter(new JacksonConverter())
       .build()
       .create(EchoService)
