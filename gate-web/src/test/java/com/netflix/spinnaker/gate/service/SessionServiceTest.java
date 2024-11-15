@@ -58,7 +58,8 @@ public class SessionServiceTest {
     Set<String> springSessionKeys = jedis.keys("spring:session*");
     Set<String> otherKeys = jedis.keys("other:key");
 
-    Assertions.assertTrue(springSessionKeys.isEmpty(), "Spring session keys should have been deleted");
+    Assertions.assertTrue(
+        springSessionKeys.isEmpty(), "Spring session keys should have been deleted");
     Assertions.assertEquals(1, otherKeys.size(), "Other keys should remain");
   }
 }
