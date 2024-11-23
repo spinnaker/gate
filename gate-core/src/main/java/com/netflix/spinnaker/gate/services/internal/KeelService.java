@@ -24,6 +24,7 @@ import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
 import com.netflix.spinnaker.gate.model.manageddelivery.GraphQLRequest;
 import com.netflix.spinnaker.gate.model.manageddelivery.OverrideVerificationRequest;
+import com.netflix.spinnaker.gate.model.manageddelivery.RawDeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginDescriptor;
@@ -79,9 +80,9 @@ public interface KeelService {
   @GET("/delivery-configs/{name}/artifacts")
   List<Map<String, Object>> getManifestArtifacts(@Path("name") String name);
 
-  @POST("/delivery-configs")
+  @POST("/delivery-configs/upsertGate")
   @Headers("Accept: application/json")
-  DeliveryConfig upsertManifest(@Body DeliveryConfig manifest);
+  DeliveryConfig upsertManifest(@Body RawDeliveryConfig req);
 
   @DELETE("/delivery-configs/{name}")
   DeliveryConfig deleteManifest(@Path("name") String name);

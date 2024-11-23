@@ -10,6 +10,7 @@ import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactPin;
 import com.netflix.spinnaker.gate.model.manageddelivery.EnvironmentArtifactVeto;
 import com.netflix.spinnaker.gate.model.manageddelivery.GraphQLRequest;
 import com.netflix.spinnaker.gate.model.manageddelivery.OverrideVerificationRequest;
+import com.netflix.spinnaker.gate.model.manageddelivery.RawDeliveryConfig;
 import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.gate.services.NotificationService;
@@ -22,13 +23,17 @@ import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,16 +200,19 @@ public class ManagedController {
 
   @SneakyThrows
   @ApiOperation(
-      value = "Create or update a delivery config manifest",
-      response = DeliveryConfig.class)
+    value = "Create or update a delivery config manifest",
+    response = DeliveryConfig.class)
   @PostMapping(
-      path = "/delivery-configs",
-      consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
-      produces = {APPLICATION_JSON_VALUE})
-  DeliveryConfig upsertManifest(@RequestBody DeliveryConfig manifest) {
+    path = "/delivery-configs",
+    consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
+    produces = {APPLICATION_JSON_VALUE})
+  DeliveryConfig upsertManifestRaw(InputStream body) {
+    StringWriter writer = new StringWriter();
+    IOUtils.copy(body, writer, StandardCharsets.UTF_8);
+    RawDeliveryConfig config = new RawDeliveryConfig(writer.toString());
     return retryRegistry
-        .retry("managed-write")
-        .executeCallable(() -> keelService.upsertManifest(manifest));
+      .retry("managed-write")
+      .executeCallable(() -> keelService.upsertManifest(config));
   }
 
   @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
