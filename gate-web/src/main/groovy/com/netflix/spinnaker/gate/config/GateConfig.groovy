@@ -18,6 +18,7 @@ package com.netflix.spinnaker.gate.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.config.DefaultServiceEndpoint
 import com.netflix.spinnaker.config.OkHttp3ClientConfiguration
@@ -27,6 +28,9 @@ import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
 import com.netflix.spinnaker.fiat.shared.FiatService
 import com.netflix.spinnaker.fiat.shared.FiatStatus
 import com.netflix.spinnaker.filters.AuthenticatedRequestFilter
+import com.netflix.spinnaker.gate.config.controllers.PipelineControllerConfigProperties
+import com.netflix.spinnaker.gate.converters.JsonHttpMessageConverter
+import com.netflix.spinnaker.gate.converters.YamlHttpMessageConverter
 import com.netflix.spinnaker.gate.filters.RequestLoggingFilter
 import com.netflix.spinnaker.gate.filters.RequestSheddingFilter
 import com.netflix.spinnaker.gate.filters.ResetAuthenticatedRequestFilter
@@ -48,25 +52,25 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.core.Ordered
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.util.CollectionUtils
 import org.springframework.web.client.RestTemplate
 import retrofit.Endpoint
-
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 import static retrofit.Endpoints.newFixedEndpoint
 
 @CompileStatic
 @Configuration
 @Slf4j
+@EnableConfigurationProperties([PipelineControllerConfigProperties, ApplicationConfigurationProperties])
 @Import([PluginsAutoConfiguration, DeckPluginConfiguration, PluginWebConfiguration])
 class GateConfig {
 
@@ -83,11 +87,6 @@ class GateConfig {
     new RestTemplate()
   }
 
-  @Bean
-  ExecutorService executorService() {
-    Executors.newCachedThreadPool()
-  }
-
   @Autowired
   Registry registry
 
@@ -97,6 +96,19 @@ class GateConfig {
   @Autowired
   Jackson2ObjectMapperBuilder objectMapperBuilder
 
+  /**
+   * This needs to be before the yaml converter in order for json to be the default
+   * response type.
+   */
+  @Bean
+  AbstractJackson2HttpMessageConverter jsonHttpMessageConverter() {
+    return new JsonHttpMessageConverter(objectMapperBuilder.build())
+  }
+
+  @Bean
+  AbstractJackson2HttpMessageConverter yamlHttpMessageConverter() {
+    return new YamlHttpMessageConverter(objectMapperBuilder.factory(new YAMLFactory()).build())
+  }
 
   @Bean
   RequestContextProvider requestContextProvider() {

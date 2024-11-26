@@ -20,7 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.gate.services.BuildService
 import com.netflix.spinnaker.gate.services.internal.GoogleCloudBuildTrigger
 import com.netflix.spinnaker.gate.services.internal.IgorService
-import com.squareup.okhttp.mockwebserver.MockWebServer
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
+import okhttp3.mockwebserver.MockWebServer
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
@@ -89,7 +90,7 @@ class GoogleCloudBuildControllerSpec extends Specification {
     def downstreamResponse = new Response("blah", 404, "Not found", [], null)
     given:
     1 * igorService.getGoogleCloudBuildTriggers(ACCOUNT) >> {String account ->
-      throw RetrofitError.httpError("blah", downstreamResponse, null, null)
+      throw new SpinnakerHttpException(RetrofitError.httpError("blah", downstreamResponse, null, null))
     }
 
     when:

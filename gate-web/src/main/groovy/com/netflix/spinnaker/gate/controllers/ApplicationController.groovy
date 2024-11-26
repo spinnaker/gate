@@ -137,8 +137,9 @@ class ApplicationController {
 
   @Operation(summary = "Retrieve a list of an application's pipeline configurations")
   @RequestMapping(value = "/{application}/pipelineConfigs", method = RequestMethod.GET)
-  List getPipelineConfigsForApplication(@PathVariable("application") String application) {
-    applicationService.getPipelineConfigsForApplication(application)
+  List getPipelineConfigsForApplication(@PathVariable("application") String application,
+                                        @RequestParam(required = false, value="pipelineNameFilter") String pipelineNameFilter) {
+    applicationService.getPipelineConfigsForApplication(application, pipelineNameFilter)
   }
 
   @Operation(summary = "Retrieve a pipeline configuration")

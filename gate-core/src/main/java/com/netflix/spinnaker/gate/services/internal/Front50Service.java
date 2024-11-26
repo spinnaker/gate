@@ -42,7 +42,16 @@ public interface Front50Service {
 
   @GET("/pipelines/{app}")
   List<Map> getPipelineConfigsForApplication(
-      @Path("app") String app, @Query("refresh") boolean refresh);
+      @Path("app") String app,
+      @Query("pipelineNameFilter") String pipelineNameFilter,
+      @Query("refresh") boolean refresh);
+
+  @GET("/pipelines/{app}/name/{name}")
+  Map getPipelineConfigByApplicationAndName(
+      @Path("app") String app, @Path("name") String name, @Query("refresh") boolean refresh);
+
+  @GET("/pipelines/{id}/get")
+  Map getPipelineConfigById(@Path("id") String id);
 
   @DELETE("/pipelines/{app}/{name}")
   Response deletePipelineConfig(@Path("app") String app, @Path("name") String name);
