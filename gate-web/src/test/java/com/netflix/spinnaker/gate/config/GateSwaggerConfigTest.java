@@ -43,7 +43,7 @@ public class GateSwaggerConfigTest {
   private static final String OPENAPI_API_PATH = "/v3/api-docs";
 
   @Test
-  void TestSwaggerEndpointIsOk() throws Exception {
+  void TestSwaggerDocsIsNotMalformed() throws Exception {
     mockMvc
         .perform(get(OPENAPI_API_PATH))
         .andDo(print())

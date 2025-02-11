@@ -28,17 +28,16 @@ public class CloudEventHandlerConfiguration implements WebMvcConfigurer {
 
   @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(0, byteArrayHttpMessageConverter());
+    converters.add(
+        0,
+        new ByteArrayHttpMessageConverter()); // adding ByteArrayHttpMessageConverter as the first
+    // element to avoid Swagger decode issues. See:
+    // https://github.com/springdoc/springdoc-openapi/issues/2143
     converters.add(cloudEventHttpMessageConverter());
   }
 
   @Bean
   public CloudEventHttpMessageConverter cloudEventHttpMessageConverter() {
     return new CloudEventHttpMessageConverter();
-  }
-
-  @Bean
-  public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
-    return new ByteArrayHttpMessageConverter();
   }
 }
