@@ -136,8 +136,6 @@ class InvokePipelineConfigTest {
   private final Map<String, Object> TRIGGER = Collections.emptyMap();
 
   private final AnythingPattern anythingPattern = new AnythingPattern();
-  //  @Autowired
-  //  private Front50Service front50Service;
 
   @DynamicPropertySource
   static void registerUrls(DynamicPropertyRegistry registry) {
@@ -263,7 +261,7 @@ class InvokePipelineConfigTest {
     webAppMockMvc
         .perform(invokePipelineConfigRequest())
         .andDo(print())
-        .andExpect(status().is(400))
+        .andExpect(status().isBadRequest())
         .andExpect(
             status()
                 .reason(
@@ -358,7 +356,8 @@ class InvokePipelineConfigTest {
         .andExpect(
             status()
                 .reason(
-                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Failed to process response body"))
+                    "Unable to trigger pipeline (application: my-application, pipelineNameOrId: my-pipeline-name). Error: Failed to process response body: Unrecognized token 'this': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
+                        + " at [Source: (okhttp3.ResponseBody$BomAwareReader); line: 1, column: 5]"))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
 
     verifyFront50PipelinesRequest();
@@ -519,8 +518,7 @@ class InvokePipelineConfigTest {
     wmFront50.stubFor(
         WireMock.get(urlPathEqualTo("/pipelines/" + APPLICATION + "/name/" + PIPELINE_NAME))
             .withQueryParam("refresh", anythingPattern)
-            //            .willReturn(responseDefinitionBuilder));
-            .willReturn(ResponseDefinitionBuilder.like(responseDefinitionBuilder.build())));
+            .willReturn(responseDefinitionBuilder));
   }
 
   /** An arbitrary successful response from orca */

@@ -16,6 +16,7 @@
 
 package com.netflix.spinnaker.gate.controllers;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
@@ -105,10 +106,8 @@ public class ArtifactControllerTest {
 
     Response<ResponseBody> response = Response.success(responseBody);
 
-    InputStream actualStream = responseBody.byteStream();
-
-    assert response.body().byteStream() != null;
-
-    actualStream.close();
+    try (InputStream actualStream = response.body().byteStream()) {
+      assertThat(actualStream).isNotNull();
+    }
   }
 }

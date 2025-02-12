@@ -18,7 +18,7 @@ import retrofit2.http.Query;
 public interface OrcaService {
   @Headers("Content-type: application/context+json")
   @POST("/ops")
-  Call<Map> doOperation(@Body Map<String, ? extends Object> body);
+  Call<Map> doOperation(@Body Map<String, Object> body);
 
   @Headers("Accept: application/json")
   @GET("/applications/{application}/tasks")

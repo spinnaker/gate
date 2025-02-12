@@ -48,26 +48,25 @@ public class TaskService {
     this.taskServiceProperties = taskServiceProperties;
   }
 
-  public Map create(Map body) {
+  public Map create(Map<String, Object> body) {
     if (body.containsKey("application")) {
       AuthenticatedRequest.setApplication(body.get("application").toString());
     }
-
-    return (Map) Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
+    return Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
   }
 
-  public Map createAppTask(String app, Map body) {
+  public Map createAppTask(String app, Map<String, Object> body) {
     body.put("application", app);
     AuthenticatedRequest.setApplication(app);
-    return (Map) Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
+    return Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
   }
 
-  public Map createAppTask(Map body) {
+  public Map createAppTask(Map<String, Object> body) {
     if (body.containsKey("application")) {
       AuthenticatedRequest.setApplication(body.get("application").toString());
     }
 
-    return (Map) Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
+    return Retrofit2SyncCall.execute(orcaServiceSelector.select().doOperation(body));
   }
 
   public Map getTask(final String id) {

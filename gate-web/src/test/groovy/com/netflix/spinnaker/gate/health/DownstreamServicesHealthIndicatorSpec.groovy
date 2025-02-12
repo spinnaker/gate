@@ -65,7 +65,7 @@ class DownstreamServicesHealthIndicatorSpec extends Specification {
 
     then:
     1 * healthCheckableService.health() >> {
-      throw new SpinnakerServerException( "Unable to connect" ,new SpinnakerServerException(new Request.Builder().url("http://localhost").build()))
+      throw new SpinnakerServerException( "Unable to connect", new SpinnakerServerException(new Request.Builder().url("http://localhost").build()))
     }
 
     healthIndicator.failuresByService.get() == [

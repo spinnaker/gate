@@ -133,7 +133,7 @@ class ApplicationServiceSpec extends Specification {
     then:
     1 * front50.getApplication(name) >> { throw exception }
 
-    numberOfClouddriverInvocations * clouddriver.getApplication(name) >> { return Calls.response(clouddriverApp) }
+    numberOfClouddriverInvocations * clouddriver.getApplication(name) >> Calls.response(clouddriverApp)
 
     assert app == result
 
