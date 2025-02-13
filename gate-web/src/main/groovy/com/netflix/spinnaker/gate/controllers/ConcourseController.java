@@ -18,7 +18,8 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.IgorService;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
-import io.swagger.annotations.ApiOperation;
+import com.netflix.spinnaker.kork.retrofit.Retrofit2SyncCall;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -32,54 +33,50 @@ public class ConcourseController {
   private final Optional<IgorService> igorService;
   private final OrcaServiceSelector orcaService;
 
-  @ApiOperation(
-      value = "Retrieve the list of team names available to triggers",
-      response = List.class)
+  @Operation(summary = "Retrieve the list of team names available to triggers")
   @GetMapping(value = "/{buildMaster}/teams")
   List<String> teams(@PathVariable("buildMaster") String buildMaster) {
-    return igorService.get().getConcourseTeams(buildMaster);
+    return Retrofit2SyncCall.execute(igorService.get().getConcourseTeams(buildMaster));
   }
 
-  @ApiOperation(
-      value = "Retrieve the list of pipeline names for a given team available to triggers",
-      response = List.class)
+  @Operation(summary = "Retrieve the list of pipeline names for a given team available to triggers")
   @GetMapping(value = "/{buildMaster}/teams/{team}/pipelines")
   List<String> pipelines(
       @PathVariable("buildMaster") String buildMaster, @PathVariable("team") String team) {
-    return igorService.get().getConcoursePipelines(buildMaster, team);
+    return Retrofit2SyncCall.execute(igorService.get().getConcoursePipelines(buildMaster, team));
   }
 
-  @ApiOperation(
-      value = "Retrieve the list of job names for a given pipeline available to triggers",
-      response = List.class)
+  @Operation(summary = "Retrieve the list of job names for a given pipeline available to triggers")
   @GetMapping(value = "/{buildMaster}/teams/{team}/pipelines/{pipeline}/jobs")
   List<String> jobs(
       @PathVariable("buildMaster") String buildMaster,
       @PathVariable("team") String team,
       @PathVariable("pipeline") String pipeline) {
-    return igorService.get().getConcourseJobs(buildMaster, team, pipeline);
+    return Retrofit2SyncCall.execute(
+        igorService.get().getConcourseJobs(buildMaster, team, pipeline));
   }
 
-  @ApiOperation(
-      value =
-          "Retrieve the list of resource names for a given pipeline available to the Concourse stage",
-      response = List.class)
+  @Operation(
+      summary =
+          "Retrieve the list of resource names for a given pipeline available to the Concourse stage")
   @GetMapping(value = "/{buildMaster}/teams/{team}/pipelines/{pipeline}/resources")
   List<String> resources(
       @PathVariable("buildMaster") String buildMaster,
       @PathVariable("team") String team,
       @PathVariable("pipeline") String pipeline) {
-    return igorService.get().getConcourseResources(buildMaster, team, pipeline);
+    return Retrofit2SyncCall.execute(
+        igorService.get().getConcourseResources(buildMaster, team, pipeline));
   }
 
-  @ApiOperation(
-      value =
+  @Operation(
+      summary =
           "Inform Spinnaker of the Concourse build running connected to a particular Concourse stage execution")
   @PostMapping("/stage/start")
   void stageExecution(
       @RequestParam("stageId") String stageId,
       @RequestParam("job") String job,
       @RequestParam("buildNumber") Integer buildNumber) {
-    orcaService.select().concourseStageExecution(stageId, job, buildNumber, "");
+    Retrofit2SyncCall.execute(
+        orcaService.select().concourseStageExecution(stageId, job, buildNumber, ""));
   }
 }

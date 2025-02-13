@@ -20,8 +20,9 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.spinnaker.gate.config.SlackConfigProperties;
 import com.netflix.spinnaker.gate.services.SlackService;
 import com.netflix.spinnaker.kork.core.RetrySupport;
+import com.netflix.spinnaker.kork.retrofit.Retrofit2SyncCall;
 import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,7 +66,7 @@ public class SlackController {
     this.registry = registry;
   }
 
-  @ApiOperation("Retrieve a list of public slack channels")
+  @Operation(summary = "Retrieve a list of public slack channels")
   @RequestMapping("/channels")
   public List<Map> getChannels() {
     return slackChannelsCache.get();
@@ -108,7 +109,7 @@ public class SlackController {
     return retrySupport.retry(
         () -> {
           try {
-            return slackService.getChannels(token, cursor);
+            return Retrofit2SyncCall.execute(slackService.getChannels(token, cursor));
           } catch (Exception e) {
             long retryDelayMs = getRetryDelayMs(e).orElse(30_000L);
 

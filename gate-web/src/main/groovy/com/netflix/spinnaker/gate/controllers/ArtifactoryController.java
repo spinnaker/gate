@@ -17,7 +17,8 @@
 package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.IgorService;
-import io.swagger.annotations.ApiOperation;
+import com.netflix.spinnaker.kork.retrofit.Retrofit2SyncCall;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,9 @@ public class ArtifactoryController {
     this.igorService = igorService;
   }
 
-  @ApiOperation(
-      value = "Retrieve the list of artifactory names available to triggers",
-      response = List.class)
+  @Operation(summary = "Retrieve the list of artifactory names available to triggers")
   @GetMapping(value = "/names")
   List<String> names() {
-    return igorService.get().getArtifactoryNames();
+    return Retrofit2SyncCall.execute(igorService.get().getArtifactoryNames());
   }
 }

@@ -14,13 +14,14 @@ import com.netflix.spinnaker.gate.model.manageddelivery.Resource;
 import com.netflix.spinnaker.gate.model.manageddelivery.RetryVerificationRequest;
 import com.netflix.spinnaker.gate.services.NotificationService;
 import com.netflix.spinnaker.gate.services.internal.KeelService;
+import com.netflix.spinnaker.kork.retrofit.Retrofit2SyncCall;
 import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
 import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import com.netflix.spinnaker.kork.web.interceptors.Criticality;
 import groovy.util.logging.Slf4j;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import retrofit.client.Header;
-import retrofit.client.Response;
+import retrofit2.Response;
 
 @Criticality(Criticality.Value.LOW)
 @RequestMapping("/managed")
@@ -96,59 +97,57 @@ public class ManagedController {
             .build());
   }
 
-  @ApiOperation(value = "Post a graphql request", response = Map.class)
+  @Operation(summary = "Post a graphql request")
   @PostMapping(
       path = "/graphql",
       consumes = {APPLICATION_JSON_VALUE},
       produces = {APPLICATION_JSON_VALUE})
   Map graphql(@RequestBody GraphQLRequest query) {
-    return keelService.graphql(query);
+    return Retrofit2SyncCall.execute(keelService.graphql(query));
   }
 
-  @ApiOperation(value = "Get a resource", response = Resource.class)
+  @Operation(summary = "Get a resource")
   @GetMapping(path = "/resources/{resourceId}")
   Resource getResource(@PathVariable("resourceId") String resourceId) {
-    return keelService.getResource(resourceId);
+    return Retrofit2SyncCall.execute(keelService.getResource(resourceId));
   }
 
-  @ApiOperation(value = "Get a resource", response = Resource.class)
+  @Operation(summary = "Get a resource")
   @GetMapping(path = "/resources/{resourceId}.yml", produces = APPLICATION_YAML_VALUE)
   Resource getResourceYaml(@PathVariable("resourceId") String resourceId) {
-    return keelService.getResourceYaml(resourceId);
+    return Retrofit2SyncCall.execute(keelService.getResourceYaml(resourceId));
   }
 
-  @ApiOperation(value = "Get status of a resource", response = Map.class)
+  @Operation(summary = "Get status of a resource")
   @GetMapping(path = "/resources/{resourceId}/status")
   Map getResourceStatus(@PathVariable("resourceId") String resourceId) {
     Map<String, String> status = new HashMap<>();
-    status.put("status", keelService.getResourceStatus(resourceId));
+    status.put("status", Retrofit2SyncCall.execute(keelService.getResourceStatus(resourceId)));
     return status;
   }
 
-  @ApiOperation(value = "Ad-hoc validate and diff a resource", response = Map.class)
+  @Operation(summary = "Ad-hoc validate and diff a resource")
   @PostMapping(
       path = "/resources/diff",
       consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
       produces = {APPLICATION_JSON_VALUE})
   Map diffResource(@RequestBody Resource resource) {
-    return keelService.diffResource(resource);
+    return Retrofit2SyncCall.execute(keelService.diffResource(resource));
   }
 
-  @ApiOperation(value = "Pause management of a resource")
+  @Operation(summary = "Pause management of a resource")
   @PostMapping(path = "/resources/{resourceId}/pause")
   void pauseResource(@PathVariable("resourceId") String resourceId) {
-    keelService.pauseResource(resourceId, Collections.emptyMap());
+    Retrofit2SyncCall.executeCall(keelService.pauseResource(resourceId, Collections.emptyMap()));
   }
 
-  @ApiOperation(value = "Resume management of a resource")
+  @Operation(summary = "Resume management of a resource")
   @DeleteMapping(path = "/resources/{resourceId}/pause")
   void resumeResource(@PathVariable("resourceId") String resourceId) {
-    keelService.resumeResource(resourceId);
+    Retrofit2SyncCall.executeCall(keelService.resumeResource(resourceId));
   }
 
-  @ApiOperation(
-      value = "Generate a keel resource definition for a deployed cloud resource",
-      response = Resource.class)
+  @Operation(summary = "Generate a keel resource definition for a deployed cloud resource")
   @GetMapping(path = "/resources/export/{cloudProvider}/{account}/{type}/{name}")
   ResponseEntity<Resource> exportResource(
       @PathVariable("cloudProvider") String cloudProvider,
@@ -157,46 +156,43 @@ public class ManagedController {
       @PathVariable("name") String name,
       @RequestParam("serviceAccount") String serviceAccount) {
     Resource resource =
-        keelService.exportResource(cloudProvider, account, type, name, serviceAccount);
+        Retrofit2SyncCall.execute(
+            keelService.exportResource(cloudProvider, account, type, name, serviceAccount));
     return new ResponseEntity<>(resource, yamlResponseHeaders, HttpStatus.OK);
   }
 
-  @ApiOperation(
-      value = "Generates an artifact definition based on the artifact used in a running cluster",
-      response = Map.class)
+  @Operation(
+      summary = "Generates an artifact definition based on the artifact used in a running cluster")
   @GetMapping(path = "/resources/export/artifact/{cloudProvider}/{account}/{clusterName}")
   ResponseEntity<Map> exportResource(
       @PathVariable("cloudProvider") String cloudProvider,
       @PathVariable("account") String account,
       @PathVariable("clusterName") String clusterName) {
-    Map<String, Object> artifact = keelService.exportArtifact(cloudProvider, account, clusterName);
+    Map<String, Object> artifact =
+        Retrofit2SyncCall.execute(keelService.exportArtifact(cloudProvider, account, clusterName));
     return new ResponseEntity<>(artifact, yamlResponseHeaders, HttpStatus.OK);
   }
 
-  @ApiOperation(value = "Get a delivery config manifest", response = DeliveryConfig.class)
+  @Operation(summary = "Get a delivery config manifest")
   @GetMapping(path = "/delivery-configs/{name}")
   DeliveryConfig getManifest(@PathVariable("name") String name) {
-    return keelService.getManifest(name);
+    return Retrofit2SyncCall.execute(keelService.getManifest(name));
   }
 
-  @ApiOperation(value = "Get a delivery config manifest", response = DeliveryConfig.class)
+  @Operation(summary = "Get a delivery config manifest")
   @GetMapping(path = "/delivery-configs/{name}.yml", produces = APPLICATION_YAML_VALUE)
   DeliveryConfig getManifestYaml(@PathVariable("name") String name) {
-    return keelService.getManifestYaml(name);
+    return Retrofit2SyncCall.execute(keelService.getManifestYaml(name));
   }
 
-  @ApiOperation(
-      value = "Get the status of each version of each artifact in each environment",
-      response = List.class)
+  @Operation(summary = "Get the status of each version of each artifact in each environment")
   @GetMapping(path = "/delivery-configs/{name}/artifacts")
   List<Map<String, Object>> getManifestArtifacts(@PathVariable("name") String name) {
-    return keelService.getManifestArtifacts(name);
+    return Retrofit2SyncCall.execute(keelService.getManifestArtifacts(name));
   }
 
   @SneakyThrows
-  @ApiOperation(
-      value = "Create or update a delivery config manifest",
-      response = DeliveryConfig.class)
+  @Operation(summary = "Create or update a delivery config manifest")
   @PostMapping(
       path = "/delivery-configs",
       consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
@@ -204,23 +200,23 @@ public class ManagedController {
   DeliveryConfig upsertManifest(@RequestBody DeliveryConfig manifest) {
     return retryRegistry
         .retry("managed-write")
-        .executeCallable(() -> keelService.upsertManifest(manifest));
+        .executeCallable(() -> Retrofit2SyncCall.execute(keelService.upsertManifest(manifest)));
   }
 
-  @ApiOperation(value = "Delete a delivery config manifest", response = DeliveryConfig.class)
+  @Operation(summary = "Delete a delivery config manifest")
   @DeleteMapping(path = "/delivery-configs/{name}")
   DeliveryConfig deleteManifest(@PathVariable("name") String name) {
-    return keelService.deleteManifest(name);
+    return Retrofit2SyncCall.execute(keelService.deleteManifest(name));
   }
 
-  @ApiOperation(value = "Validate a delivery config manifest", response = Map.class)
+  @Operation(summary = "Validate a delivery config manifest")
   @PostMapping(
       path = "/delivery-configs/validate",
       consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
       produces = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE})
   ResponseEntity<Map> validateManifest(@RequestBody DeliveryConfig manifest) {
     try {
-      return ResponseEntity.ok(keelService.validateManifest(manifest));
+      return ResponseEntity.ok(Retrofit2SyncCall.execute(keelService.validateManifest(manifest)));
     } catch (SpinnakerHttpException e) {
       if (e.getResponseCode() == 400) {
         Map<String, Object> responseBody = e.getResponseBody();
@@ -231,60 +227,56 @@ public class ManagedController {
     }
   }
 
-  @ApiOperation(value = "Ad-hoc validate and diff a config manifest", response = Map.class)
+  @Operation(summary = "Ad-hoc validate and diff a config manifest")
   @PostMapping(
       path = "/delivery-configs/diff",
       consumes = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE},
       produces = {APPLICATION_JSON_VALUE})
   List<Map> diffManifest(@RequestBody DeliveryConfig manifest) {
-    return keelService.diffManifest(manifest);
+    return Retrofit2SyncCall.execute(keelService.diffManifest(manifest));
   }
 
-  @ApiOperation(value = "Ad-hoc validate and diff a config manifest", response = Map.class)
+  @Operation(summary = "Ad-hoc validate and diff a config manifest")
   @GetMapping(
       path = "/delivery-configs/schema",
       produces = {APPLICATION_JSON_VALUE, APPLICATION_YAML_VALUE})
   Map<String, Object> schema() {
-    return keelService.schema();
+    return Retrofit2SyncCall.execute(keelService.schema());
   }
 
-  @ApiOperation(
-      value = "List up-to {limit} current constraint states for an environment",
-      response = ConstraintState.class)
+  @Operation(summary = "List up-to {limit} current constraint states for an environment")
   @GetMapping(path = "/application/{application}/environment/{environment}/constraints")
   List<ConstraintState> getConstraintState(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @RequestParam(value = "limit", required = false, defaultValue = "10") String limit) {
-    return keelService.getConstraintState(application, environment, Integer.valueOf(limit));
+    return Retrofit2SyncCall.execute(
+        keelService.getConstraintState(application, environment, Integer.valueOf(limit)));
   }
 
-  @ApiOperation(
-      value = "Get the delivery config associated with an application",
-      response = DeliveryConfig.class)
+  @Operation(summary = "Get the delivery config associated with an application")
   @GetMapping(path = "/application/{application}/config")
   DeliveryConfig getConfigBy(@PathVariable("application") String application) {
-    return keelService.getConfigBy(application);
+    return Retrofit2SyncCall.execute(keelService.getConfigBy(application));
   }
 
-  @ApiOperation(
-      value = "Delete a delivery config manifest for an application",
-      response = DeliveryConfig.class)
+  @Operation(summary = "Delete a delivery config manifest for an application")
   @DeleteMapping(path = "/application/{application}/config")
   DeliveryConfig deleteManifestByApp(@PathVariable("application") String application) {
-    return keelService.deleteManifestByAppName(application);
+    return Retrofit2SyncCall.execute(keelService.deleteManifestByAppName(application));
   }
 
-  @ApiOperation(value = "Update the status of an environment constraint")
+  @Operation(summary = "Update the status of an environment constraint")
   @PostMapping(path = "/application/{application}/environment/{environment}/constraint")
   void updateConstraintStatus(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @RequestBody ConstraintStatus status) {
-    keelService.updateConstraintStatus(application, environment, status);
+    Retrofit2SyncCall.executeCall(
+        keelService.updateConstraintStatus(application, environment, status));
   }
 
-  @ApiOperation(value = "Get managed details about an application", response = Map.class)
+  @Operation(summary = "Get managed details about an application")
   @GetMapping(path = "/application/{application}")
   Map getApplicationDetails(
       @PathVariable("application") String application,
@@ -293,31 +285,33 @@ public class ManagedController {
       @RequestParam(name = "entities", required = false, defaultValue = "resources")
           List<String> entities,
       @RequestParam(name = "maxArtifactVersions", required = false) Integer maxArtifactVersions) {
-    return keelService.getApplicationDetails(
-        application, includeDetails, entities, maxArtifactVersions);
+    return Retrofit2SyncCall.execute(
+        keelService.getApplicationDetails(
+            application, includeDetails, entities, maxArtifactVersions));
   }
 
-  @ApiOperation(value = "Pause management of an entire application")
+  @Operation(summary = "Pause management of an entire application")
   @PostMapping(path = "/application/{application}/pause")
   void pauseApplication(@PathVariable("application") String application) {
-    keelService.pauseApplication(application, Collections.emptyMap());
+    Retrofit2SyncCall.executeCall(
+        keelService.pauseApplication(application, Collections.emptyMap()));
   }
 
-  @ApiOperation(value = "Resume management of an entire application")
+  @Operation(summary = "Resume management of an entire application")
   @DeleteMapping(path = "/application/{application}/pause")
   void resumeApplication(@PathVariable("application") String application) {
-    keelService.resumeApplication(application);
+    Retrofit2SyncCall.executeCall(keelService.resumeApplication(application));
   }
 
-  @ApiOperation(value = "Create a pin for an artifact in an environment")
+  @Operation(summary = "Create a pin for an artifact in an environment")
   @PostMapping(path = "/application/{application}/pin")
   void createPin(
       @PathVariable("application") String application, @RequestBody EnvironmentArtifactPin pin) {
-    keelService.pin(application, pin);
+    Retrofit2SyncCall.executeCall(keelService.pin(application, pin));
   }
 
-  @ApiOperation(
-      value =
+  @Operation(
+      summary =
           "Unpin one or more artifact(s) in an environment. If the `reference` parameter is specified, only "
               + "the corresponding artifact will be unpinned. If it's omitted, all pinned artifacts in the environment will be "
               + "unpinned.")
@@ -326,57 +320,60 @@ public class ManagedController {
       @PathVariable("application") String application,
       @PathVariable("targetEnvironment") String targetEnvironment,
       @RequestParam(value = "reference", required = false) String reference) {
-    keelService.deletePinForEnvironment(application, targetEnvironment, reference);
+    Retrofit2SyncCall.executeCall(
+        keelService.deletePinForEnvironment(application, targetEnvironment, reference));
   }
 
-  @ApiOperation(value = "Veto an artifact version in an environment")
+  @Operation(summary = "Veto an artifact version in an environment")
   @PostMapping(path = "/application/{application}/veto")
   void veto(
       @PathVariable("application") String application, @RequestBody EnvironmentArtifactVeto veto) {
-    keelService.veto(application, veto);
+    Retrofit2SyncCall.executeCall(keelService.veto(application, veto));
   }
 
-  @ApiOperation(value = "Remove veto of an artifact version in an environment")
+  @Operation(summary = "Remove veto of an artifact version in an environment")
   @DeleteMapping(path = "/application/{application}/veto/{targetEnvironment}/{reference}/{version}")
   void deleteVeto(
       @PathVariable("application") String application,
       @PathVariable("targetEnvironment") String targetEnvironment,
       @PathVariable("reference") String reference,
       @PathVariable("version") String version) {
-    keelService.deleteVeto(application, targetEnvironment, reference, version);
+    Retrofit2SyncCall.executeCall(
+        keelService.deleteVeto(application, targetEnvironment, reference, version));
   }
 
-  @ApiOperation(value = "Veto an artifact version in an environment")
+  @Operation(summary = "Veto an artifact version in an environment")
   @PostMapping(path = "/application/{application}/mark/bad")
   void markBad(
       @PathVariable("application") String application, @RequestBody EnvironmentArtifactVeto veto) {
-    keelService.markBad(application, veto);
+    Retrofit2SyncCall.executeCall(keelService.markBad(application, veto));
   }
 
-  @ApiOperation(value = "Delete veto of an artifact version in an environment")
+  @Operation(summary = "Delete veto of an artifact version in an environment")
   @PostMapping(path = "/application/{application}/mark/good")
   void markGood(
       @PathVariable("application") String application, @RequestBody EnvironmentArtifactVeto veto) {
-    keelService.markGood(application, veto);
+    Retrofit2SyncCall.executeCall(keelService.markGood(application, veto));
   }
 
-  @ApiOperation(value = "Override the status of a verification")
+  @Operation(summary = "Override the status of a verification")
   @PostMapping(path = "/{application}/environment/{environment}/verifications")
   void overrideVerification(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @RequestBody OverrideVerificationRequest payload) {
-    keelService.overrideVerification(application, environment, payload);
+    Retrofit2SyncCall.executeCall(
+        keelService.overrideVerification(application, environment, payload));
   }
 
-  @ApiOperation(value = "Retry a verification")
+  @Operation(summary = "Retry a verification")
   @PostMapping(path = "/{application}/environment/{environment}/verifications/retry")
   void retryVerification(
       @PathVariable("application") String application,
       @PathVariable("environment") String environment,
       @PathVariable("verificationId") String verificationId,
       @RequestBody RetryVerificationRequest payload) {
-    keelService.retryVerification(application, environment, payload);
+    Retrofit2SyncCall.executeCall(keelService.retryVerification(application, environment, payload));
   }
 
   @PostMapping(
@@ -388,41 +385,38 @@ public class ManagedController {
     return notificationService.processNotificationCallback(source, request, "keel");
   }
 
-  @ApiOperation(value = "Get a report of application onboarding")
+  @Operation(summary = "Get a report of application onboarding")
   @GetMapping(path = "/reports/onboarding")
   ResponseEntity<byte[]> getOnboardingReport(
       @RequestHeader(value = "Accept", defaultValue = "text/html") String accept,
       @RequestParam Map<String, String> params)
       throws IOException {
-    Response keelResponse = keelService.getOnboardingReport(accept, params);
+    Response<ResponseBody> keelResponse =
+        Retrofit2SyncCall.executeCall(keelService.getOnboardingReport(accept, params));
 
-    ResponseEntity response =
-        ResponseEntity.status(keelResponse.getStatus())
-            .header(
-                "Content-Type",
-                keelResponse.getHeaders().stream()
-                    .filter(header -> header.getName().equalsIgnoreCase("Content-Type"))
-                    .findFirst()
-                    .orElse(new Header("Content-Type", accept))
-                    .getValue())
-            .body(keelResponse.getBody().in().readAllBytes());
-
-    return response;
+    String contentType = keelResponse.headers().get("Content-Type");
+    if (contentType == null || contentType.isEmpty()) {
+      contentType = accept;
+    }
+    return ResponseEntity.status(keelResponse.code())
+        .header("Content-Type", contentType)
+        .body(keelResponse.body().byteStream().readAllBytes());
   }
 
-  @ApiOperation(value = "Get a report of Managed Delivery adoption")
+  @Operation(summary = "Get a report of Managed Delivery adoption")
   @GetMapping(path = "/reports/adoption", produces = "text/html")
   ResponseEntity<byte[]> getAdoptionReport(@RequestParam Map<String, String> params)
       throws IOException {
-    Response keelResponse = keelService.getAdoptionReport(params);
-    return ResponseEntity.status(keelResponse.getStatus())
+    Response<ResponseBody> keelResponse =
+        Retrofit2SyncCall.executeCall(keelService.getAdoptionReport(params));
+    return ResponseEntity.status(keelResponse.code())
         .header("Content-Type", "text/html")
-        .body(keelResponse.getBody().in().readAllBytes());
+        .body(keelResponse.body().byteStream().readAllBytes());
   }
 
-  @ApiOperation(value = "Get current environment details")
+  @Operation(summary = "Get current environment details")
   @GetMapping(path = "/environments/{application}", produces = MediaType.APPLICATION_JSON_VALUE)
   List<Map<String, Object>> getEnvironments(@PathVariable String application) {
-    return keelService.getEnvironments(application);
+    return Retrofit2SyncCall.execute(keelService.getEnvironments(application));
   }
 }

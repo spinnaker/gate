@@ -18,7 +18,8 @@ package com.netflix.spinnaker.gate.controllers;
 
 import com.netflix.spinnaker.gate.services.internal.EchoService;
 import com.netflix.spinnaker.gate.services.internal.OrcaServiceSelector;
-import io.swagger.annotations.ApiOperation;
+import com.netflix.spinnaker.kork.retrofit.Retrofit2SyncCall;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,23 +40,23 @@ public class CapabilitiesController {
     this.echoService = echoService;
   }
 
-  @ApiOperation(value = "Retrieve the list configured deployment monitors", response = List.class)
+  @Operation(summary = "Retrieve the list configured deployment monitors")
   @GetMapping(value = "/deploymentMonitors")
   List<Object> getDeploymentMonitors() {
-    return orcaService.select().getDeploymentMonitors();
+    return Retrofit2SyncCall.execute(orcaService.select().getDeploymentMonitors());
   }
 
-  @ApiOperation(
-      value = "Retrieve the SpEL expression capabilities (e.g. registered functions, etc)",
-      response = Map.class)
+  @Operation(summary = "Retrieve the SpEL expression capabilities (e.g. registered functions, etc)")
   @GetMapping(value = "/expressions")
   Map getExpressionCapabilities() {
-    return orcaService.select().getExpressionCapabilities();
+    return Retrofit2SyncCall.execute(orcaService.select().getExpressionCapabilities());
   }
 
-  @ApiOperation(value = "Retrieve the current state of the quiet period", response = Map.class)
+  @Operation(summary = "Retrieve the current state of the quiet period")
   @GetMapping(value = "/quietPeriod")
   Map getQuietPeriodState() {
-    return echoService.map(EchoService::getQuietPeriodState).orElse(null);
+    return echoService
+        .map(echo -> Retrofit2SyncCall.execute(echo.getQuietPeriodState()))
+        .orElse(null);
   }
 }
