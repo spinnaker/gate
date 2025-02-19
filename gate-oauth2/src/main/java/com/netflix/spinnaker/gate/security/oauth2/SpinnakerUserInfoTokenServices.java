@@ -110,7 +110,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
       }
     }
 
-    final String username = safeGet(details.get(userInfoMapping.getUsername()));
+    final String username = toStringOrNull(details.get(userInfoMapping.getUsername()));
     List<String> roles =
         Optional.ofNullable(groupExtractor)
             .map(extractor -> extractor.apply(accessToken, details))
@@ -160,9 +160,9 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     }
 
     User spinnakerUser = new User();
-    spinnakerUser.setEmail(safeGet(details.get(userInfoMapping.getEmail())));
-    spinnakerUser.setFirstName(safeGet(details.get(userInfoMapping.getFirstName())));
-    spinnakerUser.setLastName(safeGet(details.get(userInfoMapping.getLastName())));
+    spinnakerUser.setEmail(toStringOrNull(details.get(userInfoMapping.getEmail())));
+    spinnakerUser.setFirstName(toStringOrNull(details.get(userInfoMapping.getFirstName())));
+    spinnakerUser.setLastName(toStringOrNull(details.get(userInfoMapping.getLastName())));
     spinnakerUser.setAllowedAccounts(allowedAccountsSupport.filterAllowedAccounts(username, roles));
     spinnakerUser.setRoles(roles);
     spinnakerUser.setUsername(username);
@@ -188,8 +188,8 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
    * @param o the object to convert to a string, may be {@code null}
    * @return the string representation of the object, or {@code null} if the object is {@code null}
    */
-  private String safeGet(Object o) {
-    return o != null ? o.toString() : "";
+  private String toStringOrNull(Object o) {
+    return o != null ? o.toString() : null;
   }
 
   @Override
