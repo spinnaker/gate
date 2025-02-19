@@ -287,7 +287,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
       return List.of();
     }
 
-    Object roles = details.getOrDefault(userInfoMapping.getRoles(), List.of());
+    Object roles = Optional.ofNullable(details.get(userInfoMapping.getRoles())).orElse(List.of());
     if (roles instanceof Collection<?> collection) {
       // Some providers (Azure AD) return roles in this format: ["[\"role-1\", \"role-2\"]"]
       if (!collection.isEmpty()
