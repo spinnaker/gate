@@ -23,7 +23,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.security.core.Authentication;
@@ -50,7 +49,7 @@ public class ExternalAuthTokenFilter implements Filter {
       throws IOException, ServletException {
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     Authentication auth = extractor.extract(httpServletRequest);
-    if (DefaultGroovyMethods.asBoolean((auth == null ? null : auth.getPrincipal()))) {
+    if (auth != null && auth.getPrincipal() != null) {
       DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(auth.getPrincipal().toString());
       // Reassign token type to be capitalized "Bearer",
       // see https://github.com/spinnaker/spinnaker/issues/2074
