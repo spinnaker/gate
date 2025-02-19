@@ -15,6 +15,8 @@
  */
 package com.netflix.spinnaker.gate.security.oauth2;
 
+import static net.logstash.logback.argument.StructuredArguments.entries;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spectator.api.Registry;
@@ -93,7 +95,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     final Map<String, Object> details =
         (Map<String, Object>) oAuth2Authentication.getUserAuthentication().getDetails();
 
-    log.debug("UserInfo details: " + details);
+    log.debug("UserInfo details: " + entries(details));
 
     boolean isServiceAccount = isServiceAccount(details);
     if (!isServiceAccount) {
