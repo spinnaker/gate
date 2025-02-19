@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.gate.security.oauth2;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,7 +76,7 @@ public class ExternalAuthTokenFilterTest {
 
     // Assert
     verify(chain).doFilter(request, response);
-    assertEquals(token.getTokenType(), "Bearer");
-    assertEquals(token.getValue(), "foo");
+    assertThat(token.getTokenType()).isEqualTo("Bearer");
+    assertThat(token.getValue()).isEqualTo("foo");
   }
 }

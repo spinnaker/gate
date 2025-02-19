@@ -16,9 +16,7 @@
 
 package com.netflix.spinnaker.gate.security.oauth2;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,53 +43,61 @@ public class SpinnakerUserInfoTokenServicesTest {
   @Test
   public void shouldEvaluateUserInfoRequirementsAgainstAuthenticationDetails() {
     // No domain restriction, everything should match
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of()));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com")));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com")));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com")));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of())).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com"))).isTrue();
 
     // Domain restricted but not found
     userInfoRequirements.put("hd", "foo.com");
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of()));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com")));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com")));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com")));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of())).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com"))).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com"))).isFalse();
 
     // Domain restricted by regex
     userInfoRequirements.put("hd", "/foo\\.com|bar\\.com/");
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of()));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com")));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "bar.com")));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "baz.com")));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com")));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of())).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "bar.com"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "baz.com"))).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "foo.com"))).isFalse();
 
     // Multiple restriction values
     userInfoRequirements.put("bar", "bar.com");
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com")));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com")));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com", "bar", "bar.com")));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com"))).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("bar", "bar.com"))).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("hd", "foo.com", "bar", "bar.com")))
+        .isTrue();
 
     // Evaluating a list
     userInfoRequirements.clear();
     userInfoRequirements.put("roles", "expected-role");
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "expected-role")));
-    assertTrue(
-        tokenServices.hasAllUserInfoRequirements(
-            Map.of("roles", List.of("expected-role", "unexpected-role"))));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of()));
-    assertFalse(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "unexpected-role")));
-    assertFalse(
-        tokenServices.hasAllUserInfoRequirements(Map.of("roles", List.of("unexpected-role"))));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "expected-role"))).isTrue();
+    assertThat(
+            tokenServices.hasAllUserInfoRequirements(
+                Map.of("roles", List.of("expected-role", "unexpected-role"))))
+        .isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of())).isFalse();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "unexpected-role")))
+        .isFalse();
+    assertThat(
+            tokenServices.hasAllUserInfoRequirements(Map.of("roles", List.of("unexpected-role"))))
+        .isFalse();
 
     // Evaluating a regex in a list
     userInfoRequirements.put("roles", "/^.+_ADMIN$/");
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "foo_ADMIN")));
-    assertTrue(tokenServices.hasAllUserInfoRequirements(Map.of("roles", List.of("foo_ADMIN"))));
-    assertFalse(
-        tokenServices.hasAllUserInfoRequirements(Map.of("roles", List.of("_ADMIN", "foo_USER"))));
-    assertFalse(
-        tokenServices.hasAllUserInfoRequirements(
-            Map.of("roles", List.of("foo_ADMINISTRATOR", "bar_USER"))));
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("roles", "foo_ADMIN"))).isTrue();
+    assertThat(tokenServices.hasAllUserInfoRequirements(Map.of("roles", List.of("foo_ADMIN"))))
+        .isTrue();
+    assertThat(
+            tokenServices.hasAllUserInfoRequirements(
+                Map.of("roles", List.of("_ADMIN", "foo_USER"))))
+        .isFalse();
+    assertThat(
+            tokenServices.hasAllUserInfoRequirements(
+                Map.of("roles", List.of("foo_ADMINISTRATOR", "bar_USER"))))
+        .isFalse();
   }
 
   @ParameterizedTest
@@ -102,7 +108,7 @@ public class SpinnakerUserInfoTokenServicesTest {
     tokenServices.userInfoMapping.setRoles("roles");
     Map<String, Object> details = new HashMap<>();
     details.put("roles", rolesValue);
-    assertEquals(expectedRoles, tokenServices.getRoles(details));
+    assertThat(tokenServices.getRoles(details)).isEqualTo(expectedRoles);
   }
 
   private static Stream<Arguments> provideRoleData() {
