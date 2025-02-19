@@ -305,7 +305,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
 
       return Arrays.asList(roleString.split("[, ]+"));
     }
-
+    log.warn("unsupported roles value in details, type: {}, value: {}", roles.getClass(), roles);
     return List.of();
   }
 
