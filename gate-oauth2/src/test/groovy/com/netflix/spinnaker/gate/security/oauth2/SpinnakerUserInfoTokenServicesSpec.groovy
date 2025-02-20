@@ -128,6 +128,6 @@ class SpinnakerUserInfoTokenServicesSpec extends Specification {
     def isServiceAccount = tokenServices.isServiceAccount(details)
 
     then:
-    thrown(MissingPropertyException) // TODO: fix the bug in isServiceAccount() where front50Service.getServiceAccounts() is not surrounded by Retrofit2SyncCall.execute()
+    isServiceAccount
   }
 }

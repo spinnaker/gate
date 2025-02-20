@@ -26,7 +26,6 @@ import groovy.json.JsonSlurper
 import okhttp3.ResponseBody
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.util.NestedServletException
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.mock.Calls;
@@ -118,7 +117,7 @@ class PipelineControllerSpec extends Specification {
     ).andReturn().response
 
     then:
-    thrown(NestedServletException) // TODO: fix the bug in the controller where front50Service.getPipelineConfigsForApplication() is not surrounded by Retrofit2SyncCall.execute()
+    notThrown(Exception)
   }
 
   def "should propagate pipeline template errors"() {
