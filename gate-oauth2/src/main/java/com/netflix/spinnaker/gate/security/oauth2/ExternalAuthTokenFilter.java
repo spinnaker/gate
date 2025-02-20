@@ -49,7 +49,7 @@ public class ExternalAuthTokenFilter implements Filter {
       throws IOException, ServletException {
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     Authentication auth = extractor.extract(httpServletRequest);
-    if (auth != null && auth.getPrincipal() != null) {
+    if (auth != null && auth.getPrincipal() != null && !auth.getPrincipal().toString().isEmpty()) {
       DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(auth.getPrincipal().toString());
       // Reassign token type to be capitalized "Bearer",
       // see https://github.com/spinnaker/spinnaker/issues/2074
