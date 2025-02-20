@@ -95,7 +95,9 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     final Map<String, Object> details =
         (Map<String, Object>) oAuth2Authentication.getUserAuthentication().getDetails();
 
-    log.debug("UserInfo details: " + entries(details));
+    if (log.isDebugEnabled()) {
+      log.debug("UserInfo details: " + entries(details));
+    }
 
     boolean isServiceAccount = isServiceAccount(details);
     if (!isServiceAccount) {
