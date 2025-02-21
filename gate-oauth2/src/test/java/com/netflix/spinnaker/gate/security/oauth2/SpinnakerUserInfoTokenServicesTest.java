@@ -17,7 +17,12 @@
 package com.netflix.spinnaker.gate.security.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.netflix.spinnaker.fiat.model.resources.ServiceAccount;
+import com.netflix.spinnaker.gate.services.PermissionService;
+import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import retrofit2.mock.Calls;
 
 public class SpinnakerUserInfoTokenServicesTest {
 
@@ -98,6 +104,27 @@ public class SpinnakerUserInfoTokenServicesTest {
             tokenServices.hasAllUserInfoRequirements(
                 Map.of("roles", List.of("foo_ADMINISTRATOR", "bar_USER"))))
         .isFalse();
+  }
+
+  @Test
+  public void verifyIsServiceAccount() {
+    PermissionService permissionService = mock(PermissionService.class);
+    when(permissionService.isEnabled()).thenReturn(true);
+
+    Front50Service front50Service = mock(Front50Service.class);
+    ServiceAccount serviceAccount = new ServiceAccount();
+    serviceAccount = serviceAccount.setName("ex@foo.com");
+    when(front50Service.getServiceAccounts()).thenReturn(Calls.response(List.of(serviceAccount)));
+
+    SpinnakerUserInfoTokenServices tokenServices = new SpinnakerUserInfoTokenServices();
+    tokenServices.userInfoMapping = new OAuth2SsoConfig.UserInfoMapping();
+    tokenServices.permissionService = permissionService;
+    tokenServices.front50Service = front50Service;
+
+    Map<String, Object> details = Map.of("client_email", "ex@foo.com");
+    boolean isServiceAccount = tokenServices.isServiceAccount(details);
+
+    assertThat(isServiceAccount).isTrue();
   }
 
   @ParameterizedTest

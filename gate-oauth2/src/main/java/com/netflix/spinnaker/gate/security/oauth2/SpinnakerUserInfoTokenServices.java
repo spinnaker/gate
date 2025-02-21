@@ -70,8 +70,8 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
   @Autowired private CredentialsService credentialsService;
   @Autowired protected OAuth2SsoConfig.UserInfoMapping userInfoMapping;
   @Autowired protected OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
-  @Autowired private PermissionService permissionService;
-  @Autowired private Front50Service front50Service;
+  @Autowired protected PermissionService permissionService;
+  @Autowired protected Front50Service front50Service;
 
   @Autowired(required = false)
   private SpinnakerProviderTokenServices providerTokenServices;
@@ -199,7 +199,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     return userInfoTokenServices.readAccessToken(accessToken);
   }
 
-  private boolean isServiceAccount(Map<String, Object> details) {
+  protected boolean isServiceAccount(Map<String, Object> details) {
     String email = (String) details.get(userInfoMapping.getServiceAccountEmail());
     if (email == null || !permissionService.isEnabled()) {
       return false;
