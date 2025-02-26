@@ -68,10 +68,10 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
   @Autowired private ResourceServerProperties sso;
   @Autowired private UserInfoTokenServices userInfoTokenServices;
   @Autowired private CredentialsService credentialsService;
-  @Autowired protected OAuth2SsoConfig.UserInfoMapping userInfoMapping;
-  @Autowired protected OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
-  @Autowired protected PermissionService permissionService;
-  @Autowired protected Front50Service front50Service;
+  @Autowired private OAuth2SsoConfig.UserInfoMapping userInfoMapping;
+  @Autowired private OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
+  @Autowired private PermissionService permissionService;
+  @Autowired private Front50Service front50Service;
 
   @Autowired(required = false)
   private SpinnakerProviderTokenServices providerTokenServices;
@@ -85,6 +85,32 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
   private BiFunction<String, Map, List<String>> groupExtractor;
 
   private RetrySupport retrySupport = new RetrySupport();
+
+  // Unit Tests
+  public SpinnakerUserInfoTokenServices(
+      ResourceServerProperties sso,
+      UserInfoTokenServices userInfoTokenServices,
+      CredentialsService credentialsService,
+      OAuth2SsoConfig.UserInfoMapping userInfoMapping,
+      OAuth2SsoConfig.UserInfoRequirements userInfoRequirements,
+      PermissionService permissionService,
+      Front50Service front50Service,
+      AllowedAccountsSupport allowedAccountsSupport,
+      FiatClientConfigurationProperties fiatClientConfigurationProperties,
+      Registry registry) {
+    this.sso = sso;
+    this.userInfoTokenServices = userInfoTokenServices;
+    this.credentialsService = credentialsService;
+    this.userInfoMapping = userInfoMapping;
+    this.userInfoRequirements = userInfoRequirements;
+    this.permissionService = permissionService;
+    this.front50Service = front50Service;
+    this.allowedAccountsSupport = allowedAccountsSupport;
+    this.fiatClientConfigurationProperties = fiatClientConfigurationProperties;
+    this.registry = registry;
+  }
+
+  public SpinnakerUserInfoTokenServices() {}
 
   @Override
   public OAuth2Authentication loadAuthentication(final String accessToken)

@@ -41,9 +41,10 @@ public class SpinnakerUserInfoTokenServicesTest {
 
   @BeforeEach
   public void setUp() {
-    tokenServices = new SpinnakerUserInfoTokenServices();
     userInfoRequirements = new OAuth2SsoConfig.UserInfoRequirements();
-    tokenServices.userInfoRequirements = userInfoRequirements;
+    tokenServices =
+        new SpinnakerUserInfoTokenServices(
+            null, null, null, null, userInfoRequirements, null, null, null, null, null);
   }
 
   @Test
@@ -116,10 +117,18 @@ public class SpinnakerUserInfoTokenServicesTest {
     serviceAccount = serviceAccount.setName("ex@foo.com");
     when(front50Service.getServiceAccounts()).thenReturn(Calls.response(List.of(serviceAccount)));
 
-    SpinnakerUserInfoTokenServices tokenServices = new SpinnakerUserInfoTokenServices();
-    tokenServices.userInfoMapping = new OAuth2SsoConfig.UserInfoMapping();
-    tokenServices.permissionService = permissionService;
-    tokenServices.front50Service = front50Service;
+    SpinnakerUserInfoTokenServices tokenServices =
+        new SpinnakerUserInfoTokenServices(
+            null,
+            null,
+            null,
+            new OAuth2SsoConfig.UserInfoMapping(),
+            null,
+            permissionService,
+            front50Service,
+            null,
+            null,
+            null);
 
     Map<String, Object> details = Map.of("client_email", "ex@foo.com");
     boolean isServiceAccount = tokenServices.isServiceAccount(details);
@@ -130,9 +139,12 @@ public class SpinnakerUserInfoTokenServicesTest {
   @ParameterizedTest
   @MethodSource("provideRoleData")
   public void shouldExtractRolesFromDetails(Object rolesValue, List<String> expectedRoles) {
-    SpinnakerUserInfoTokenServices tokenServices = new SpinnakerUserInfoTokenServices();
-    tokenServices.userInfoMapping = new OAuth2SsoConfig.UserInfoMapping();
-    tokenServices.userInfoMapping.setRoles("roles");
+    OAuth2SsoConfig.UserInfoMapping userInfoMapping = new OAuth2SsoConfig.UserInfoMapping();
+    userInfoMapping.setRoles("roles");
+    SpinnakerUserInfoTokenServices tokenServices =
+        new SpinnakerUserInfoTokenServices(
+            null, null, null, userInfoMapping, null, null, null, null, null, null);
+
     Map<String, Object> details = new HashMap<>();
     details.put("roles", rolesValue);
     assertThat(tokenServices.getRoles(details)).isEqualTo(expectedRoles);
