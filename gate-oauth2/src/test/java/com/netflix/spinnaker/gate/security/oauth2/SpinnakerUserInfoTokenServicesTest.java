@@ -17,7 +17,9 @@
 package com.netflix.spinnaker.gate.security.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.netflix.spinnaker.fiat.model.resources.ServiceAccount;
 import com.netflix.spinnaker.gate.services.PermissionService;
