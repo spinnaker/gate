@@ -65,20 +65,20 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @Slf4j
 public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServices {
 
-  @Autowired private ResourceServerProperties sso;
-  @Autowired private UserInfoTokenServices userInfoTokenServices;
-  @Autowired private CredentialsService credentialsService;
-  @Autowired private OAuth2SsoConfig.UserInfoMapping userInfoMapping;
-  @Autowired private OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
-  @Autowired private PermissionService permissionService;
-  @Autowired private Front50Service front50Service;
+  private final ResourceServerProperties sso;
+  private final UserInfoTokenServices userInfoTokenServices;
+  private final CredentialsService credentialsService;
+  private final OAuth2SsoConfig.UserInfoMapping userInfoMapping;
+  private final OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
+  private final PermissionService permissionService;
+  private final Front50Service front50Service;
 
   @Autowired(required = false)
   private SpinnakerProviderTokenServices providerTokenServices;
 
-  @Autowired private AllowedAccountsSupport allowedAccountsSupport;
-  @Autowired private FiatClientConfigurationProperties fiatClientConfigurationProperties;
-  @Autowired private Registry registry;
+  private final AllowedAccountsSupport allowedAccountsSupport;
+  private final FiatClientConfigurationProperties fiatClientConfigurationProperties;
+  private final Registry registry;
 
   @Autowired(required = false)
   @Qualifier("spinnaker-oauth2-group-extractor")
@@ -86,7 +86,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
 
   private RetrySupport retrySupport = new RetrySupport();
 
-  // Unit Tests
+  @Autowired
   public SpinnakerUserInfoTokenServices(
       ResourceServerProperties sso,
       UserInfoTokenServices userInfoTokenServices,
@@ -109,8 +109,6 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     this.fiatClientConfigurationProperties = fiatClientConfigurationProperties;
     this.registry = registry;
   }
-
-  public SpinnakerUserInfoTokenServices() {}
 
   @Override
   public OAuth2Authentication loadAuthentication(final String accessToken)

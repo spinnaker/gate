@@ -15,8 +15,14 @@
  */
 package com.netflix.spinnaker.gate.security.oauth2;
 
+import com.netflix.spectator.api.Registry;
+import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties;
 import com.netflix.spinnaker.gate.config.AuthConfig;
+import com.netflix.spinnaker.gate.security.AllowedAccountsSupport;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.gate.services.CredentialsService;
+import com.netflix.spinnaker.gate.services.PermissionService;
+import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2SsoProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -65,8 +73,28 @@ public class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
       name = "enabled",
       havingValue = "true",
       matchIfMissing = true)
-  public ResourceServerTokenServices spinnakerUserInfoTokenServices() {
-    return new SpinnakerUserInfoTokenServices();
+  public ResourceServerTokenServices spinnakerUserInfoTokenServices(
+      ResourceServerProperties sso,
+      UserInfoTokenServices userInfoTokenServices,
+      CredentialsService credentialsService,
+      OAuth2SsoConfig.UserInfoMapping userInfoMapping,
+      OAuth2SsoConfig.UserInfoRequirements userInfoRequirements,
+      PermissionService permissionService,
+      Front50Service front50Service,
+      AllowedAccountsSupport allowedAccountsSupport,
+      FiatClientConfigurationProperties fiatClientConfigurationProperties,
+      Registry registry) {
+    return new SpinnakerUserInfoTokenServices(
+        sso,
+        userInfoTokenServices,
+        credentialsService,
+        userInfoMapping,
+        userInfoRequirements,
+        permissionService,
+        front50Service,
+        allowedAccountsSupport,
+        fiatClientConfigurationProperties,
+        registry);
   }
 
   @Override
