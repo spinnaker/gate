@@ -15,7 +15,7 @@
  */
 package com.netflix.spinnaker.gate.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,11 +24,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.netflix.spinnaker.gate.services.BakeService;
 import com.netflix.spinnaker.gate.services.internal.RoscoService;
 import com.netflix.spinnaker.gate.services.internal.RoscoServiceSelector;
-import groovy.lang.MissingPropertyException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,20 +80,8 @@ class BakeServiceTest {
     when(roscoService.bakeOptions()).thenReturn(Calls.response(bakeOptions));
 
     // when
-
-    // TODO: fix BakeService
-    //
-    // List<BakeService.BakeOptions> result = (List<BakeService.BakeOptions>)
-    // bakeService.bakeOptions();
-    // assertThat(result).isEqualTo(bakeOptions);
-    assertThatThrownBy(
-            () -> {
-              List<BakeService.BakeOptions> result =
-                  (List<BakeService.BakeOptions>) bakeService.bakeOptions();
-            })
-        .isInstanceOf(ClassCastException.class)
-        .hasMessage(
-            "class retrofit2.mock.Calls$FakeCall cannot be cast to class java.util.List (retrofit2.mock.Calls$FakeCall is in unnamed module of loader 'app'; java.util.List is in module java.base of loader 'bootstrap')");
+    List<BakeService.BakeOptions> result =
+        (List<BakeService.BakeOptions>) bakeService.bakeOptions();
 
     // then
     verify(roscoServiceSelector).withLocation(null);
@@ -148,15 +134,9 @@ class BakeServiceTest {
     verify(roscoServiceSelector).withLocation(null);
     verify(roscoService).bakeOptions(cloudProvider);
 
-    // TODO: fix BakeService
-    //
-    // BakeService.BakeOptions result = objectMapper.convertValue(resultObj,
-    // BakeService.BakeOptions.class);
-    // assertThat(result).usingRecursiveComparison().isEqualTo(bakeOption);
-    assertThatThrownBy(() -> objectMapper.convertValue(resultObj, BakeService.BakeOptions.class))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasCauseInstanceOf(UnrecognizedPropertyException.class)
-        .hasMessageContaining("Unrecognized field \"canceled\"");
+    BakeService.BakeOptions result =
+        objectMapper.convertValue(resultObj, BakeService.BakeOptions.class);
+    assertThat(result).usingRecursiveComparison().isEqualTo(bakeOption);
   }
 
   @Test
@@ -171,18 +151,12 @@ class BakeServiceTest {
     when(roscoService.lookupLogs(region, statusId)).thenReturn(Calls.response(roscoResult));
 
     // when
-
-    // TODO: fix BakeService
-    //
-    // String result = bakeService.lookupLogs(region, statusId);
-    //
-    // assertThat(result).isEqualTo("<pre>" + roscoLog + "</pre>");
-    assertThatThrownBy(() -> bakeService.lookupLogs(region, statusId))
-        .isInstanceOf(MissingPropertyException.class)
-        .hasMessage("No such property: logsContent for class: retrofit2.mock.Calls$FakeCall");
+    String result = bakeService.lookupLogs(region, statusId);
 
     // then
     verify(roscoServiceSelector).withLocation(region);
     verify(roscoService).lookupLogs(region, statusId);
+
+    assertThat(result).isEqualTo("<pre>" + roscoLog + "</pre>");
   }
 }
