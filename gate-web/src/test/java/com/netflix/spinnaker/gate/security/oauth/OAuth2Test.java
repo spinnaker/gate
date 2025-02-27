@@ -17,14 +17,17 @@
 package com.netflix.spinnaker.gate.security.oauth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -50,5 +53,24 @@ public class OAuth2Test {
             .andReturn();
 
     assertEquals(302, result.getResponse().getStatus());
+  }
+
+  /** Test: Public endpoint should be accessible without authentication */
+  @Test
+  public void whenAccessingPublicEndpointThenSuccess() throws Exception {
+    mockMvc.perform(get("/auth/user")).andExpect(status().isOk());
+  }
+
+  /** Test: Secure endpoint should be accessible with OAuth2 authentication */
+  @Test
+  public void whenAuthenticatedWithOAuth2ThenAccessGranted() throws Exception {
+    mockMvc.perform(get("/credentials").with(oauth2Login())).andExpect(status().isOk());
+  }
+
+  /** Test: Logout should redirect to home */
+  @Test
+  @WithMockUser // Simulating an authenticated user
+  public void whenLoggingOutThenRedirectToHome() throws Exception {
+    mockMvc.perform(get("/auth/logout")).andExpect(status().is3xxRedirection());
   }
 }
