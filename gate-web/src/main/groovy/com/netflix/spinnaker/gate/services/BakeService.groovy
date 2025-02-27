@@ -27,13 +27,17 @@ import org.springframework.stereotype.Component
 @Component
 @ConfigurationProperties('services.rosco.defaults')
 class BakeService {
-  @Autowired(required = false)
   RoscoServiceSelector roscoServiceSelector
 
   // Default bake options from configuration.
   List<BakeOptions> bakeOptions
   // If set, use bake options defined in gate.yml instead of calling rosco
   boolean useDefaultBakeOptions
+
+  @Autowired
+  BakeService(Optional<RoscoServiceSelector> roscoServiceSelector) {
+    this.roscoServiceSelector = roscoServiceSelector.orElse(null);
+  }
 
   def bakeOptions() {
     (roscoServiceSelector && !useDefaultBakeOptions) ?
