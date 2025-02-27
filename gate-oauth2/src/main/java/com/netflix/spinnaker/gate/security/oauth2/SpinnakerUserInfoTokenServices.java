@@ -72,9 +72,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
   private final OAuth2SsoConfig.UserInfoRequirements userInfoRequirements;
   private final PermissionService permissionService;
   private final Front50Service front50Service;
-
-  @Autowired(required = false)
-  private SpinnakerProviderTokenServices providerTokenServices;
+  private final SpinnakerProviderTokenServices providerTokenServices;
 
   private final AllowedAccountsSupport allowedAccountsSupport;
   private final FiatClientConfigurationProperties fiatClientConfigurationProperties;
@@ -95,6 +93,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
       OAuth2SsoConfig.UserInfoRequirements userInfoRequirements,
       PermissionService permissionService,
       Front50Service front50Service,
+      Optional<SpinnakerProviderTokenServices> providerTokenServices,
       AllowedAccountsSupport allowedAccountsSupport,
       FiatClientConfigurationProperties fiatClientConfigurationProperties,
       Registry registry) {
@@ -105,6 +104,7 @@ public class SpinnakerUserInfoTokenServices implements ResourceServerTokenServic
     this.userInfoRequirements = userInfoRequirements;
     this.permissionService = permissionService;
     this.front50Service = front50Service;
+    this.providerTokenServices = providerTokenServices.orElse(null);
     this.allowedAccountsSupport = allowedAccountsSupport;
     this.fiatClientConfigurationProperties = fiatClientConfigurationProperties;
     this.registry = registry;

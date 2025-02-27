@@ -20,10 +20,12 @@ import com.netflix.spinnaker.fiat.shared.FiatClientConfigurationProperties;
 import com.netflix.spinnaker.gate.config.AuthConfig;
 import com.netflix.spinnaker.gate.security.AllowedAccountsSupport;
 import com.netflix.spinnaker.gate.security.SpinnakerAuthConfig;
+import com.netflix.spinnaker.gate.security.oauth2.provider.SpinnakerProviderTokenServices;
 import com.netflix.spinnaker.gate.services.CredentialsService;
 import com.netflix.spinnaker.gate.services.PermissionService;
 import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import java.util.HashMap;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Data;
@@ -81,6 +83,7 @@ public class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
       OAuth2SsoConfig.UserInfoRequirements userInfoRequirements,
       PermissionService permissionService,
       Front50Service front50Service,
+      Optional<SpinnakerProviderTokenServices> providerTokenServices,
       AllowedAccountsSupport allowedAccountsSupport,
       FiatClientConfigurationProperties fiatClientConfigurationProperties,
       Registry registry) {
@@ -92,6 +95,7 @@ public class OAuth2SsoConfig extends WebSecurityConfigurerAdapter {
         userInfoRequirements,
         permissionService,
         front50Service,
+        providerTokenServices,
         allowedAccountsSupport,
         fiatClientConfigurationProperties,
         registry);

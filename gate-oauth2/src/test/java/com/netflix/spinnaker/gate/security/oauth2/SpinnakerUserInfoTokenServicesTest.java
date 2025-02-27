@@ -27,6 +27,7 @@ import com.netflix.spinnaker.gate.services.internal.Front50Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,17 @@ public class SpinnakerUserInfoTokenServicesTest {
     userInfoRequirements = new OAuth2SsoConfig.UserInfoRequirements();
     tokenServices =
         new SpinnakerUserInfoTokenServices(
-            null, null, null, null, userInfoRequirements, null, null, null, null, null);
+            null,
+            null,
+            null,
+            null,
+            userInfoRequirements,
+            null,
+            null,
+            Optional.empty(),
+            null,
+            null,
+            null);
   }
 
   @Test
@@ -127,6 +138,7 @@ public class SpinnakerUserInfoTokenServicesTest {
             null,
             permissionService,
             front50Service,
+            Optional.empty(),
             null,
             null,
             null);
@@ -146,7 +158,17 @@ public class SpinnakerUserInfoTokenServicesTest {
     userInfoMapping.setRoles("roles");
     SpinnakerUserInfoTokenServices tokenServices =
         new SpinnakerUserInfoTokenServices(
-            null, null, null, userInfoMapping, null, null, null, null, null, null);
+            null,
+            null,
+            null,
+            userInfoMapping,
+            null,
+            null,
+            null,
+            Optional.empty(),
+            null,
+            null,
+            null);
 
     Map<String, Object> details = new HashMap<>();
     details.put("roles", rolesValue);
