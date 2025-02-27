@@ -18,9 +18,10 @@ package com.netflix.spinnaker.gate.services.internal;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -68,18 +69,19 @@ public class ClouddriverServiceTest {
   @Test
   void testClouddriverService_withQueryMap() {
     stubFor(
-        get(urlEqualTo("/search?q=app1&type=securityGroups&platform=aws&pageSize=10&page=1"))
+        get(urlEqualTo("/search?q=app1&type=securityGroups&platform=aws&pageSize=500&page=1"))
             .willReturn(
                 aResponse()
                     .withStatus(200)
                     .withBody(
                         "[{\"pageNumber\":1,\"pageSize\":500,\"platform\":\"aws\",\"query\":\"app1\",\"results\":[],\"totalMatches\":0}]")));
 
-    assertThrows(
-        java.lang.IllegalArgumentException.class,
-        () ->
-            Retrofit2SyncCall.execute(
-                clouddriverService.search("app1", "securityGroups", "aws", 500, 1, Map.of())),
-        "Map must include generic types (e.g., Map<String, String>)");
+    Retrofit2SyncCall.execute(
+        clouddriverService.search("app1", "securityGroups", "aws", 500, 1, Map.of()));
+
+    verify(
+        1,
+        getRequestedFor(
+            urlEqualTo("/search?q=app1&type=securityGroups&platform=aws&pageSize=500&page=1")));
   }
 }

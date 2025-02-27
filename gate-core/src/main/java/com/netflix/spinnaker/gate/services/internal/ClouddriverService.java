@@ -227,7 +227,7 @@ public interface ClouddriverService {
       @Query("region") String region,
       @Query("account") String account,
       @Query("count") Integer count,
-      @QueryMap Map additionalFilters);
+      @QueryMap Map<String, String> additionalFilters);
 
   @Headers("Accept: application/json")
   @GET("/{provider}/images/tags")
@@ -244,7 +244,7 @@ public interface ClouddriverService {
       @Query("platform") String platform,
       @Query("pageSize") Integer size,
       @Query("page") Integer offset,
-      @QueryMap Map filters);
+      @QueryMap Map<String, String> filters);
 
   @GET("/securityGroups")
   Call<Map> getSecurityGroups();
@@ -303,7 +303,7 @@ public interface ClouddriverService {
       @QueryMap Map<String, String> filters);
 
   @GET("/tags")
-  Call<List<Map>> listEntityTags(@QueryMap Map allParameters);
+  Call<List<Map>> listEntityTags(@QueryMap Map<String, Object> allParameters);
 
   @GET("/tags/{id}")
   Call<Map> getEntityTags(@Path("id") String id);
