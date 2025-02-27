@@ -380,9 +380,9 @@ public interface ClouddriverService {
 
   @GET("/servicebroker/{account}/services")
   Call<List<Map>> listServices(
+      @Path(value = "account") String account,
       @Query(value = "cloudProvider") String cloudProvider,
-      @Query(value = "region") String region,
-      @Path(value = "account") String account);
+      @Query(value = "region") String region);
 
   @GET("/servicebroker/{account}/serviceInstance")
   Call<Map> getServiceInstance(
