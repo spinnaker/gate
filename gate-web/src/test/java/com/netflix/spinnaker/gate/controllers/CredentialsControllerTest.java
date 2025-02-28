@@ -23,9 +23,9 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static com.netflix.spinnaker.kork.common.Header.ACCOUNTS;
 import static com.netflix.spinnaker.kork.common.Header.REQUEST_ID;
 import static com.netflix.spinnaker.kork.common.Header.USER;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -123,7 +123,6 @@ public class CredentialsControllerTest {
             .willReturn(
                 aResponse().withStatus(HttpStatus.OK.value()).withBody(accountDefinitionJson)));
 
-    // TODO: Fix the error so that the expected response matches the clouddriver's response
     webAppMockMvc
         .perform(
             get("/credentials/type/sometype")
@@ -132,13 +131,8 @@ public class CredentialsControllerTest {
                 .header(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID)
                 .header(ACCOUNTS.getHeader(), ACCOUNT))
         .andDo(print())
-        .andExpect(status().is5xxServerError())
-        .andExpect(
-            status()
-                .reason(
-                    containsString(
-                        "Cannot cast object 'com.netflix.spinnaker.kork.retrofit.ErrorHandlingExecutorCallAdapterFactory$ExecutorCallbackCall")))
-        .andExpect(status().reason(containsString("to class 'java.util.List'")))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(content().string(accountDefinitionJson))
         .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
   }
 }
