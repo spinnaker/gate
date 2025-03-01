@@ -19,6 +19,8 @@ package com.netflix.spinnaker.gate.service;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.netflix.spinnaker.kork.common.Header.ACCOUNTS;
+import static com.netflix.spinnaker.kork.common.Header.USER;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -88,6 +90,8 @@ public class PipelineServiceTest {
   /** To prevent periodic calls to load accounts from clouddriver */
   @MockBean DefaultProviderLookupService defaultProviderLookupService;
 
+  private static final String USERNAME = "some user";
+  private static final String ACCOUNT = "my-account";
   private static final String PIPELINE_EXECUTION_ID = "my-pipeline-execution-id";
 
   @DynamicPropertySource
@@ -128,7 +132,14 @@ public class PipelineServiceTest {
             .willReturn(aResponse().withStatus(200)));
 
     webAppMockMvc
-        .perform(delete("/pipelines/" + PIPELINE_EXECUTION_ID))
+        .perform(
+            delete("/pipelines/" + PIPELINE_EXECUTION_ID)
+                .header(
+                    USER.getHeader(),
+                    USERNAME) // to silence warning when X-SPINNAKER-USER is missing
+                .header(
+                    ACCOUNTS.getHeader(),
+                    ACCOUNT)) // to silence warning when X-SPINNAKER-ACCOUNTS is missing
         .andDo(print())
         .andExpect(status().is2xxSuccessful());
   }
