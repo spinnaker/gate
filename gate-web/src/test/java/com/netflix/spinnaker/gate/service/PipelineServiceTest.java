@@ -68,7 +68,7 @@ public class PipelineServiceTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
 
-  @Autowired ObjectMapper objectMapper;
+  ObjectMapper objectMapper = new ObjectMapper();
 
   /**
    * This takes X-SPINNAKER-* headers from requests to gate and puts them in the MDC. This is
@@ -126,19 +126,11 @@ public class PipelineServiceTest {
         WireMock.delete(urlEqualTo("/pipelines/" + PIPELINE_EXECUTION_ID))
             .willReturn(aResponse().withStatus(200)));
 
-    // TODO: Fix the response type of gate's delete pipeline execution endpoint
-    // which is supposed to be void instead of Map as Orca doesn't return anything.
     webAppMockMvc
         .perform(
             delete("/pipelines/" + PIPELINE_EXECUTION_ID)
                 .header(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID))
         .andDo(print())
-        .andExpect(status().is5xxServerError())
-        .andExpect(
-            status()
-                .reason(
-                    "Failed to process response body: No content to map due to end-of-input\n"
-                        + " at [Source: (okhttp3.ResponseBody$BomAwareReader); line: 1, column: 0]"))
-        .andExpect(header().string(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID));
+        .andExpect(status().is2xxSuccessful());
   }
 }
