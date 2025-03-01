@@ -33,6 +33,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.netflix.spinnaker.gate.Main;
 import com.netflix.spinnaker.gate.health.DownstreamServicesHealthIndicator;
+import com.netflix.spinnaker.gate.services.DefaultProviderLookupService;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverService;
 import com.netflix.spinnaker.gate.services.internal.ClouddriverServiceSelector;
 import java.util.Collections;
@@ -85,6 +86,9 @@ public class PipelineServiceTest {
 
   /** To prevent periodic calls to service's /health endpoints */
   @MockBean DownstreamServicesHealthIndicator downstreamServicesHealthIndicator;
+
+  /** To prevent periodic calls to load accounts from clouddriver */
+  @MockBean DefaultProviderLookupService defaultProviderLookupService;
 
   private static final String SUBMITTED_REQUEST_ID = "submitted-request-id";
   private static final String PIPELINE_EXECUTION_ID = "my-pipeline-execution-id";
