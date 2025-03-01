@@ -19,12 +19,10 @@ package com.netflix.spinnaker.gate.service;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static com.netflix.spinnaker.kork.common.Header.REQUEST_ID;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -90,7 +88,6 @@ public class PipelineServiceTest {
   /** To prevent periodic calls to load accounts from clouddriver */
   @MockBean DefaultProviderLookupService defaultProviderLookupService;
 
-  private static final String SUBMITTED_REQUEST_ID = "submitted-request-id";
   private static final String PIPELINE_EXECUTION_ID = "my-pipeline-execution-id";
 
   @DynamicPropertySource
@@ -131,9 +128,7 @@ public class PipelineServiceTest {
             .willReturn(aResponse().withStatus(200)));
 
     webAppMockMvc
-        .perform(
-            delete("/pipelines/" + PIPELINE_EXECUTION_ID)
-                .header(REQUEST_ID.getHeader(), SUBMITTED_REQUEST_ID))
+        .perform(delete("/pipelines/" + PIPELINE_EXECUTION_ID))
         .andDo(print())
         .andExpect(status().is2xxSuccessful());
   }
