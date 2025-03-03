@@ -168,11 +168,6 @@ public class PipelineServiceTest {
                     ACCOUNTS.getHeader(),
                     ACCOUNT)) // to silence warning when X-SPINNAKER-ACCOUNTS is missing
         .andDo(print())
-        .andExpect(status().is5xxServerError())
-        .andExpect(
-            status()
-                .reason(
-                    "Failed to process response body: No content to map due to end-of-input\n"
-                        + " at [Source: (okhttp3.ResponseBody$BomAwareReader); line: 1, column: 0]"));
+        .andExpect(status().is2xxSuccessful());
   }
 }
