@@ -36,16 +36,19 @@ import com.netflix.spinnaker.gate.services.internal.RoscoService
 import com.netflix.spinnaker.gate.services.internal.SwabbieService
 import com.netflix.spinnaker.kork.plugins.SpinnakerPluginManager
 import com.netflix.spinnaker.kork.web.exceptions.GenericExceptionHandlers
+import com.netflix.spinnaker.okhttp.Retrofit2EncodeCorrectionInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import retrofit2.mock.Calls;
 import spock.lang.Specification
 
 import static org.mockito.ArgumentMatchers.any
@@ -55,10 +58,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(ErrorConfiguration)
 @WebMvcTest(controllers = [PluginInfoController])
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = [PluginsAutoConfiguration.class,PluginInfoController, GenericExceptionHandlers, SpinnakerExtensionsConfigProperties,  PluginWebConfiguration, ServiceConfiguration])
+@ContextConfiguration(classes = [PluginsAutoConfiguration, PluginInfoController, GenericExceptionHandlers, SpinnakerExtensionsConfigProperties,  PluginWebConfiguration, ServiceConfiguration, PluginInfoControllerTestConfiguration])
 @ActiveProfiles("test")
 @TestPropertySource(properties = ["spring.config.location=classpath:gate-test.yml"])
 class PluginInfoControllerSpec extends Specification {
+
+  static class PluginInfoControllerTestConfiguration {
+    @Bean
+    Retrofit2EncodeCorrectionInterceptor retrofit2EncodeCorrectionInterceptor() {
+      return new Retrofit2EncodeCorrectionInterceptor();
+    }
+  }
 
   @Autowired
   private MockMvc mockMvc
@@ -165,7 +175,7 @@ class PluginInfoControllerSpec extends Specification {
 
   def 'get api should succeed'() {
     setup:
-    when(front50Service.getPluginInfo(any())).thenReturn([['Id': 'test-plugin-id']])
+    when(front50Service.getPluginInfo(any())).thenReturn(Calls.response([['Id': 'test-plugin-id']]))
 
     expect:
     this.mockMvc.perform(MockMvcRequestBuilders.get("/plugins/info")
